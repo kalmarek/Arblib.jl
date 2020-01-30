@@ -1,4 +1,4 @@
-name = "Arb"
+name = "Arblib"
 uuid = "fb37089c-8514-4489-9461-98f9c8763369"
 authors = ["Marek Kaluba <kalmar@amu.edu.pl>"]
 version = "0.1.0"
