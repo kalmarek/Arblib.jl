@@ -13,6 +13,8 @@ import Base: isfinite, isinf, isinteger, isnan, isone, isreal, iszero
 include("macros.jl")
 include("arb_types.jl")
 include("types.jl")
+include("rounding.jl")
+
 include("constructors.jl")
 
 include("predicates.jl")
