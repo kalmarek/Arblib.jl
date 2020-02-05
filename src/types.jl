@@ -88,9 +88,5 @@ for (T, prefix) in ((Arf, :arf), (Arb, :arb), (Acb, :acb), (Mag, :mag))
         clear!(a::$T) = clear!(a.$prefix)
         cprefix(::Type{$T}) = Symbol($spref) # useful for metaprogramming
         cstruct(t::$T) = getfield(t, cprefix($T))
-        Base.cconvert(::Type{Ref{$T}}, t::$T) =
-            Base.cconvert(Ref{$arbstruct}, cstruct(t))
-        Base.unsafe_convert(::Type{Ref{$T}}, t::Base.RefValue{$arbstruct}) =
-            Base.unsafe_convert(Ref{$arbstruct}, t)
     end
 end

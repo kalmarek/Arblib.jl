@@ -1,11 +1,11 @@
-mutable struct arf_struct
+struct arf_struct
     exponent::UInt      # fmpz
     size::UInt          # mp_size_t
     mantissa1::UInt     # mantissa_struct of length 128
     mantissa2::UInt
 end
 
-mutable struct arb_struct
+struct arb_struct
                         # ┌ arf_struct (midpoint)
     exponent::UInt      # │ fmpz
     size::UInt          # │ mp_size_t
@@ -18,7 +18,7 @@ mutable struct arb_struct
                         # └
 end
 
-mutable struct acb_struct
+struct acb_struct
                           # ┌ arb_struct (real)
     exponent_r::UInt      # │ fmpz
     size_r::UInt          # │ mp_size_t
@@ -37,7 +37,7 @@ mutable struct acb_struct
                           # └
 end
 
-mutable struct mag_struct
+struct mag_struct
     exponent::UInt       # fmpz
     mantissa::UInt       # mp_limb_t
 end
