@@ -2,36 +2,90 @@ mutable struct Arf <: Real
     arf::arf_struct
     prec::Int
 
-    Arf(prec::Integer) = new(arf_struct(), prec)
-    Arf(si::Int, prec::Integer) = new(arf_struct(si), prec)
-    Arf(ui::UInt, prec::Integer) = new(arf_struct(ui), prec)
+    function Arf(prec::Integer)
+        res = new(arf_struct(0,0,0,0), prec)
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
+
+    function Arf(si::Int64, prec::Integer)
+        res = new(arf_struct(0,0,0,0), prec)
+        ccall(@libarb(arf_init_set_si), Cvoid, (Ref{Arf}, Int), res, si)
+        finalizer(clear!, res)
+        return res
+    end
+
+    # ccall(@libarb(arf_init_set_ui), Cvoid, (Ref{Arf}, Int), res, ui)
 end
 
 mutable struct Arb <: Real
     arb::arb_struct
     prec::Int
 
-    Arb(prec::Integer) = new(arb_struct(), prec)
+    function Arb(prec::Integer)
+        res = new(arb_struct(0,0,0,0, 0,0), prec)
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
 end
 
 mutable struct Acb <: Number
     acb::acb_struct
     prec::Int
 
-    Acb(prec::Integer) = new(acb_struct(), prec)
+    function Acb(prec::Integer)
+        res = new(arb_struct(0,0,0,0, 0,0,0,0), prec)
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
 end
 
 mutable struct Mag <: Real
     mag::mag_struct
 
-    Mag() = new(mag_struct())
-    Mag(x::Arf) = new(mag_struct(cstruct(x)))
+    function Mag()
+        res = new(mag_struct(0,0))
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
+
+    function Mag(m::mag_struct)
+        res = new(mag_struct(0,0))
+        ccall(
+            @libarb(mag_init_set),
+            Cvoid,
+            (Ref{Mag}, Ref{mag_struct}),
+            res,
+            m,
+        )
+        finalizer(clear!, res)
+        return res
+    end
+
+    function Mag(arf::Arf)
+        res = new(mag_struct(0,0))
+        ccall(
+            @libarb(mag_init_set_arf),
+            Cvoid,
+            (Ref{Mag}, Ref{Arf}),
+            res,
+            arf,
+        )
+        finalizer(clear!, res)
+        return res
+    end
 end
 
 for (T, prefix) in ((Arf, :arf), (Arb, :arb), (Acb, :acb), (Mag, :mag))
     arbstruct = Symbol(prefix, :_struct)
     spref = "$prefix"
     @eval begin
+        init!(a::$T) = init!(a.$prefix)
+        clear!(a::$T) = clear!(a.$prefix)
         cprefix(::Type{$T}) = Symbol($spref) # useful for metaprogramming
         cstruct(t::$T) = getfield(t, cprefix($T))
         Base.cconvert(::Type{Ref{$T}}, t::$T) =
