@@ -58,7 +58,7 @@ end
 
 for ArbT in (:Arf, :Arb, :Acb, :Mag)
     @eval begin
-        $ArbT(t::$ArbT, prec=t.prec) = set!($ArbT(t.prec), t) # copy constructor?
+        $ArbT(t::$ArbT, prec::Integer=t.prec) = set!($ArbT(t.prec), t) # copy constructor?
 
         function $ArbT(si::T, prec::Integer) where T <: Integer
             promote_type(T, Int64) == Int64 && return $ArbT(Int64(si), prec)
@@ -75,6 +75,9 @@ for ArbT in (:Arf, :Arb, :Acb, :Mag)
         if $ArbT != Arf
             $ArbT(si::Int64, prec::Integer) = set!($ArbT(prec), si)
         end
+
+        Base.zero(t::$ArbT) = $ArbT(0, t.prec)
+        Base.one(t::$ArbT) = $ArbT(1, t.prec)
     end
 end
 
@@ -104,4 +107,3 @@ function Acb(z::Complex{T}, prec::Integer) where T
 end
 
 #arb_set_str
-
