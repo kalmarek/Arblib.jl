@@ -41,6 +41,11 @@ for (T, args) in (
     end
 end
 
+function set!(res::Arb, s::AbstractString)
+    ccall(@libarb(arb_set_str), Cvoid, (Ref{Arb}, Cstring, Int), res, s, res.prec)
+    res
+end
+
 for (jlT, cT, suffix) in (
     (Arb, Ref{Arb}, :arb_arb),
     (Float64, Cdouble, :d_d),
@@ -84,6 +89,8 @@ end
 Arf(x::BigFloat, prec::Integer) = set!(Arf(prec), x)
 Arb(x::BigFloat, prec::Integer) = set!(Arb(prec), Arf(x, prec))
 Acb(x::BigFloat, prec::Integer) = set!(Acb(prec), Arb(x, prec))
+
+Arb(s::String, prec::Integer) = set!(Arb(prec), s)
 
 # fallbacks:
 Arf(x::Real, prec::Integer) = set!(Arf(prec), BigFloat(x))

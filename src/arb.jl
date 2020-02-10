@@ -6,6 +6,11 @@ function Base.string(x::Arb)
     unsafe_string(s)
 end
 
+# Not working, where is c stdout going to???
+# function printn(x::Arb, n::Int, e::Int)
+#     ccall(@libarb(arb_printn), Cvoid, (Ref{Arb}, Int, Int), x, n, e)
+# end
+
 Base.show(io::IO, x::Arb) = print(io, string(x))
 
 @libcall arb_mul_2exp_si 2
@@ -28,8 +33,7 @@ for (arb_pred, pred) in [
 ]
     @eval begin
         function Base.$pred(x::Arb, y::Arb)
-            cmp = ccall(@libarb(arb_abs), Cint, (Ref{Arb}, Ref{Arb}), x, y)
-            Bool(cmp)
+            ccall(@libarb($arb_pred), Bool, (Ref{Arb}, Ref{Arb}), x, y)
         end
     end
 end
