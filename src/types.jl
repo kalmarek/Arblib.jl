@@ -89,4 +89,8 @@ for (T, prefix) in ((Arf, :arf), (Arb, :arb), (Acb, :acb), (Mag, :mag))
         cprefix(::Type{$T}) = Symbol($spref) # useful for metaprogramming
         cstruct(t::$T) = getfield(t, cprefix($T))
     end
+    T == Mag && continue
+    @eval begin
+        Base.precision(x::$T) = x.prec
+    end
 end
