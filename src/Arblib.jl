@@ -18,5 +18,6 @@ include("rounding.jl")
 include("constructors.jl")
 
 include("predicates.jl")
+include("show.jl")
 
 end # module
