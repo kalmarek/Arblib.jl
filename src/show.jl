@@ -63,3 +63,25 @@ for ArbT in (Arf, Arb, Acb, Mag)
     end
 end
 
+for ArbT in (Arf, Arb, Mag)
+    jlf = :_load_string!
+    arbf = Symbol(cprefix(ArbT), :_load_str)
+    @eval begin
+        function $(jlf)(x::$ArbT, str::AbstractString)
+            res = ccall(@libarb($arbf), Cint, (Ref{$ArbT}, Cstring), x, str)
+            iszero(res) || throw(ArgumentError("arblib could not load_str $str as "*$(string(ArbT))))
+            return x
+        end
+    end
+
+    jlf = :_dump_string
+    arbf = Symbol(cprefix(ArbT), :_dump_str)
+    @eval begin
+        function $(jlf)(x::$ArbT)
+            char_ptr = ccall(@libarb($arbf), Cstring, (Ref{$ArbT},), x)
+            str = unsafe_string(char_ptr)
+            ccall((:flint_free, libflint), Cvoid, (Cstring,), char_ptr)
+            return str
+        end
+    end
+end
