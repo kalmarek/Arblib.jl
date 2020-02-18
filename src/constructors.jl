@@ -41,6 +41,12 @@ for (T, args) in (
     end
 end
 
+function set!(res::Arb, str::AbstractString)
+    flag = ccall(@libarb(arb_set_str), Cint, (Ref{Arb}, Cstring, Int), res, str, res.prec)
+    iszero(flag) || throw(ArgumentError("arblib could not parse $str as an Arb"))
+    return res
+end
+
 for (jlT, cT, suffix) in (
     (Arb, Ref{Arb}, :arb_arb),
     (Float64, Cdouble, :d_d),
@@ -87,6 +93,9 @@ Arf(x::Real, prec::Integer) = set!(Arf(prec), BigFloat(x))
 Arb(x::Real, prec::Integer) = set!(Arb(prec), Arf(x, prec))
 Acb(x::Real, prec::Integer) = set!(Acb(prec), Arb(x, prec))
 
+# string input
+Arb(str::AbstractString, prec::Integer) = set!(Arb(prec), str)
+
 function Acb(re::Integer, im::Integer, prec::Integer)
     promote_type(T, Int64) == Int64 && return Acb(Int64(re), Int64(im), prec)
     return Acb(BigInt(re), BigInt(im), prec)
@@ -102,6 +111,3 @@ function Acb(z::Complex{T}, prec::Integer) where T
     end
     return Acb(ArbReal(real(z), prec), ArbReal(imag, prec), prec)
 end
-
-#arb_set_str
-
