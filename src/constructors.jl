@@ -114,3 +114,24 @@ function Acb(z::Complex{T}, prec::Integer) where T
     end
     return Acb(ArbReal(real(z), prec), ArbReal(imag, prec), prec)
 end
+
+# Irrationals
+for (irr, suffix) in ((:π, "pi"), (:ℯ, "e"), (:γ, "euler"))
+    arbf = Symbol("arb_const_", suffix)
+    jlf = Symbol("const_$suffix", "!")
+    IrrT = Irrational{irr}
+    @eval begin
+        function $(jlf)(res::Arb)
+            ccall(@libarb($arbf), Cvoid, (Ref{Arb}, Clong,), res, precision(res))
+            return res
+        end
+        Arb(::$IrrT, prec::Integer)= $jlf(Arb(prec))
+    end
+end
+
+Acb(::Irrational{:π}, prec::Integer) = const_pi!(Acb(prec))
+
+function const_pi!(res::Acb)
+    ccall(@libarb(acb_const_pi), Cvoid, (Ref{Acb}, Clong,), res, precision(res))
+    return res
+end
