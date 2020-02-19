@@ -41,6 +41,12 @@ for (T, args) in (
     end
 end
 
+function set!(res::Arb, str::AbstractString)
+    flag = ccall(@libarb(arb_set_str), Cint, (Ref{Arb}, Cstring, Int), res, str, precision(res))
+    iszero(flag) || throw(ArgumentError("arblib could not parse $str as an Arb"))
+    return res
+end
+
 for (jlT, cT, suffix) in (
     (Arb, Ref{Arb}, :arb_arb),
     (Float64, Cdouble, :d_d),
@@ -58,7 +64,7 @@ end
 
 for ArbT in (:Arf, :Arb, :Acb, :Mag)
     @eval begin
-        $ArbT(t::$ArbT, prec=t.prec) = set!($ArbT(t.prec), t) # copy constructor?
+        $ArbT(t::$ArbT, prec::Integer=precision(t)) = set!($ArbT(prec), t)
 
         function $ArbT(si::T, prec::Integer) where T <: Integer
             promote_type(T, Int64) == Int64 && return $ArbT(Int64(si), prec)
@@ -75,17 +81,23 @@ for ArbT in (:Arf, :Arb, :Acb, :Mag)
         if $ArbT != Arf
             $ArbT(si::Int64, prec::Integer) = set!($ArbT(prec), si)
         end
+
+        Base.zero(t::$ArbT) = $ArbT(0, precision(t))
+        Base.one(t::$ArbT) = $ArbT(1, precision(t))
     end
 end
 
-Arf(x::BigFloat, prec::Integer) = set!(Arf(prec), x)
-Arb(x::BigFloat, prec::Integer) = set!(Arb(prec), Arf(x, prec))
-Acb(x::BigFloat, prec::Integer) = set!(Acb(prec), Arb(x, prec))
+Arf(x::BigFloat, prec::Integer=precision(x)) = set!(Arf(prec), x)
+Arb(x::BigFloat, prec::Integer=precision(x)) = set!(Arb(prec), Arf(x, prec))
+Acb(x::BigFloat, prec::Integer=precision(x)) = set!(Acb(prec), Arb(x, prec))
 
 # fallbacks:
 Arf(x::Real, prec::Integer) = set!(Arf(prec), BigFloat(x))
 Arb(x::Real, prec::Integer) = set!(Arb(prec), Arf(x, prec))
 Acb(x::Real, prec::Integer) = set!(Acb(prec), Arb(x, prec))
+
+# string input
+Arb(str::AbstractString, prec::Integer) = set!(Arb(prec), str)
 
 function Acb(re::Integer, im::Integer, prec::Integer)
     promote_type(T, Int64) == Int64 && return Acb(Int64(re), Int64(im), prec)
@@ -94,7 +106,7 @@ end
 
 Acb(re::Int64, im::Int64, prec::Integer) = set!(Acb(prec), re, im)
 Acb(re::Float64, im::Float64, prec::Integer) = set!(Acb(prec), re, im)
-Acb(re::Arb, im::Arb, prec::Integer=min(re.prec, im.prec)) = set!(Acb(prec), re, im)
+Acb(re::Arb, im::Arb, prec::Integer=min(precision(re), precision(im))) = set!(Acb(prec), re, im)
 
 function Acb(z::Complex{T}, prec::Integer) where T
     if promote_type(T, Float64) == Float64
@@ -103,5 +115,23 @@ function Acb(z::Complex{T}, prec::Integer) where T
     return Acb(ArbReal(real(z), prec), ArbReal(imag, prec), prec)
 end
 
-#arb_set_str
+# Irrationals
+for (irr, suffix) in ((:π, "pi"), (:ℯ, "e"), (:γ, "euler"))
+    arbf = Symbol("arb_const_", suffix)
+    jlf = Symbol("const_$suffix", "!")
+    IrrT = Irrational{irr}
+    @eval begin
+        function $(jlf)(res::Arb)
+            ccall(@libarb($arbf), Cvoid, (Ref{Arb}, Clong,), res, precision(res))
+            return res
+        end
+        Arb(::$IrrT, prec::Integer)= $jlf(Arb(prec))
+    end
+end
 
+Acb(::Irrational{:π}, prec::Integer) = const_pi!(Acb(prec))
+
+function const_pi!(res::Acb)
+    ccall(@libarb(acb_const_pi), Cvoid, (Ref{Acb}, Clong,), res, precision(res))
+    return res
+end

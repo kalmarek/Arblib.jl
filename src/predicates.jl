@@ -46,3 +46,66 @@ for (T, funcpairs) in (
         end
     end
 end
+
+for ArbT in (Arf, Arb, Acb, Mag)
+    arbf = Symbol(cprefix(ArbT), :_equal)
+    @eval begin
+        function Base.isequal(x::$ArbT, y::$ArbT)
+            res = ccall(@libarb($arbf), Cint, (Ref{$ArbT}, Ref{$ArbT}), x, y)
+            return !iszero(res)
+        end
+    end
+
+    ArbT == Mag && continue
+
+    arbf = Symbol(cprefix(ArbT), :_equal_si)
+    @eval begin
+        function Base.isequal(x::$ArbT, y::Int)
+            res = ccall(@libarb($arbf), Cint, (Ref{$ArbT}, Clong), x, y)
+            return !iszero(res)
+        end
+        Base.isequal(y::Int, x::$ArbT) = isequal(x,y)
+    end
+end
+
+Base.:(==)(x::Arf, y::Arf) = isequal(x, y)
+Base.:(==)(x::Arf, y::Int) = isequal(x, y)
+Base.:(==)(y::Int, x::Arf) = isequal(x, y)
+
+for (suffix, jltype, ctype) in (
+        ("",   Arf, Ref{Arf}),
+        (:_si, Int, Clong),
+        (:_ui, UInt, Culong),
+        (:_d,  Float64, Cdouble)
+        )
+    arbf = Symbol(:arf_cmp, suffix)
+    @eval begin
+        function Base.isless(x::Arf, y::$jltype)
+            res = ccall(@libarb($arbf), Cint, (Ref{Arf}, $ctype), x, y)
+            return res < 0
+        end
+        Base.:(<)(x::Arf, y::$jltype) = isless(x, y)
+        Base.:(<=)(x::Arf, y::$jltype) = isequal(x,y) | isless(x,y)
+    end
+end
+
+for (ArbT, args) in (
+    (Arb, (
+        (:(==), :_eq), (:(!=), :_ne),
+        (:(<),  :_lt), (:(<=), :_le),
+        (:(>),  :_gt), (:(>=), :_ge),
+        )),
+    (Acb, (
+        (:(==), :_eq), (:(!=), :_ne),
+        )),
+    )
+    for (jlf, suffix) in args
+        arbf = Symbol(cprefix(ArbT), suffix)
+        @eval begin
+            function Base.$jlf(x::$ArbT, y::$ArbT)
+                res = ccall(@libarb($arbf), Cint, (Ref{$ArbT}, Ref{$ArbT}), x, y)
+                return !iszero(res)
+            end
+        end
+    end
+end
