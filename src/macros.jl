@@ -84,12 +84,12 @@ macro libcall(name::Symbol, n::Int, opts...)
 
     if endswith(fname, "_si")
         fname = chop(fname; tail = 3)
-        push!(ccall_types, :Int)
+        push!(ccall_types, :Clong)
         push!(arg_names, :e)
         push!(arg_types, :Integer)
     elseif endswith(fname, "_ui")
         fname = chop(fname; tail = 3)
-        push!(ccall_types, :UInt)
+        push!(ccall_types, :Culong)
         push!(arg_names, :e)
         push!(arg_types, :Integer)
     end
@@ -99,10 +99,9 @@ macro libcall(name::Symbol, n::Int, opts...)
     end
 
     if prec
-        push!(ccall_types, :Int)
-        ccall_args = [arg_names; :($(arg_names[1]).prec)]
-    else
-        ccall_args = arg_names
+        push!(args, :(prec::Integer=precision($(arg_names[1]))))
+        push!(ccall_types, :Clong)
+        push!(arg_names, :prec)
     end
 
     fsymb = inplace ? Symbol(fname, "!") : Symbol(fname)
@@ -111,9 +110,9 @@ macro libcall(name::Symbol, n::Int, opts...)
         function $(esc(fsymb))($(args...))
             ccall(
                 ($(QuoteNode(name)), libarb),
-                Bool,
+                Cvoid,
                 $(Expr(:tuple, ccall_types...)),
-                $(ccall_args...),
+                $(arg_names...),
             )
             $(arg_names[1])
         end
