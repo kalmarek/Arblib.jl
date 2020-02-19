@@ -14,6 +14,7 @@ include("macros.jl")
 include("arb_types.jl")
 include("types.jl")
 include("rounding.jl")
+include("precision.jl")
 
 include("constructors.jl")
 
