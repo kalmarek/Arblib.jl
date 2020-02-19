@@ -1,5 +1,21 @@
 using Arblib, Test
 
 @testset "Arblib" begin
-    @test isa(Arb(π, 256), Arb)
+    @test isa(Arb(π), Arb)
+end
+
+@testset "setprecision" begin
+    x = Arb("0.1")
+    @test precision(x) == 256
+    @test precision(Arb) == 256
+    @test string(x) == "[0.1000000000000000000000000000000000000000000000000000000000000000000000000000 +/- 1.95e-78]"
+
+    setprecision(Arb, 64)
+    @test precision(x) == 256
+    @test precision(Arb) == 64
+    y = Arb("0.1")
+    @test precision(y) == 64
+    @test string(y) == "[0.100000000000000000 +/- 1.22e-20]"
+
+    setprecision(Arb, 256)
 end

@@ -2,14 +2,14 @@ mutable struct Arf <: Real
     arf::arf_struct
     prec::Int
 
-    function Arf(prec::Integer)
+    function Arf(;prec::Integer=DEFAULT_PRECISION[])
         res = new(arf_struct(0,0,0,0), prec)
         init!(res)
         finalizer(clear!, res)
         return res
     end
 
-    function Arf(si::Int64, prec::Integer)
+    function Arf(si::Int64; prec::Integer=DEFAULT_PRECISION[])
         res = new(arf_struct(0,0,0,0), prec)
         ccall(@libarb(arf_init_set_si), Cvoid, (Ref{Arf}, Int), res, si)
         finalizer(clear!, res)
@@ -23,7 +23,7 @@ mutable struct Arb <: Real
     arb::arb_struct
     prec::Int
 
-    function Arb(prec::Integer)
+    function Arb(;prec::Integer=DEFAULT_PRECISION[])
         res = new(arb_struct(0,0,0,0, 0,0), prec)
         init!(res)
         finalizer(clear!, res)
@@ -35,7 +35,7 @@ mutable struct Acb <: Number
     acb::acb_struct
     prec::Int
 
-    function Acb(prec::Integer)
+    function Acb(;prec::Integer=DEFAULT_PRECISION[])
         res = new(arb_struct(0,0,0,0, 0,0,0,0), prec)
         init!(res)
         finalizer(clear!, res)
