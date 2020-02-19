@@ -27,25 +27,13 @@ function sin_naive!(res, x)
     Arblib.set!(res, s)
 end
 
-let prec = 1024
-    x = Arb(π, prec)
-    Y = sin_naive!(zero(x), x)
-    y = sin_naive!(zero(x), Arb(big(π), prec))
-    # @show Y
-    Y, y
+global prec = 64
+while true
+    x = Arb("2016.1"; prec = prec)
+    y = zero(x)
+    y = sin_naive!(y, x)
+    print("Using $(lpad(prec, 5)) bits, sin(x) = ")
+    println(Arblib.string_nice(y, 10))
+    y < zero(y) && break
+    global prec *= 2
 end
-
-function main()
-    prec = 64
-    while true
-        x = Arb("2016.1", prec)
-        y = zero(x)
-        y = sin_naive!(y, x)
-        println("Using $(lpad(prec, 5)) bits, sin(x) = $y")
-        y < zero(y) && break
-        prec *= 2
-    end
-end
-
-
-main()

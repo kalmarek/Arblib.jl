@@ -78,19 +78,19 @@ macro libcall(name::Symbol, n::Int, opts...)
     typename, fname = split(String(name), "_"; limit = 2)
     T = Symbol(titlecase(typename))
 
-    arg_names = Any[Symbol(:x, i) for i = 1:n]
+    arg_names = Any[esc(Symbol(:x, i)) for i = 1:n]
     arg_types = Symbol[T for _ in 1:n]
     ccall_types = Any[:(Ref{$T}) for _ in 1:n]
 
     if endswith(fname, "_si")
         fname = chop(fname; tail = 3)
         push!(ccall_types, :Clong)
-        push!(arg_names, :e)
+        push!(arg_names, esc(:e))
         push!(arg_types, :Integer)
     elseif endswith(fname, "_ui")
         fname = chop(fname; tail = 3)
         push!(ccall_types, :Culong)
-        push!(arg_names, :e)
+        push!(arg_names, esc(:e))
         push!(arg_types, :Integer)
     end
 
@@ -99,9 +99,10 @@ macro libcall(name::Symbol, n::Int, opts...)
     end
 
     if prec
-        push!(args, :(prec::Integer=precision($(arg_names[1]))))
+        p = esc(:prec)
+        push!(args, Expr(:kw, :($p::Integer), :(precision($(arg_names[1])))))
         push!(ccall_types, :Clong)
-        push!(arg_names, :prec)
+        push!(arg_names, p)
     end
 
     fsymb = inplace ? Symbol(fname, "!") : Symbol(fname)
