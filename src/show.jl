@@ -26,7 +26,7 @@ for ArbT in (Arf, Arb, Acb, Mag)
 
     arbf = Symbol(cprefix(ArbT), :_printd)
     @eval begin
-        function string_decimal(x::$ArbT, digits::Integer=digits_prec(x.prec))
+        function string_decimal(x::$ArbT, digits::Integer=digits_prec(precision(x)))
             Libc.flush_cstdio()
             Base.flush(stdout)
             original_stdout = stdout
@@ -46,7 +46,7 @@ for ArbT in (Arf, Arb, Acb, Mag)
 
     arbf = Symbol(cprefix(ArbT), :_, :printn)
     @eval begin
-        function string_nice(x::$ArbT, digits::Integer=digits_prec(x.prec), flags::UInt=UInt(0))
+        function string_nice(x::$ArbT, digits::Integer=digits_prec(precision(x)), flags::UInt=UInt(0))
             Libc.flush_cstdio()
             Base.flush(stdout)
             original_stdout = stdout
