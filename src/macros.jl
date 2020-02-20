@@ -57,3 +57,65 @@ macro frominplace(res, function_call)
     fname, args, templates = digest_call(function_call)
     return from_inplace(res, fname, args, templates)
 end
+
+macro libcall(name::Symbol, n::Int, opts...)
+    inplace = true
+    prec = false
+    for opt in opts
+        if opt isa Expr && opt.head == :(=)
+            if opt.args[1] == :inplace
+                inplace = opt.args[2]::Bool
+            elseif opt.args[1] == :prec
+                prec = opt.args[2]::Bool
+            else
+                throw(UndefKeywordError(opts.args[1]))
+            end
+        else
+            throw(ArgumentError("Unexpected argument: $opt"))
+        end
+    end
+
+    typename, fname = split(String(name), "_"; limit = 2)
+    T = Symbol(titlecase(typename))
+
+    arg_names = Any[esc(Symbol(:x, i)) for i = 1:n]
+    arg_types = Symbol[T for _ in 1:n]
+    ccall_types = Any[:(Ref{$T}) for _ in 1:n]
+
+    if endswith(fname, "_si")
+        fname = chop(fname; tail = 3)
+        push!(ccall_types, :Clong)
+        push!(arg_names, esc(:e))
+        push!(arg_types, :Integer)
+    elseif endswith(fname, "_ui")
+        fname = chop(fname; tail = 3)
+        push!(ccall_types, :Culong)
+        push!(arg_names, esc(:e))
+        push!(arg_types, :Integer)
+    end
+
+    args = map(arg_names, arg_types) do x, T
+        :($x::$T)
+    end
+
+    if prec
+        p = esc(:prec)
+        push!(args, Expr(:kw, :($p::Integer), :(precision($(arg_names[1])))))
+        push!(ccall_types, :Clong)
+        push!(arg_names, p)
+    end
+
+    fsymb = inplace ? Symbol(fname, "!") : Symbol(fname)
+
+    quote
+        function $(esc(fsymb))($(args...))
+            ccall(
+                ($(QuoteNode(name)), libarb),
+                Cvoid,
+                $(Expr(:tuple, ccall_types...)),
+                $(arg_names...),
+            )
+            $(arg_names[1])
+        end
+    end
+end

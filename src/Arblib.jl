@@ -20,5 +20,6 @@ include("constructors.jl")
 
 include("predicates.jl")
 include("show.jl")
+include("arb.jl")
 
 end # module

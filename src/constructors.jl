@@ -82,8 +82,8 @@ for ArbT in (:Arf, :Arb, :Acb, :Mag)
             $ArbT(si::Int64; prec::Integer=DEFAULT_PRECISION[]) = set!($ArbT(prec=prec), si)
         end
 
-        Base.zero(t::$ArbT) = $ArbT(0, precision(t))
-        Base.one(t::$ArbT) = $ArbT(1, precision(t))
+        Base.zero(t::$ArbT) = $ArbT(0; prec = precision(t))
+        Base.one(t::$ArbT) = $ArbT(1; prec = precision(t))
     end
 end
 
