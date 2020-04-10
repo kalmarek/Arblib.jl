@@ -1,5 +1,7 @@
 using Arblib, Test
 
+include("arbcall-test.jl")
+
 @testset "Arblib" begin
     @test isa(Arb(π), Arb)
 end
