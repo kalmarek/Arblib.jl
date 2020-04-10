@@ -44,3 +44,26 @@
         @test Arblib.jlfname(arbfname, inplace = true) == Symbol(name, :!)
     end
 end
+
+@testset "returntype" begin
+    # Supported return types
+    for (str, T) in (("void arb_init(arb_t x)", Nothing),
+                     ("slong arb_rel_error_bits(const arb_t x)", Int),
+                     ("int arb_is_zero(const arb_t x)", Int32),
+                     ("double arf_get_d(const arf_t x, arf_rnd_t rnd)", Float64))
+        @test Arblib.returntype(Arblib.Arbfunction(str)) == T
+    end
+
+    # Unsupported return types
+    for str in ("mag_ptr _mag_vec_init(slong n)",
+                "arb_ptr _arb_vec_init(slong n)",
+                "acb_ptr _acb_vec_init(slong n)",
+                )
+        @test_throws KeyError Arblib.Arbfunction(str)
+    end
+
+    # Return types with parse errors
+    for str in ("char * arb_get_str(const arb_t x, slong n, ulong flags)",)
+        @test_throws ArgumentError Arblib.Arbfunction(str)
+    end
+end
