@@ -1,3 +1,64 @@
+@testset "Carg" begin
+    # Supported types
+    for (str, name, isconst, type, ctype) in (("mag_t res", "res", false, Arblib.Mag, Ref{Arblib.Mag}),
+                                              ("arf_t res", "res", false, Arf, Ref{Arf}),
+                                              ("arb_t res", "res", false, Arb, Ref{Arb}),
+                                              ("acb_t res", "res", false, Acb, Ref{Acb}),
+                                              ("int flags", "flags", false, Cint, Cint),
+                                              ("slong x", "x", false, Clong, Clong),
+                                              ("ulong x", "x", false, Culong, Culong),
+                                              ("double x", "x", false, Cdouble, Cdouble),
+                                              ("arf_rnd_t rnd", "rnd", false, Arblib.arb_rnd, Arblib.arb_rnd),
+                                              ("const mag_t x", "x", true, Arblib.Mag, Ref{Arblib.Mag}),
+                                              ("const arf_t x", "x", true, Arf, Ref{Arf}),
+                                              ("const arb_t x", "x", true, Arb, Ref{Arb}),
+                                              ("const acb_t x", "x", true, Acb, Ref{Acb}),
+                                    )
+        arg = Arblib.Carg(str)
+        @test Arblib.name(arg) == name
+        @test Arblib.isconst(arg) == isconst
+        @test Arblib.jltype(arg) == type
+        @test Arblib.ctype(arg) == ctype
+    end
+
+    # Unsupported types
+    for str in ("fmpz_t x",
+                "fmpq_t x",
+                "mag_ptr res",
+                "arb_ptr res",
+                "acb_ptr res",
+                "const fmpz_t x",
+                "const fmpq_t x",
+                "mag_srcptr res",
+                "arb_srcptr res",
+                "acb_srcptr res",
+
+                # Internal types
+                "mpfr_rnd_t rnd",
+                "mp_limb_t lo",
+                "mp_bitcnt_t r",
+                "mp_ptr ycos",
+                "mp_srcptr x",
+                )
+        @test_throws KeyError arg = Arblib.Carg(str)
+    end
+
+    # Parsed incorrectly
+    for str in ("const char * inp",
+                )
+        @test_throws KeyError arg = Arblib.Carg(str)
+    end
+
+
+    # Parse errors
+    for str in (# Internal types
+                "mp_limb_t * error",
+                "mp_bitcnt_t * Qexp",
+                )
+        @test_throws ArgumentError arg = Arblib.Carg(str)
+    end
+end
+
 @testset "jlfname" begin
     for (arbfname, name) in (# Supported types
                              ("mag_set", :set),
