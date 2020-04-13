@@ -165,17 +165,14 @@ function jlcode(af::Arbfunction, jl_fname=jlfname(af))
 
     jl_args = [:($a::$T) for (a, T) in zip(arg_names, jl_types)]
 
-    res = first(arg_names)
-
     return :(
-        function $jl_fname($(jl_args...); $(kwargs...))
-            ccall(Arblib.@libarb($(arbfname(af))),
-            $returnT,
-            $(Expr(:tuple, c_types...)),
-            $(Symbol.(name.(args))...))
-            return $res
+        function $jl_fname($(jl_args...); $(kwargs...))::$returnT
+        ccall(Arblib.@libarb($(arbfname(af))),
+              $returnT,
+              $(Expr(:tuple, c_types...)),
+              $(Symbol.(name.(args))...))
         end
-        )
+    )
 end
 
 macro arbcall_str(str)
