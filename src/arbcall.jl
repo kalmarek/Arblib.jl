@@ -71,6 +71,44 @@ function jlfname(af::Arbfunction,
     return jlfname(arbfname(af), prefixes, suffixes, inplace=inplace)
 end
 
+function jlsignature(af::Arbfunction)
+    returnT = returntype(af)
+    args = arguments(af)
+
+    arg_names = Symbol.(name.(args))
+    jl_types = jltype.(args)
+
+    jl_kwargs = Expr[]
+
+    k = findfirst(==(:prec), arg_names)
+    if !isnothing(k)
+        @assert jl_types[k] == Int64
+        p = :prec
+        a = first(args)
+        default = if jltype(a) ∈ (Arf, Arb, Acb)
+            :(precision($(Symbol(name(a)))))
+        else
+            :(DEFAULT_PRECISION[])
+        end
+        push!(jl_kwargs, Expr(:kw, :($p::Integer), default))
+        deleteat!(arg_names, k)
+        deleteat!(jl_types, k)
+    end
+
+    k = findfirst(==(:rnd), arg_names)
+    if !isnothing(k)
+        @assert jl_types[k] == arb_rnd
+        r = :rnd
+        push!(jl_kwargs, Expr(:kw, :($r::Union{arb_rnd, RoundingMode}), :(RoundNearest)))
+        deleteat!(arg_names, k)
+        deleteat!(jl_types, k)
+    end
+
+    jl_args = [:($a::$T) for (a, T) in zip(arg_names, jl_types)]
+
+    :($(jlfname(af))($(jl_args...); $(jl_kwargs...))::$(returnT))
+end
+
 function arbsignature(af::Arbfunction)
     jltoctype = Dict(value => key for (key, value) in Ctypes)
 
