@@ -128,3 +128,19 @@ end
         @test_throws ArgumentError Arblib.Arbfunction(str)
     end
 end
+
+@testset "arbsignature" begin
+    for str in ("void arb_init(arb_t x)",
+                "slong arb_rel_error_bits(const arb_t x)",
+                "int arb_is_zero(const arb_t x)",
+                "void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)",
+                "void arb_add_arf(arb_t z, const arb_t x, const arf_t y, slong prec)",
+                "void arb_add_ui(arb_t z, const arb_t x, ulong y, slong prec)",
+                "void arb_add_si(arb_t z, const arb_t x, slong y, slong prec)",
+                "void arb_sin(arb_t s, const arb_t x, slong prec)",
+                "void arb_cos(arb_t c, const arb_t x, slong prec)",
+                "void arb_sin_cos(arb_t s, arb_t c, const arb_t x, slong prec)",
+                )
+        @test Arblib.arbsignature(Arblib.Arbfunction(str)) == str
+    end
+end

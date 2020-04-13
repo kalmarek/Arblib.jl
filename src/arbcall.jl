@@ -71,6 +71,26 @@ function jlfname(af::Arbfunction,
     return jlfname(arbfname(af), prefixes, suffixes, inplace=inplace)
 end
 
+function arbsignature(af::Arbfunction)
+    jltoctype = Dict(value => key for (key, value) in Ctypes)
+
+    creturnT = jltoctype[returntype(af)]
+    args = arguments(af)
+
+    arg_consts = isconst.(args)
+    arg_ctypes = [jltoctype[jltype(arg)] for arg in args]
+    arg_names = name.(args)
+
+
+    c_args = join([ifelse(isconst, "const ", "")*"$type $name" for (isconst, type, name)
+                   in zip(arg_consts, arg_ctypes, arg_names)], ", ")
+
+    c_args = join([ifelse(isconst(arg), "const ", "") *
+                   "$(jltoctype[jltype(arg)]) $(name(arg))" for arg in args], ", ")
+
+    "$creturnT $(arbfname(af))($c_args)"
+end
+
 function jlcode(af::Arbfunction, jl_fname=jlfname(af))
     returnT = returntype(af)
     args = arguments(af)
