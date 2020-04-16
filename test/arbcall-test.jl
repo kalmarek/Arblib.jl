@@ -13,6 +13,7 @@
                                               ("const arf_t x", "x", true, Arf, Ref{Arf}),
                                               ("const arb_t x", "x", true, Arb, Ref{Arb}),
                                               ("const acb_t x", "x", true, Acb, Ref{Acb}),
+                                              ("const char * inp", "inp", true, Cstring, Cstring),
                                     )
         arg = Arblib.Carg(str)
         @test Arblib.name(arg) == name
@@ -44,7 +45,9 @@
     end
 
     # Parsed incorrectly
-    for str in ("const char * inp",
+    for str in (
+                "mp_limb_t * error",
+                "mp_bitcnt_t * Qexp",
                 )
         @test_throws KeyError arg = Arblib.Carg(str)
     end
@@ -52,8 +55,6 @@
 
     # Parse errors
     for str in (# Internal types
-                "mp_limb_t * error",
-                "mp_bitcnt_t * Qexp",
                 )
         @test_throws ArgumentError arg = Arblib.Carg(str)
     end
@@ -124,7 +125,7 @@ end
     end
 
     # Return types with parse errors
-    for str in ("char * arb_get_str(const arb_t x, slong n, ulong flags)",)
+    for str in ()
         @test_throws ArgumentError Arblib.Arbfunction(str)
     end
 end
@@ -155,6 +156,8 @@ end
                 "void arb_sin(arb_t s, const arb_t x, slong prec)",
                 "void arb_cos(arb_t c, const arb_t x, slong prec)",
                 "void arb_sin_cos(arb_t s, arb_t c, const arb_t x, slong prec)",
+                # Pointer
+                "char * arb_get_str(const arb_t x, slong n, ulong flags)",
                 )
         @test Arblib.arbsignature(Arblib.Arbfunction(str)) == str
     end
