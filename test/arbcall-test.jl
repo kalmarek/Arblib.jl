@@ -159,3 +159,21 @@ end
         @test Arblib.arbsignature(Arblib.Arbfunction(str)) == str
     end
 end
+
+@testset "jlcode" begin
+    x = Arb(1)
+    y = Arb(2)
+    z = Arb(0)
+
+    Arblib.@arbcall_str "void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)"
+    @test typeof(Arblib.add!(z, x, y)) == Nothing
+
+    Arblib.@arbcall_str "slong arb_rel_error_bits(const arb_t x)"
+    @test typeof(Arblib.rel_error_bits(x)) == Int64
+
+    Arblib.@arbcall_str "int arb_is_zero(const arb_t x)"
+    @test typeof(Arblib.is_zero(x)) == Int32
+
+    Arblib.@arbcall_str "double arf_get_d(const arf_t x, arf_rnd_t rnd)"
+    @test typeof(Arblib.get(Arf(1))) == Float64
+end
