@@ -10,6 +10,8 @@ const Ctypes = Dict{String, DataType}(
     "mag_t"     => Mag,
     "arf_rnd_t" => arb_rnd,
     "mpfr_t"    => BigFloat,
+    "char *"    => Cstring,
+    "slong *"   => Vector{Clong},
 )
 
 struct Carg{ArgT}
@@ -18,7 +20,7 @@ struct Carg{ArgT}
 end
 
 function Carg(str)
-    m = match(r"(?<const>const)?\s*(?<type>\w+)\s+(?<name>\w+)", str)
+    m = match(r"(?<const>const)?\s*(?<type>\w+(\s\*)?)\s+(?<name>\w+)", str)
     isnothing(m) && throw(ArgumentError("string doesn't match c-argument pattern"))
 
     return Carg{Ctypes[m[:type]]}(m[:name], !isnothing(m[:const]))
@@ -29,6 +31,7 @@ isconst(ca::Carg) = ca.isconst
 jltype(::Carg{ArgT}) where ArgT = ArgT
 ctype(ca::Carg) = jltype(ca)
 ctype(::Carg{ArgT}) where ArgT <: Union{Arf, Arb, Acb, Mag, BigFloat}  = Ref{ArgT}
+ctype(::Carg{Vector{T}}) where T = Ref{T}
 
 struct Arbfunction{ReturnT}
     fname::String
@@ -36,7 +39,7 @@ struct Arbfunction{ReturnT}
 end
 
 function Arbfunction(str)
-    m = match(r"(?<returntype>\w+)\s+(?<arbfunction>[\w_]+)\((?<args>.*)\)",
+    m = match(r"(?<returntype>\w+(\s\*)?)\s+(?<arbfunction>[\w_]+)\((?<args>.*)\)",
         str)
     isnothing(m) && throw(ArgumentError("string doesn't match arblib function signature pattern"))
 
