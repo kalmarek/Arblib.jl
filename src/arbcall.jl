@@ -8,7 +8,8 @@ const Ctypes = Dict{String, DataType}(
     "arb_t"     => Arb,
     "acb_t"     => Acb,
     "mag_t"     => Mag,
-    "arf_rnd_t" => arb_rnd
+    "arf_rnd_t" => arb_rnd,
+    "mpfr_t"    => BigFloat,
 )
 
 struct Carg{ArgT}
@@ -27,7 +28,7 @@ name(ca::Carg) = ca.name
 isconst(ca::Carg) = ca.isconst
 jltype(::Carg{ArgT}) where ArgT = ArgT
 ctype(ca::Carg) = jltype(ca)
-ctype(::Carg{ArgT}) where ArgT <: Union{Arf, Arb, Acb, Mag}  = Ref{ArgT}
+ctype(::Carg{ArgT}) where ArgT <: Union{Arf, Arb, Acb, Mag, BigFloat}  = Ref{ArgT}
 
 struct Arbfunction{ReturnT}
     fname::String
