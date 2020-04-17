@@ -75,26 +75,24 @@ function jlfname(af::Arbfunction,
     return jlfname(arbfname(af), prefixes, suffixes, inplace=inplace)
 end
 
-function jlsignature(af::Arbfunction)
-    returnT = returntype(af)
-    args = arguments(af)
+function jlargs(af::Arbfunction)
+    cargs = arguments(af)
+    arg_names = Symbol.(name.(cargs))
+    jl_types = jltype.(cargs)
 
-    arg_names = Symbol.(name.(args))
-    jl_types = jltype.(args)
-
-    jl_kwargs = Expr[]
+    kwargs = Expr[]
 
     k = findfirst(==(:prec), arg_names)
     if !isnothing(k)
         @assert jl_types[k] == Int64
         p = :prec
-        a = first(args)
+        a = first(cargs)
         default = if jltype(a) ∈ (Arf, Arb, Acb)
             :(precision($(Symbol(name(a)))))
         else
             :(DEFAULT_PRECISION[])
         end
-        push!(jl_kwargs, Expr(:kw, :($p::Integer), default))
+        push!(kwargs, Expr(:kw, :($p::Integer), default))
         deleteat!(arg_names, k)
         deleteat!(jl_types, k)
     end
@@ -103,14 +101,14 @@ function jlsignature(af::Arbfunction)
     if !isnothing(k)
         @assert jl_types[k] == arb_rnd
         r = :rnd
-        push!(jl_kwargs, Expr(:kw, :($r::Union{arb_rnd, RoundingMode}), :(RoundNearest)))
+        push!(kwargs, Expr(:kw, :($r::Union{arb_rnd, RoundingMode}), :(RoundNearest)))
         deleteat!(arg_names, k)
         deleteat!(jl_types, k)
     end
 
-    jl_args = [:($a::$T) for (a, T) in zip(arg_names, jl_types)]
+    args = [:($a::$T) for (a, T) in zip(arg_names, jl_types)]
 
-    :($(jlfname(af))($(jl_args...); $(jl_kwargs...))::$(returnT))
+    return (args, kwargs)
 end
 
 function arbsignature(af::Arbfunction)
@@ -135,15 +133,17 @@ end
 
 function jlcode(af::Arbfunction, jl_fname=jlfname(af))
     returnT = returntype(af)
-    args = arguments(af)
+    cargs = arguments(af)
+    args, kwargs = jlargs(af)
 
-    return :($(jlsignature(af)) = begin
-             ccall(Arblib.@libarb($(arbfname(af))),
-                   $returnT,
-                   $(Expr(:tuple, ctype.(args)...)),
-                   $(Symbol.(name.(args))...))
-             end
-             )
+    return :(
+        function $jl_fname($(args...); $(kwargs...))
+        ccall(Arblib.@libarb($(arbfname(af))),
+              $returnT,
+              $(Expr(:tuple, ctype.(cargs)...)),
+              $(Symbol.(name.(cargs))...))
+        end
+    )
 end
 
 macro arbcall_str(str)

@@ -130,18 +130,21 @@ end
     end
 end
 
-@testset "jlsignature" begin
-    for (str, signature) in (("void arb_init(arb_t x)",
-                              :(init!(x::$Arb; )::$Nothing)),
-                             ("void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)",
-                              :(add!(z::$Arb, x::$Arb, y::$Arb;
-                                     prec::Integer = precision(z))::$Nothing)),
-                             ("int arf_add(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)",
-                              :(add!(res::$Arf, x::$Arf, y::$Arf;
-                                     prec::Integer = precision(res),
-                                     rnd::Union{arb_rnd, RoundingMode} = RoundNearest)::$Int32)),
-                             )
-        @test Arblib.jlsignature(Arblib.Arbfunction(str)) == signature
+@testset "jlargs" begin
+    for (str, args, kwargs) in (("void arb_init(arb_t x)",
+                                 [:(x::$Arb)],
+                                 Expr[]),
+                                ("void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)",
+                                 [:(z::$Arb), :(x::$Arb), :(y::$Arb)],
+                                 [Expr(:kw, :(prec::Integer), :(precision(z)))]),
+                                ("int arf_add(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)",
+                                 [:(res::$Arf), :(x::$Arf), :(y::$Arf)],
+                                 [Expr(:kw, :(prec::Integer), :(precision(res))),
+                                  Expr(:kw, :(rnd::Union{arb_rnd, RoundingMode}), :(RoundNearest))])
+                                )
+        (a, k) = Arblib.jlargs(Arblib.Arbfunction(str))
+        @test a == args
+        @test k == kwargs
     end
 end
 
