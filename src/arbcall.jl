@@ -8,7 +8,10 @@ const Ctypes = Dict{String, DataType}(
     "arb_t"     => Arb,
     "acb_t"     => Acb,
     "mag_t"     => Mag,
-    "arf_rnd_t" => arb_rnd
+    "arf_rnd_t" => arb_rnd,
+    "mpfr_t"    => BigFloat,
+    "char *"    => Cstring,
+    "slong *"   => Vector{Clong},
 )
 
 struct Carg{ArgT}
@@ -17,7 +20,7 @@ struct Carg{ArgT}
 end
 
 function Carg(str)
-    m = match(r"(?<const>const)?\s*(?<type>\w+)\s+(?<name>\w+)", str)
+    m = match(r"(?<const>const)?\s*(?<type>\w+(\s\*)?)\s+(?<name>\w+)", str)
     isnothing(m) && throw(ArgumentError("string doesn't match c-argument pattern"))
 
     return Carg{Ctypes[m[:type]]}(m[:name], !isnothing(m[:const]))
@@ -27,7 +30,8 @@ name(ca::Carg) = ca.name
 isconst(ca::Carg) = ca.isconst
 jltype(::Carg{ArgT}) where ArgT = ArgT
 ctype(ca::Carg) = jltype(ca)
-ctype(::Carg{ArgT}) where ArgT <: Union{Arf, Arb, Acb, Mag}  = Ref{ArgT}
+ctype(::Carg{ArgT}) where ArgT <: Union{Arf, Arb, Acb, Mag, BigFloat}  = Ref{ArgT}
+ctype(::Carg{Vector{T}}) where T = Ref{T}
 
 struct Arbfunction{ReturnT}
     fname::String
@@ -35,7 +39,7 @@ struct Arbfunction{ReturnT}
 end
 
 function Arbfunction(str)
-    m = match(r"(?<returntype>\w+)\s+(?<arbfunction>[\w_]+)\((?<args>.*)\)",
+    m = match(r"(?<returntype>\w+(\s\*)?)\s+(?<arbfunction>[\w_]+)\((?<args>.*)\)",
         str)
     isnothing(m) && throw(ArgumentError("string doesn't match arblib function signature pattern"))
 
@@ -71,13 +75,10 @@ function jlfname(af::Arbfunction,
     return jlfname(arbfname(af), prefixes, suffixes, inplace=inplace)
 end
 
-function jlcode(af::Arbfunction, jl_fname=jlfname(af))
-    returnT = returntype(af)
-    args = arguments(af)
-    c_types = ctype.(args)
-
-    arg_names = Symbol.(name.(args))
-    jl_types = jltype.(args)
+function jlargs(af::Arbfunction)
+    cargs = arguments(af)
+    arg_names = Symbol.(name.(cargs))
+    jl_types = jltype.(cargs)
 
     kwargs = Expr[]
 
@@ -85,7 +86,7 @@ function jlcode(af::Arbfunction, jl_fname=jlfname(af))
     if !isnothing(k)
         @assert jl_types[k] == Int64
         p = :prec
-        a = first(args)
+        a = first(cargs)
         default = if jltype(a) ∈ (Arf, Arb, Acb)
             :(precision($(Symbol(name(a)))))
         else
@@ -105,19 +106,44 @@ function jlcode(af::Arbfunction, jl_fname=jlfname(af))
         deleteat!(jl_types, k)
     end
 
-    jl_args = [:($a::$T) for (a, T) in zip(arg_names, jl_types)]
+    args = [:($a::$T) for (a, T) in zip(arg_names, jl_types)]
 
-    res = first(arg_names)
+    return (args, kwargs)
+end
+
+function arbsignature(af::Arbfunction)
+    jltoctype = Dict(value => key for (key, value) in Ctypes)
+
+    creturnT = jltoctype[returntype(af)]
+    args = arguments(af)
+
+    arg_consts = isconst.(args)
+    arg_ctypes = [jltoctype[jltype(arg)] for arg in args]
+    arg_names = name.(args)
+
+
+    c_args = join([ifelse(isconst, "const ", "")*"$type $name" for (isconst, type, name)
+                   in zip(arg_consts, arg_ctypes, arg_names)], ", ")
+
+    c_args = join([ifelse(isconst(arg), "const ", "") *
+                   "$(jltoctype[jltype(arg)]) $(name(arg))" for arg in args], ", ")
+
+    "$creturnT $(arbfname(af))($c_args)"
+end
+
+function jlcode(af::Arbfunction, jl_fname=jlfname(af))
+    returnT = returntype(af)
+    cargs = arguments(af)
+    args, kwargs = jlargs(af)
 
     return :(
-        function $jl_fname($(jl_args...); $(kwargs...))
-            ccall(Arblib.@libarb($(arbfname(af))),
-            $returnT,
-            $(Expr(:tuple, c_types...)),
-            $(Symbol.(name.(args))...))
-            return $res
+        function $jl_fname($(args...); $(kwargs...))
+        ccall(Arblib.@libarb($(arbfname(af))),
+              $returnT,
+              $(Expr(:tuple, ctype.(cargs)...)),
+              $(Symbol.(name.(cargs))...))
         end
-        )
+    )
 end
 
 macro arbcall_str(str)
