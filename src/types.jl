@@ -36,7 +36,7 @@ mutable struct Acb <: Number
     prec::Int
 
     function Acb(;prec::Integer=DEFAULT_PRECISION[])
-        res = new(arb_struct(0,0,0,0, 0,0,0,0), prec)
+        res = new(acb_struct(0,0,0,0,0,0, 0,0,0,0,0,0), prec)
         init!(res)
         finalizer(clear!, res)
         return res
