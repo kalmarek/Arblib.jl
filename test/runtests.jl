@@ -31,7 +31,7 @@ end
             # @show tol
             k = 0
             while true
-                Arblib.pow!(t, x, 2k + 1)
+                Arblib.pow!(t, x, UInt(2k + 1))
                 Arblib.fac!(u, UInt(2k + 1))
                 Arblib.div!(t, t, u)
                 Arblib.abs!(u, t)

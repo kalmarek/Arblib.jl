@@ -32,9 +32,12 @@ isconst(ca::Carg) = ca.isconst
 rawtype(::Carg{T}) where T = T
 
 jltype(ca::Carg) = rawtype(ca)
-jltype(::Carg{<:AbstractFloat}) = AbstractFloat
-jltype(::Carg{<:Integer}) = Integer
-jltype(::Carg{Cstring}) = AbstractString
+jltype(ca::Carg{Cint}) = Integer
+jltype(ca::Carg{Clong}) = Integer
+jltype(ca::Carg{Culong}) = Unsigned
+jltype(ca::Carg{Cdouble}) = Base.GMP.CdoubleMax
+jltype(ca::Carg{arb_rnd}) = Union{arb_rnd, RoundingMode}
+jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
 
 ctype(ca::Carg) = rawtype(ca)
 ctype(::Carg{T}) where T <: Union{Arf, Arb, Acb, Mag, BigFloat}  = Ref{T}
@@ -85,13 +88,14 @@ end
 function jlargs(af::Arbfunction)
     cargs = arguments(af)
     arg_names = Symbol.(name.(cargs))
+    c_types = ctype.(cargs)
     jl_types = jltype.(cargs)
 
     kwargs = Expr[]
 
     k = findfirst(==(:prec), arg_names)
     if !isnothing(k)
-        @assert jl_types[k] == Integer
+        @assert c_types[k] == Clong
         p = :prec
         a = first(cargs)
         default = if jltype(a) ∈ (Arf, Arb, Acb)
@@ -101,15 +105,17 @@ function jlargs(af::Arbfunction)
         end
         push!(kwargs, Expr(:kw, :($p::Integer), default))
         deleteat!(arg_names, k)
+        deleteat!(c_types, k)
         deleteat!(jl_types, k)
     end
 
     k = findfirst(==(:rnd), arg_names)
     if !isnothing(k)
-        @assert jl_types[k] == arb_rnd
+        @assert c_types[k] == arb_rnd
         r = :rnd
         push!(kwargs, Expr(:kw, :($r::Union{arb_rnd, RoundingMode}), :(RoundNearest)))
         deleteat!(arg_names, k)
+        deleteat!(c_types, k)
         deleteat!(jl_types, k)
     end
 
