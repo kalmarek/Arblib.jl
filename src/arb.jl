@@ -1,9 +1,9 @@
-@libcall arb_mul_2exp_si 2
-@libcall arb_one 1
-@libcall arb_pow_ui 2 prec=true
-@libcall arb_fac_ui 1 prec=true
-@libcall arb_div 3 prec=true
-@libcall arb_abs 2 prec=true
-@libcall arb_add_error 2
-@libcall arb_add 3 prec=true
-@libcall arb_sub 3 prec=true
+arbcall"void arb_mul_2exp_si(arb_t y, const arb_t x, slong e)"
+arbcall"void arb_one(arb_t f)"
+arbcall"void arb_pow_ui(arb_t y, const arb_t b, ulong e, slong prec)"
+arbcall"void arb_fac_ui(arb_t z, ulong n, slong prec)"
+arbcall"void arb_div(arb_t z, const arb_t x, const arb_t y, slong prec)"
+arbcall"void arb_abs(arb_t y, const arb_t x)"
+arbcall"void arb_add_error(arb_t x, const arb_t err)"
+arbcall"void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)"
+arbcall"void arb_sub(arb_t z, const arb_t x, const arb_t y, slong prec)"

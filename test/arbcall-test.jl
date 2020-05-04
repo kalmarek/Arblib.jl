@@ -1,24 +1,24 @@
 @testset "Carg" begin
     # Supported types
-    for (str, name, isconst, type, ctype) in (("mag_t res", "res", false, Arblib.Mag, Ref{Arblib.Mag}),
-                                              ("arf_t res", "res", false, Arf, Ref{Arf}),
-                                              ("arb_t res", "res", false, Arb, Ref{Arb}),
-                                              ("acb_t res", "res", false, Acb, Ref{Acb}),
-                                              ("int flags", "flags", false, Cint, Cint),
-                                              ("slong x", "x", false, Clong, Clong),
-                                              ("ulong x", "x", false, Culong, Culong),
-                                              ("double x", "x", false, Cdouble, Cdouble),
-                                              ("arf_rnd_t rnd", "rnd", false, Arblib.arb_rnd, Arblib.arb_rnd),
-                                              ("const mag_t x", "x", true, Arblib.Mag, Ref{Arblib.Mag}),
-                                              ("const arf_t x", "x", true, Arf, Ref{Arf}),
-                                              ("const arb_t x", "x", true, Arb, Ref{Arb}),
-                                              ("const acb_t x", "x", true, Acb, Ref{Acb}),
-                                              ("const char * inp", "inp", true, Cstring, Cstring),
-                                    )
+    for (str, name, isconst, jltype, ctype) in (("mag_t res", "res", false, Arblib.Mag, Ref{Arblib.Mag}),
+        ("arf_t res", "res", false, Arf, Ref{Arf}),
+        ("arb_t res", "res", false, Arb, Ref{Arb}),
+        ("acb_t res", "res", false, Acb, Ref{Acb}),
+        ("int flags", "flags", false, Integer, Cint),
+        ("slong x", "x", false, Integer, Clong),
+        ("ulong x", "x", false, Unsigned, Culong),
+        ("double x", "x", false, Base.GMP.CdoubleMax, Cdouble),
+        ("arf_rnd_t rnd", "rnd", false, Union{Arblib.arb_rnd, RoundingMode}, Arblib.arb_rnd),
+        ("const mag_t x", "x", true, Arblib.Mag, Ref{Arblib.Mag}),
+        ("const arf_t x", "x", true, Arf, Ref{Arf}),
+        ("const arb_t x", "x", true, Arb, Ref{Arb}),
+        ("const acb_t x", "x", true, Acb, Ref{Acb}),
+        ("const char * inp", "inp", true, Cstring, Cstring),
+    )
         arg = Arblib.Carg(str)
         @test Arblib.name(arg) == name
         @test Arblib.isconst(arg) == isconst
-        @test Arblib.jltype(arg) == type
+        @test Arblib.jltype(arg) == jltype
         @test Arblib.ctype(arg) == ctype
     end
 

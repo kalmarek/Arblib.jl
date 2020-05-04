@@ -28,9 +28,19 @@ end
 
 name(ca::Carg) = ca.name
 isconst(ca::Carg) = ca.isconst
-jltype(::Carg{ArgT}) where ArgT = ArgT
-ctype(ca::Carg) = jltype(ca)
-ctype(::Carg{ArgT}) where ArgT <: Union{Arf, Arb, Acb, Mag, BigFloat}  = Ref{ArgT}
+
+rawtype(::Carg{T}) where T = T
+
+jltype(ca::Carg) = rawtype(ca)
+jltype(ca::Carg{Cint}) = Integer
+jltype(ca::Carg{Clong}) = Integer
+jltype(ca::Carg{Culong}) = Unsigned
+jltype(ca::Carg{Cdouble}) = Base.GMP.CdoubleMax
+jltype(ca::Carg{arb_rnd}) = Union{arb_rnd, RoundingMode}
+jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
+
+ctype(ca::Carg) = rawtype(ca)
+ctype(::Carg{T}) where T <: Union{Arf, Arb, Acb, Mag, BigFloat}  = Ref{T}
 ctype(::Carg{Vector{T}}) where T = Ref{T}
 
 struct Arbfunction{ReturnT}
@@ -78,13 +88,14 @@ end
 function jlargs(af::Arbfunction)
     cargs = arguments(af)
     arg_names = Symbol.(name.(cargs))
+    c_types = ctype.(cargs)
     jl_types = jltype.(cargs)
 
     kwargs = Expr[]
 
     k = findfirst(==(:prec), arg_names)
     if !isnothing(k)
-        @assert jl_types[k] == Int64
+        @assert c_types[k] == Clong
         p = :prec
         a = first(cargs)
         default = if jltype(a) ∈ (Arf, Arb, Acb)
@@ -94,15 +105,17 @@ function jlargs(af::Arbfunction)
         end
         push!(kwargs, Expr(:kw, :($p::Integer), default))
         deleteat!(arg_names, k)
+        deleteat!(c_types, k)
         deleteat!(jl_types, k)
     end
 
     k = findfirst(==(:rnd), arg_names)
     if !isnothing(k)
-        @assert jl_types[k] == arb_rnd
+        @assert c_types[k] == arb_rnd
         r = :rnd
         push!(kwargs, Expr(:kw, :($r::Union{arb_rnd, RoundingMode}), :(RoundNearest)))
         deleteat!(arg_names, k)
+        deleteat!(c_types, k)
         deleteat!(jl_types, k)
     end
 
@@ -118,15 +131,12 @@ function arbsignature(af::Arbfunction)
     args = arguments(af)
 
     arg_consts = isconst.(args)
-    arg_ctypes = [jltoctype[jltype(arg)] for arg in args]
+    arg_ctypes = [jltoctype[rawtype(arg)] for arg in args]
     arg_names = name.(args)
 
 
     c_args = join([ifelse(isconst, "const ", "")*"$type $name" for (isconst, type, name)
                    in zip(arg_consts, arg_ctypes, arg_names)], ", ")
-
-    c_args = join([ifelse(isconst(arg), "const ", "") *
-                   "$(jltoctype[jltype(arg)]) $(name(arg))" for arg in args], ", ")
 
     "$creturnT $(arbfname(af))($c_args)"
 end
