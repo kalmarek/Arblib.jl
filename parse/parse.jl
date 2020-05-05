@@ -49,10 +49,10 @@ they do not parse for some other reason and error is thrown.
 function generate_file(title, sections; filename = nothing)
     str = "###\n"
     str *= "### " * title * "\n"
-    str *= "###\n\n"
+    str *= "###\n"
 
     for (section_title, functions) in sections
-        str *= "### " * section_title * "\n"
+        str *= "\n### " * section_title * "\n"
 
         for s in functions
             try
@@ -69,8 +69,6 @@ function generate_file(title, sections; filename = nothing)
                 end
             end
         end
-
-        str *= "\n"
     end
 
     if !isnothing(filename)
