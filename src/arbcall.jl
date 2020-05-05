@@ -10,8 +10,11 @@ const Ctypes = Dict{String, DataType}(
     "mag_t"     => Mag,
     "arf_rnd_t" => arb_rnd,
     "mpfr_t"    => BigFloat,
+    "mpfr_rnd_t" => Base.MPFR.MPFRRoundingMode,
+    "mpz_t"     => BigInt,
     "char *"    => Cstring,
     "slong *"   => Vector{Clong},
+    "ulong *"   => Vector{Culong},
 )
 
 struct Carg{ArgT}
@@ -37,10 +40,12 @@ jltype(ca::Carg{Clong}) = Integer
 jltype(ca::Carg{Culong}) = Unsigned
 jltype(ca::Carg{Cdouble}) = Base.GMP.CdoubleMax
 jltype(ca::Carg{arb_rnd}) = Union{arb_rnd, RoundingMode}
+jltype(ca::Carg{Base.MPFR.MPFRRoundingMode}) = Union{Base.MPFR.MPFRRoundingMode, RoundingMode}
 jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
+jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
 
 ctype(ca::Carg) = rawtype(ca)
-ctype(::Carg{T}) where T <: Union{Arf, Arb, Acb, Mag, BigFloat}  = Ref{T}
+ctype(::Carg{T}) where T <: Union{Arf, Arb, Acb, Mag, BigFloat, BigInt}  = Ref{T}
 ctype(::Carg{Vector{T}}) where T = Ref{T}
 
 struct Arbfunction{ReturnT}
@@ -111,9 +116,13 @@ function jlargs(af::Arbfunction)
 
     k = findfirst(==(:rnd), arg_names)
     if !isnothing(k)
-        @assert c_types[k] == arb_rnd
+        @assert c_types[k] == arb_rnd || c_types[k] == Base.MPFR.MPFRRoundingMode
         r = :rnd
-        push!(kwargs, Expr(:kw, :($r::Union{arb_rnd, RoundingMode}), :(RoundNearest)))
+        if c_types[k] == arb_rnd
+            push!(kwargs, Expr(:kw, :($r::Union{arb_rnd, RoundingMode}), :(RoundNearest)))
+        elseif c_types[k] == Base.MPFR.MPFRRoundingMode
+            push!(kwargs, Expr(:kw, :($r::Union{Base.MPFR.MPFRRoundingMode, RoundingMode}), :(RoundNearest)))
+        end
         deleteat!(arg_names, k)
         deleteat!(c_types, k)
         deleteat!(jl_types, k)
