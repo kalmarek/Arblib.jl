@@ -1,5 +1,7 @@
 module Arblib
 
+using LoadFlint
+
 include(joinpath(@__DIR__, "..", "deps", "deps.jl"))
 
 function __init__()
