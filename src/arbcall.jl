@@ -1,17 +1,53 @@
-const Ctypes = Dict{String, DataType}(
-    "void"      => Cvoid,
-    "int"       => Cint,
-    "slong"     => Clong,
-    "ulong"     => Culong,
-    "double"    => Cdouble,
-    "arf_t"     => Arf,
-    "arb_t"     => Arb,
-    "acb_t"     => Acb,
-    "mag_t"     => Mag,
-    "arf_rnd_t" => arb_rnd,
-    "mpfr_t"    => BigFloat,
-    "char *"    => Cstring,
-    "slong *"   => Vector{Clong},
+struct UnsupportedArgumentType <: Exception
+    key::String
+end
+
+struct ArbArgTypes
+    supported::Dict{String, DataType}
+    unsupported::Set{String}
+    supported_reversed::Dict{DataType, String}
+end
+
+function ArbArgTypes(supported, unsupported)
+    supported_reversed = Dict(value => key for (key, value) in supported)
+    if length(supported) != length(supported_reversed)
+        @warn "Supported arb types does not define a bijection"
+    end
+    return ArbArgTypes(supported, unsupported, supported_reversed)
+end
+
+function Base.getindex(arbargtypes::ArbArgTypes, key::AbstractString)
+    haskey(arbargtypes.supported, key) && return arbargtypes.supported[key]
+    key in arbargtypes.unsupported && throw(UnsupportedArgumentType(key))
+    throw(KeyError(key))
+end
+
+const arbargtypes = ArbArgTypes(
+    Dict{String, DataType}(
+        "void"      => Cvoid,
+        "int"       => Cint,
+        "slong"     => Clong,
+        "ulong"     => Culong,
+        "double"    => Cdouble,
+        "arf_t"     => Arf,
+        "arb_t"     => Arb,
+        "acb_t"     => Acb,
+        "mag_t"     => Mag,
+        "arf_rnd_t" => arb_rnd,
+        "mpfr_t"    => BigFloat,
+        "mpfr_rnd_t" => Base.MPFR.MPFRRoundingMode,
+        "mpz_t"     => BigInt,
+        "char *"    => Cstring,
+        "slong *"   => Vector{Clong},
+        "ulong *"   => Vector{Culong},
+    ),
+    Set([
+        "FILE *",
+        "fmpr_t",
+        "fmpr_rnd_t",
+        "flint_rand_t",
+        "bool_mat_t",
+    ])
 )
 
 struct Carg{ArgT}
@@ -23,7 +59,7 @@ function Carg(str)
     m = match(r"(?<const>const)?\s*(?<type>\w+(\s\*)?)\s+(?<name>\w+)", str)
     isnothing(m) && throw(ArgumentError("string doesn't match c-argument pattern"))
 
-    return Carg{Ctypes[m[:type]]}(m[:name], !isnothing(m[:const]))
+    return Carg{arbargtypes[m[:type]]}(m[:name], !isnothing(m[:const]))
 end
 
 name(ca::Carg) = ca.name
@@ -37,10 +73,12 @@ jltype(ca::Carg{Clong}) = Integer
 jltype(ca::Carg{Culong}) = Unsigned
 jltype(ca::Carg{Cdouble}) = Base.GMP.CdoubleMax
 jltype(ca::Carg{arb_rnd}) = Union{arb_rnd, RoundingMode}
+jltype(ca::Carg{Base.MPFR.MPFRRoundingMode}) = Union{Base.MPFR.MPFRRoundingMode, RoundingMode}
 jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
+jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
 
 ctype(ca::Carg) = rawtype(ca)
-ctype(::Carg{T}) where T <: Union{Arf, Arb, Acb, Mag, BigFloat}  = Ref{T}
+ctype(::Carg{T}) where T <: Union{Arf, Arb, Acb, Mag, BigFloat, BigInt}  = Ref{T}
 ctype(::Carg{Vector{T}}) where T = Ref{T}
 
 struct Arbfunction{ReturnT}
@@ -55,7 +93,7 @@ function Arbfunction(str)
 
     args = Carg.(strip.(split(m[:args], ",")))
 
-    return Arbfunction{Ctypes[m[:returntype]]}(m[:arbfunction], args)
+    return Arbfunction{arbargtypes[m[:returntype]]}(m[:arbfunction], args)
 end
 
 function jlfname(arbfname,
@@ -111,9 +149,13 @@ function jlargs(af::Arbfunction)
 
     k = findfirst(==(:rnd), arg_names)
     if !isnothing(k)
-        @assert c_types[k] == arb_rnd
+        @assert c_types[k] == arb_rnd || c_types[k] == Base.MPFR.MPFRRoundingMode
         r = :rnd
-        push!(kwargs, Expr(:kw, :($r::Union{arb_rnd, RoundingMode}), :(RoundNearest)))
+        if c_types[k] == arb_rnd
+            push!(kwargs, Expr(:kw, :($r::Union{arb_rnd, RoundingMode}), :(RoundNearest)))
+        elseif c_types[k] == Base.MPFR.MPFRRoundingMode
+            push!(kwargs, Expr(:kw, :($r::Union{Base.MPFR.MPFRRoundingMode, RoundingMode}), :(RoundNearest)))
+        end
         deleteat!(arg_names, k)
         deleteat!(c_types, k)
         deleteat!(jl_types, k)
@@ -125,13 +167,11 @@ function jlargs(af::Arbfunction)
 end
 
 function arbsignature(af::Arbfunction)
-    jltoctype = Dict(value => key for (key, value) in Ctypes)
-
-    creturnT = jltoctype[returntype(af)]
+    creturnT = arbargtypes.supported_reversed[returntype(af)]
     args = arguments(af)
 
     arg_consts = isconst.(args)
-    arg_ctypes = [jltoctype[rawtype(arg)] for arg in args]
+    arg_ctypes = [arbargtypes.supported_reversed[rawtype(arg)] for arg in args]
     arg_names = name.(args)
 
 

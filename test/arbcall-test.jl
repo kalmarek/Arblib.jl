@@ -1,18 +1,25 @@
 @testset "Carg" begin
     # Supported types
-    for (str, name, isconst, jltype, ctype) in (("mag_t res", "res", false, Arblib.Mag, Ref{Arblib.Mag}),
+    for (str, name, isconst, jltype, ctype) in (
+        ("mag_t res", "res", false, Arblib.Mag, Ref{Arblib.Mag}),
         ("arf_t res", "res", false, Arf, Ref{Arf}),
         ("arb_t res", "res", false, Arb, Ref{Arb}),
         ("acb_t res", "res", false, Acb, Ref{Acb}),
-        ("int flags", "flags", false, Integer, Cint),
-        ("slong x", "x", false, Integer, Clong),
-        ("ulong x", "x", false, Unsigned, Culong),
-        ("double x", "x", false, Base.GMP.CdoubleMax, Cdouble),
-        ("arf_rnd_t rnd", "rnd", false, Union{Arblib.arb_rnd, RoundingMode}, Arblib.arb_rnd),
         ("const mag_t x", "x", true, Arblib.Mag, Ref{Arblib.Mag}),
         ("const arf_t x", "x", true, Arf, Ref{Arf}),
         ("const arb_t x", "x", true, Arb, Ref{Arb}),
         ("const acb_t x", "x", true, Acb, Ref{Acb}),
+        ("arf_rnd_t rnd", "rnd", false, Union{Arblib.arb_rnd, RoundingMode}, Arblib.arb_rnd),
+        ("mpfr_t x", "x", false, BigFloat, Ref{BigFloat}),
+        ("mpfr_rnd_t rnd", "rnd", false, Union{Base.MPFR.MPFRRoundingMode, RoundingMode},
+         Base.MPFR.MPFRRoundingMode),
+        ("mpz_t x", "x", false, BigInt, Ref{BigInt}),
+        ("int flags", "flags", false, Integer, Cint),
+        ("slong x", "x", false, Integer, Clong),
+        ("ulong x", "x", false, Unsigned, Culong),
+        ("double x", "x", false, Base.GMP.CdoubleMax, Cdouble),
+        ("slong * x", "x", false, Vector{<:Integer}, Ref{Clong}),
+        ("ulong * x", "x", false, Vector{<:Unsigned}, Ref{Culong}),
         ("const char * inp", "inp", true, Cstring, Cstring),
     )
         arg = Arblib.Carg(str)
@@ -23,35 +30,39 @@
     end
 
     # Unsupported types
-    for str in ("fmpz_t x",
-                "fmpq_t x",
-                "mag_ptr res",
-                "arb_ptr res",
-                "acb_ptr res",
-                "const fmpz_t x",
-                "const fmpq_t x",
-                "mag_srcptr res",
-                "arb_srcptr res",
-                "acb_srcptr res",
-
-                # Internal types
-                "mpfr_rnd_t rnd",
-                "mp_limb_t lo",
-                "mp_bitcnt_t r",
-                "mp_ptr ycos",
-                "mp_srcptr x",
-                )
-        @test_throws KeyError arg = Arblib.Carg(str)
-    end
-
-    # Parsed incorrectly
     for str in (
-                "mp_limb_t * error",
-                "mp_bitcnt_t * Qexp",
-                )
-        @test_throws KeyError arg = Arblib.Carg(str)
+        "FILE * file",
+        "fmpr_t x",
+        "fmpr_rnd_t rnd",
+        "flint_rand_t state",
+        "bool_mat_t mat",
+    )
+        @test_throws Arblib.UnsupportedArgumentType arg = Arblib.Carg(str)
     end
 
+    # Unimplemented types
+        for str in (
+            "fmpz_t x",
+            "fmpq_t x",
+            "mag_ptr res",
+            "arb_ptr res",
+            "acb_ptr res",
+            "const fmpz_t x",
+            "const fmpq_t x",
+            "mag_srcptr res",
+            "arb_srcptr res",
+            "acb_srcptr res",
+
+            # Internal types
+            "mp_limb_t lo",
+            "mp_bitcnt_t r",
+            "mp_ptr ycos",
+            "mp_srcptr x",
+            "mp_limb_t * error",
+            "mp_bitcnt_t * Qexp",
+        )
+            @test_throws KeyError arg = Arblib.Carg(str)
+    end
 
     # Parse errors
     for str in (# Internal types
