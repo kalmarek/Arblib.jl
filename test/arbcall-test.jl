@@ -30,26 +30,38 @@
     end
 
     # Unsupported types
-    for str in ("fmpz_t x",
-                "fmpq_t x",
-                "mag_ptr res",
-                "arb_ptr res",
-                "acb_ptr res",
-                "const fmpz_t x",
-                "const fmpq_t x",
-                "mag_srcptr res",
-                "arb_srcptr res",
-                "acb_srcptr res",
+    for str in (
+        "FILE * file",
+        "fmpr_t x",
+        "fmpr_rnd_t rnd",
+        "flint_rand_t state",
+        "bool_mat_t mat",
+    )
+        @test_throws Arblib.UnsupportedArgumentType arg = Arblib.Carg(str)
+    end
 
-                # Internal types
-                "mp_limb_t lo",
-                "mp_bitcnt_t r",
-                "mp_ptr ycos",
-                "mp_srcptr x",
-                "mp_limb_t * error",
-                "mp_bitcnt_t * Qexp",
-                )
-        @test_throws KeyError arg = Arblib.Carg(str)
+    # Unimplemented types
+        for str in (
+            "fmpz_t x",
+            "fmpq_t x",
+            "mag_ptr res",
+            "arb_ptr res",
+            "acb_ptr res",
+            "const fmpz_t x",
+            "const fmpq_t x",
+            "mag_srcptr res",
+            "arb_srcptr res",
+            "acb_srcptr res",
+
+            # Internal types
+            "mp_limb_t lo",
+            "mp_bitcnt_t r",
+            "mp_ptr ycos",
+            "mp_srcptr x",
+            "mp_limb_t * error",
+            "mp_bitcnt_t * Qexp",
+        )
+            @test_throws KeyError arg = Arblib.Carg(str)
     end
 
     # Parse errors
