@@ -41,11 +41,8 @@ for (T, args) in (
     end
 end
 
-function set!(res::Arb, str::AbstractString)
-    flag = ccall(@libarb(arb_set_str), Cint, (Ref{Arb}, Cstring, Int), res, str, precision(res))
-    iszero(flag) || throw(ArgumentError("arblib could not parse $str as an Arb"))
-    return res
-end
+set!(res::Arb, str::AbstractString) =
+    ccall(@libarb(arb_set_str), Cint, (Ref{Arb}, Cstring, Int), res, str, precision(res))
 
 for (jlT, cT, suffix) in (
     (Arb, Ref{Arb}, :arb_arb),
@@ -64,7 +61,10 @@ end
 
 for ArbT in (:Arf, :Arb, :Acb, :Mag)
     @eval begin
-        $ArbT(t::$ArbT; prec::Integer=precision(t)) = set!($ArbT(prec=prec), t)
+        function $ArbT(t::$ArbT; prec::Integer=precision(t))
+            res = $ArbT(prec=prec)
+            set!(res, t)
+        end
 
         function $ArbT(si::T; prec::Integer=DEFAULT_PRECISION[]) where T <: Integer
             promote_type(T, Int64) == Int64 && return $ArbT(Int64(si), prec)
@@ -76,10 +76,18 @@ for ArbT in (:Arf, :Arb, :Acb, :Mag)
             return $ArbT(BigFloat(d), prec)
         end
 
-        $ArbT(d::Float64; prec::Integer=DEFAULT_PRECISION[]) = set!($ArbT(prec=prec), d)
+        function $ArbT(d::Base.GMP.CdoubleMax; prec::Integer=DEFAULT_PRECISION[])
+            res = $ArbT(prec=prec)
+            set!(res, d)
+            return res
+        end
 
         if $ArbT != Arf
-            $ArbT(si::Int64; prec::Integer=DEFAULT_PRECISION[]) = set!($ArbT(prec=prec), si)
+            function $ArbT(si::Base.GMP.ClongMax; prec::Integer=DEFAULT_PRECISION[])
+                res = $ArbT(prec=prec)
+                set!(res, si)
+                return res
+            end
         end
 
         Base.zero(t::$ArbT) = $ArbT(0; prec = precision(t))
@@ -87,26 +95,49 @@ for ArbT in (:Arf, :Arb, :Acb, :Mag)
     end
 end
 
-Arf(x::BigFloat; prec::Integer=precision(x)) = set!(Arf(prec=prec), x)
-Arb(x::BigFloat; prec::Integer=precision(x)) = set!(Arb(prec=prec), Arf(x, prec=prec))
-Acb(x::BigFloat; prec::Integer=precision(x)) = set!(Acb(prec=prec), Arb(x, prec=prec))
+function Arf(x::BigFloat; prec::Integer=precision(x))
+    res = Arf(prec=prec)
+    set!(res, x)
+    return res
+end
+function Arb(x::BigFloat; prec::Integer=precision(x))
+    res = Arb(prec=prec)
+    set!(res, Arf(x, prec=prec))
+    return res
+end
+function Acb(x::BigFloat; prec::Integer=precision(x))
+    res = Acb(prec=prec)
+    set!(res, Arb(x, prec=prec))
+    return res
+end
 
 # fallbacks:
-Arf(x::Real; prec::Integer=DEFAULT_PRECISION[]) = set!(Arf(prec=prec), BigFloat(x))
-Arb(x::Real; prec::Integer=DEFAULT_PRECISION[]) = set!(Arb(prec=prec), Arf(x, prec=prec))
-Acb(x::Real; prec::Integer=DEFAULT_PRECISION[]) = set!(Acb(prec=prec), Arb(x, prec=prec))
+Arf(x::Real; prec::Integer=DEFAULT_PRECISION[]) = Arf(BigFloat(x); prec=prec)
+Arb(x::Real; prec::Integer=DEFAULT_PRECISION[]) = Arb(Arf(x, prec=prec))
+Acb(x::Real; prec::Integer=DEFAULT_PRECISION[]) = Acb(Arb(x, prec=prec))
 
 # string input
-Arb(str::AbstractString; prec::Integer=DEFAULT_PRECISION[]) = set!(Arb(prec=prec), str)
+function Arb(str::AbstractString; prec::Integer=DEFAULT_PRECISION[])
+    res = Arb(prec=prec)
+    flag = set!(res, str)
+    iszero(flag) || throw(ArgumentError("arblib could not parse $str as an Arb"))
+    return res
+end
 
-function Acb(re::Integer, im::Integer; prec::Integer=DEFAULT_PRECISION[])
+function Acb(re::T, im::T; prec::Integer=DEFAULT_PRECISION[]) where T<:Integer
     promote_type(T, Int64) == Int64 && return Acb(Int64(re), Int64(im), prec=prec)
     return Acb(BigInt(re), BigInt(im), prec=prec)
 end
 
-Acb(re::Int64, im::Int64; prec::Integer=DEFAULT_PRECISION[]) = set!(Acb(prec=prec), re, im)
-Acb(re::Float64, im::Float64; prec::Integer=DEFAULT_PRECISION[]) = set!(Acb(prec=prec), re, im)
-Acb(re::Arb, im::Arb; prec::Integer=min(precision(re), precision(im))) = set!(Acb(prec=prec), re, im)
+for T in (Integer, Base.GMP.CdoubleMax, Arb)
+    @eval begin
+        function Acb(re::$T, im::$T; prec::Integer=DEFAULT_PRECISION[])
+            res = Acb(prec=prec)
+            set!(res, re, im)
+            return res
+        end
+    end
+end
 
 function Acb(z::Complex{T}; prec::Integer=DEFAULT_PRECISION[]) where T
     if promote_type(T, Float64) == Float64
@@ -117,21 +148,19 @@ end
 
 # Irrationals
 for (irr, suffix) in ((:π, "pi"), (:ℯ, "e"), (:γ, "euler"))
-    arbf = Symbol("arb_const_", suffix)
     jlf = Symbol("const_$suffix", "!")
     IrrT = Irrational{irr}
     @eval begin
-        function $(jlf)(res::Arb)
-            ccall(@libarb($arbf), Cvoid, (Ref{Arb}, Clong,), res, precision(res))
+        function Arb(::$IrrT; prec::Integer=DEFAULT_PRECISION[])
+            res=Arb(prec=prec)
+            $jlf(res)
             return res
         end
-        Arb(::$IrrT; prec::Integer=DEFAULT_PRECISION[])= $jlf(Arb(prec=prec))
     end
 end
 
-Acb(::Irrational{:π}; prec::Integer=DEFAULT_PRECISION[]) = const_pi!(Acb(prec=prec))
-
-function const_pi!(res::Acb)
-    ccall(@libarb(acb_const_pi), Cvoid, (Ref{Acb}, Clong,), res, precision(res=prec))
+function Acb(::Irrational{:π}; prec::Integer=DEFAULT_PRECISION[])
+    res = Acb(prec=prec)
+    const_pi!(res)
     return res
 end
