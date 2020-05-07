@@ -12,18 +12,21 @@ export Arf, Arb, Acb
 
 import Base: isfinite, isinf, isinteger, isnan, isone, isreal, iszero
 
-include("macros.jl")
+macro libarb(function_name)
+    return (:($function_name), libarb)
+end
+
 include("arb_types.jl")
 include("types.jl")
 include("rounding.jl")
+include("arbcall.jl")
+
 include("precision.jl")
 
 include("constructors.jl")
 
 include("predicates.jl")
 include("show.jl")
-
-include("arbcall.jl")
 
 include("arb.jl")
 
