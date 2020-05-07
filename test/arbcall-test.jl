@@ -193,4 +193,20 @@ end
 
     Arblib.@arbcall_str "double arf_get_d(const arf_t x, arf_rnd_t rnd)"
     @test typeof(Arblib.get(Arf(1))) == Float64
+
+    # these were needed for examples tests: 
+
+    Arblib.@arbcall_str "int arb_le(const arb_t x, const arb_t y)"
+    @test Arblib.le(x,y) == 1
+    @test Arblib.le(x,x) == 1
+
+    Arblib.@arbcall_str "int arb_lt(const arb_t x, const arb_t y)"
+    @test Arblib.lt(x,y) == 1
+    @test Arblib.lt(x,x) == 0
+
+    Arblib.@arbcall_str "void arb_const_pi(arb_t x, slong prec)"
+    res = Arb()
+    @test isnothing(Arblib.const_pi!(res))
+    @test Arblib.le(x, res) ==1
+
 end
