@@ -4,7 +4,7 @@ const DEFAULT_PRECISION = Ref{Clong}(256)
     precision(<:Union{Arf,Arb,Acb})
 Get the default precision (in bits) currently used for `Arblib` arithmetic.
 """
-Base.precision(::Type{<:Union{Arf,Arb,Acb}}) = Int(DEFAULT_PRECISION[])
+Base.precision(::Type{<:Union{Arf,Arb,Acb}}) = DEFAULT_PRECISION[]
 
 """
     setprecision(::Type{<:Union{Arf, Arb, Acb}}, precision::Int)
