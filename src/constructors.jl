@@ -60,12 +60,16 @@ for (jlT, cT, suffix) in (
 end
 
 for ArbT in (:Arf, :Arb, :Acb, :Mag)
-    @eval begin
-        function $ArbT(t::$ArbT; prec::Integer=precision(t))
-            res = $ArbT(prec=prec)
-            set!(res, t)
+    if ArbT != :Mag
+        @eval begin
+            function $ArbT(t::$ArbT; prec::Integer=precision(t))
+                res = $ArbT(prec=prec)
+                set!(res, t)
+            end
         end
+    end
 
+    @eval begin
         function $ArbT(si::T; prec::Integer=DEFAULT_PRECISION[]) where T <: Integer
             promote_type(T, Int64) == Int64 && return $ArbT(Int64(si), prec)
             return $ArbT(BigInt(si), prec)

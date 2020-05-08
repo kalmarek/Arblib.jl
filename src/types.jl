@@ -9,14 +9,44 @@ mutable struct Arf <: Real
         return res
     end
 
-    function Arf(si::Int64; prec::Integer=DEFAULT_PRECISION[])
+    function Arf(ui::UInt64; prec::Integer=DEFAULT_PRECISION[])
         res = new(arf_struct(0,0,0,0), prec)
-        ccall(@libarb(arf_init_set_si), Cvoid, (Ref{Arf}, Int), res, si)
+        init_set!(res, ui)
         finalizer(clear!, res)
         return res
     end
 
-    # ccall(@libarb(arf_init_set_ui), Cvoid, (Ref{Arf}, Int), res, ui)
+    function Arf(si::Int64; prec::Integer=DEFAULT_PRECISION[])
+        res = new(arf_struct(0,0,0,0), prec)
+        init_set!(res, si)
+        finalizer(clear!, res)
+        return res
+    end
+end
+
+mutable struct Mag <: Real
+    mag::mag_struct
+
+    function Mag()
+        res = new(mag_struct(0,0))
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
+
+    function Mag(m::Mag)
+        res = new(mag_struct(0,0))
+        init_set!(res, m)
+        finalizer(clear!, res)
+        return res
+    end
+
+    function Mag(arf::Arf)
+        res = new(mag_struct(0,0))
+        init_set!(res, arf)
+        finalizer(clear!, res)
+        return res
+    end
 end
 
 mutable struct Arb <: Real
@@ -43,49 +73,10 @@ mutable struct Acb <: Number
     end
 end
 
-mutable struct Mag <: Real
-    mag::mag_struct
-
-    function Mag()
-        res = new(mag_struct(0,0))
-        init!(res)
-        finalizer(clear!, res)
-        return res
-    end
-
-    function Mag(m::mag_struct)
-        res = new(mag_struct(0,0))
-        ccall(
-            @libarb(mag_init_set),
-            Cvoid,
-            (Ref{Mag}, Ref{mag_struct}),
-            res,
-            m,
-        )
-        finalizer(clear!, res)
-        return res
-    end
-
-    function Mag(arf::Arf)
-        res = new(mag_struct(0,0))
-        ccall(
-            @libarb(mag_init_set_arf),
-            Cvoid,
-            (Ref{Mag}, Ref{Arf}),
-            res,
-            arf,
-        )
-        finalizer(clear!, res)
-        return res
-    end
-end
-
-for (T, prefix) in ((Arf, :arf), (Arb, :arb), (Acb, :acb), (Mag, :mag))
+for (T, prefix) in ((Mag, :mag), (Arf, :arf), (Arb, :arb), (Acb, :acb))
     arbstruct = Symbol(prefix, :_struct)
     spref = "$prefix"
     @eval begin
-        init!(a::$T) = init!(a.$prefix)
-        clear!(a::$T) = clear!(a.$prefix)
         cprefix(::Type{$T}) = Symbol($spref) # useful for metaprogramming
         cstruct(t::$T) = getfield(t, cprefix($T))
     end

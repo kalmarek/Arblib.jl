@@ -28,6 +28,9 @@ include("constructors.jl")
 include("predicates.jl")
 include("show.jl")
 
+include("arbcalls/mag.jl")
+include("arbcalls/arf.jl")
 include("arbcalls/arb.jl")
+include("arbcalls/acb.jl")
 
 end # module
