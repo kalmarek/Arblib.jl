@@ -7,7 +7,7 @@ function sin_naive!(res, x)
     # @show tol
     k = 0
     while true
-        Arblib.pow!(t, x, 2k + 1)
+        Arblib.pow!(t, x, UInt(2k + 1))
         Arblib.fac!(u, UInt(2k + 1))
         Arblib.div!(t, t, u)
         Arblib.abs!(u, t)
@@ -25,6 +25,7 @@ function sin_naive!(res, x)
         k += 1
     end
     Arblib.set!(res, s)
+    return res
 end
 
 global prec = 64

@@ -27,7 +27,6 @@ for (T, args) in (
     @eval begin
         function set!(res::$T, x::$T)
             ccall(@libarb($arbf), Cvoid, (Ref{$T}, Ref{$T}), res, x)
-            return res
         end
     end
     for (jlT, cT, suffix) in args
@@ -35,7 +34,6 @@ for (T, args) in (
         @eval begin
             function set!(res::$T, x::$jlT)
                 ccall(@libarb($arbf), Cvoid, (Ref{$T}, $cT), res, x)
-                return res
             end
         end
     end
@@ -54,7 +52,6 @@ for (jlT, cT, suffix) in (
     @eval begin
         function set!(res::$T, re::$jlT, im::$jlT)
             ccall(@libarb($arbf), Cvoid, (Ref{$T}, $cT, $cT), res, re, im)
-            return res
         end
     end
 end
@@ -64,6 +61,7 @@ for ArbT in (:Arf, :Arb, :Acb, :Mag)
         function $ArbT(t::$ArbT; prec::Integer=precision(t))
             res = $ArbT(prec=prec)
             set!(res, t)
+            return res
         end
 
         function $ArbT(si::T; prec::Integer=DEFAULT_PRECISION[]) where T <: Integer
