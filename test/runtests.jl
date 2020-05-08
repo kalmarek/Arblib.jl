@@ -1,5 +1,6 @@
 using Arblib, Test
 
+include("arb_types-test.jl")
 include("arbcall-test.jl")
 include("examples.jl")
 

@@ -1,3 +1,8 @@
+struct mag_struct
+    exponent::UInt       # fmpz
+    mantissa::UInt       # mp_limb_t
+end
+
 struct arf_struct
     exponent::UInt      # fmpz
     size::UInt          # mp_size_t
@@ -35,11 +40,6 @@ struct acb_struct
     exp_mag_i::Int        # │ fmpz
     mantissa_mag_i::UInt  # │ mp_limb_t
                           # └
-end
-
-struct mag_struct
-    exponent::UInt       # fmpz
-    mantissa::UInt       # mp_limb_t
 end
 
 for prefix in (:arf, :arb, :acb, :mag)
