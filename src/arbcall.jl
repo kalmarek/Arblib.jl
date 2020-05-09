@@ -74,6 +74,7 @@ jltype(ca::Carg{Culong}) = Unsigned
 jltype(ca::Carg{Cdouble}) = Base.GMP.CdoubleMax
 jltype(ca::Carg{arb_rnd}) = Union{arb_rnd, RoundingMode}
 jltype(ca::Carg{Base.MPFR.MPFRRoundingMode}) = Union{Base.MPFR.MPFRRoundingMode, RoundingMode}
+jltype(ca::Carg{Cstring}) = AbstractString
 jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
 jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
 
@@ -118,7 +119,7 @@ end
 
 function jlfname(af::Arbfunction,
         prefixes=("arf", "arb", "acb", "mag"),
-        suffixes=("si", "ui", "d", "arf", "arb");
+        suffixes=("si", "ui", "d", "mag", "arf", "arb", "mpfr", "str");
         inplace=inplace(af))
     return jlfname(arbfname(af), prefixes, suffixes, inplace=inplace)
 end
