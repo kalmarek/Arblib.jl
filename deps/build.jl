@@ -20,6 +20,7 @@ download_info = Dict(
 dependencies = [
     "https://github.com/JuliaPackaging/Yggdrasil/releases/download/GMP-v6.1.2-1/build_GMP.v6.1.2.jl",
     "https://github.com/JuliaPackaging/Yggdrasil/releases/download/MPFR-v4.0.2-1/build_MPFR.v4.0.2.jl",
+    "https://github.com/thofma/Flint2Builder/releases/download/f46562/build_libflint.v0.0.0-f465622699d5c4c22bb3617596f8ae86e4570652.jl",
     "https://github.com/thofma/ArbBuilder/releases/download/6c3738-v2/build_libarb.v0.0.0-6c3738555d00b8b8b24a1f5e0065ef787432513c.jl",
 ]
 
