@@ -5,6 +5,7 @@ include("types-test.jl")
 include("arbcall-test.jl")
 include("constructors-test.jl")
 include("predicates-test.jl")
+include("show-test.jl")
 include("examples.jl")
 
 @testset "Arblib" begin
