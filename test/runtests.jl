@@ -2,8 +2,9 @@ using Arblib, Test
 
 include("arb_types-test.jl")
 include("types-test.jl")
-include("constructors-test.jl")
 include("arbcall-test.jl")
+include("constructors-test.jl")
+include("predicates-test.jl")
 include("examples.jl")
 
 @testset "Arblib" begin

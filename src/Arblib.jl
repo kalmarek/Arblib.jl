@@ -10,8 +10,6 @@ end
 
 export Arf, Arb, Acb
 
-import Base: isfinite, isinf, isinteger, isnan, isone, isreal, iszero
-
 macro libarb(function_name)
     return (:($function_name), libarb)
 end
