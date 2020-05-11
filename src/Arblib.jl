@@ -1,6 +1,7 @@
 module Arblib
 
 using LoadFlint
+const libflint = LoadFlint.libflint
 
 include(joinpath(@__DIR__, "..", "deps", "deps.jl"))
 
