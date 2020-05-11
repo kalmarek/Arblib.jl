@@ -62,7 +62,9 @@ function generate_file(title, sections; filename = nothing)
 
                 str *= "arbcall\"" * s * "\"\n"
             catch e
-                if e isa KeyError
+                if e isa Arblib.UnsupportedArgumentType
+                    str *= "##arbcall\"" * s * "\"\n"
+                elseif e isa KeyError
                     str *= "#arbcall\"" * s * "\"\n"
                 else
                     rethrow(e)
