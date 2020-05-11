@@ -51,7 +51,7 @@ arbcall"void mag_min(mag_t res, const mag_t x, const mag_t y)"
 arbcall"void mag_max(mag_t res, const mag_t x, const mag_t y)"
 
 ### Input and output
-arbcall"void mag_print(const mag_t x)"
+#arbcall"void mag_print(const mag_t x)"
 ##arbcall"void mag_fprint(FILE * file, const mag_t x)"
 arbcall"char * mag_dump_str(const mag_t x)"
 arbcall"int mag_load_str(mag_t x, const char * str)"

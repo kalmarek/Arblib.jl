@@ -36,7 +36,7 @@ arbcall"void acb_add_error_mag(acb_t x, const mag_t err)"
 arbcall"void acb_get_mid(acb_t m, const acb_t x)"
 
 ### Input and output
-arbcall"void acb_print(const acb_t x)"
+#arbcall"void acb_print(const acb_t x)"
 ##arbcall"void acb_fprint(FILE * file, const acb_t x)"
 arbcall"void acb_printd(const acb_t x, slong digits)"
 ##arbcall"void acb_fprintd(FILE * file, const acb_t x, slong digits)"
