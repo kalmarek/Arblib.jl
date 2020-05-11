@@ -1,46 +1,47 @@
-@testset "Carg" begin
-    # Supported types
-    for (str, name, isconst, jltype, ctype) in (
-        ("mag_t res", "res", false, Arblib.Mag, Ref{Arblib.Mag}),
-        ("arf_t res", "res", false, Arf, Ref{Arf}),
-        ("arb_t res", "res", false, Arb, Ref{Arb}),
-        ("acb_t res", "res", false, Acb, Ref{Acb}),
-        ("const mag_t x", "x", true, Arblib.Mag, Ref{Arblib.Mag}),
-        ("const arf_t x", "x", true, Arf, Ref{Arf}),
-        ("const arb_t x", "x", true, Arb, Ref{Arb}),
-        ("const acb_t x", "x", true, Acb, Ref{Acb}),
-        ("arf_rnd_t rnd", "rnd", false, Union{Arblib.arb_rnd, RoundingMode}, Arblib.arb_rnd),
-        ("mpfr_t x", "x", false, BigFloat, Ref{BigFloat}),
-        ("mpfr_rnd_t rnd", "rnd", false, Union{Base.MPFR.MPFRRoundingMode, RoundingMode},
-         Base.MPFR.MPFRRoundingMode),
-        ("mpz_t x", "x", false, BigInt, Ref{BigInt}),
-        ("int flags", "flags", false, Integer, Cint),
-        ("slong x", "x", false, Integer, Clong),
-        ("ulong x", "x", false, Unsigned, Culong),
-        ("double x", "x", false, Base.GMP.CdoubleMax, Cdouble),
-        ("slong * x", "x", false, Vector{<:Integer}, Ref{Clong}),
-        ("ulong * x", "x", false, Vector{<:Unsigned}, Ref{Culong}),
-        ("const char * inp", "inp", true, AbstractString, Cstring),
-    )
-        arg = Arblib.Carg(str)
-        @test Arblib.name(arg) == name
-        @test Arblib.isconst(arg) == isconst
-        @test Arblib.jltype(arg) == jltype
-        @test Arblib.ctype(arg) == ctype
-    end
+@testset "arbcall" begin
+    @testset "Carg" begin
+        # Supported types
+        for (str, name, isconst, jltype, ctype) in (
+            ("mag_t res", "res", false, Arblib.Mag, Ref{Arblib.Mag}),
+            ("arf_t res", "res", false, Arf, Ref{Arf}),
+            ("arb_t res", "res", false, Arb, Ref{Arb}),
+            ("acb_t res", "res", false, Acb, Ref{Acb}),
+            ("const mag_t x", "x", true, Arblib.Mag, Ref{Arblib.Mag}),
+            ("const arf_t x", "x", true, Arf, Ref{Arf}),
+            ("const arb_t x", "x", true, Arb, Ref{Arb}),
+            ("const acb_t x", "x", true, Acb, Ref{Acb}),
+            ("arf_rnd_t rnd", "rnd", false, Union{Arblib.arb_rnd, RoundingMode}, Arblib.arb_rnd),
+            ("mpfr_t x", "x", false, BigFloat, Ref{BigFloat}),
+            ("mpfr_rnd_t rnd", "rnd", false, Union{Base.MPFR.MPFRRoundingMode, RoundingMode},
+             Base.MPFR.MPFRRoundingMode),
+            ("mpz_t x", "x", false, BigInt, Ref{BigInt}),
+            ("int flags", "flags", false, Integer, Cint),
+            ("slong x", "x", false, Integer, Clong),
+            ("ulong x", "x", false, Unsigned, Culong),
+            ("double x", "x", false, Base.GMP.CdoubleMax, Cdouble),
+            ("slong * x", "x", false, Vector{<:Integer}, Ref{Clong}),
+            ("ulong * x", "x", false, Vector{<:Unsigned}, Ref{Culong}),
+            ("const char * inp", "inp", true, AbstractString, Cstring),
+        )
+            arg = Arblib.Carg(str)
+            @test Arblib.name(arg) == name
+            @test Arblib.isconst(arg) == isconst
+            @test Arblib.jltype(arg) == jltype
+            @test Arblib.ctype(arg) == ctype
+        end
 
-    # Unsupported types
-    for str in (
-        "FILE * file",
-        "fmpr_t x",
-        "fmpr_rnd_t rnd",
-        "flint_rand_t state",
-        "bool_mat_t mat",
-    )
-        @test_throws Arblib.UnsupportedArgumentType arg = Arblib.Carg(str)
-    end
+        # Unsupported types
+        for str in (
+            "FILE * file",
+            "fmpr_t x",
+            "fmpr_rnd_t rnd",
+            "flint_rand_t state",
+            "bool_mat_t mat",
+        )
+            @test_throws Arblib.UnsupportedArgumentType arg = Arblib.Carg(str)
+        end
 
-    # Unimplemented types
+        # Unimplemented types
         for str in (
             "fmpz_t x",
             "fmpq_t x",
@@ -62,61 +63,61 @@
             "mp_bitcnt_t * Qexp",
         )
             @test_throws KeyError arg = Arblib.Carg(str)
+        end
+
+        # Parse errors
+        for str in (# Internal types
+                    )
+            @test_throws ArgumentError arg = Arblib.Carg(str)
+        end
     end
 
-    # Parse errors
-    for str in (# Internal types
-                )
-        @test_throws ArgumentError arg = Arblib.Carg(str)
+    @testset "jlfname" begin
+        for (arbfname, name) in (# Supported types
+                                 ("mag_set", :set),
+                                 ("mag_set_d", :set),
+                                 ("mag_set_ui", :set),
+                                 ("arf_set", :set),
+                                 ("arf_set_ui", :set),
+                                 ("arf_set_si", :set),
+                                 ("arf_set_d", :set),
+                                 ("arb_set", :set),
+                                 ("arb_set_arf", :set),
+                                 ("arb_set_si", :set),
+                                 ("arb_set_ui", :set),
+                                 ("arb_set_d", :set),
+                                 ("acb_set", :set),
+                                 ("acb_set_ui", :set),
+                                 ("acb_set_si", :set),
+                                 ("acb_set_d", :set),
+                                 ("acb_set_arb", :set),
+                                 ("acb_set_si_si", :set),
+                                 ("acb_set_d_d", :set),
+                                 ("acb_set_arb_arb", :set),
+
+                                 # Unsupported types
+                                 ("arf_set_fmpz", :set_fmpz),
+                                 ("arf_set_mpfr", :set_mpfr),
+                                 ("acb_set_fmpq", :set_fmpq),
+                                 ("arb_bin_uiui", :bin_uiui),
+
+                                 # Deprecated types
+                                 ("arf_set_mpz", :set_mpz),
+                                 ("arf_set_fmpr", :set_fmpr),
+
+                                 # Underscore methods
+                                 ("_arb_vec_set", :_arb_vec_set),
+
+                                 # Some special cases to be aware of and maybe change
+                                 ("mag_set_d_lower", :set_d_lower),
+                                 ("arb_ui_div", :ui_div),
+                                 ("arb_rising_ui_rec", :rising_ui_rec),
+                                 ("arb_zeta_ui_vec", :zeta_ui_vec),
+                                 )
+            @test Arblib.jlfname(arbfname) == name
+            @test Arblib.jlfname(arbfname, inplace = true) == Symbol(name, :!)
+        end
     end
-end
-
-@testset "jlfname" begin
-    for (arbfname, name) in (# Supported types
-                             ("mag_set", :set),
-                             ("mag_set_d", :set),
-                             ("mag_set_ui", :set),
-                             ("arf_set", :set),
-                             ("arf_set_ui", :set),
-                             ("arf_set_si", :set),
-                             ("arf_set_d", :set),
-                             ("arb_set", :set),
-                             ("arb_set_arf", :set),
-                             ("arb_set_si", :set),
-                             ("arb_set_ui", :set),
-                             ("arb_set_d", :set),
-                             ("acb_set", :set),
-                             ("acb_set_ui", :set),
-                             ("acb_set_si", :set),
-                             ("acb_set_d", :set),
-                             ("acb_set_arb", :set),
-                             ("acb_set_si_si", :set),
-                             ("acb_set_d_d", :set),
-                             ("acb_set_arb_arb", :set),
-
-                             # Unsupported types
-                             ("arf_set_fmpz", :set_fmpz),
-                             ("arf_set_mpfr", :set_mpfr),
-                             ("acb_set_fmpq", :set_fmpq),
-                             ("arb_bin_uiui", :bin_uiui),
-
-                             # Deprecated types
-                             ("arf_set_mpz", :set_mpz),
-                             ("arf_set_fmpr", :set_fmpr),
-
-                             # Underscore methods
-                             ("_arb_vec_set", :_arb_vec_set),
-
-                             # Some special cases to be aware of and maybe change
-                             ("mag_set_d_lower", :set_d_lower),
-                             ("arb_ui_div", :ui_div),
-                             ("arb_rising_ui_rec", :rising_ui_rec),
-                             ("arb_zeta_ui_vec", :zeta_ui_vec),
-                             )
-        @test Arblib.jlfname(arbfname) == name
-        @test Arblib.jlfname(arbfname, inplace = true) == Symbol(name, :!)
-    end
-end
 
 @testset "returntype" begin
     # Supported return types
@@ -209,4 +210,5 @@ end
     @test isnothing(Arblib.const_pi!(res))
     @test Arblib.le(x, res) ==1
 
+end
 end
