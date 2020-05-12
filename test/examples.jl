@@ -25,6 +25,7 @@
                 k += 1
             end
             Arblib.set!(res, s)
+            return res
         end
 
         @test let

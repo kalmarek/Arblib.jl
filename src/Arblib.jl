@@ -1,6 +1,7 @@
 module Arblib
 
 using LoadFlint
+const libflint = LoadFlint.libflint
 
 include(joinpath(@__DIR__, "..", "deps", "deps.jl"))
 
@@ -9,8 +10,6 @@ function __init__()
 end
 
 export Arf, Arb, Acb
-
-import Base: isfinite, isinf, isinteger, isnan, isone, isreal, iszero
 
 macro libarb(function_name)
     return (:($function_name), libarb)
@@ -28,6 +27,9 @@ include("constructors.jl")
 include("predicates.jl")
 include("show.jl")
 
-include("arb.jl")
+include("arbcalls/mag.jl")
+include("arbcalls/arf.jl")
+include("arbcalls/arb.jl")
+include("arbcalls/acb.jl")
 
 end # module

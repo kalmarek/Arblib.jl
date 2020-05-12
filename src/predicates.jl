@@ -1,40 +1,40 @@
 for (T, funcpairs) in (
     (Mag, (
-        (:isfinite, :is_finite),
-        (:isinf, :is_inf),
+        (:(Base.isfinite), :is_finite),
+        (:(Base.isinf), :is_inf),
         (:isspecial, :is_special),
-        (:iszero, :is_zero),)),
+        (:(Base.iszero), :is_zero),)),
     (Arf, (
-        (:isfinite, :is_finite),
-        (:isinf, :is_inf),
-        (:isinteger, :is_int),
-        (:isnan, :is_nan),
+        (:(Base.isfinite), :is_finite),
+        (:(Base.isinf), :is_inf),
+        (:(Base.isinteger), :is_int),
+        (:(Base.isnan), :is_nan),
         (:isneginf, :is_neg_inf),
         (:isnormal, :is_normal),
-        (:isone, :is_one),
+        (:(Base.isone), :is_one),
         (:isposinf, :is_pos_inf),
         (:isspecial, :is_special),
-        (:iszero, :is_zero),
+        (:(Base.iszero), :is_zero),
         )),
     (Arb, (
         (:isexact, :is_exact),
-        (:isfinite, :is_finite),
-        (:isinteger, :is_int),
+        (:(Base.isfinite), :is_finite),
+        (:(Base.isinteger), :is_int),
         (:isnegative, :is_negative),
         (:isnonnegative, :is_nonnegative),
         (:isnonpositive, :is_nonpositive),
         (:isnonzero, :is_nonzero),
-        (:isone, :is_one),
+        (:(Base.isone), :is_one),
         (:ispositive, :is_positive),
-        (:iszero, :is_zero),
+        (:(Base.iszero), :is_zero),
     )),
     (Acb, (
         (:isexact, :is_exact),
-        (:isfinite, :is_finite),
-        (:isinteger, :is_int),
-        (:isone, :is_one),
-        (:isreal, :is_real),
-        (:iszero, :is_zero),
+        (:(Base.isfinite), :is_finite),
+        (:(Base.isinteger), :is_int),
+        (:(Base.isone), :is_one),
+        (:(Base.isreal), :is_real),
+        (:(Base.iszero), :is_zero),
     ))
     )
     for (jlf, arbf) in funcpairs
@@ -42,27 +42,37 @@ for (T, funcpairs) in (
     end
 end
 
-for ArbT in (Arf, Arb, Acb, Mag)
+#Base.isless(x::Mag, y::Mag) = cmp(x, y) < 0
+#Base.:(==)(x::Mag, y::Mag) = !iszero(is_equal(x, y))
+#
+#Base.isless(x::Arf, y::Arf) = (isnan(y) && !isnan(x)) || cmp(x, y) < 0
+#Base.:(==)(x::Arf, y::Arf) = !isnan(x) && !iszero(equal(x, y))
+#Base.:(<)(x::Arf, y::Arf) = !isnan(x) && !isnan(y) && cmp(x, y) < 0
+#Base.:(<=)(x::Arf, y::Arf) = !isnan(x) && !isnan(y) && cmp(x, y) <= 0
+#Base.isequal(x::Arf, y::Arf) = !iszero(is_equal(x, y))
+
+for ArbT in (Mag, Arf, Arb, Acb)
     @eval begin
-        Base.isequal(y::$ArbT, x::$ArbT) = !iszero(is_equal(x,y))
+        Base.isequal(y::$ArbT, x::$ArbT) = !iszero(equal(x, y))
     end
 
     ArbT == Mag && continue
 
     @eval begin
-        Base.isequal(y::Int, x::$ArbT) = !iszero(is_equal(x,y))
+        Base.isequal(y::Integer, x::$ArbT) = !iszero(equal(x, y))
+        Base.isequal(x::$ArbT, y::Integer) = !iszero(equal(x, y))
     end
 end
 
-Base.:(==)(x::Arf, y::Arf) = isequal(x, y)
-Base.:(==)(x::Arf, y::Int) = isequal(x, y)
-Base.:(==)(y::Int, x::Arf) = isequal(x, y)
+Base.isless(x::Mag, y::Mag) = cmp(x, y) < 0
+Base.:(<)(x::Mag, y::Mag) = cmp(x, y) < 0
+Base.:(<=)(x::Mag, y::Mag) = cmp(x, y) <= 0
 
 for jltype in (Arf, Integer, Unsigned, Base.GMP.CdoubleMax)
     @eval begin
-        Base.isless(x::Arf, y::$jltype) = cmp(x, y) < 0
-        Base.:(<)(x::Arf, y::$jltype) = isless(x, y)
-        Base.:(<=)(x::Arf, y::$jltype) = isequal(x,y) | isless(x,y)
+        Base.isless(x::Arf, y::$jltype) = (isnan(y) && !isnan(x)) || cmp(x, y) < 0
+        Base.:(<)(x::Arf, y::$jltype) = !isnan(x) && !isnan(y) && cmp(x, y) < 0
+        Base.:(<=)(x::Arf, y::$jltype) = (x < y) || isequal(x, y)
     end
 end
 

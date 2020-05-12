@@ -1,9 +1,10 @@
 digits_prec(prec::Integer) = floor(Int, prec * log(2) / log(10))
 
+Base.show(io::IO, x::Mag) = print(io, _string(x))
 Base.show(io::IO, x::Union{Arb, Acb}) = print(io, string_nice(x))
 Base.show(io::IO, x::Arf) = print(io, string_decimal(x))
 
-for ArbT in (Arf, Arb, Acb, Mag)
+for ArbT in (Mag, Arf, Arb, Acb)
     arbf = Symbol(cprefix(ArbT), :_, :print)
     @eval begin
         function _string(x::$ArbT)
@@ -24,7 +25,6 @@ for ArbT in (Arf, Arb, Acb, Mag)
 
     ArbT == Mag && continue # no mag_printd and mag_printn
 
-    arbf = Symbol(cprefix(ArbT), :_printd)
     @eval begin
         function string_decimal(x::$ArbT, digits::Integer=digits_prec(precision(x)))
             Libc.flush_cstdio()
@@ -32,7 +32,7 @@ for ArbT in (Arf, Arb, Acb, Mag)
             original_stdout = stdout
             out_rd, out_wr = redirect_stdout()
             try
-                ccall(@libarb($arbf), Cvoid, (Ref{$ArbT}, Clong), x, digits)
+                printd(x, digits)
                 Libc.flush_cstdio()
             finally
                 redirect_stdout(original_stdout)
@@ -44,7 +44,6 @@ for ArbT in (Arf, Arb, Acb, Mag)
 
     ArbT == Arf && continue #no arf_printn
 
-    arbf = Symbol(cprefix(ArbT), :_, :printn)
     @eval begin
         function string_nice(x::$ArbT, digits::Integer=digits_prec(precision(x)), flags::UInt=UInt(0))
             Libc.flush_cstdio()
@@ -52,7 +51,7 @@ for ArbT in (Arf, Arb, Acb, Mag)
             original_stdout = stdout
             out_rd, out_wr = redirect_stdout()
             try
-                ccall(@libarb($arbf), Cvoid, (Ref{$ArbT}, Clong, Culong), x, digits, flags)
+                printn(x, digits, flags)
                 Libc.flush_cstdio()
             finally
                 redirect_stdout(original_stdout)
@@ -63,22 +62,16 @@ for ArbT in (Arf, Arb, Acb, Mag)
     end
 end
 
-for ArbT in (Arf, Arb, Mag)
-    jlf = :_load_string!
-    arbf = Symbol(cprefix(ArbT), :_load_str)
+for ArbT in (Mag, Arf, Arb)
     @eval begin
-        function $(jlf)(x::$ArbT, str::AbstractString)
-            res = ccall(@libarb($arbf), Cint, (Ref{$ArbT}, Cstring), x, str)
-            iszero(res) || throw(ArgumentError("arblib could not load_str $str as "*$(string(ArbT))))
+        function load_string!(x::$ArbT, str::AbstractString)
+            res = load!(x, str)
+            iszero(res) || throw(ArgumentError("could not load $str as " * $(string(ArbT))))
             return x
         end
-    end
 
-    jlf = :_dump_string
-    arbf = Symbol(cprefix(ArbT), :_dump_str)
-    @eval begin
-        function $(jlf)(x::$ArbT)
-            char_ptr = ccall(@libarb($arbf), Cstring, (Ref{$ArbT},), x)
+        function dump_string(x::$ArbT)
+            char_ptr = dump(x)
             str = unsafe_string(char_ptr)
             ccall((:flint_free, libflint), Cvoid, (Cstring,), char_ptr)
             return str

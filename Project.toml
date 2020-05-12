@@ -1,10 +1,14 @@
 name = "Arblib"
 uuid = "fb37089c-8514-4489-9461-98f9c8763369"
-authors = ["Marek Kaluba <kalmar@amu.edu.pl>"]
-version = "0.1.0"
+authors = ["Marek Kaluba <kalmar@amu.edu.pl>", "Sascha Timme <Sascha Timme <timme@math.tu-berlin.de>", "Joel Dahne <joel@dahne.eu>"]
+version = "0.2.0"
 
 [deps]
 BinaryProvider = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 LoadFlint = "472f376f-f1cf-461b-9ac1-d103423be9b7"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+BinaryProvider = "0.5.0"
+LoadFlint = "0.1.0"
