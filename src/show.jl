@@ -13,7 +13,7 @@ for ArbT in (Mag, Arf, Arb, Acb)
             original_stdout = stdout
             out_rd, out_wr = redirect_stdout()
             try
-                ccall(@libarb($arbf), Cvoid, (Ref{$ArbT},), x)
+                ccall(@libarb($arbf), Cvoid, (Ref{$(cstructtype(ArbT))},), x)
                 Libc.flush_cstdio()
             finally
                 redirect_stdout(original_stdout)

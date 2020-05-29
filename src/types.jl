@@ -77,8 +77,12 @@ for (T, prefix) in ((Mag, :mag), (Arf, :arf), (Arb, :arb), (Acb, :acb))
     arbstruct = Symbol(prefix, :_struct)
     spref = "$prefix"
     @eval begin
-        cprefix(::Type{$T}) = Symbol($spref) # useful for metaprogramming
-        cstruct(t::$T) = getfield(t, cprefix($T))
+        cstructtype(::Type{$T}) = $arbstruct
+    end
+    @eval begin
+        cprefix(::Type{$T}) = Symbol($spref)
+        cstruct(x::$T) = getfield(x, cprefix($T))
+        Base.convert(::Type{$(cstructtype(T))}, x::$T) = cstruct(x)
     end
     T == Mag && continue
     @eval begin

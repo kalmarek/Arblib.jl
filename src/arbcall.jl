@@ -79,7 +79,8 @@ jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
 jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
 
 ctype(ca::Carg) = rawtype(ca)
-ctype(::Carg{T}) where T <: Union{Arf, Arb, Acb, Mag, BigFloat, BigInt}  = Ref{T}
+ctype(::Carg{T}) where T <: Union{Mag, Arf, Arb, Acb}  = Ref{cstructtype(T)}
+ctype(::Carg{T}) where T <: Union{BigFloat, BigInt}  = Ref{T}
 ctype(::Carg{Vector{T}}) where T = Ref{T}
 
 struct Arbfunction{ReturnT}

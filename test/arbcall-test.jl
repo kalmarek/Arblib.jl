@@ -1,15 +1,20 @@
 @testset "arbcall" begin
+    mag_struct = Arblib.mag_struct
+    arf_struct = Arblib.arf_struct
+    arb_struct = Arblib.arb_struct
+    acb_struct = Arblib.acb_struct
+
     @testset "Carg" begin
         # Supported types
         for (str, name, isconst, jltype, ctype) in (
-            ("mag_t res", "res", false, Arblib.Mag, Ref{Arblib.Mag}),
-            ("arf_t res", "res", false, Arf, Ref{Arf}),
-            ("arb_t res", "res", false, Arb, Ref{Arb}),
-            ("acb_t res", "res", false, Acb, Ref{Acb}),
-            ("const mag_t x", "x", true, Arblib.Mag, Ref{Arblib.Mag}),
-            ("const arf_t x", "x", true, Arf, Ref{Arf}),
-            ("const arb_t x", "x", true, Arb, Ref{Arb}),
-            ("const acb_t x", "x", true, Acb, Ref{Acb}),
+            ("mag_t res", "res", false, Arblib.Mag, Ref{mag_struct}),
+            ("arf_t res", "res", false, Arf, Ref{arf_struct}),
+            ("arb_t res", "res", false, Arb, Ref{arb_struct}),
+            ("acb_t res", "res", false, Acb, Ref{acb_struct}),
+            ("const mag_t x", "x", true, Arblib.Mag, Ref{mag_struct}),
+            ("const arf_t x", "x", true, Arf, Ref{arf_struct}),
+            ("const arb_t x", "x", true, Arb, Ref{arb_struct}),
+            ("const acb_t x", "x", true, Acb, Ref{acb_struct}),
             ("arf_rnd_t rnd", "rnd", false, Union{Arblib.arb_rnd, RoundingMode}, Arblib.arb_rnd),
             ("mpfr_t x", "x", false, BigFloat, Ref{BigFloat}),
             ("mpfr_rnd_t rnd", "rnd", false, Union{Base.MPFR.MPFRRoundingMode, RoundingMode},
