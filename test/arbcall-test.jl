@@ -199,14 +199,21 @@ end
 
     Arblib.@arbcall_str "void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)"
     @test Arblib.add!(z, x, y) isa Nothing
+    @test Arblib.add!(
+        Ptr{arb_struct}(pointer_from_objref(z.arb)),
+        Ptr{arb_struct}(pointer_from_objref(x.arb)),
+        Ptr{arb_struct}(pointer_from_objref(y.arb)),
+    ) isa Nothing
     @test Arblib.add!(z.arb, x.arb, y.arb) isa Nothing
 
     Arblib.@arbcall_str "slong arb_rel_error_bits(const arb_t x)"
     @test Arblib.rel_error_bits(x) isa Int64
+    @test Arblib.rel_error_bits(Ptr{arb_struct}(pointer_from_objref(x.arb))) isa Int64
     @test Arblib.rel_error_bits(x.arb) isa Int64
 
     Arblib.@arbcall_str "int arb_is_zero(const arb_t x)"
     @test Arblib.is_zero(x) isa Int32
+    @test Arblib.is_zero(Ptr{arb_struct}(pointer_from_objref(x.arb))) isa Int32
     @test Arblib.is_zero(x.arb) isa Int32
 
     Arblib.@arbcall_str "double arf_get_d(const arf_t x, arf_rnd_t rnd)"
