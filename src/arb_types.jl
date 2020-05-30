@@ -41,15 +41,3 @@ mutable struct acb_struct
     mantissa_mag_i::UInt  # │ mp_limb_t
                           # └
 end
-
-for prefix in (:arf, :arb, :acb, :mag)
-    arbstruct = Symbol(prefix, :_struct)
-    arb_init = Symbol(prefix, :_init)
-    arb_clear = Symbol(prefix, :_clear)
-    @eval begin
-        init!(t::$arbstruct) =
-            ccall(@libarb($arb_init), Cvoid, (Ref{$arbstruct},), t)
-        clear!(t::$arbstruct) =
-            ccall(@libarb($arb_clear), Cvoid, (Ref{$arbstruct},), t)
-    end
-end

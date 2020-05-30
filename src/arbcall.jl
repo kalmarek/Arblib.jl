@@ -77,6 +77,7 @@ jltype(ca::Carg{Base.MPFR.MPFRRoundingMode}) = Union{Base.MPFR.MPFRRoundingMode,
 jltype(ca::Carg{Cstring}) = AbstractString
 jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
 jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
+jltype(::Carg{T}) where {T <: Union{Mag, Arf, Arb, Acb}}  = Union{T, cstructtype(T), Ptr{cstructtype(T)}}
 
 ctype(ca::Carg) = rawtype(ca)
 ctype(::Carg{T}) where T <: Union{Mag, Arf, Arb, Acb}  = Ref{cstructtype(T)}
@@ -138,7 +139,11 @@ function jlargs(af::Arbfunction)
         @assert c_types[k] == Clong
         p = :prec
         a = first(cargs)
-        default = if jltype(a) ∈ (Arf, Arb, Acb)
+        default = if jltype(a) ∈ (
+            Union{Arf, arf_struct, Ptr{arf_struct}},
+            Union{Arb, arb_struct, Ptr{arb_struct}},
+            Union{Acb, acb_struct, Ptr{acb_struct}},
+        )
             :(precision($(Symbol(name(a)))))
         else
             :(DEFAULT_PRECISION[])

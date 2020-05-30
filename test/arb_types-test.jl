@@ -3,10 +3,6 @@
     arf = Arblib.arf_struct(0,0,0,0)
     arb = Arblib.arb_struct(0,0,0,0,0,0)
     acb = Arblib.acb_struct(0,0,0,0,0,0, 0,0,0,0,0,0)
-    @test typeof(mag) == Arblib.mag_struct
-    @test typeof(arf) == Arblib.arf_struct
-    @test typeof(arb) == Arblib.arb_struct
-    @test typeof(acb) == Arblib.acb_struct
 
     for x in (mag, arf, arb, acb)
         @test begin
@@ -14,5 +10,13 @@
             Arblib.clear!(x)
             true
         end
+    end
+
+    prec = 256
+    for x in (arf, arb, acb)
+        @test precision(x) == prec
+        @test precision(Ptr{typeof(x)}()) == prec
+        @test precision(typeof(x)) == prec
+        @test precision(Ptr{typeof(x)}) == prec
     end
 end
