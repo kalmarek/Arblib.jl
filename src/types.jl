@@ -73,6 +73,11 @@ mutable struct Acb <: Number
     end
 end
 
+cprefix(::Type{Mag}) = :mag
+cprefix(::Type{Arf}) = :arf
+cprefix(::Type{Arb}) = :arb
+cprefix(::Type{Acb}) = :acb
+
 for (T, prefix) in ((Mag, :mag), (Arf, :arf), (Arb, :arb), (Acb, :acb))
     arbstruct = Symbol(prefix, :_struct)
     spref = "$prefix"
@@ -80,7 +85,6 @@ for (T, prefix) in ((Mag, :mag), (Arf, :arf), (Arb, :arb), (Acb, :acb))
         cstructtype(::Type{$T}) = $arbstruct
     end
     @eval begin
-        cprefix(::Type{$T}) = Symbol($spref)
         cstruct(x::$T) = getfield(x, cprefix($T))
         Base.convert(::Type{$(cstructtype(T))}, x::$T) = cstruct(x)
     end
