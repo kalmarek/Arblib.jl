@@ -3,23 +3,12 @@ mutable struct Arf <: Real
     prec::Int
 
     function Arf(;prec::Integer=DEFAULT_PRECISION[])
-        res = new(arf_struct(0,0,0,0), prec)
-        init!(res)
-        finalizer(clear!, res)
+        res = new(arf_struct(), prec)
         return res
     end
 
-    function Arf(ui::UInt64; prec::Integer=DEFAULT_PRECISION[])
-        res = new(arf_struct(0,0,0,0), prec)
-        init_set!(res, ui)
-        finalizer(clear!, res)
-        return res
-    end
-
-    function Arf(si::Int64; prec::Integer=DEFAULT_PRECISION[])
-        res = new(arf_struct(0,0,0,0), prec)
-        init_set!(res, si)
-        finalizer(clear!, res)
+    function Arf(x::Union{UInt, Int}; prec::Integer=DEFAULT_PRECISION[])
+        res = new(arf_struct(x), prec)
         return res
     end
 end
@@ -28,23 +17,12 @@ mutable struct Mag <: Real
     mag::mag_struct
 
     function Mag()
-        res = new(mag_struct(0,0))
-        init!(res)
-        finalizer(clear!, res)
+        res = new(mag_struct())
         return res
     end
 
-    function Mag(m::Mag)
-        res = new(mag_struct(0,0))
-        init_set!(res, m)
-        finalizer(clear!, res)
-        return res
-    end
-
-    function Mag(arf::Arf)
-        res = new(mag_struct(0,0))
-        init_set!(res, arf)
-        finalizer(clear!, res)
+    function Mag(x::Union{Mag, Arf})
+        res = new(mag_struct(cstruct(x)))
         return res
     end
 end
@@ -54,9 +32,7 @@ mutable struct Arb <: Real
     prec::Int
 
     function Arb(;prec::Integer=DEFAULT_PRECISION[])
-        res = new(arb_struct(0,0,0,0, 0,0), prec)
-        init!(res)
-        finalizer(clear!, res)
+        res = new(arb_struct(), prec)
         return res
     end
 end
@@ -66,9 +42,7 @@ mutable struct Acb <: Number
     prec::Int
 
     function Acb(;prec::Integer=DEFAULT_PRECISION[])
-        res = new(acb_struct(0,0,0,0,0,0, 0,0,0,0,0,0), prec)
-        init!(res)
-        finalizer(clear!, res)
+        res = new(acb_struct(), prec)
         return res
     end
 end

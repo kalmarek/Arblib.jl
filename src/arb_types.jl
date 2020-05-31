@@ -1,13 +1,41 @@
-mutable struct mag_struct
-    exponent::UInt       # fmpz
-    mantissa::UInt       # mp_limb_t
-end
-
 mutable struct arf_struct
     exponent::UInt      # fmpz
     size::UInt          # mp_size_t
     mantissa1::UInt     # mantissa_struct of length 128
     mantissa2::UInt
+
+    function arf_struct()
+        res = new()
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
+
+    function arf_struct(x::Union{UInt, Int})
+        res = new()
+        init_set!(res, x)
+        finalizer(clear!, res)
+        return res
+    end
+end
+
+mutable struct mag_struct
+    exponent::UInt       # fmpz
+    mantissa::UInt       # mp_limb_t
+
+    function mag_struct()
+        res = new()
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
+
+    function mag_struct(x::Union{mag_struct, arf_struct})
+        res = new()
+        init_set!(res, x)
+        finalizer(clear!, res)
+        return res
+    end
 end
 
 mutable struct arb_struct
@@ -21,6 +49,13 @@ mutable struct arb_struct
     exponent_mag::UInt  # │ fmpz
     mantissa_mag::UInt  # │ mp_limb_t
                         # └
+
+    function arb_struct()
+        res = new()
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
 end
 
 mutable struct acb_struct
@@ -40,4 +75,10 @@ mutable struct acb_struct
     exp_mag_i::Int        # │ fmpz
     mantissa_mag_i::UInt  # │ mp_limb_t
                           # └
+    function acb_struct()
+        res = new()
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
 end
