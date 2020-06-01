@@ -20,14 +20,16 @@ for T in (Unsigned, Integer, Base.GMP.CdoubleMax, Mag)
     end
 end
 
-for T in (BigFloat, Arf)
-    @eval begin
-        function Arf(x::$T; prec::Integer=precision(x))
-            res = Arf(prec=prec)
-            set!(res, x)
-            return res
-        end
-    end
+function Arf(x::BigFloat; prec::Integer=precision(x))
+    res = Arf(prec=prec)
+    set!(res, x)
+    return res
+end
+
+function Arf(x::Arf;
+             prec::Integer=precision(x),
+             shallow::Bool = false)
+    return Arf(x.arf, prec = prec, shallow = shallow)
 end
 
 ## Arb
@@ -41,14 +43,16 @@ for T in (Unsigned, Integer, Base.GMP.CdoubleMax)
     end
 end
 
-for T in (Arf, Arb)
-    @eval begin
-        function Arb(x::$T; prec::Integer=precision(x))
-            res = Arb(prec=prec)
-            set!(res, x)
-            return res
-        end
-    end
+function Arb(x::Arf; prec::Integer=precision(x))
+    res = Arb(prec=prec)
+    set!(res, x)
+    return res
+end
+
+function Arb(x::Arb;
+             prec::Integer=precision(x),
+             shallow::Bool = false)
+    return Arb(x.arb, prec = prec, shallow = shallow)
 end
 
 function Arb(str::AbstractString; prec::Integer=DEFAULT_PRECISION[])
@@ -69,14 +73,16 @@ for T in (Unsigned, Integer, Base.GMP.CdoubleMax)
     end
 end
 
-for T in (Arb, Acb)
-    @eval begin
-        function Acb(x::$T; prec::Integer=precision(x))
-            res = Acb(prec=prec)
-            set!(res, x)
-            return res
-        end
-    end
+function Acb(x::Arb; prec::Integer=precision(x))
+    res = Acb(prec=prec)
+    set!(res, x)
+    return res
+end
+
+function Acb(x::Acb;
+             prec::Integer=precision(x),
+             shallow::Bool = false)
+    return Acb(x.acb, prec = prec, shallow = shallow)
 end
 
 for T in (Integer, Base.GMP.CdoubleMax)

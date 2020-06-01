@@ -7,6 +7,19 @@ mutable struct Arf <: Real
         return res
     end
 
+    function Arf(x::arf_struct;
+                 prec::Integer=DEFAULT_PRECISION[],
+                 shallow::Bool = false)
+        if shallow
+            res = new(x, prec)
+        else
+            res = Arf(prec = prec)
+            set!(res, x)
+        end
+
+        return res
+    end
+
     function Arf(x::Union{UInt, Int}; prec::Integer=DEFAULT_PRECISION[])
         res = new(arf_struct(x), prec)
         return res
@@ -18,6 +31,17 @@ mutable struct Mag <: Real
 
     function Mag()
         res = new(mag_struct())
+        return res
+    end
+
+    function Mag(x::mag_struct;
+                 shallow::Bool = false)
+        if shallow
+            res = new(x)
+        else
+            res = new(mag_struct(x))
+        end
+
         return res
     end
 
@@ -35,6 +59,19 @@ mutable struct Arb <: Real
         res = new(arb_struct(), prec)
         return res
     end
+
+    function Arb(x::arb_struct;
+                 prec::Integer=DEFAULT_PRECISION[],
+                 shallow::Bool = false)
+        if shallow
+            res = new(x, prec)
+        else
+            res = Arb(prec = prec)
+            set!(res, x)
+        end
+
+        return res
+    end
 end
 
 mutable struct Acb <: Number
@@ -43,6 +80,19 @@ mutable struct Acb <: Number
 
     function Acb(;prec::Integer=DEFAULT_PRECISION[])
         res = new(acb_struct(), prec)
+        return res
+    end
+
+    function Acb(x::acb_struct;
+                 prec::Integer=DEFAULT_PRECISION[],
+                 shallow::Bool = false)
+        if shallow
+            res = new(x, prec)
+        else
+            res = Acb(prec = prec)
+            set!(res, x)
+        end
+
         return res
     end
 end
@@ -57,9 +107,5 @@ for (T, prefix) in ((Mag, :mag), (Arf, :arf), (Arb, :arb), (Acb, :acb))
         cprefix(::Type{$T}) = $(QuoteNode(Symbol(prefix)))
         cstruct(x::$T) = getfield(x, cprefix($T))
         Base.convert(::Type{$(cstructtype(T))}, x::$T) = cstruct(x)
-    end
-    T == Mag && continue
-    @eval begin
-        Base.precision(x::$T) = x.prec
     end
 end
