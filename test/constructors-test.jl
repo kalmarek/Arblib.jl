@@ -9,6 +9,8 @@
         @test typeof(zero(Mag())) == Mag
         @test typeof(one(Mag())) == Mag
         @test typeof(Mag(π)) == Mag
+        @test typeof(Mag(Mag().mag), shallow = false) == Mag
+        @test typeof(Mag(Mag().mag), shallow = true) == Mag
     end
 
     @testset "Arf" begin
