@@ -1,4 +1,4 @@
-mutable struct Arf <: Real
+struct Arf <: Real
     arf::arf_struct
     prec::Int
 
@@ -26,7 +26,7 @@ mutable struct Arf <: Real
     end
 end
 
-mutable struct Mag <: Real
+struct Mag <: Real
     mag::mag_struct
 
     function Mag()
@@ -51,7 +51,7 @@ mutable struct Mag <: Real
     end
 end
 
-mutable struct Arb <: Real
+struct Arb <: Real
     arb::arb_struct
     prec::Int
 
@@ -74,7 +74,7 @@ mutable struct Arb <: Real
     end
 end
 
-mutable struct Acb <: Number
+struct Acb <: Number
     acb::acb_struct
     prec::Int
 
