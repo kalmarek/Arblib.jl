@@ -1,16 +1,44 @@
-struct mag_struct
-    exponent::UInt       # fmpz
-    mantissa::UInt       # mp_limb_t
-end
-
-struct arf_struct
+mutable struct arf_struct
     exponent::UInt      # fmpz
     size::UInt          # mp_size_t
     mantissa1::UInt     # mantissa_struct of length 128
     mantissa2::UInt
+
+    function arf_struct()
+        res = new()
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
+
+    function arf_struct(x::Union{UInt, Int})
+        res = new()
+        init_set!(res, x)
+        finalizer(clear!, res)
+        return res
+    end
 end
 
-struct arb_struct
+mutable struct mag_struct
+    exponent::UInt       # fmpz
+    mantissa::UInt       # mp_limb_t
+
+    function mag_struct()
+        res = new()
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
+
+    function mag_struct(x::Union{mag_struct, arf_struct})
+        res = new()
+        init_set!(res, x)
+        finalizer(clear!, res)
+        return res
+    end
+end
+
+mutable struct arb_struct
                         # ┌ arf_struct (midpoint)
     exponent::UInt      # │ fmpz
     size::UInt          # │ mp_size_t
@@ -21,9 +49,16 @@ struct arb_struct
     exponent_mag::UInt  # │ fmpz
     mantissa_mag::UInt  # │ mp_limb_t
                         # └
+
+    function arb_struct()
+        res = new()
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
 end
 
-struct acb_struct
+mutable struct acb_struct
                           # ┌ arb_struct (real)
     exponent_r::UInt      # │ fmpz
     size_r::UInt          # │ mp_size_t
@@ -40,16 +75,10 @@ struct acb_struct
     exp_mag_i::Int        # │ fmpz
     mantissa_mag_i::UInt  # │ mp_limb_t
                           # └
-end
-
-for prefix in (:arf, :arb, :acb, :mag)
-    arbstruct = Symbol(prefix, :_struct)
-    arb_init = Symbol(prefix, :_init)
-    arb_clear = Symbol(prefix, :_clear)
-    @eval begin
-        init!(t::$arbstruct) =
-            ccall(@libarb($arb_init), Cvoid, (Ref{$arbstruct},), t)
-        clear!(t::$arbstruct) =
-            ccall(@libarb($arb_clear), Cvoid, (Ref{$arbstruct},), t)
+    function acb_struct()
+        res = new()
+        init!(res)
+        finalizer(clear!, res)
+        return res
     end
 end

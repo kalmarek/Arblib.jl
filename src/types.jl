@@ -1,74 +1,98 @@
-mutable struct Arf <: Real
+struct Arf <: Real
     arf::arf_struct
     prec::Int
 
     function Arf(;prec::Integer=DEFAULT_PRECISION[])
-        res = new(arf_struct(0,0,0,0), prec)
-        init!(res)
-        finalizer(clear!, res)
+        res = new(arf_struct(), prec)
         return res
     end
 
-    function Arf(ui::UInt64; prec::Integer=DEFAULT_PRECISION[])
-        res = new(arf_struct(0,0,0,0), prec)
-        init_set!(res, ui)
-        finalizer(clear!, res)
+    function Arf(x::arf_struct;
+                 prec::Integer=DEFAULT_PRECISION[],
+                 shallow::Bool = false)
+        if shallow
+            res = new(x, prec)
+        else
+            res = Arf(prec = prec)
+            set!(res, x)
+        end
+
         return res
     end
 
-    function Arf(si::Int64; prec::Integer=DEFAULT_PRECISION[])
-        res = new(arf_struct(0,0,0,0), prec)
-        init_set!(res, si)
-        finalizer(clear!, res)
+    function Arf(x::Union{UInt, Int}; prec::Integer=DEFAULT_PRECISION[])
+        res = new(arf_struct(x), prec)
         return res
     end
 end
 
-mutable struct Mag <: Real
+struct Mag <: Real
     mag::mag_struct
 
     function Mag()
-        res = new(mag_struct(0,0))
-        init!(res)
-        finalizer(clear!, res)
+        res = new(mag_struct())
         return res
     end
 
-    function Mag(m::Mag)
-        res = new(mag_struct(0,0))
-        init_set!(res, m)
-        finalizer(clear!, res)
+    function Mag(x::mag_struct;
+                 shallow::Bool = false)
+        if shallow
+            res = new(x)
+        else
+            res = new(mag_struct(x))
+        end
+
         return res
     end
 
-    function Mag(arf::Arf)
-        res = new(mag_struct(0,0))
-        init_set!(res, arf)
-        finalizer(clear!, res)
+    function Mag(x::Union{Mag, Arf})
+        res = new(mag_struct(cstruct(x)))
         return res
     end
 end
 
-mutable struct Arb <: Real
+struct Arb <: Real
     arb::arb_struct
     prec::Int
 
     function Arb(;prec::Integer=DEFAULT_PRECISION[])
-        res = new(arb_struct(0,0,0,0, 0,0), prec)
-        init!(res)
-        finalizer(clear!, res)
+        res = new(arb_struct(), prec)
+        return res
+    end
+
+    function Arb(x::arb_struct;
+                 prec::Integer=DEFAULT_PRECISION[],
+                 shallow::Bool = false)
+        if shallow
+            res = new(x, prec)
+        else
+            res = Arb(prec = prec)
+            set!(res, x)
+        end
+
         return res
     end
 end
 
-mutable struct Acb <: Number
+struct Acb <: Number
     acb::acb_struct
     prec::Int
 
     function Acb(;prec::Integer=DEFAULT_PRECISION[])
-        res = new(acb_struct(0,0,0,0,0,0, 0,0,0,0,0,0), prec)
-        init!(res)
-        finalizer(clear!, res)
+        res = new(acb_struct(), prec)
+        return res
+    end
+
+    function Acb(x::acb_struct;
+                 prec::Integer=DEFAULT_PRECISION[],
+                 shallow::Bool = false)
+        if shallow
+            res = new(x, prec)
+        else
+            res = Acb(prec = prec)
+            set!(res, x)
+        end
+
         return res
     end
 end
@@ -77,11 +101,11 @@ for (T, prefix) in ((Mag, :mag), (Arf, :arf), (Arb, :arb), (Acb, :acb))
     arbstruct = Symbol(prefix, :_struct)
     spref = "$prefix"
     @eval begin
-        cprefix(::Type{$T}) = Symbol($spref) # useful for metaprogramming
-        cstruct(t::$T) = getfield(t, cprefix($T))
+        cstructtype(::Type{$T}) = $arbstruct
     end
-    T == Mag && continue
     @eval begin
-        Base.precision(x::$T) = x.prec
+        cprefix(::Type{$T}) = $(QuoteNode(Symbol(prefix)))
+        cstruct(x::$T) = getfield(x, cprefix($T))
+        Base.convert(::Type{$(cstructtype(T))}, x::$T) = cstruct(x)
     end
 end

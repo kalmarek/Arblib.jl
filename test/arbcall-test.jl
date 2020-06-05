@@ -1,15 +1,21 @@
 @testset "arbcall" begin
+    Mag = Arblib.Mag
+    mag_struct = Arblib.mag_struct
+    arf_struct = Arblib.arf_struct
+    arb_struct = Arblib.arb_struct
+    acb_struct = Arblib.acb_struct
+
     @testset "Carg" begin
         # Supported types
         for (str, name, isconst, jltype, ctype) in (
-            ("mag_t res", "res", false, Arblib.Mag, Ref{Arblib.Mag}),
-            ("arf_t res", "res", false, Arf, Ref{Arf}),
-            ("arb_t res", "res", false, Arb, Ref{Arb}),
-            ("acb_t res", "res", false, Acb, Ref{Acb}),
-            ("const mag_t x", "x", true, Arblib.Mag, Ref{Arblib.Mag}),
-            ("const arf_t x", "x", true, Arf, Ref{Arf}),
-            ("const arb_t x", "x", true, Arb, Ref{Arb}),
-            ("const acb_t x", "x", true, Acb, Ref{Acb}),
+            ("mag_t res", "res", false, Union{Mag, mag_struct, Ptr{mag_struct}}, Ref{mag_struct}),
+            ("arf_t res", "res", false, Union{Arf, arf_struct, Ptr{arf_struct}}, Ref{arf_struct}),
+            ("arb_t res", "res", false, Union{Arb, arb_struct, Ptr{arb_struct}}, Ref{arb_struct}),
+            ("acb_t res", "res", false, Union{Acb, acb_struct, Ptr{acb_struct}}, Ref{acb_struct}),
+            ("const mag_t x", "x", true, Union{Mag, mag_struct, Ptr{mag_struct}}, Ref{mag_struct}),
+            ("const arf_t x", "x", true, Union{Arf, arf_struct, Ptr{arf_struct}}, Ref{arf_struct}),
+            ("const arb_t x", "x", true, Union{Arb, arb_struct, Ptr{arb_struct}}, Ref{arb_struct}),
+            ("const acb_t x", "x", true, Union{Acb, acb_struct, Ptr{acb_struct}}, Ref{acb_struct}),
             ("arf_rnd_t rnd", "rnd", false, Union{Arblib.arb_rnd, RoundingMode}, Arblib.arb_rnd),
             ("mpfr_t x", "x", false, BigFloat, Ref{BigFloat}),
             ("mpfr_rnd_t rnd", "rnd", false, Union{Base.MPFR.MPFRRoundingMode, RoundingMode},
@@ -144,13 +150,21 @@ end
 
 @testset "jlargs" begin
     for (str, args, kwargs) in (("void arb_init(arb_t x)",
-                                 [:(x::$Arb)],
+                                 [:(x::$(Union{Arb, arb_struct, Ptr{arb_struct}}))],
                                  Expr[]),
                                 ("void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)",
-                                 [:(z::$Arb), :(x::$Arb), :(y::$Arb)],
+                                 [
+                                     :(z::$(Union{arb_struct, Ptr{arb_struct}, Arb})),
+                                     :(x::$(Union{arb_struct, Ptr{arb_struct}, Arb})),
+                                     :(y::$(Union{arb_struct, Ptr{arb_struct}, Arb}))
+                                 ],
                                  [Expr(:kw, :(prec::Integer), :(precision(z)))]),
                                 ("int arf_add(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)",
-                                 [:(res::$Arf), :(x::$Arf), :(y::$Arf)],
+                                 [
+                                     :(res::$(Union{Arf, arf_struct, Ptr{arf_struct}})),
+                                     :(x::$(Union{Arf, arf_struct, Ptr{arf_struct}})),
+                                     :(y::$(Union{Arf, arf_struct, Ptr{arf_struct}}))
+                                 ],
                                  [Expr(:kw, :(prec::Integer), :(precision(res))),
                                   Expr(:kw, :(rnd::Union{arb_rnd, RoundingMode}), :(RoundNearest))])
                                 )
@@ -184,16 +198,27 @@ end
     z = Arb(0)
 
     Arblib.@arbcall_str "void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)"
-    @test typeof(Arblib.add!(z, x, y)) == Nothing
+    @test Arblib.add!(z, x, y) isa Nothing
+    @test Arblib.add!(
+        Ptr{arb_struct}(pointer_from_objref(z.arb)),
+        Ptr{arb_struct}(pointer_from_objref(x.arb)),
+        Ptr{arb_struct}(pointer_from_objref(y.arb)),
+    ) isa Nothing
+    @test Arblib.add!(z.arb, x.arb, y.arb) isa Nothing
 
     Arblib.@arbcall_str "slong arb_rel_error_bits(const arb_t x)"
-    @test typeof(Arblib.rel_error_bits(x)) == Int64
+    @test Arblib.rel_error_bits(x) isa Int64
+    @test Arblib.rel_error_bits(Ptr{arb_struct}(pointer_from_objref(x.arb))) isa Int64
+    @test Arblib.rel_error_bits(x.arb) isa Int64
 
     Arblib.@arbcall_str "int arb_is_zero(const arb_t x)"
-    @test typeof(Arblib.is_zero(x)) == Int32
+    @test Arblib.is_zero(x) isa Int32
+    @test Arblib.is_zero(Ptr{arb_struct}(pointer_from_objref(x.arb))) isa Int32
+    @test Arblib.is_zero(x.arb) isa Int32
 
     Arblib.@arbcall_str "double arf_get_d(const arf_t x, arf_rnd_t rnd)"
-    @test typeof(Arblib.get(Arf(1))) == Float64
+    @test Arblib.get(Arf(1)) isa Float64
+    @test Arblib.get(Arf(1).arf) isa Float64
 
     # these were needed for examples tests:
 
