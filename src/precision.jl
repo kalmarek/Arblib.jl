@@ -7,13 +7,15 @@ const DEFAULT_PRECISION = Ref{Clong}(256)
     precision(x::Ptr{<:Union{arf_struct, arb_struct, acb_struct}})
 Get the default precision (in bits) currently used for `Arblib` arithmetic.
 """
-Base.precision(::Type{<:Union{Arf, Arb, Acb, arf_struct, arb_struct, acb_struct}}) = DEFAULT_PRECISION[]
-Base.precision(::Type{<:Ptr{<:Union{arf_struct, arb_struct, acb_struct}}}) = DEFAULT_PRECISION[]
+Base.precision(::Type{<:Union{Arf,Arb,Acb,arf_struct,arb_struct,acb_struct}}) =
+    DEFAULT_PRECISION[]
+Base.precision(::Type{<:Ptr{<:Union{arf_struct,arb_struct,acb_struct}}}) =
+    DEFAULT_PRECISION[]
 
-Base.precision(x::Union{arf_struct, arb_struct, acb_struct}) = DEFAULT_PRECISION[]
-Base.precision(x::Ptr{<:Union{arf_struct, arb_struct, acb_struct}}) = DEFAULT_PRECISION[]
+Base.precision(x::Union{arf_struct,arb_struct,acb_struct}) = DEFAULT_PRECISION[]
+Base.precision(x::Ptr{<:Union{arf_struct,arb_struct,acb_struct}}) = DEFAULT_PRECISION[]
 
-Base.precision(x::Union{Arf, Arb, Acb}) = x.prec
+Base.precision(x::Union{Arf,Arb,Acb}) = x.prec
 
 """
     setprecision(::Type{<:Union{Arf, Arb, Acb}}, precision::Int)
@@ -31,8 +33,10 @@ function Base.setprecision(::Type{<:Union{Arf,Arb,Acb}}, precision::Integer)
     return precision
 end
 
-function Base.setprecision(x::T,
-                           precision::Integer;
-                           shallow = false) where {T <: Union{Arf, Arb, Acb}}
+function Base.setprecision(
+    x::T,
+    precision::Integer;
+    shallow = false,
+) where {T<:Union{Arf,Arb,Acb}}
     return T(x, prec = precision, shallow = shallow)
 end

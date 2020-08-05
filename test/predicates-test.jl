@@ -3,44 +3,38 @@
 
     @testset "predicates" begin
         for (T, fs) in (
-            (Mag, (
-                isfinite,
-                isinf,
-                Arblib.isspecial,
-                iszero
-            )),
-            (Arf, (
-                isfinite,
-                isinf,
-                isinteger,
-                isnan,
-                Arblib.isneginf,
-                Arblib.isnormal,
-                isone,
-                Arblib.isposinf,
-                Arblib.isspecial,
-                iszero,
-            )),
-            (Arb, (
-                Arblib.isexact,
-                isfinite,
-                isinteger,
-                Arblib.isnegative,
-                Arblib.isnonnegative,
-                Arblib.isnonpositive,
-                Arblib.isnonzero,
-                isone,
-                Arblib.ispositive,
-                iszero,
-            )),
-            (Acb, (
-                Arblib.isexact,
-                isfinite,
-                isinteger,
-                isone,
-                isreal,
-                iszero,
-            ))
+            (Mag, (isfinite, isinf, Arblib.isspecial, iszero)),
+            (
+                Arf,
+                (
+                    isfinite,
+                    isinf,
+                    isinteger,
+                    isnan,
+                    Arblib.isneginf,
+                    Arblib.isnormal,
+                    isone,
+                    Arblib.isposinf,
+                    Arblib.isspecial,
+                    iszero,
+                ),
+            ),
+            (
+                Arb,
+                (
+                    Arblib.isexact,
+                    isfinite,
+                    isinteger,
+                    Arblib.isnegative,
+                    Arblib.isnonnegative,
+                    Arblib.isnonpositive,
+                    Arblib.isnonzero,
+                    isone,
+                    Arblib.ispositive,
+                    iszero,
+                ),
+            ),
+            (Acb, (Arblib.isexact, isfinite, isinteger, isone, isreal, iszero)),
         )
             for f in fs
                 @test f(T()) isa Bool

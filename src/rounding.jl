@@ -12,7 +12,8 @@ ARF_RND_UP     (1)
     Round to the nearest representable number in the direction away from zero.
 =#
 
-@enum(arb_rnd::Cint,
+@enum(
+    arb_rnd::Cint,
     ArbRoundToZero, # ARF_RND_DOWN
     ArbRoundFromZero, # ARF_RND_UP
     ArbRoundDown, # ARF_RND_FLOOR

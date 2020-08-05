@@ -16,17 +16,17 @@ function parse_arbdoc(filename)
         # Quick and dirty way to find all the sections
         splits = findall(str -> startswith(str, "------"), lines)
 
-        sections = Vector{Tuple{String, Vector{String}}}()
-        for n in 1:length(splits)
-            section_title = lines[splits[n] - 1]
+        sections = Vector{Tuple{String,Vector{String}}}()
+        for n = 1:length(splits)
+            section_title = lines[splits[n]-1]
             push!(sections, (section_title, []))
 
             start = splits[n]
-            stop = n == length(splits) ? length(lines) : splits[n + 1] - 1
+            stop = n == length(splits) ? length(lines) : splits[n+1] - 1
 
             for line in lines[start:stop]
                 if startswith(line, ".. function::")
-                    push!(sections[n][2], strip(line[length(".. function::") + 1:end]))
+                    push!(sections[n][2], strip(line[length(".. function::")+1:end]))
                 end
             end
         end
