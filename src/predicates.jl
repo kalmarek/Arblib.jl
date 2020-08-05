@@ -49,6 +49,17 @@ for (T, funcpairs) in (
             (:(Base.iszero), :is_zero),
         ),
     ),
+    (
+        AcbMatrix,
+        (
+            (:isexact, :is_exact),
+            (:(Base.isfinite), :is_finite),
+            (:(Base.isone), :is_one),
+            (:(Base.isreal), :is_real),
+            (:(Base.iszero), :is_zero),
+        ),
+    ),
+
 )
     for (jlf, arbf) in funcpairs
         @eval $jlf(x::$T) = !iszero($arbf(x))
@@ -95,6 +106,7 @@ for (ArbT, args) in (
         ((:(==), :eq), (:(!=), :ne), (:(<), :lt), (:(<=), :le), (:(>), :gt), (:(>=), :ge)),
     ),
     (Acb, ((:(==), :eq), (:(!=), :ne))),
+    (AcbMatrix, ((:(==), :eq), (:(!=), :ne))),
 )
     for (jlf, arbf) in args
         @eval begin

@@ -73,11 +73,11 @@ jltype(ca::Carg{Base.MPFR.MPFRRoundingMode}) =
 jltype(ca::Carg{Cstring}) = AbstractString
 jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
 jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
-jltype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb}} =
+jltype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,AcbMatrix}} =
     Union{T,cstructtype(T),Ptr{cstructtype(T)}}
 
 ctype(ca::Carg) = rawtype(ca)
-ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb}} = Ref{cstructtype(T)}
+ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,AcbMatrix}} = Ref{cstructtype(T)}
 ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
 ctype(::Carg{Vector{T}}) where {T} = Ref{T}
 

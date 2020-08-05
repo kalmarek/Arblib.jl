@@ -90,6 +90,17 @@ struct Acb <: Number
     end
 end
 
+
+struct AcbMatrix <: AbstractMatrix{Acb}
+    acb_mat::acb_mat_struct
+    prec::Int
+
+    function AcbMatrix(m::Integer, n::Integer; prec::Integer = DEFAULT_PRECISION[])
+        res = new(acb_mat_struct(m, n), prec)
+        return res
+    end
+end
+
 for (T, prefix) in
     ((Mag, :mag), (Arf, :arf), (Arb, :arb), (Acb, :acb), (AcbMatrix, :acb_mat))
     arbstruct = Symbol(prefix, :_struct)

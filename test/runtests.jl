@@ -8,6 +8,7 @@ include("constructors-test.jl")
 include("predicates-test.jl")
 include("show-test.jl")
 include("examples.jl")
+include("acb_mat.jl")
 
 @testset "Arblib" begin
     @test isa(Arb(π), Arb)
