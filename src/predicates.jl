@@ -59,7 +59,6 @@ for (T, funcpairs) in (
             (:(Base.iszero), :is_zero),
         ),
     ),
-
 )
     for (jlf, arbf) in funcpairs
         @eval $jlf(x::$T) = !iszero($arbf(x))

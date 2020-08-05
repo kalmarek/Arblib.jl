@@ -1,7 +1,7 @@
 function AcbMatrix(A::AbstractMatrix{Acb}; prec::Integer = precision(first(A)))
     M = AcbMatrix(size(A)...; prec = prec)
-    for j in 1:size(A, 2), i in 1:size(A,1)
-        M[i,j] = A[i,j]
+    for j = 1:size(A, 2), i = 1:size(A, 1)
+        M[i, j] = A[i, j]
     end
     M
 end
@@ -35,13 +35,7 @@ function Base.setindex!(
     i::Integer,
     j::Integer,
 )
-    ccall(
-        @libarb(acb_set),
-        Cvoid,
-        (Ptr{acb_struct}, Ref{acb_struct}),
-        M[i, j],
-        x,
-    )
+    ccall(@libarb(acb_set), Cvoid, (Ptr{acb_struct}, Ref{acb_struct}), M[i, j], x)
     x
 end
 Base.@propagate_inbounds function Base.setindex!(
