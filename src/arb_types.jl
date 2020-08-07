@@ -83,6 +83,17 @@ mutable struct acb_struct
     end
 end
 
+mutable struct acb_vec_struct
+    entries::Ptr{acb_struct}
+    n::Int
+
+    function acb_vec_struct(n::Integer)
+        v = new(ccall(@libarb(_acb_vec_init), Ptr{acb_struct}, (Clong,), n), n)
+        finalizer(clear!, v)
+        return v
+    end
+end
+
 mutable struct acb_mat_struct
     entries::Ptr{acb_struct}
     r::Clong

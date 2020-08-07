@@ -90,6 +90,13 @@ struct Acb <: Number
     end
 end
 
+struct AcbVector <: AbstractVector{Acb}
+    acb_vec::acb_vec_struct
+    prec::Int
+
+    AcbVector(n::Integer;  prec::Integer = DEFAULT_PRECISION[]) =
+        new(acb_vec_struct(n), prec)
+end
 
 struct AcbMatrix <: AbstractMatrix{Acb}
     acb_mat::acb_mat_struct
@@ -116,6 +123,7 @@ for (T, prefix) in (
     (Arf, :arf),
     (Arb, :arb),
     (Acb, :acb),
+    (AcbVector, :acb_vec),
     (ArbMatrix, :arb_mat),
     (AcbMatrix, :acb_mat),
 )
