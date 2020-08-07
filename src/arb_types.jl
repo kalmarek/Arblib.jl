@@ -96,3 +96,17 @@ mutable struct acb_mat_struct
         return A
     end
 end
+
+mutable struct arb_mat_struct
+    entries::Ptr{arb_struct}
+    r::Clong
+    c::Clong
+    rows::Ptr{Ptr{arb_struct}}
+
+    function arb_mat_struct(r::Integer, c::Integer)
+        A = new()
+        init!(A, r, c)
+        finalizer(clear!, A)
+        return A
+    end
+end

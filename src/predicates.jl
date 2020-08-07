@@ -50,6 +50,16 @@ for (T, funcpairs) in (
         ),
     ),
     (
+        ArbMatrix,
+        (
+            (:isexact, :is_exact),
+            (:(Base.isfinite), :is_finite),
+            (:(Base.isone), :is_one),
+            (:(Base.isreal), :is_real),
+            (:(Base.iszero), :is_zero),
+        ),
+    ),
+    (
         AcbMatrix,
         (
             (:isexact, :is_exact),
@@ -105,6 +115,7 @@ for (ArbT, args) in (
         ((:(==), :eq), (:(!=), :ne), (:(<), :lt), (:(<=), :le), (:(>), :gt), (:(>=), :ge)),
     ),
     (Acb, ((:(==), :eq), (:(!=), :ne))),
+    (ArbMatrix, ((:(==), :eq), (:(!=), :ne))),
     (AcbMatrix, ((:(==), :eq), (:(!=), :ne))),
 )
     for (jlf, arbf) in args

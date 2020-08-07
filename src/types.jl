@@ -101,8 +101,24 @@ struct AcbMatrix <: AbstractMatrix{Acb}
     end
 end
 
-for (T, prefix) in
-    ((Mag, :mag), (Arf, :arf), (Arb, :arb), (Acb, :acb), (AcbMatrix, :acb_mat))
+struct ArbMatrix <: AbstractMatrix{Arb}
+    arb_mat::arb_mat_struct
+    prec::Int
+
+    function ArbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[])
+        res = new(arb_mat_struct(r, c), prec)
+        return res
+    end
+end
+
+for (T, prefix) in (
+    (Mag, :mag),
+    (Arf, :arf),
+    (Arb, :arb),
+    (Acb, :acb),
+    (ArbMatrix, :arb_mat),
+    (AcbMatrix, :acb_mat),
+)
     arbstruct = Symbol(prefix, :_struct)
     spref = "$prefix"
     @eval begin

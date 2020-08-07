@@ -33,6 +33,7 @@ const arbargtypes = ArbArgTypes(
         "arb_t" => Arb,
         "acb_t" => Acb,
         "mag_t" => Mag,
+        "arb_mat_t" => ArbMatrix,
         "acb_mat_t" => AcbMatrix,
         "arf_rnd_t" => arb_rnd,
         "mpfr_t" => BigFloat,
@@ -73,11 +74,11 @@ jltype(ca::Carg{Base.MPFR.MPFRRoundingMode}) =
 jltype(ca::Carg{Cstring}) = AbstractString
 jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
 jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
-jltype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,AcbMatrix}} =
+jltype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbMatrix,AcbMatrix}} =
     Union{T,cstructtype(T),Ptr{cstructtype(T)}}
 
 ctype(ca::Carg) = rawtype(ca)
-ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,AcbMatrix}} = Ref{cstructtype(T)}
+ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbMatrix,AcbMatrix}} = Ref{cstructtype(T)}
 ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
 ctype(::Carg{Vector{T}}) where {T} = Ref{T}
 

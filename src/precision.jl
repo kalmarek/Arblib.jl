@@ -15,7 +15,7 @@ Base.precision(::Type{<:Ptr{<:Union{arf_struct,arb_struct,acb_struct}}}) =
 Base.precision(x::Union{arf_struct,arb_struct,acb_struct}) = DEFAULT_PRECISION[]
 Base.precision(x::Ptr{<:Union{arf_struct,arb_struct,acb_struct}}) = DEFAULT_PRECISION[]
 
-Base.precision(x::Union{Arf,Arb,Acb,AcbMatrix}) = x.prec
+Base.precision(x::Union{Arf,Arb,Acb,ArbMatrix,AcbMatrix}) = x.prec
 
 """
     setprecision(::Type{<:Union{Arf, Arb, Acb}}, precision::Int)
@@ -25,7 +25,10 @@ Set the precision (in bits) to be used for `Arblib` arithmetic.
     its behavior is undefined if called concurrently with computations that use the
     setting.
 """
-function Base.setprecision(::Type{<:Union{Arf,Arb,Acb,AcbMatrix}}, precision::Integer)
+function Base.setprecision(
+    ::Type{<:Union{Arf,Arb,Acb,ArbMatrix,AcbMatrix}},
+    precision::Integer,
+)
     if precision < 2
         throw(DomainError(precision, "`precision` cannot be less than 2."))
     end
@@ -40,4 +43,5 @@ function Base.setprecision(
 ) where {T<:Union{Arf,Arb,Acb}}
     return T(x, prec = precision, shallow = shallow)
 end
+Base.setprecision(A::ArbMatrix, precision::Integer) = ArbMatrix(A.arb_mat, precision)
 Base.setprecision(A::AcbMatrix, precision::Integer) = AcbMatrix(A.acb_mat, precision)
