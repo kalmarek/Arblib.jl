@@ -1,5 +1,5 @@
 @inline clear!(acb_vs::acb_vec_struct) = clear!(acb_vs.entries, acb_vs.n)
-size(acb_v::acb_vec_struct) = (acb_v.n,)
+Base.size(acb_v::acb_vec_struct) = (acb_v.n,)
 Base.getindex(v::acb_vec_struct, i::Integer) = v.entries + (i - 1) * sizeof(acb_struct)
 function Base.setindex!(v::acb_vec_struct, x, i::Integer)
     set!(v[i], x)
