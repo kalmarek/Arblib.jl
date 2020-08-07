@@ -84,16 +84,15 @@ mutable struct acb_struct
 end
 
 mutable struct acb_mat_struct
-
     entries::Ptr{acb_struct}
     r::Clong
     c::Clong
     rows::Ptr{Ptr{acb_struct}}
 
-    function acb_mat_struct(n::Integer, m::Integer)
-        M = new()
-        init!(M, n, m)
-        finalizer(clear!, M)
-        return M
+    function acb_mat_struct(r::Integer, c::Integer)
+        A = new()
+        init!(A, r, c)
+        finalizer(clear!, A)
+        return A
     end
 end
