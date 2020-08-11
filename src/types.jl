@@ -2,14 +2,12 @@ struct Arf <: Real
     arf::arf_struct
     prec::Int
 
-    function Arf(;prec::Integer=DEFAULT_PRECISION[])
+    function Arf(; prec::Integer = DEFAULT_PRECISION[])
         res = new(arf_struct(), prec)
         return res
     end
 
-    function Arf(x::arf_struct;
-                 prec::Integer=DEFAULT_PRECISION[],
-                 shallow::Bool = false)
+    function Arf(x::arf_struct; prec::Integer = DEFAULT_PRECISION[], shallow::Bool = false)
         if shallow
             res = new(x, prec)
         else
@@ -20,7 +18,7 @@ struct Arf <: Real
         return res
     end
 
-    function Arf(x::Union{UInt, Int}; prec::Integer=DEFAULT_PRECISION[])
+    function Arf(x::Union{UInt,Int}; prec::Integer = DEFAULT_PRECISION[])
         res = new(arf_struct(x), prec)
         return res
     end
@@ -34,8 +32,7 @@ struct Mag <: Real
         return res
     end
 
-    function Mag(x::mag_struct;
-                 shallow::Bool = false)
+    function Mag(x::mag_struct; shallow::Bool = false)
         if shallow
             res = new(x)
         else
@@ -45,7 +42,7 @@ struct Mag <: Real
         return res
     end
 
-    function Mag(x::Union{Mag, Arf})
+    function Mag(x::Union{Mag,Arf})
         res = new(mag_struct(cstruct(x)))
         return res
     end
@@ -55,14 +52,12 @@ struct Arb <: Real
     arb::arb_struct
     prec::Int
 
-    function Arb(;prec::Integer=DEFAULT_PRECISION[])
+    function Arb(; prec::Integer = DEFAULT_PRECISION[])
         res = new(arb_struct(), prec)
         return res
     end
 
-    function Arb(x::arb_struct;
-                 prec::Integer=DEFAULT_PRECISION[],
-                 shallow::Bool = false)
+    function Arb(x::arb_struct; prec::Integer = DEFAULT_PRECISION[], shallow::Bool = false)
         if shallow
             res = new(x, prec)
         else
@@ -78,14 +73,12 @@ struct Acb <: Number
     acb::acb_struct
     prec::Int
 
-    function Acb(;prec::Integer=DEFAULT_PRECISION[])
+    function Acb(; prec::Integer = DEFAULT_PRECISION[])
         res = new(acb_struct(), prec)
         return res
     end
 
-    function Acb(x::acb_struct;
-                 prec::Integer=DEFAULT_PRECISION[],
-                 shallow::Bool = false)
+    function Acb(x::acb_struct; prec::Integer = DEFAULT_PRECISION[], shallow::Bool = false)
         if shallow
             res = new(x, prec)
         else
@@ -97,7 +90,54 @@ struct Acb <: Number
     end
 end
 
-for (T, prefix) in ((Mag, :mag), (Arf, :arf), (Arb, :arb), (Acb, :acb))
+struct ArbVector <: AbstractVector{Arb}
+    arb_vec::arb_vec_struct
+    prec::Int
+
+    ArbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+        new(arb_vec_struct(n), prec)
+end
+
+struct AcbVector <: AbstractVector{Acb}
+    acb_vec::acb_vec_struct
+    prec::Int
+
+    AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+        new(acb_vec_struct(n), prec)
+end
+
+struct ArbMatrix <: AbstractMatrix{Arb}
+    arb_mat::arb_mat_struct
+    prec::Int
+
+    function ArbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[])
+        res = new(arb_mat_struct(r, c), prec)
+        return res
+    end
+end
+
+struct AcbMatrix <: AbstractMatrix{Acb}
+    acb_mat::acb_mat_struct
+    prec::Int
+
+    function AcbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[])
+        res = new(acb_mat_struct(r, c), prec)
+        return res
+    end
+end
+
+const ArbTypes = Union{Arf,Arb,Acb,ArbVector,AcbVector,ArbMatrix,AcbMatrix}
+
+for (T, prefix) in (
+    (Mag, :mag),
+    (Arf, :arf),
+    (Arb, :arb),
+    (Acb, :acb),
+    (ArbVector, :arb_vec),
+    (AcbVector, :acb_vec),
+    (ArbMatrix, :arb_mat),
+    (AcbMatrix, :acb_mat),
+)
     arbstruct = Symbol(prefix, :_struct)
     spref = "$prefix"
     @eval begin

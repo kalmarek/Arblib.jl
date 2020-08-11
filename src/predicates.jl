@@ -1,42 +1,83 @@
 for (T, funcpairs) in (
-    (Mag, (
-        (:(Base.isfinite), :is_finite),
-        (:(Base.isinf), :is_inf),
-        (:isspecial, :is_special),
-        (:(Base.iszero), :is_zero),)),
-    (Arf, (
-        (:(Base.isfinite), :is_finite),
-        (:(Base.isinf), :is_inf),
-        (:(Base.isinteger), :is_int),
-        (:(Base.isnan), :is_nan),
-        (:isneginf, :is_neg_inf),
-        (:isnormal, :is_normal),
-        (:(Base.isone), :is_one),
-        (:isposinf, :is_pos_inf),
-        (:isspecial, :is_special),
-        (:(Base.iszero), :is_zero),
-        )),
-    (Arb, (
-        (:isexact, :is_exact),
-        (:(Base.isfinite), :is_finite),
-        (:(Base.isinteger), :is_int),
-        (:isnegative, :is_negative),
-        (:isnonnegative, :is_nonnegative),
-        (:isnonpositive, :is_nonpositive),
-        (:isnonzero, :is_nonzero),
-        (:(Base.isone), :is_one),
-        (:ispositive, :is_positive),
-        (:(Base.iszero), :is_zero),
-    )),
-    (Acb, (
-        (:isexact, :is_exact),
-        (:(Base.isfinite), :is_finite),
-        (:(Base.isinteger), :is_int),
-        (:(Base.isone), :is_one),
-        (:(Base.isreal), :is_real),
-        (:(Base.iszero), :is_zero),
-    ))
-    )
+    (
+        Mag,
+        (
+            (:(Base.isfinite), :is_finite),
+            (:(Base.isinf), :is_inf),
+            (:isspecial, :is_special),
+            (:(Base.iszero), :is_zero),
+        ),
+    ),
+    (
+        Arf,
+        (
+            (:(Base.isfinite), :is_finite),
+            (:(Base.isinf), :is_inf),
+            (:(Base.isinteger), :is_int),
+            (:(Base.isnan), :is_nan),
+            (:isneginf, :is_neg_inf),
+            (:isnormal, :is_normal),
+            (:(Base.isone), :is_one),
+            (:isposinf, :is_pos_inf),
+            (:isspecial, :is_special),
+            (:(Base.iszero), :is_zero),
+        ),
+    ),
+    (
+        Arb,
+        (
+            (:isexact, :is_exact),
+            (:(Base.isfinite), :is_finite),
+            (:(Base.isinteger), :is_int),
+            (:isnegative, :is_negative),
+            (:isnonnegative, :is_nonnegative),
+            (:isnonpositive, :is_nonpositive),
+            (:isnonzero, :is_nonzero),
+            (:(Base.isone), :is_one),
+            (:ispositive, :is_positive),
+            (:(Base.iszero), :is_zero),
+        ),
+    ),
+    (
+        Acb,
+        (
+            (:isexact, :is_exact),
+            (:(Base.isfinite), :is_finite),
+            (:(Base.isinteger), :is_int),
+            (:(Base.isone), :is_one),
+            (:(Base.isreal), :is_real),
+            (:(Base.iszero), :is_zero),
+        ),
+    ),
+    (ArbVector, ((:(Base.isfinite), :is_finite), (:(Base.iszero), :is_zero))),
+    (
+        AcbVector,
+        (
+            (:(Base.isfinite), :is_finite),
+            (:(Base.isreal), :is_real),
+            (:(Base.iszero), :is_zero),
+        ),
+    ),
+    (
+        ArbMatrix,
+        (
+            (:isexact, :is_exact),
+            (:(Base.isfinite), :is_finite),
+            (:(Base.isone), :is_one),
+            (:(Base.iszero), :is_zero),
+        ),
+    ),
+    (
+        AcbMatrix,
+        (
+            (:isexact, :is_exact),
+            (:(Base.isfinite), :is_finite),
+            (:(Base.isone), :is_one),
+            (:(Base.isreal), :is_real),
+            (:(Base.iszero), :is_zero),
+        ),
+    ),
+)
     for (jlf, arbf) in funcpairs
         @eval $jlf(x::$T) = !iszero($arbf(x))
     end
@@ -77,18 +118,17 @@ for jltype in (Arf, Integer, Unsigned, Base.GMP.CdoubleMax)
 end
 
 for (ArbT, args) in (
-    (Arb, (
-        (:(==), :eq), (:(!=), :ne),
-        (:(<),  :lt), (:(<=), :le),
-        (:(>),  :gt), (:(>=), :ge),
-        )),
-    (Acb, (
-        (:(==), :eq), (:(!=), :ne),
-        )),
-    )
+    (
+        Arb,
+        ((:(==), :eq), (:(!=), :ne), (:(<), :lt), (:(<=), :le), (:(>), :gt), (:(>=), :ge)),
+    ),
+    (Acb, ((:(==), :eq), (:(!=), :ne))),
+    (ArbMatrix, ((:(==), :eq), (:(!=), :ne))),
+    (AcbMatrix, ((:(==), :eq), (:(!=), :ne))),
+)
     for (jlf, arbf) in args
         @eval begin
-            Base.$jlf(x::$ArbT, y::$ArbT) = !iszero($arbf(x,y))
+            Base.$jlf(x::$ArbT, y::$ArbT) = !iszero($arbf(x, y))
         end
     end
 end

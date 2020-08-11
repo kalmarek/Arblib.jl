@@ -8,6 +8,10 @@ include("constructors-test.jl")
 include("predicates-test.jl")
 include("show-test.jl")
 include("examples.jl")
+include("arb_vector.jl")
+include("acb_vector.jl")
+include("arb_matrix.jl")
+include("acb_matrix.jl")
 
 @testset "Arblib" begin
     @test isa(Arb(π), Arb)
@@ -17,7 +21,8 @@ end
     x = Arb("0.1")
     @test precision(x) == 256
     @test precision(Arb) == 256
-    @test string(x) == "[0.1000000000000000000000000000000000000000000000000000000000000000000000000000 +/- 1.95e-78]"
+    @test string(x) ==
+          "[0.1000000000000000000000000000000000000000000000000000000000000000000000000000 +/- 1.95e-78]"
 
     setprecision(Arb, 64)
     @test precision(x) == 256

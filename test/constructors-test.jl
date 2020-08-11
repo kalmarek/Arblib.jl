@@ -23,12 +23,12 @@
         @test typeof(zero(Arf)) == Arf
         @test typeof(one(Arf)) == Arf
 
-        @test precision(Arf(UInt64(1), prec=64)) == 64
-        @test precision(Arf(1, prec=64)) == 64
-        @test precision(Arf(1.0, prec=64)) == 64
-        @test precision(Arf(BigFloat(1, precision=64))) == 64
-        @test precision(Arf(Mag(), prec=64)) == 64
-        @test precision(Arf(Arf(prec=64))) == 64
+        @test precision(Arf(UInt64(1), prec = 64)) == 64
+        @test precision(Arf(1, prec = 64)) == 64
+        @test precision(Arf(1.0, prec = 64)) == 64
+        @test precision(Arf(BigFloat(1, precision = 64))) == 64
+        @test precision(Arf(Mag(), prec = 64)) == 64
+        @test precision(Arf(Arf(prec = 64))) == 64
         @test precision(zero(Arf(prec = 64))) == 64
         @test precision(one(Arf(prec = 64))) == 64
     end
@@ -46,17 +46,17 @@
         @test typeof(Arb(ℯ)) == Arb
         @test typeof(Arb(MathConstants.γ)) == Arb
 
-        @test precision(Arb(UInt64(1), prec=64)) == 64
-        @test precision(Arb(1, prec=64)) == 64
-        @test precision(Arb(1.0, prec=64)) == 64
-        @test precision(Arb(Arf(prec=64))) == 64
-        @test precision(Arb(Arb(prec=64))) == 64
+        @test precision(Arb(UInt64(1), prec = 64)) == 64
+        @test precision(Arb(1, prec = 64)) == 64
+        @test precision(Arb(1.0, prec = 64)) == 64
+        @test precision(Arb(Arf(prec = 64))) == 64
+        @test precision(Arb(Arb(prec = 64))) == 64
         @test precision(Arb("1.1", prec = 64)) == 64
         @test precision(zero(Arb(prec = 64))) == 64
         @test precision(one(Arb(prec = 64))) == 64
         @test precision(Arb(π, prec = 64)) == 64
-        @test typeof(Arb(ℯ, prec=64)) == Arb
-        @test typeof(Arb(MathConstants.γ, prec=64)) == Arb
+        @test typeof(Arb(ℯ, prec = 64)) == Arb
+        @test typeof(Arb(MathConstants.γ, prec = 64)) == Arb
     end
 
     @testset "Acb" begin
@@ -75,14 +75,14 @@
         @test typeof(one(Acb)) == Acb
         @test typeof(Acb(π)) == Acb
 
-        @test precision(Acb(UInt64(1), prec=64)) == 64
-        @test precision(Acb(1, prec=64)) == 64
-        @test precision(Acb(1.0, prec=64)) == 64
-        @test precision(Acb(Arb(prec=64))) == 64
-        @test precision(Acb(Acb(prec=64))) == 64
-        @test precision(Acb(1, 1, prec=64)) == 64
-        @test precision(Acb(1.0, 1.0, prec=64)) == 64
-        @test precision(Acb(Arb(), Arb(), prec=64)) == 64
+        @test precision(Acb(UInt64(1), prec = 64)) == 64
+        @test precision(Acb(1, prec = 64)) == 64
+        @test precision(Acb(1.0, prec = 64)) == 64
+        @test precision(Acb(Arb(prec = 64))) == 64
+        @test precision(Acb(Acb(prec = 64))) == 64
+        @test precision(Acb(1, 1, prec = 64)) == 64
+        @test precision(Acb(1.0, 1.0, prec = 64)) == 64
+        @test precision(Acb(Arb(), Arb(), prec = 64)) == 64
         @test precision(zero(Acb(prec = 64))) == 64
         @test precision(one(Acb(prec = 64))) == 64
         @test precision(Acb(π, prec = 64)) == 64
