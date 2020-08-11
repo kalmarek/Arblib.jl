@@ -14,6 +14,6 @@
     V2[3] = Acb(3)
     @test V == V2
 
-    A = AcbVector([Acb(i+1) for i = 2:5])
+    A = AcbVector([Acb(i + 1) for i = 2:5])
     @test A[end] == Acb(6)
 end

@@ -49,13 +49,7 @@ for (T, funcpairs) in (
             (:(Base.iszero), :is_zero),
         ),
     ),
-    (
-        ArbVector,
-        (
-            (:(Base.isfinite), :is_finite),
-            (:(Base.iszero), :is_zero),
-        ),
-    ),
+    (ArbVector, ((:(Base.isfinite), :is_finite), (:(Base.iszero), :is_zero))),
     (
         AcbVector,
         (
