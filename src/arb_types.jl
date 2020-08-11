@@ -83,6 +83,17 @@ mutable struct acb_struct
     end
 end
 
+mutable struct arb_vec_struct
+    entries::Ptr{arb_struct}
+    n::Int
+
+    function acb_vec_struct(n::Integer)
+        v = new(ccall(@libarb(_arb_vec_init), Ptr{arb_struct}, (Clong,), n), n)
+        finalizer(clear!, v)
+        return v
+    end
+end
+
 mutable struct acb_vec_struct
     entries::Ptr{acb_struct}
     n::Int
@@ -91,6 +102,20 @@ mutable struct acb_vec_struct
         v = new(ccall(@libarb(_acb_vec_init), Ptr{acb_struct}, (Clong,), n), n)
         finalizer(clear!, v)
         return v
+    end
+end
+
+mutable struct arb_mat_struct
+    entries::Ptr{arb_struct}
+    r::Clong
+    c::Clong
+    rows::Ptr{Ptr{arb_struct}}
+
+    function arb_mat_struct(r::Integer, c::Integer)
+        A = new()
+        init!(A, r, c)
+        finalizer(clear!, A)
+        return A
     end
 end
 
@@ -108,16 +133,12 @@ mutable struct acb_mat_struct
     end
 end
 
-mutable struct arb_mat_struct
-    entries::Ptr{arb_struct}
-    r::Clong
-    c::Clong
-    rows::Ptr{Ptr{arb_struct}}
-
-    function arb_mat_struct(r::Integer, c::Integer)
-        A = new()
-        init!(A, r, c)
-        finalizer(clear!, A)
-        return A
-    end
-end
+const ArbStructTypes = Union{
+    arf_struct,
+    arb_struct,
+    acb_struct,
+    arb_vec_struct,
+    acb_vec_struct,
+    arb_mat_struct,
+    acb_mat_struct,
+}

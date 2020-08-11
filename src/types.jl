@@ -90,22 +90,20 @@ struct Acb <: Number
     end
 end
 
+struct ArbVector <: AbstractVector{Arb}
+    arb_vec::arb_vec_struct
+    prec::Int
+
+    AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+        new(arb_vec_struct(n), prec)
+end
+
 struct AcbVector <: AbstractVector{Acb}
     acb_vec::acb_vec_struct
     prec::Int
 
-    AcbVector(n::Integer;  prec::Integer = DEFAULT_PRECISION[]) =
+    AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
         new(acb_vec_struct(n), prec)
-end
-
-struct AcbMatrix <: AbstractMatrix{Acb}
-    acb_mat::acb_mat_struct
-    prec::Int
-
-    function AcbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[])
-        res = new(acb_mat_struct(r, c), prec)
-        return res
-    end
 end
 
 struct ArbMatrix <: AbstractMatrix{Arb}
@@ -118,11 +116,24 @@ struct ArbMatrix <: AbstractMatrix{Arb}
     end
 end
 
+struct AcbMatrix <: AbstractMatrix{Acb}
+    acb_mat::acb_mat_struct
+    prec::Int
+
+    function AcbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[])
+        res = new(acb_mat_struct(r, c), prec)
+        return res
+    end
+end
+
+const ArbTypes = Union{Arf,Arb,Acb,ArbVector,AcbVector,ArbMatrix,AcbMatrix}
+
 for (T, prefix) in (
     (Mag, :mag),
     (Arf, :arf),
     (Arb, :arb),
     (Acb, :acb),
+    (ArbVector, :arb_vec),
     (AcbVector, :acb_vec),
     (ArbMatrix, :arb_mat),
     (AcbMatrix, :acb_mat),
