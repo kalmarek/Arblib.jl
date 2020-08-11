@@ -36,7 +36,8 @@ function parse_arbdoc(filename)
 end
 
 """
-    generate_file(title, sections; filename = nothing)
+    generate_file(title, sections)
+    generate_file(filename, title, sections)
 Given a title and a list of sections, as returned by
 [`parse_arbdoc`](@ref), return a string with the Julia code to load
 all of those functions. If a file name is given then also write the
@@ -46,7 +47,15 @@ For each function it checks that it is correctly parsed. Those that do
 not parse due to unsupported types are commented out in the code. If
 they do not parse for some other reason and error is thrown.
 """
-function generate_file(title, sections; filename = nothing)
+function generate_file(filename, title, sections)
+    str = generate_file(title, sections)
+    open(filename, "w") do file
+        write(file, str)
+    end
+    return str
+end
+
+function generate_file(title, sections)
     str = "###\n"
     str *= "### " * title * "\n"
     str *= "###\n"
@@ -58,24 +67,19 @@ function generate_file(title, sections; filename = nothing)
             try
                 f = Arblib.Arbfunction(s)
 
-                @assert s == Arblib.arbsignature(f)
+                s == Arblib.arbsignature(f) || @warn(
+                    "Expected signature: $s\n Obtained signature: $(Arblib.arbsignature(f))")
 
                 str *= "arbcall\"" * s * "\"\n"
             catch e
                 if e isa Arblib.UnsupportedArgumentType
                     str *= "##arbcall\"" * s * "\"\n"
                 elseif e isa KeyError
-                    str *= "#arbcall\"" * s * "\"\n"
+                    str *= "# arbcall\"" * s * "\"\n"
                 else
                     rethrow(e)
                 end
             end
-        end
-    end
-
-    if !isnothing(filename)
-        open(filename, "w") do file
-            write(file, str)
         end
     end
     return str

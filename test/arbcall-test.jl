@@ -87,6 +87,20 @@
             ("slong * x", "x", false, Vector{<:Integer}, Ref{Clong}),
             ("ulong * x", "x", false, Vector{<:Unsigned}, Ref{Culong}),
             ("const char * inp", "inp", true, AbstractString, Cstring),
+            (
+                "acb_ptr v",
+                "v",
+                false,
+                Union{AcbVector,Arblib.acb_vec_struct,Ptr{acb_struct}},
+                Ptr{acb_struct},
+            ),
+            (
+                "acb_srcptr res",
+                "res",
+                true,
+                Union{AcbVector,Arblib.acb_vec_struct,Ptr{acb_struct}},
+                Ptr{acb_struct},
+            ),
         )
             arg = Arblib.Carg(str)
             @test Arblib.name(arg) == name
@@ -112,12 +126,10 @@
             "fmpq_t x",
             "mag_ptr res",
             "arb_ptr res",
-            "acb_ptr res",
             "const fmpz_t x",
             "const fmpq_t x",
             "mag_srcptr res",
             "arb_srcptr res",
-            "acb_srcptr res",
 
             # Internal types
             "mp_limb_t lo",
@@ -146,6 +158,7 @@
             ("arf_set_si", :set),
             ("arf_set_d", :set),
             ("arb_set", :set),
+            ("arf_set_mpfr", :set),
             ("arb_set_arf", :set),
             ("arb_set_si", :set),
             ("arb_set_ui", :set),
@@ -161,7 +174,6 @@
 
             # Unsupported types
             ("arf_set_fmpz", :set_fmpz),
-            ("arf_set_mpfr", :set_mpfr),
             ("acb_set_fmpq", :set_fmpq),
             ("arb_bin_uiui", :bin_uiui),
 
@@ -170,7 +182,7 @@
             ("arf_set_fmpr", :set_fmpr),
 
             # Underscore methods
-            ("_arb_vec_set", :_arb_vec_set),
+            ("_acb_vec_set", :set),
 
             # Some special cases to be aware of and maybe change
             ("mag_set_d_lower", :set_d_lower),
@@ -190,16 +202,13 @@
             ("slong arb_rel_error_bits(const arb_t x)", Int),
             ("int arb_is_zero(const arb_t x)", Int32),
             ("double arf_get_d(const arf_t x, arf_rnd_t rnd)", Float64),
+            ("acb_ptr _acb_vec_init(slong n)", AcbVector),
         )
             @test Arblib.returntype(Arblib.Arbfunction(str)) == T
         end
 
         # Unsupported return types
-        for str in (
-            "mag_ptr _mag_vec_init(slong n)",
-            "arb_ptr _arb_vec_init(slong n)",
-            "acb_ptr _acb_vec_init(slong n)",
-        )
+        for str in ("mag_ptr _mag_vec_init(slong n)", "arb_ptr _arb_vec_init(slong n)")
             @test_throws KeyError Arblib.Arbfunction(str)
         end
 

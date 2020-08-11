@@ -3,13 +3,14 @@ function AcbMatrix(A::AbstractMatrix{Acb}; prec::Integer = precision(first(A)))
     @inbounds for j = 1:size(A, 2), i = 1:size(A, 1)
         M[i, j] = A[i, j]
     end
-    M
+    return M
 end
 
-Base.size(A::AcbMatrix) = (A.acb_mat.r, A.acb_mat.c)
+Base.size(A::AcbMatrix) = size(A.acb_mat)
+Base.size(A::acb_mat_struct) = (A.r, A.c)
 
 function Base.getindex(A::acb_mat_struct, i::Integer, j::Integer)
-    ccall(
+    return ccall(
         @libarb(acb_mat_entry_ptr),
         Ptr{acb_struct},
         (Ref{acb_mat_struct}, Clong, Clong),
@@ -25,7 +26,7 @@ Base.@propagate_inbounds function Base.getindex(
     shallow::Bool = false,
 )
     @boundscheck checkbounds(A, i, j)
-    Acb(unsafe_load(A.acb_mat[i, j]); prec = precision(A), shallow = shallow)
+    return Acb(unsafe_load(A.acb_mat[i, j]); prec = precision(A), shallow = shallow)
 end
 
 function Base.setindex!(
@@ -34,8 +35,8 @@ function Base.setindex!(
     i::Integer,
     j::Integer,
 )
-    ccall(@libarb(acb_set), Cvoid, (Ptr{acb_struct}, Ref{acb_struct}), A[i, j], x)
-    x
+    set!(A[i, j], x)
+    return x
 end
 Base.@propagate_inbounds function Base.setindex!(
     A::AcbMatrix,
@@ -44,6 +45,6 @@ Base.@propagate_inbounds function Base.setindex!(
     j::Integer,
 )
     @boundscheck checkbounds(A, i, j)
-    setindex!(A.acb_mat, x, i, j)
-    x
+    A.acb_mat[i, j] = x
+    return x
 end

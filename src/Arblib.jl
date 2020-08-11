@@ -9,7 +9,7 @@ function __init__()
     check_deps()
 end
 
-export Arf, Arb, Acb, ArbMatrix, AcbMatrix
+export Arf, Arb, Acb, AcbVector, ArbMatrix, AcbMatrix
 
 macro libarb(function_name)
     return (:($function_name), libarb)
@@ -24,6 +24,7 @@ include("precision.jl")
 
 include("constructors.jl")
 
+include("acb_vector.jl")
 include("arb_matrix.jl")
 include("acb_matrix.jl")
 

@@ -11,7 +11,7 @@ end
 function ArbArgTypes(supported, unsupported)
     supported_reversed = Dict(value => key for (key, value) in supported)
     if length(supported) != length(supported_reversed)
-        @warn "Supported arb types does not define a bijection"
+        @warn "Supported arb types do not define a bijection"
     end
     return ArbArgTypes(supported, unsupported, supported_reversed)
 end
@@ -33,6 +33,8 @@ const arbargtypes = ArbArgTypes(
         "arb_t" => Arb,
         "acb_t" => Acb,
         "mag_t" => Mag,
+        "acb_srcptr" => AcbVector,
+        "acb_ptr" => AcbVector,
         "arb_mat_t" => ArbMatrix,
         "acb_mat_t" => AcbMatrix,
         "arf_rnd_t" => arb_rnd,
@@ -54,8 +56,8 @@ end
 function Carg(str)
     m = match(r"(?<const>const)?\s*(?<type>\w+(\s\*)?)\s+(?<name>\w+)", str)
     isnothing(m) && throw(ArgumentError("string doesn't match c-argument pattern"))
-
-    return Carg{arbargtypes[m[:type]]}(m[:name], !isnothing(m[:const]))
+    cnst = !isnothing(m[:const]) || (!isnothing(m[:type]) && m[:type] == "acb_srcptr")
+    return Carg{arbargtypes[m[:type]]}(m[:name], cnst)
 end
 
 name(ca::Carg) = ca.name
@@ -74,10 +76,12 @@ jltype(ca::Carg{Base.MPFR.MPFRRoundingMode}) =
 jltype(ca::Carg{Cstring}) = AbstractString
 jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
 jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
+jltype(ca::Carg{T}) where {T<:AcbVector} = Union{T, cstructtype(T), Ptr{acb_struct}}
 jltype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbMatrix,AcbMatrix}} =
     Union{T,cstructtype(T),Ptr{cstructtype(T)}}
 
 ctype(ca::Carg) = rawtype(ca)
+ctype(::Carg{T}) where {T<:Union{AcbVector, acb_vec_struct}} = Ptr{acb_struct}
 ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbMatrix,AcbMatrix}} = Ref{cstructtype(T)}
 ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
 ctype(::Carg{Vector{T}}) where {T} = Ref{T}
@@ -99,11 +103,11 @@ end
 
 function jlfname(
     arbfname,
-    prefixes = ("arf", "arb", "acb", "mag", "mat"),
-    suffixes = ("si", "ui", "d", "arf", "arb");
+    prefixes = ("arf", "arb", "acb", "mag", "mat", "vec"),
+    suffixes = ("si", "ui", "d", "mag", "arf", "arb", "mpfr", "str");
     inplace = false,
 )
-    strs = split(arbfname, "_")
+    strs = filter(!isempty, split(arbfname, "_"))
     k = findfirst(s -> s ∉ prefixes, strs)
     l = findfirst(s -> s ∉ suffixes, reverse(strs))
     fname = join(strs[k:end-l+1], "_")
@@ -116,12 +120,13 @@ arguments(af::Arbfunction) = af.args
 
 function inplace(af::Arbfunction)
     firstarg = first(arguments(af))
-    return !isconst(firstarg) && ctype(firstarg) <: Ref
+    return !isconst(firstarg) &&
+           (ctype(firstarg) <: Ref || ctype(firstarg) <: AbstractArray)
 end
 
 function jlfname(
     af::Arbfunction,
-    prefixes = ("arf", "arb", "acb", "mag", "mat"),
+    prefixes = ("arf", "arb", "acb", "mag", "mat", "vec"),
     suffixes = ("si", "ui", "d", "mag", "arf", "arb", "mpfr", "str");
     inplace = inplace(af),
 )
