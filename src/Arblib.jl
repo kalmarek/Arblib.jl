@@ -36,8 +36,6 @@ include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")
 include("arbcalls/arb.jl")
 include("arbcalls/acb.jl")
-include("arbcalls/arb_vec.jl")
-include("arbcalls/acb_vec.jl")
 include("arbcalls/arb_mat.jl")
 include("arbcalls/acb_mat.jl")
 
