@@ -7,14 +7,13 @@ function Base.setindex!(v::acb_vec_struct, x, i::Integer)
 end
 
 Base.size(v::AcbVector) = size(v.acb_vec)
-Base.precision(v::AcbVector) = v.prec
 Base.cconvert(::Type{Ptr{acb_struct}}, v::AcbVector) = v.acb_vec
 Base.unsafe_convert(::Type{Ptr{acb_struct}}, v::acb_vec_struct) = v.entries
 
 function AcbVector(v::AbstractVector{Acb}, prec::Integer = precision(first(v)))
     V = AcbVector(length(v); prec = prec)
-    @inbounds for i in eachindex(V)
-        V[i] = v[i]
+    @inbounds for (i, vᵢ) in enumerate(v)
+        V[i] = vᵢ
     end
     return V
 end

@@ -50,12 +50,26 @@ for (T, funcpairs) in (
         ),
     ),
     (
+        ArbVector,
+        (
+            (:(Base.isfinite), :is_finite),
+            (:(Base.iszero), :is_zero),
+        ),
+    ),
+    (
+        AcbVector,
+        (
+            (:(Base.isfinite), :is_finite),
+            (:(Base.isreal), :is_real),
+            (:(Base.iszero), :is_zero),
+        ),
+    ),
+    (
         ArbMatrix,
         (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
             (:(Base.isone), :is_one),
-            (:(Base.isreal), :is_real),
             (:(Base.iszero), :is_zero),
         ),
     ),

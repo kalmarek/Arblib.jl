@@ -88,6 +88,20 @@
             ("ulong * x", "x", false, Vector{<:Unsigned}, Ref{Culong}),
             ("const char * inp", "inp", true, AbstractString, Cstring),
             (
+                "arb_ptr v",
+                "v",
+                false,
+                Union{ArbVector,Arblib.arb_vec_struct,Ptr{arb_struct}},
+                Ptr{arb_struct},
+            ),
+            (
+                "arb_srcptr res",
+                "res",
+                true,
+                Union{ArbVector,Arblib.arb_vec_struct,Ptr{arb_struct}},
+                Ptr{arb_struct},
+            ),
+            (
                 "acb_ptr v",
                 "v",
                 false,

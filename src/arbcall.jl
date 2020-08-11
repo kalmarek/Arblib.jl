@@ -10,9 +10,6 @@ end
 
 function ArbArgTypes(supported, unsupported)
     supported_reversed = Dict(value => key for (key, value) in supported)
-    if length(supported) != length(supported_reversed)
-        @warn "Supported arb types do not define a bijection"
-    end
     return ArbArgTypes(supported, unsupported, supported_reversed)
 end
 
@@ -33,6 +30,8 @@ const arbargtypes = ArbArgTypes(
         "arb_t" => Arb,
         "acb_t" => Acb,
         "mag_t" => Mag,
+        "arb_srcptr" => ArbVector,
+        "arb_ptr" => ArbVector,
         "acb_srcptr" => AcbVector,
         "acb_ptr" => AcbVector,
         "arb_mat_t" => ArbMatrix,
@@ -56,7 +55,9 @@ end
 function Carg(str)
     m = match(r"(?<const>const)?\s*(?<type>\w+(\s\*)?)\s+(?<name>\w+)", str)
     isnothing(m) && throw(ArgumentError("string doesn't match c-argument pattern"))
-    cnst = !isnothing(m[:const]) || (!isnothing(m[:type]) && m[:type] == "acb_srcptr")
+    cnst =
+        !isnothing(m[:const]) ||
+        (!isnothing(m[:type]) && (m[:type] == "arb_srcptr" || m[:type] == "acb_srcptr"))
     return Carg{arbargtypes[m[:type]]}(m[:name], cnst)
 end
 
@@ -76,12 +77,14 @@ jltype(ca::Carg{Base.MPFR.MPFRRoundingMode}) =
 jltype(ca::Carg{Cstring}) = AbstractString
 jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
 jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
-jltype(ca::Carg{T}) where {T<:AcbVector} = Union{T, cstructtype(T), Ptr{acb_struct}}
+jltype(ca::Carg{ArbVector}) = Union{ArbVector,cstructtype(ArbVector),Ptr{arb_struct}}
+jltype(ca::Carg{AcbVector}) = Union{AcbVector,cstructtype(AcbVector),Ptr{acb_struct}}
 jltype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbMatrix,AcbMatrix}} =
     Union{T,cstructtype(T),Ptr{cstructtype(T)}}
 
 ctype(ca::Carg) = rawtype(ca)
-ctype(::Carg{T}) where {T<:Union{AcbVector, acb_vec_struct}} = Ptr{acb_struct}
+ctype(::Carg{T}) where {T<:Union{ArbVector,arb_vec_struct}} = Ptr{arb_struct}
+ctype(::Carg{T}) where {T<:Union{AcbVector,acb_vec_struct}} = Ptr{acb_struct}
 ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbMatrix,AcbMatrix}} = Ref{cstructtype(T)}
 ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
 ctype(::Carg{Vector{T}}) where {T} = Ref{T}
@@ -160,6 +163,23 @@ function jlargs(af::Arbfunction)
         deleteat!(arg_names, k)
         deleteat!(c_types, k)
         deleteat!(jl_types, k)
+    end
+
+    k = findfirst(==(:len), arg_names)
+    if !isnothing(k)
+        @assert c_types[k] == Clong
+        len = :len
+        a = first(cargs)
+        if jltype(a) ∈ (
+            Union{ArbVector,cstructtype(ArbVector),Ptr{arb_struct}},
+            Union{AcbVector,cstructtype(AcbVector),Ptr{acb_struct}},
+        )
+            push!(kwargs, Expr(:kw, :($len::Integer), :(length($(Symbol(name(a)))))))
+
+            deleteat!(arg_names, k)
+            deleteat!(c_types, k)
+            deleteat!(jl_types, k)
+        end
     end
 
     k = findfirst(==(:rnd), arg_names)
