@@ -45,6 +45,28 @@ const arbargtypes = ArbArgTypes(
         "ulong *" => Vector{Culong},
     ),
     Set(["FILE *", "fmpr_t", "fmpr_rnd_t", "flint_rand_t", "bool_mat_t"]),
+    Dict{DataType,String}(
+        Cvoid => "void",
+        Cint => "int",
+        Clong => "slong",
+        Culong => "ulong",
+        Cdouble => "double",
+        Arf => "arf_t",
+        Arb => "arb_t",
+        Acb => "acb_t",
+        Mag => "mag_t",
+        ArbVector => "arb_ptr",
+        AcbVector => "acb_ptr",
+        ArbMatrix => "arb_mat_t",
+        AcbMatrix => "acb_mat_t",
+        arb_rnd => "arf_rnd_t",
+        BigFloat => "mpfr_t",
+        Base.MPFR.MPFRRoundingMode => "mpfr_rnd_t",
+        BigInt => "mpz_t",
+        Cstring => "char *",
+        Vector{Clong} => "slong *",
+        Vector{Culong} => "ulong *",
+    ),
 )
 
 struct Carg{ArgT}
@@ -219,8 +241,11 @@ function arbsignature(af::Arbfunction)
 
     c_args = join(
         [
-            ifelse(isconst, "const ", "") * "$type $name"
-            for (isconst, type, name) in zip(arg_consts, arg_ctypes, arg_names)
+            ifelse(
+                isconst && (type == "arb_ptr" || type == "acb_ptr"),
+                "$(split(type, "_")[1])_srcptr $name",
+                ifelse(isconst, "const ", "") * "$type $name",
+            ) for (isconst, type, name) in zip(arg_consts, arg_ctypes, arg_names)
         ],
         ", ",
     )
