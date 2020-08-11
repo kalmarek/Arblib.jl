@@ -7,8 +7,6 @@
 ### Memory management
 arbcall"void arb_init(arb_t x)"
 arbcall"void arb_clear(arb_t x)"
-#arbcall"arb_ptr _arb_vec_init(slong n)"
-#arbcall"void _arb_vec_clear(arb_ptr v, slong n)"
 arbcall"void arb_swap(arb_t x, arb_t y)"
 arbcall"slong arb_allocated_bytes(const arb_t x)"
 #arbcall"slong _arb_vec_allocated_bytes(arb_srcptr vec, slong len)"

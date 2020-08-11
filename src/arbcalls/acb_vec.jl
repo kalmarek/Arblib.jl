@@ -1,3 +1,6 @@
+# arbcall"void _acb_vec_clear(acb_ptr v, slong n)" ## We define this manually
+
+arbcall"slong _acb_vec_allocated_bytes(acb_srcptr vec, slong len)"
 arbcall"void _acb_vec_zero(acb_ptr A, slong n)"
 arbcall"int _acb_vec_is_zero(acb_srcptr vec, slong len)"
 arbcall"int _acb_vec_is_real(acb_srcptr v, slong len)"

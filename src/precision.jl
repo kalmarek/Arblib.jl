@@ -11,7 +11,7 @@ Base.precision(::Type{<:Union{ArbTypes,ArbStructTypes}}) = DEFAULT_PRECISION[]
 Base.precision(::Type{<:Ptr{<:ArbStructTypes}}) = DEFAULT_PRECISION[]
 
 Base.precision(x::ArbStructTypes) = DEFAULT_PRECISION[]
-Base.precision(x::Ptr{ArbStructTypes}) = DEFAULT_PRECISION[]
+Base.precision(x::Ptr{<:ArbStructTypes}) = DEFAULT_PRECISION[]
 Base.precision(x::ArbTypes) = x.prec
 
 """

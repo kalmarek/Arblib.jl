@@ -94,7 +94,7 @@ struct ArbVector <: AbstractVector{Arb}
     arb_vec::arb_vec_struct
     prec::Int
 
-    AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+    ArbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
         new(arb_vec_struct(n), prec)
 end
 

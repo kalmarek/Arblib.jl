@@ -24,6 +24,7 @@ include("precision.jl")
 
 include("constructors.jl")
 
+include("arb_vector.jl")
 include("acb_vector.jl")
 include("arb_matrix.jl")
 include("acb_matrix.jl")

@@ -7,10 +7,7 @@
 ### Memory management
 arbcall"void acb_init(acb_t x)"
 arbcall"void acb_clear(acb_t x)"
-# arbcall"acb_ptr _acb_vec_init(slong n)"
-arbcall"void _acb_vec_clear(acb_ptr v, slong n)"
 arbcall"slong acb_allocated_bytes(const acb_t x)"
-arbcall"slong _acb_vec_allocated_bytes(acb_srcptr vec, slong len)"
 # arbcall"double _acb_vec_estimate_allocated_bytes(slong len, slong prec)"
 
 ### Basic manipulation

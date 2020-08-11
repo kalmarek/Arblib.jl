@@ -87,7 +87,7 @@ mutable struct arb_vec_struct
     entries::Ptr{arb_struct}
     n::Int
 
-    function acb_vec_struct(n::Integer)
+    function arb_vec_struct(n::Integer)
         v = new(ccall(@libarb(_arb_vec_init), Ptr{arb_struct}, (Clong,), n), n)
         finalizer(clear!, v)
         return v

@@ -1,5 +1,8 @@
-@inline clear!(arb_vs::arb_vec_struct) = clear!(arb_vs.entries, arb_vs.n)
-Base.size(arb_v::arb_vec_struct) = (arb_v.n,)
+# @inline clear!(arb_vs::arb_vec_struct) = clear!(arb_vs.entries, arb_vs.n)
+function clear!(v::arb_vec_struct)
+    ccall(@libarb(_arb_vec_clear), Cvoid, (Ptr{arb_struct}, Clong), v.entries, v.n)
+end
+Base.size(v::arb_vec_struct) = (v.n,)
 Base.getindex(v::arb_vec_struct, i::Integer) = v.entries + (i - 1) * sizeof(arb_struct)
 function Base.setindex!(v::arb_vec_struct, x, i::Integer)
     set!(v[i], x)

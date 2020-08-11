@@ -1,3 +1,4 @@
+# arbcall"void _arb_vec_clear(arb_ptr v, slong n)" ## We define this manually
 arbcall"void _arb_vec_zero(arb_ptr vec, slong n)"
 arbcall"int _arb_vec_is_zero(arb_srcptr vec, slong len)"
 arbcall"int _arb_vec_is_finite(arb_srcptr x, slong len)"

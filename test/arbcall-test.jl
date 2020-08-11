@@ -91,28 +91,28 @@
                 "arb_ptr v",
                 "v",
                 false,
-                Union{ArbVector,Arblib.arb_vec_struct,Ptr{arb_struct}},
+                Union{ArbVector,Arblib.arb_vec_struct},
                 Ptr{arb_struct},
             ),
             (
                 "arb_srcptr res",
                 "res",
                 true,
-                Union{ArbVector,Arblib.arb_vec_struct,Ptr{arb_struct}},
+                Union{ArbVector,Arblib.arb_vec_struct},
                 Ptr{arb_struct},
             ),
             (
                 "acb_ptr v",
                 "v",
                 false,
-                Union{AcbVector,Arblib.acb_vec_struct,Ptr{acb_struct}},
+                Union{AcbVector,Arblib.acb_vec_struct},
                 Ptr{acb_struct},
             ),
             (
                 "acb_srcptr res",
                 "res",
                 true,
-                Union{AcbVector,Arblib.acb_vec_struct,Ptr{acb_struct}},
+                Union{AcbVector,Arblib.acb_vec_struct},
                 Ptr{acb_struct},
             ),
         )
@@ -139,11 +139,9 @@
             "fmpz_t x",
             "fmpq_t x",
             "mag_ptr res",
-            "arb_ptr res",
             "const fmpz_t x",
             "const fmpq_t x",
             "mag_srcptr res",
-            "arb_srcptr res",
 
             # Internal types
             "mp_limb_t lo",
@@ -222,7 +220,7 @@
         end
 
         # Unsupported return types
-        for str in ("mag_ptr _mag_vec_init(slong n)", "arb_ptr _arb_vec_init(slong n)")
+        for str in ("mag_ptr _mag_vec_init(slong n)",)
             @test_throws KeyError Arblib.Arbfunction(str)
         end
 
