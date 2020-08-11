@@ -3,11 +3,7 @@ module Arblib
 using LoadFlint
 const libflint = LoadFlint.libflint
 
-include(joinpath(@__DIR__, "..", "deps", "deps.jl"))
-
-function __init__()
-    check_deps()
-end
+using Arb_jll
 
 export Arf, Arb, Acb
 
