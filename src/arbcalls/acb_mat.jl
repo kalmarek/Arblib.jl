@@ -1,6 +1,3 @@
-import LinearAlgebra: det, lu, inv
-import Base: exp
-
 ###
 ### **acb_mat.h** -- matrices over the complex numbers
 ###
@@ -19,8 +16,8 @@ arbcall"void acb_mat_set(acb_mat_t dest, const acb_mat_t src)"
 # arbcall"void acb_mat_set_fmpz_mat(acb_mat_t dest, const fmpz_mat_t src)"
 # arbcall"void acb_mat_set_round_fmpz_mat(acb_mat_t dest, const fmpz_mat_t src, slong prec)"
 # arbcall"void acb_mat_set_fmpq_mat(acb_mat_t dest, const fmpq_mat_t src, slong prec)"
-# arbcall"void acb_mat_set_arb_mat(acb_mat_t dest, const arb_mat_t src)"
-# arbcall"void acb_mat_set_round_arb_mat(acb_mat_t dest, const arb_mat_t src, slong prec)"
+arbcall"void acb_mat_set_arb_mat(acb_mat_t dest, const arb_mat_t src)"
+arbcall"void acb_mat_set_round_arb_mat(acb_mat_t dest, const arb_mat_t src, slong prec)"
 
 ### Random generation
 # arbcall"void acb_mat_randtest(acb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)"
@@ -28,7 +25,7 @@ arbcall"void acb_mat_set(acb_mat_t dest, const acb_mat_t src)"
 
 ### Input and output
 arbcall"void acb_mat_printd(const acb_mat_t mat, slong digits)"
-##arbcall"void acb_mat_fprintd(FILE * file, const acb_mat_t mat, slong digits)"
+# arbcall"void acb_mat_fprintd(FILE * file, const acb_mat_t mat, slong digits)"
 
 ### Comparisons
 arbcall"int acb_mat_equal(const acb_mat_t mat1, const acb_mat_t mat2)"
@@ -120,9 +117,9 @@ arbcall"int acb_mat_approx_solve(acb_mat_t X, const acb_mat_t A, const acb_mat_t
 arbcall"int acb_mat_approx_inv(acb_mat_t X, const acb_mat_t A, slong prec)"
 
 ### Characteristic polynomial and companion matrix
-# arbcall"void _acb_mat_charpoly(acb_ptr poly, const acb_mat_t mat, slong prec)"
+arbcall"void _acb_mat_charpoly(acb_ptr poly, const acb_mat_t mat, slong prec)"
 # arbcall"void acb_mat_charpoly(acb_poly_t poly, const acb_mat_t mat, slong prec)"
-# arbcall"void _acb_mat_companion(acb_mat_t mat, acb_srcptr poly, slong prec)"
+arbcall"void _acb_mat_companion(acb_mat_t mat, acb_srcptr poly, slong prec)"
 # arbcall"void acb_mat_companion(acb_mat_t mat, const acb_poly_t poly, slong prec)"
 
 ### Special functions
@@ -137,11 +134,11 @@ arbcall"void acb_mat_get_mid(acb_mat_t B, const acb_mat_t A)"
 arbcall"void acb_mat_add_error_mag(acb_mat_t mat, const mag_t err)"
 
 ### Eigenvalues and eigenvectors
-# arbcall"int acb_mat_approx_eig_qr(acb_ptr E, acb_mat_t L, acb_mat_t R, const acb_mat_t A, const mag_t tol, slong maxiter, slong prec)"
-# arbcall"void acb_mat_eig_global_enclosure(mag_t eps, const acb_mat_t A, acb_srcptr E, const acb_mat_t R, slong prec)"
+arbcall"int acb_mat_approx_eig_qr(acb_ptr E, acb_mat_t L, acb_mat_t R, const acb_mat_t A, const mag_t tol, slong maxiter, slong prec)"
+arbcall"void acb_mat_eig_global_enclosure(mag_t eps, const acb_mat_t A, acb_srcptr E, const acb_mat_t R, slong prec)"
 arbcall"void acb_mat_eig_enclosure_rump(acb_t lambda, acb_mat_t J, acb_mat_t R, const acb_mat_t A, const acb_t lambda_approx, const acb_mat_t R_approx, slong prec)"
-# arbcall"int acb_mat_eig_simple_rump(acb_ptr E, acb_mat_t L, acb_mat_t R, const acb_mat_t A, acb_srcptr E_approx, const acb_mat_t R_approx, slong prec)"
-# arbcall"int acb_mat_eig_simple_vdhoeven_mourrain(acb_ptr E, acb_mat_t L, acb_mat_t R, const acb_mat_t A, acb_srcptr E_approx, const acb_mat_t R_approx, slong prec)"
-# arbcall"int acb_mat_eig_simple(acb_ptr E, acb_mat_t L, acb_mat_t R, const acb_mat_t A, acb_srcptr E_approx, const acb_mat_t R_approx, slong prec)"
-# arbcall"int acb_mat_eig_multiple_rump(acb_ptr E, const acb_mat_t A, acb_srcptr E_approx, const acb_mat_t R_approx, slong prec)"
-# arbcall"int acb_mat_eig_multiple(acb_ptr E, const acb_mat_t A, acb_srcptr E_approx, const acb_mat_t R_approx, slong prec)"
+arbcall"int acb_mat_eig_simple_rump(acb_ptr E, acb_mat_t L, acb_mat_t R, const acb_mat_t A, acb_srcptr E_approx, const acb_mat_t R_approx, slong prec)"
+arbcall"int acb_mat_eig_simple_vdhoeven_mourrain(acb_ptr E, acb_mat_t L, acb_mat_t R, const acb_mat_t A, acb_srcptr E_approx, const acb_mat_t R_approx, slong prec)"
+arbcall"int acb_mat_eig_simple(acb_ptr E, acb_mat_t L, acb_mat_t R, const acb_mat_t A, acb_srcptr E_approx, const acb_mat_t R_approx, slong prec)"
+arbcall"int acb_mat_eig_multiple_rump(acb_ptr E, const acb_mat_t A, acb_srcptr E_approx, const acb_mat_t R_approx, slong prec)"
+arbcall"int acb_mat_eig_multiple(acb_ptr E, const acb_mat_t A, acb_srcptr E_approx, const acb_mat_t R_approx, slong prec)"

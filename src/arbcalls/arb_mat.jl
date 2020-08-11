@@ -1,6 +1,3 @@
-import LinearAlgebra: det, lu, inv
-import Base: exp
-
 ###
 ### **arb_mat.h** -- matrices over the real numbers
 ###
@@ -16,23 +13,23 @@ arbcall"void arb_mat_window_clear(arb_mat_t window)"
 
 ### Conversions
 arbcall"void arb_mat_set(arb_mat_t dest, const arb_mat_t src)"
-#arbcall"void arb_mat_set_fmpz_mat(arb_mat_t dest, const fmpz_mat_t src)"
-#arbcall"void arb_mat_set_round_fmpz_mat(arb_mat_t dest, const fmpz_mat_t src, slong prec)"
-#arbcall"void arb_mat_set_fmpq_mat(arb_mat_t dest, const fmpq_mat_t src, slong prec)"
+# arbcall"void arb_mat_set_fmpz_mat(arb_mat_t dest, const fmpz_mat_t src)"
+# arbcall"void arb_mat_set_round_fmpz_mat(arb_mat_t dest, const fmpz_mat_t src, slong prec)"
+# arbcall"void arb_mat_set_fmpq_mat(arb_mat_t dest, const fmpq_mat_t src, slong prec)"
 
 ### Random generation
-#arbcall"void arb_mat_randtest(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)"
+# arbcall"void arb_mat_randtest(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)"
 
 ### Input and output
 arbcall"void arb_mat_printd(const arb_mat_t mat, slong digits)"
-##arbcall"void arb_mat_fprintd(FILE * file, const arb_mat_t mat, slong digits)"
+# arbcall"void arb_mat_fprintd(FILE * file, const arb_mat_t mat, slong digits)"
 
 ### Comparisons
 arbcall"int arb_mat_equal(const arb_mat_t mat1, const arb_mat_t mat2)"
 arbcall"int arb_mat_overlaps(const arb_mat_t mat1, const arb_mat_t mat2)"
 arbcall"int arb_mat_contains(const arb_mat_t mat1, const arb_mat_t mat2)"
-#arbcall"int arb_mat_contains_fmpz_mat(const arb_mat_t mat1, const fmpz_mat_t mat2)"
-#arbcall"int arb_mat_contains_fmpq_mat(const arb_mat_t mat1, const fmpq_mat_t mat2)"
+# arbcall"int arb_mat_contains_fmpz_mat(const arb_mat_t mat1, const fmpz_mat_t mat2)"
+# arbcall"int arb_mat_contains_fmpq_mat(const arb_mat_t mat1, const fmpq_mat_t mat2)"
 arbcall"int arb_mat_eq(const arb_mat_t mat1, const arb_mat_t mat2)"
 arbcall"int arb_mat_ne(const arb_mat_t mat1, const arb_mat_t mat2)"
 arbcall"int arb_mat_is_empty(const arb_mat_t mat)"
@@ -49,7 +46,7 @@ arbcall"void arb_mat_zero(arb_mat_t mat)"
 arbcall"void arb_mat_one(arb_mat_t mat)"
 arbcall"void arb_mat_ones(arb_mat_t mat)"
 arbcall"void arb_mat_indeterminate(arb_mat_t mat)"
-arbcall"void arb_mat_hilbert(arb_mat_t mat)"
+arbcall"void arb_mat_hilbert(arb_mat_t mat, slong prec)"
 arbcall"void arb_mat_pascal(arb_mat_t mat, int triangular, slong prec)"
 arbcall"void arb_mat_stirling(arb_mat_t mat, int kind, slong prec)"
 arbcall"void arb_mat_dct(arb_mat_t mat, int type, slong prec)"
@@ -80,13 +77,13 @@ arbcall"void arb_mat_approx_mul(arb_mat_t res, const arb_mat_t mat1, const arb_m
 ### Scalar arithmetic
 arbcall"void arb_mat_scalar_mul_2exp_si(arb_mat_t B, const arb_mat_t A, slong c)"
 arbcall"void arb_mat_scalar_addmul_si(arb_mat_t B, const arb_mat_t A, slong c, slong prec)"
-#arbcall"void arb_mat_scalar_addmul_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
+# arbcall"void arb_mat_scalar_addmul_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
 arbcall"void arb_mat_scalar_addmul_arb(arb_mat_t B, const arb_mat_t A, const arb_t c, slong prec)"
 arbcall"void arb_mat_scalar_mul_si(arb_mat_t B, const arb_mat_t A, slong c, slong prec)"
-#arbcall"void arb_mat_scalar_mul_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
+# arbcall"void arb_mat_scalar_mul_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
 arbcall"void arb_mat_scalar_mul_arb(arb_mat_t B, const arb_mat_t A, const arb_t c, slong prec)"
 arbcall"void arb_mat_scalar_div_si(arb_mat_t B, const arb_mat_t A, slong c, slong prec)"
-#arbcall"void arb_mat_scalar_div_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
+# arbcall"void arb_mat_scalar_div_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
 arbcall"void arb_mat_scalar_div_arb(arb_mat_t B, const arb_mat_t A, const arb_t c, slong prec)"
 
 ### Gaussian elimination and solving
@@ -129,10 +126,10 @@ arbcall"void arb_mat_solve_ldl_precomp(arb_mat_t X, const arb_mat_t L, const arb
 arbcall"void arb_mat_inv_ldl_precomp(arb_mat_t X, const arb_mat_t L, slong prec)"
 
 ### Characteristic polynomial and companion matrix
-#arbcall"void _arb_mat_charpoly(arb_ptr poly, const arb_mat_t mat, slong prec)"
-#arbcall"void arb_mat_charpoly(arb_poly_t poly, const arb_mat_t mat, slong prec)"
-#arbcall"void _arb_mat_companion(arb_mat_t mat, arb_srcptr poly, slong prec)"
-#arbcall"void arb_mat_companion(arb_mat_t mat, const arb_poly_t poly, slong prec)"
+arbcall"void _arb_mat_charpoly(arb_ptr poly, const arb_mat_t mat, slong prec)"
+# arbcall"void arb_mat_charpoly(arb_poly_t poly, const arb_mat_t mat, slong prec)"
+arbcall"void _arb_mat_companion(arb_mat_t mat, arb_srcptr poly, slong prec)"
+# arbcall"void arb_mat_companion(arb_mat_t mat, const arb_poly_t poly, slong prec)"
 
 ### Special functions
 arbcall"void arb_mat_exp_taylor_sum(arb_mat_t S, const arb_mat_t A, slong N, slong prec)"
@@ -142,11 +139,13 @@ arbcall"void _arb_mat_diag_prod(arb_t res, const arb_mat_t mat, slong a, slong b
 arbcall"void arb_mat_diag_prod(arb_t res, const arb_mat_t mat, slong prec)"
 
 ### Sparsity structure
-#arbcall"void arb_mat_entrywise_is_zero(fmpz_mat_t dest, const arb_mat_t src)"
-#arbcall"void arb_mat_entrywise_not_is_zero(fmpz_mat_t dest, const arb_mat_t src)"
+# arbcall"void arb_mat_entrywise_is_zero(fmpz_mat_t dest, const arb_mat_t src)"
+# arbcall"void arb_mat_entrywise_not_is_zero(fmpz_mat_t dest, const arb_mat_t src)"
 arbcall"slong arb_mat_count_is_zero(const arb_mat_t mat)"
 arbcall"slong arb_mat_count_not_is_zero(const arb_mat_t mat)"
 
 ### Component and error operations
 arbcall"void arb_mat_get_mid(arb_mat_t B, const arb_mat_t A)"
 arbcall"void arb_mat_add_error_mag(arb_mat_t mat, const mag_t err)"
+
+### Eigenvalues and eigenvectors

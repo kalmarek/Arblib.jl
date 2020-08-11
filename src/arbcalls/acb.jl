@@ -7,10 +7,11 @@
 ### Memory management
 arbcall"void acb_init(acb_t x)"
 arbcall"void acb_clear(acb_t x)"
-# arbcall"acb_ptr _acb_vec_init(slong n)" ## We define this manually
-# arbcall"void _acb_vec_clear(acb_ptr v, slong n)" ## We define this manually
+#arbcall"acb_ptr _acb_vec_init(slong n)"
+arbcall"void _acb_vec_clear(acb_ptr v, slong n)"
 arbcall"slong acb_allocated_bytes(const acb_t x)"
-# arbcall"double _acb_vec_estimate_allocated_bytes(slong len, slong prec)"
+arbcall"slong _acb_vec_allocated_bytes(acb_srcptr vec, slong len)"
+#arbcall"double _acb_vec_estimate_allocated_bytes(slong len, slong prec)"
 
 ### Basic manipulation
 arbcall"void acb_zero(acb_t z)"
@@ -35,18 +36,18 @@ arbcall"void acb_add_error_mag(acb_t x, const mag_t err)"
 arbcall"void acb_get_mid(acb_t m, const acb_t x)"
 
 ### Input and output
-# arbcall"void acb_print(const acb_t x)"
-##arbcall"void acb_fprint(FILE * file, const acb_t x)"
+#arbcall"void acb_print(const acb_t x)"
+# arbcall"void acb_fprint(FILE * file, const acb_t x)"
 arbcall"void acb_printd(const acb_t x, slong digits)"
-##arbcall"void acb_fprintd(FILE * file, const acb_t x, slong digits)"
+# arbcall"void acb_fprintd(FILE * file, const acb_t x, slong digits)"
 arbcall"void acb_printn(const acb_t x, slong digits, ulong flags)"
-##arbcall"void acb_fprintn(FILE * file, const acb_t x, slong digits, ulong flags)"
+# arbcall"void acb_fprintn(FILE * file, const acb_t x, slong digits, ulong flags)"
 
 ### Random number generation
-##arbcall"void acb_randtest(acb_t z, flint_rand_t state, slong prec, slong mag_bits)"
-##arbcall"void acb_randtest_special(acb_t z, flint_rand_t state, slong prec, slong mag_bits)"
-##arbcall"void acb_randtest_precise(acb_t z, flint_rand_t state, slong prec, slong mag_bits)"
-##arbcall"void acb_randtest_param(acb_t z, flint_rand_t state, slong prec, slong mag_bits)"
+# arbcall"void acb_randtest(acb_t z, flint_rand_t state, slong prec, slong mag_bits)"
+# arbcall"void acb_randtest_special(acb_t z, flint_rand_t state, slong prec, slong mag_bits)"
+# arbcall"void acb_randtest_precise(acb_t z, flint_rand_t state, slong prec, slong mag_bits)"
+# arbcall"void acb_randtest_param(acb_t z, flint_rand_t state, slong prec, slong mag_bits)"
 
 ### Precision and comparisons
 arbcall"int acb_is_zero(const acb_t z)"
@@ -253,7 +254,6 @@ arbcall"void acb_real_min(acb_t res, const acb_t x, const acb_t y, int analytic,
 arbcall"void acb_real_sqrtpos(acb_t res, const acb_t z, int analytic, slong prec)"
 
 ### Vector functions
-arbcall"slong _acb_vec_allocated_bytes(acb_srcptr vec, slong len)"
 arbcall"void _acb_vec_zero(acb_ptr A, slong n)"
 arbcall"int _acb_vec_is_zero(acb_srcptr vec, slong len)"
 arbcall"int _acb_vec_is_real(acb_srcptr v, slong len)"
