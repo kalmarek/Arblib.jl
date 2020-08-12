@@ -27,6 +27,7 @@ include("acb_matrix.jl")
 
 include("predicates.jl")
 include("show.jl")
+include("arithmetic.jl")
 
 include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")
