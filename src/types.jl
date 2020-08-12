@@ -133,8 +133,7 @@ struct ArbPoly
     arb_poly::arb_poly_struct
     prec::Int
 
-    ArbPoly(;prec::Integer = DEFAULT_PRECISION[]) =
-        new(arb_poly_struct(), prec)
+    ArbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(arb_poly_struct(), prec)
 end
 
 struct ArbMatrix <: DenseMatrix{ArbRef}

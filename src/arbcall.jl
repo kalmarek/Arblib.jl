@@ -111,7 +111,8 @@ jltype(::Carg{T}) where {T<:Union{Mag,Arf,ArbPoly,ArbSeries,ArbMatrix,AcbMatrix}
 ctype(ca::Carg) = rawtype(ca)
 ctype(::Carg{T}) where {T<:Union{ArbVector,arb_vec_struct}} = Ptr{arb_struct}
 ctype(::Carg{T}) where {T<:Union{AcbVector,acb_vec_struct}} = Ptr{acb_struct}
-ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbPoly,ArbMatrix,AcbMatrix}} = Ref{cstructtype(T)}
+ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbPoly,ArbMatrix,AcbMatrix}} =
+    Ref{cstructtype(T)}
 ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
 ctype(::Carg{Vector{T}}) where {T} = Ref{T}
 
