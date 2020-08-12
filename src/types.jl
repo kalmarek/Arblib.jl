@@ -129,6 +129,14 @@ end
 AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     AcbVector(acb_vec_struct(n), prec)
 
+struct ArbPoly
+    arb_poly::arb_poly_struct
+    prec::Int
+
+    ArbPoly(;prec::Integer = DEFAULT_PRECISION[]) =
+        new(arb_poly_struct(), prec)
+end
+
 struct ArbMatrix <: DenseMatrix{ArbRef}
     arb_mat::arb_mat_struct
     prec::Int
@@ -143,7 +151,7 @@ end
 AcbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     AcbMatrix(acb_mat_struct(r, c), prec)
 
-const ArbTypes = Union{Arf,Arb,ArbRef,Acb,AcbRef,ArbVector,AcbVector,ArbMatrix,AcbMatrix}
+const ArbTypes = Union{Arf,Arb,ArbRef,Acb,AcbRef,ArbVector,AcbVector,ArbPoly,ArbMatrix,AcbMatrix}
 
 for (T, prefix) in (
     (Mag, :mag),
@@ -152,6 +160,7 @@ for (T, prefix) in (
     (Acb, :acb),
     (ArbVector, :arb_vec),
     (AcbVector, :acb_vec),
+    (ArbPoly, :arb_poly),
     (ArbMatrix, :arb_mat),
     (AcbMatrix, :acb_mat),
 )

@@ -34,6 +34,7 @@ const arbargtypes = ArbArgTypes(
         "arb_ptr" => ArbVector,
         "acb_srcptr" => AcbVector,
         "acb_ptr" => AcbVector,
+        "arb_poly_t" => ArbPoly,
         "arb_mat_t" => ArbMatrix,
         "acb_mat_t" => AcbMatrix,
         "arf_rnd_t" => arb_rnd,
@@ -57,6 +58,7 @@ const arbargtypes = ArbArgTypes(
         Mag => "mag_t",
         ArbVector => "arb_ptr",
         AcbVector => "acb_ptr",
+        ArbPoly => "arb_poly_t",
         ArbMatrix => "arb_mat_t",
         AcbMatrix => "acb_mat_t",
         arb_rnd => "arf_rnd_t",
@@ -103,13 +105,13 @@ jltype(ca::Carg{ArbVector}) = Union{ArbVector,cstructtype(ArbVector)}
 jltype(ca::Carg{AcbVector}) = Union{AcbVector,cstructtype(AcbVector)}
 jltype(::Carg{Acb}) = Union{Acb,cstructtype(Acb),Ptr{cstructtype(Acb)},AcbRef}
 jltype(::Carg{Arb}) = Union{Arb,cstructtype(Arb),Ptr{cstructtype(Arb)},ArbRef}
-jltype(::Carg{T}) where {T<:Union{Mag,Arf,ArbMatrix,AcbMatrix}} =
+jltype(::Carg{T}) where {T<:Union{Mag,Arf,ArbPoly,ArbSeries,ArbMatrix,AcbMatrix}} =
     Union{T,cstructtype(T),Ptr{cstructtype(T)}}
 
 ctype(ca::Carg) = rawtype(ca)
 ctype(::Carg{T}) where {T<:Union{ArbVector,arb_vec_struct}} = Ptr{arb_struct}
 ctype(::Carg{T}) where {T<:Union{AcbVector,acb_vec_struct}} = Ptr{acb_struct}
-ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbMatrix,AcbMatrix}} = Ref{cstructtype(T)}
+ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbPoly,ArbMatrix,AcbMatrix}} = Ref{cstructtype(T)}
 ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
 ctype(::Carg{Vector{T}}) where {T} = Ref{T}
 
@@ -130,7 +132,7 @@ end
 
 function jlfname(
     arbfname,
-    prefixes = ("arf", "arb", "acb", "mag", "mat", "vec"),
+    prefixes = ("arf", "arb", "acb", "mag", "mat", "vec", "poly"),
     suffixes = ("si", "ui", "d", "mag", "arf", "arb", "mpfr", "str");
     inplace = false,
 )
@@ -153,7 +155,7 @@ end
 
 function jlfname(
     af::Arbfunction,
-    prefixes = ("arf", "arb", "acb", "mag", "mat", "vec"),
+    prefixes = ("arf", "arb", "acb", "mag", "mat", "vec", "poly"),
     suffixes = ("si", "ui", "d", "mag", "arf", "arb", "mpfr", "str");
     inplace = inplace(af),
 )
