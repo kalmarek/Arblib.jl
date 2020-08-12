@@ -68,6 +68,12 @@ for T in (Unsigned, Integer, Base.GMP.CdoubleMax)
         end
     end
 end
+function Acb(x::Arf; prec::Integer = precision(x))
+    res = Acb(prec = prec)
+    # There is not set! with Acb and Arf. So create intermediate Arb :shrug:
+    set!(res, Arb(x, prec=prec))
+    return res
+end
 
 function Acb(x::Arb; prec::Integer = precision(x))
     res = Acb(prec = prec)
