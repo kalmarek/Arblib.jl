@@ -131,10 +131,10 @@ Base.zero(x::T) where {T<:Union{Arf,Arb,Acb}} = T(0, prec = precision(x))
 Base.one(x::T) where {T<:Union{Arf,Arb,Acb}} = T(1, prec = precision(x))
 # Define these since the base implementation would create `n` copies of the same element
 # I.e. only allocating **one** Arf/Arb/Acb.
-Base.zeros(x::T, n::Integer) where {T<:Union{Arf,Arb,Acb}} =[zero(x) for _ in 1:n]
-Base.ones(x::T, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(x) for _ in 1:n]
-Base.zeros(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} =[zero(T) for _ in 1:n]
-Base.ones(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(T) for _ in 1:n]
+Base.zeros(x::T, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [zero(x) for _ = 1:n]
+Base.ones(x::T, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(x) for _ = 1:n]
+Base.zeros(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [zero(T) for _ = 1:n]
+Base.ones(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(T) for _ = 1:n]
 
 # Irrationals
 function Mag(::Irrational{:π})

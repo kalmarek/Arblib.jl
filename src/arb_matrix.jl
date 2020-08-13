@@ -17,9 +17,9 @@ end
 Base.size(A::ArbMatrix) = size(A.arb_mat)
 Base.size(A::arb_mat_struct) = (A.r, A.c)
 
-Base.copy(A::ArbMatrix) = copy!(ArbMatrix(size(A)...; prec=precision(A)), A)
+Base.copy(A::ArbMatrix) = copy!(ArbMatrix(size(A)...; prec = precision(A)), A)
 Base.copy!(A::ArbMatrix, B::ArbMatrix) = (set!(A, B); A)
-Base.copyto!(A::ArbMatrix, B::ArbMatrix)  = (set!(A, B); A)
+Base.copyto!(A::ArbMatrix, B::ArbMatrix) = (set!(A, B); A)
 
 function Base.getindex(A::arb_mat_struct, i::Integer, j::Integer)
     return ccall(
