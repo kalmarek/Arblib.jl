@@ -58,6 +58,13 @@ function Arb(str::AbstractString; prec::Integer = DEFAULT_PRECISION[])
     return res
 end
 
+function Arb(x::Rational; prec::Integer = DEFAULT_PRECISION[])
+    num = Arb(numerator(x); prec = prec)
+    denom = Arb(denominator(x); prec = prec)
+    div!(num, num, denom)
+    return num
+end
+
 ## Acb
 for T in (Unsigned, Integer, Base.GMP.CdoubleMax)
     @eval begin
@@ -71,7 +78,7 @@ end
 function Acb(x::Arf; prec::Integer = precision(x))
     res = Acb(prec = prec)
     # There is not set! with Acb and Arf. So create intermediate Arb :shrug:
-    set!(res, Arb(x, prec=prec))
+    set!(res, Arb(x, prec = prec))
     return res
 end
 
@@ -100,6 +107,11 @@ for T in (Integer, Base.GMP.CdoubleMax)
         end
     end
 end
+
+function Acb(x::Rational; prec::Integer = DEFAULT_PRECISION[])
+    Acb(Arb(x; prec = prec); prec = prec)
+end
+
 
 function Acb(re::Arb, im::Arb; prec::Integer = max(precision(re), precision(im)))
     res = Acb(prec = prec)
