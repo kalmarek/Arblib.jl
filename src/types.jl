@@ -149,3 +149,8 @@ for (T, prefix) in (
         Base.convert(::Type{$(cstructtype(T))}, x::$T) = cstruct(x)
     end
 end
+
+function Base.setindex!(x::Union{Mag,Arf,Arb,Acb}, z::Number)
+    set!(x, z)
+    x
+end
