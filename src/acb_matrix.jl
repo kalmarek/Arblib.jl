@@ -16,9 +16,9 @@ end
 Base.size(A::AcbMatrix) = size(A.acb_mat)
 Base.size(A::acb_mat_struct) = (A.r, A.c)
 
-Base.copy(A::AcbMatrix) = copy!(AcbMatrix(size(A)...; prec=precision(A)), A)
+Base.copy(A::AcbMatrix) = copy!(AcbMatrix(size(A)...; prec = precision(A)), A)
 Base.copy!(A::AcbMatrix, B::AcbMatrix) = (set!(A, B); A)
-Base.copyto!(A::AcbMatrix, B::AcbMatrix)  = (set!(A, B); A)
+Base.copyto!(A::AcbMatrix, B::AcbMatrix) = (set!(A, B); A)
 
 function Base.getindex(A::acb_mat_struct, i::Integer, j::Integer)
     return ccall(
