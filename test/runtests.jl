@@ -1,4 +1,4 @@
-using Arblib, Test
+using Arblib, Test, LinearAlgebra
 
 include("arb_types-test.jl")
 include("types-test.jl")
@@ -12,6 +12,7 @@ include("arb_vector.jl")
 include("acb_vector.jl")
 include("arb_matrix.jl")
 include("acb_matrix.jl")
+include("linear_algebra.jl")
 
 @testset "Arblib" begin
     @test isa(Arb(π), Arb)
