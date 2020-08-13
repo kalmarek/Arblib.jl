@@ -260,11 +260,18 @@ function jlcode(af::Arbfunction, jl_fname = jlfname(af))
 
     return :(
         function $jl_fname($(args...); $(kwargs...))
-            ccall(
+            __ret = ccall(
                 Arblib.@libarb($(arbfname(af))),
                 $returnT,
                 $(Expr(:tuple, ctype.(cargs)...)),
                 $(Symbol.(name.(cargs))...),
+            )
+            $(
+                if returnT == Nothing && inplace(af)
+                    Symbol(name(first(arguments(af))))
+                else
+                    :__ret
+                end
             )
         end
     )
