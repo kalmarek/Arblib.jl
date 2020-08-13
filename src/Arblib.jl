@@ -1,8 +1,6 @@
 module Arblib
 
-using LoadFlint
-const libflint = LoadFlint.libflint
-
+using FLINT_jll
 using Arb_jll
 
 export Arf, Arb, Acb
