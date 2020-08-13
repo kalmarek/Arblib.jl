@@ -1,3 +1,11 @@
+function ArbMatrix(v::AbstractVector{Arb}; prec::Integer = precision(first(v)))
+    M = ArbMatrix(length(v), 1; prec = prec)
+    @inbounds for (i, vᵢ) in enumerate(v)
+        M[i, 1] = vᵢ
+    end
+    return M
+end
+
 function ArbMatrix(A::AbstractMatrix{Arb}; prec::Integer = precision(first(A)))
     M = ArbMatrix(size(A)...; prec = prec)
     @inbounds for j = 1:size(A, 2), i = 1:size(A, 1)
@@ -8,6 +16,10 @@ end
 
 Base.size(A::ArbMatrix) = size(A.arb_mat)
 Base.size(A::arb_mat_struct) = (A.r, A.c)
+
+Base.copy(A::ArbMatrix) = copy!(ArbMatrix(size(A)...; prec=precision(A)), A)
+Base.copy!(A::ArbMatrix, B::ArbMatrix) = (set!(A, B); A)
+Base.copyto!(A::ArbMatrix, B::ArbMatrix)  = (set!(A, B); A)
 
 function Base.getindex(A::arb_mat_struct, i::Integer, j::Integer)
     return ccall(

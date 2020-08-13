@@ -90,7 +90,7 @@ struct Acb <: Number
     end
 end
 
-struct ArbVector <: AbstractVector{Arb}
+struct ArbVector <: DenseVector{Arb}
     arb_vec::arb_vec_struct
     prec::Int
 
@@ -98,7 +98,7 @@ struct ArbVector <: AbstractVector{Arb}
         new(arb_vec_struct(n), prec)
 end
 
-struct AcbVector <: AbstractVector{Acb}
+struct AcbVector <: DenseVector{Acb}
     acb_vec::acb_vec_struct
     prec::Int
 
@@ -106,7 +106,7 @@ struct AcbVector <: AbstractVector{Acb}
         new(acb_vec_struct(n), prec)
 end
 
-struct ArbMatrix <: AbstractMatrix{Arb}
+struct ArbMatrix <: DenseMatrix{Arb}
     arb_mat::arb_mat_struct
     prec::Int
 
@@ -116,7 +116,7 @@ struct ArbMatrix <: AbstractMatrix{Arb}
     end
 end
 
-struct AcbMatrix <: AbstractMatrix{Acb}
+struct AcbMatrix <: DenseMatrix{Acb}
     acb_mat::acb_mat_struct
     prec::Int
 
