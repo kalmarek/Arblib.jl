@@ -2,6 +2,7 @@ module Arblib
 
 using LoadFlint
 const libflint = LoadFlint.libflint
+import LinearAlgebra
 
 using Arb_jll
 
@@ -28,6 +29,7 @@ include("acb_matrix.jl")
 include("predicates.jl")
 include("show.jl")
 include("arithmetic.jl")
+include("linear_algebra.jl")
 
 include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")
