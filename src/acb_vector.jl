@@ -26,7 +26,7 @@ Base.@propagate_inbounds function Base.getindex(
     shallow::Bool = false,
 )
     @boundscheck checkbounds(v, i)
-    return Acb(unsafe_load(v.acb_vec[i]); prec = precision(v), shallow = shallow)
+    return AcbRef(v.acb_vec[i], precision(v), cstruct(v))
 end
 
 Base.@propagate_inbounds function Base.setindex!(v::AcbVector, x, i::Integer)

@@ -69,6 +69,17 @@ struct Arb <: Real
     end
 end
 
+struct AcbRef <: Number
+    acb_ptr::Ptr{acb_struct}
+    prec::Int
+    parent::Union{acb_vec_struct,acb_mat_struct}
+end
+function AcbRef(ptr::Ptr{acb_struct}, parent::Union{acb_vec_struct,acb_mat_struct}; prec::Int)
+    AcbRef(ptr, prec, parent)
+end
+AcbRef(;prec::Int = DEFAULT_PRECISION[]) = Acb(;prec=prec)
+
+
 struct Acb <: Number
     acb::acb_struct
     prec::Int
@@ -78,17 +89,19 @@ struct Acb <: Number
         return res
     end
 
-    function Acb(x::acb_struct; prec::Integer = DEFAULT_PRECISION[], shallow::Bool = false)
-        if shallow
-            res = new(x, prec)
-        else
-            res = Acb(prec = prec)
-            set!(res, x)
-        end
-
+    function Acb(x::acb_struct; prec::Integer = DEFAULT_PRECISION[])
+        res = Acb(prec = prec)
+        set!(res, x)
         return res
     end
 end
+
+function Acb(x::AcbRef; prec::Integer = precision(x))
+    res = Acb(prec = prec)
+    set!(res, x)
+    return res
+end
+Base.getindex(x::AcbRef) = Acb(x)
 
 struct ArbVector <: DenseVector{Arb}
     arb_vec::arb_vec_struct
@@ -98,7 +111,7 @@ struct ArbVector <: DenseVector{Arb}
         new(arb_vec_struct(n), prec)
 end
 
-struct AcbVector <: DenseVector{Acb}
+struct AcbVector <: DenseVector{AcbRef}
     acb_vec::acb_vec_struct
     prec::Int
 
@@ -116,7 +129,7 @@ struct ArbMatrix <: DenseMatrix{Arb}
     end
 end
 
-struct AcbMatrix <: DenseMatrix{Acb}
+struct AcbMatrix <: DenseMatrix{AcbRef}
     acb_mat::acb_mat_struct
     prec::Int
 
@@ -126,7 +139,7 @@ struct AcbMatrix <: DenseMatrix{Acb}
     end
 end
 
-const ArbTypes = Union{Arf,Arb,Acb,ArbVector,AcbVector,ArbMatrix,AcbMatrix}
+const ArbTypes = Union{Arf,Arb,Acb,AcbRef,ArbVector,AcbVector,ArbMatrix,AcbMatrix}
 
 for (T, prefix) in (
     (Mag, :mag),
@@ -149,6 +162,12 @@ for (T, prefix) in (
         Base.convert(::Type{$(cstructtype(T))}, x::$T) = cstruct(x)
     end
 end
+
+cprefix(::Type{AcbRef}) = :acb_struct
+cstructtype(::Type{AcbRef}) = Ptr{acb_struct}
+cstruct(x::AcbRef) = x.acb_ptr
+Base.convert(::Type{Ptr{acb_struct}}, x::AcbRef) = cstruct(x)
+Base.cconvert(::Type{Ref{acb_struct}}, x::AcbRef) = cstruct(x)
 
 function Base.setindex!(x::Union{Mag,Arf,Arb,Acb}, z::Number)
     set!(x, z)

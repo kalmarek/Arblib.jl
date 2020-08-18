@@ -39,7 +39,7 @@ for (T, funcpairs) in (
         ),
     ),
     (
-        Acb,
+        Union{Acb,AcbRef},
         (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
@@ -122,7 +122,7 @@ for (ArbT, args) in (
         Arb,
         ((:(==), :eq), (:(!=), :ne), (:(<), :lt), (:(<=), :le), (:(>), :gt), (:(>=), :ge)),
     ),
-    (Acb, ((:(==), :eq), (:(!=), :ne))),
+    (Union{Acb,AcbRef}, ((:(==), :eq), (:(!=), :ne))),
     (ArbMatrix, ((:(==), :eq), (:(!=), :ne))),
     (AcbMatrix, ((:(==), :eq), (:(!=), :ne))),
 )
