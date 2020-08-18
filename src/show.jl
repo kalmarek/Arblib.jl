@@ -4,6 +4,28 @@ Base.show(io::IO, x::Mag) = print(io, _string(x))
 Base.show(io::IO, x::Union{Arb,ArbRef,Acb,AcbRef}) = print(io, string_nice(x))
 Base.show(io::IO, x::Arf) = print(io, string_decimal(x))
 
+function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries}}
+    if iszero(poly)
+        print(io, "0")
+    end
+
+    for i = 0:degree(poly)
+        x = poly[i]
+        if !iszero(x)
+            str =
+                "$x" *
+                ifelse(i > 0, "⋅x", "") *
+                ifelse(i > 1, "^$i", "") *
+                ifelse(i != degree(poly), " + ", "")
+            print(io, str)
+        end
+    end
+
+    if T == ArbSeries
+        print(io, " + 𝒪(x^$(degree(poly)+1))")
+    end
+end
+
 for ArbT in (Mag, Arf, Arb, ArbRef, Acb, AcbRef)
     arbf = Symbol(cprefix(ArbT), :_, :print)
     @eval begin

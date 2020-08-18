@@ -13,7 +13,7 @@ arbcall"void _arb_poly_normalise(arb_poly_t poly)"
 arbcall"slong arb_poly_allocated_bytes(const arb_poly_t x)"
 
 ### Basic manipulation
-arbcall"slong arb_poly_length(const arb_poly_t poly)"
+#arbcall"slong arb_poly_length(const arb_poly_t poly)"
 arbcall"slong arb_poly_degree(const arb_poly_t poly)"
 arbcall"int arb_poly_is_zero(const arb_poly_t poly)"
 arbcall"int arb_poly_is_one(const arb_poly_t poly)"

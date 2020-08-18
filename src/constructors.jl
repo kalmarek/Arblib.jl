@@ -125,6 +125,23 @@ function Acb(z::Complex{Arb}; prec::Integer = max(precision(real(z)), precision(
     return res
 end
 
+# ArbPoly and ArbSeries
+function ArbPoly(coeffs::AbstractVector{Arb}; prec::Integer = precision(first(coeffs)))
+    poly = ArbPoly()
+    @inbounds for i = 1:length(coeffs)
+        poly[i] = coeffs[i]
+    end
+    return poly
+end
+
+function ArbSeries(coeffs::AbstractVector{Arb}; prec::Integer = precision(first(coeffs)))
+    series = ArbSeries(length(coeffs))
+    @inbounds for i = 1:length(coeffs)
+        series[i] = coeffs[i]
+    end
+    return series
+end
+
 Base.zero(::Union{Mag,Type{Mag}}) = Mag(UInt64(0))
 Base.one(::Union{Mag,Type{Mag}}) = Mag(UInt64(1))
 Base.zero(x::T) where {T<:Union{Arf,Arb,Acb}} = T(0, prec = precision(x))

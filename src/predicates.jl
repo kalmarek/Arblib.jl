@@ -58,6 +58,8 @@ for (T, funcpairs) in (
             (:(Base.iszero), :is_zero),
         ),
     ),
+    (ArbPoly, ((:(Base.isone), :is_one), (:(isx), :is_x), (:(Base.iszero), :is_zero))),
+    (ArbSeries, ((:(Base.isone), :is_one), (:(isx), :is_x), (:(Base.iszero), :is_zero))),
     (
         ArbMatrix,
         (
