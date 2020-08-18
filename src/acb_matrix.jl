@@ -37,24 +37,14 @@ Base.@propagate_inbounds function Base.getindex(
     shallow::Bool = false,
 )
     @boundscheck checkbounds(A, i, j)
-    return Acb(unsafe_load(A.acb_mat[i, j]); prec = precision(A), shallow = shallow)
+    return AcbRef(A.acb_mat[i, j], precision(A), cstruct(A))
 end
 
-function Base.setindex!(
-    A::acb_mat_struct,
-    x::Union{Acb,acb_struct,Ref{acb_struct}},
-    i::Integer,
-    j::Integer,
-)
+function Base.setindex!(A::acb_mat_struct, x, i::Integer, j::Integer)
     set!(A[i, j], x)
     return x
 end
-Base.@propagate_inbounds function Base.setindex!(
-    A::AcbMatrix,
-    x::Union{Acb,acb_struct,Ref{acb_struct}},
-    i::Integer,
-    j::Integer,
-)
+Base.@propagate_inbounds function Base.setindex!(A::AcbMatrix, x, i::Integer, j::Integer)
     @boundscheck checkbounds(A, i, j)
     A.acb_mat[i, j] = x
     return x

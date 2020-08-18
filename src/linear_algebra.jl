@@ -36,18 +36,18 @@ LinearAlgebra.ldiv!(Y::AcbMatrix, A::AcbMatrix, B::AcbMatrix) =
     LinearAlgebra.ldiv!(Y, LinearAlgebra.lu(A), B)
 LinearAlgebra.ldiv!(A::AcbMatrix, B::AcbMatrix) =
     LinearAlgebra.ldiv!(B, LinearAlgebra.lu(A), B)
-function LinearAlgebra.ldiv!(Y::AcbMatrix, A::LinearAlgebra.LU{Acb,AcbMatrix}, B::AcbMatrix)
+function LinearAlgebra.ldiv!(Y::AcbMatrix, A::LinearAlgebra.LU{AcbRef,AcbMatrix}, B::AcbMatrix)
     Arblib.solve_lu_precomp!(Y, A.ipiv, A.factors, B)
     Y
 end
-LinearAlgebra.ldiv!(A::LinearAlgebra.LU{Acb,AcbMatrix}, B::AcbMatrix) =
+LinearAlgebra.ldiv!(A::LinearAlgebra.LU{AcbRef,AcbMatrix}, B::AcbMatrix) =
     LinearAlgebra.ldiv!(B, A, B)
 
 function Base.:(\)(A::AcbMatrix, B::AcbMatrix)
     Y = AcbMatrix(size(A, 2), size(B, 2); prec = max(precision(A), precision(B)))
     LinearAlgebra.ldiv!(Y, A, B)
 end
-function Base.:(\)(A::LinearAlgebra.LU{Acb,AcbMatrix}, B::AcbMatrix)
+function Base.:(\)(A::LinearAlgebra.LU{AcbRef,AcbMatrix}, B::AcbMatrix)
     Y = AcbMatrix(size(A, 2), size(B, 2); prec = max(precision(A.factors), precision(B)))
     LinearAlgebra.ldiv!(Y, A, B)
 end

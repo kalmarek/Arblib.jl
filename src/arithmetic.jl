@@ -1,23 +1,26 @@
 Base.promote_rule(::Type{Arf}, ::Type{<:Union{AbstractFloat,Integer}}) = Arf
 Base.promote_rule(::Type{Arb}, ::Type{<:Union{AbstractFloat,Integer,Arf}}) = Arb
-Base.promote_rule(::Type{Acb}, ::Type{<:Union{AbstractFloat,Integer,Complex,Arf,Arb}}) = Acb
+Base.promote_rule(
+    ::Type{Acb},
+    ::Type{<:Union{AbstractFloat,Integer,Complex,Arf,Arb,AcbRef}},
+) = Acb
 
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
     @eval function $(Expr(:., :Base, QuoteNode(jf)))(
         x::T,
         y::T,
-    ) where {T<:Union{Arf,Arb,Acb}}
+    ) where {T<:Union{Arf,Arb,Acb,AcbRef}}
         z = T(prec = max(precision(x), precision(y)))
         $af(z, x, y)
         z
     end
 end
-function Base.:(-)(x::T) where {T<:Union{Arf,Arb,Acb}}
+function Base.:(-)(x::T) where {T<:Union{Arf,Arb,Acb,AcbRef}}
     z = T(prec = precision(x))
     neg!(z, x)
     z
 end
-function Base.:(^)(x::T, k::Integer) where {T<:Union{Arf,Arb,Acb}}
+function Base.:(^)(x::T, k::Integer) where {T<:Union{Arf,Arb,Acb,AcbRef}}
     z = T(prec = precision(x))
     pow!(z, x, convert(UInt, k))
     z
