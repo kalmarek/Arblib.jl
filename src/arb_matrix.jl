@@ -1,4 +1,4 @@
-function ArbMatrix(v::AbstractVector{Arb}; prec::Integer = precision(first(v)))
+function ArbMatrix(v::AbstractVector; prec::Integer = precision(first(v)))
     M = ArbMatrix(length(v), 1; prec = prec)
     @inbounds for (i, vᵢ) in enumerate(v)
         M[i, 1] = vᵢ
@@ -6,7 +6,7 @@ function ArbMatrix(v::AbstractVector{Arb}; prec::Integer = precision(first(v)))
     return M
 end
 
-function ArbMatrix(A::AbstractMatrix{Arb}; prec::Integer = precision(first(A)))
+function ArbMatrix(A::AbstractMatrix; prec::Integer = precision(first(A)))
     M = ArbMatrix(size(A)...; prec = prec)
     @inbounds for j = 1:size(A, 2), i = 1:size(A, 1)
         M[i, j] = A[i, j]

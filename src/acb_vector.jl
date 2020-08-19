@@ -12,7 +12,7 @@ Base.size(v::AcbVector) = size(v.acb_vec)
 Base.cconvert(::Type{Ptr{acb_struct}}, v::AcbVector) = v.acb_vec
 Base.unsafe_convert(::Type{Ptr{acb_struct}}, v::acb_vec_struct) = v.entries
 
-function AcbVector(v::AbstractVector{Acb}, prec::Integer = precision(first(v)))
+function AcbVector(v::AbstractVector, prec::Integer = precision(first(v)))
     V = AcbVector(length(v); prec = prec)
     @inbounds for (i, vᵢ) in enumerate(v)
         V[i] = vᵢ
