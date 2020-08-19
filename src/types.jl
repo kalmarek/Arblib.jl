@@ -135,17 +135,9 @@ struct ArbPoly
 
     ArbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(arb_poly_struct(), prec)
 
-    function ArbPoly(
-        poly::arb_poly_struct;
-        prec::Integer = DEFAULT_PRECISION[],
-        shallow::Bool = false,
-    )
-        if shallow
-            res = new(poly, prec)
-        else
-            res = ArbPoly()
-            set!(res, poly)
-        end
+    function ArbPoly(poly::arb_poly_struct; prec::Integer = DEFAULT_PRECISION[])
+        res = ArbPoly()
+        set!(res, poly)
 
         return res
     end
@@ -163,14 +155,9 @@ struct ArbSeries <: Number
         poly::arb_poly_struct,
         degree::Integer = degree(poly);
         prec::Integer = DEFAULT_PRECISION[],
-        shallow::Bool = false,
     )
-        if shallow
-            res = new(poly, degree, prec)
-        else
-            res = ArbSeries(degree)
-            set!(res, poly)
-        end
+        res = ArbSeries(degree)
+        set!(res, poly)
 
         return res
     end
