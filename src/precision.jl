@@ -38,5 +38,9 @@ function Base.setprecision(x::T, precision::Integer) where {T<:Union{Arf,Arb,Acb
 end
 Base.setprecision(v::ArbVector, precision::Integer) = ArbVector(v.arb_vec, precision)
 Base.setprecision(v::AcbVector, precision::Integer) = AcbVector(v.acb_vec, precision)
+Base.setprecision(poly::ArbPoly, precision::Integer) =
+    ArbPoly(poly.arb_poly, prec = precision)
+Base.setprecision(series::ArbSeries, precision::Integer) =
+    ArbSeries(series.arb_poly; prec = precision)
 Base.setprecision(A::ArbMatrix, precision::Integer) = ArbMatrix(A.arb_mat, precision)
 Base.setprecision(A::AcbMatrix, precision::Integer) = AcbMatrix(A.acb_mat, precision)
