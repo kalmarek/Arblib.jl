@@ -30,12 +30,8 @@ function Base.setprecision(::Type{<:ArbTypes}, precision::Integer)
     return precision
 end
 
-function Base.setprecision(
-    x::T,
-    precision::Integer;
-    shallow = false,
-) where {T<:Union{Arf,Arb,Acb}}
-    return T(x, prec = precision, shallow = shallow)
+function Base.setprecision(x::T, precision::Integer) where {T<:Union{Arf,Arb,Acb}}
+    return T(x, prec = precision)
 end
 Base.setprecision(v::ArbVector, precision::Integer) = ArbVector(v.arb_vec, precision)
 Base.setprecision(v::AcbVector, precision::Integer) = AcbVector(v.acb_vec, precision)

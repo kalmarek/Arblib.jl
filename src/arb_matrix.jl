@@ -31,14 +31,9 @@ function Base.getindex(A::arb_mat_struct, i::Integer, j::Integer)
         j - 1,
     )
 end
-Base.@propagate_inbounds function Base.getindex(
-    A::ArbMatrix,
-    i::Integer,
-    j::Integer;
-    shallow::Bool = false,
-)
+Base.@propagate_inbounds function Base.getindex(A::ArbMatrix, i::Integer, j::Integer)
     @boundscheck checkbounds(A, i, j)
-    return Arb(unsafe_load(A.arb_mat[i, j]); prec = precision(A), shallow = shallow)
+    return ArbRef(A.arb_mat[i, j], precision(A), cstruct(A))
 end
 
 function Base.setindex!(

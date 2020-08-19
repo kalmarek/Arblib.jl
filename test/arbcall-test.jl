@@ -26,14 +26,14 @@
                 "arb_t res",
                 "res",
                 false,
-                Union{Arb,arb_struct,Ptr{arb_struct}},
+                Union{Arb,ArbRef,arb_struct,Ptr{arb_struct}},
                 Ref{arb_struct},
             ),
             (
                 "acb_t res",
                 "res",
                 false,
-                Union{Acb,acb_struct,Ptr{acb_struct}},
+                Union{Acb,AcbRef,acb_struct,Ptr{acb_struct}},
                 Ref{acb_struct},
             ),
             (
@@ -54,14 +54,14 @@
                 "const arb_t x",
                 "x",
                 true,
-                Union{Arb,arb_struct,Ptr{arb_struct}},
+                Union{Arb,ArbRef,arb_struct,Ptr{arb_struct}},
                 Ref{arb_struct},
             ),
             (
                 "const acb_t x",
                 "x",
                 true,
-                Union{Acb,acb_struct,Ptr{acb_struct}},
+                Union{Acb,AcbRef,acb_struct,Ptr{acb_struct}},
                 Ref{acb_struct},
             ),
             (
@@ -234,15 +234,15 @@
         for (str, args, kwargs) in (
             (
                 "void arb_init(arb_t x)",
-                [:(x::$(Union{Arb,arb_struct,Ptr{arb_struct}}))],
+                [:(x::$(Union{Arb,ArbRef,arb_struct,Ptr{arb_struct}}))],
                 Expr[],
             ),
             (
                 "void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)",
                 [
-                    :(z::$(Union{arb_struct,Ptr{arb_struct},Arb})),
-                    :(x::$(Union{arb_struct,Ptr{arb_struct},Arb})),
-                    :(y::$(Union{arb_struct,Ptr{arb_struct},Arb})),
+                    :(z::$(Union{arb_struct,Ptr{arb_struct},Arb,ArbRef})),
+                    :(x::$(Union{arb_struct,Ptr{arb_struct},Arb,ArbRef})),
+                    :(y::$(Union{arb_struct,Ptr{arb_struct},Arb,ArbRef})),
                 ],
                 [Expr(:kw, :(prec::Integer), :(precision(z)))],
             ),

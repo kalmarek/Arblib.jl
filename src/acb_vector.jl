@@ -20,11 +20,7 @@ function AcbVector(v::AbstractVector{Acb}, prec::Integer = precision(first(v)))
     return V
 end
 
-Base.@propagate_inbounds function Base.getindex(
-    v::AcbVector,
-    i::Integer;
-    shallow::Bool = false,
-)
+Base.@propagate_inbounds function Base.getindex(v::AcbVector, i::Integer)
     @boundscheck checkbounds(v, i)
     return AcbRef(v.acb_vec[i], precision(v), cstruct(v))
 end

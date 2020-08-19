@@ -6,7 +6,7 @@
     x = Acb(1.5)
     M[2, 2] = x
     @test M[2, 2] == x
-    @test M[2, 2] isa Acb
+    @test M[2, 2] isa AcbRef
     @test precision(M[2, 2]) == 128
 
     Arblib.add!(M, M, M)

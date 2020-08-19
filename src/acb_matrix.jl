@@ -30,12 +30,7 @@ function Base.getindex(A::acb_mat_struct, i::Integer, j::Integer)
         j - 1,
     )
 end
-Base.@propagate_inbounds function Base.getindex(
-    A::AcbMatrix,
-    i::Integer,
-    j::Integer;
-    shallow::Bool = false,
-)
+Base.@propagate_inbounds function Base.getindex(A::AcbMatrix, i::Integer, j::Integer)
     @boundscheck checkbounds(A, i, j)
     return AcbRef(A.acb_mat[i, j], precision(A), cstruct(A))
 end

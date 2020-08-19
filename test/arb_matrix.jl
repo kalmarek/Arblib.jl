@@ -6,8 +6,9 @@
     x = Arb(1.5)
     M[2, 2] = x
     @test M[2, 2] == x
-    @test M[2, 2] isa Arb
+    @test M[2, 2] isa ArbRef
     @test precision(M[2, 2]) == 128
+    @test !isempty(sprint(show, M[2, 2]))
 
     Arblib.add!(M, M, M)
     M2 = Arblib.ArbMatrix(4, 4, prec = 128)

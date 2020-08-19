@@ -6,7 +6,8 @@
     x = Arb(1.5)
     V[3] = x
     @test V[3] == x
-    @test V[3] isa Arb
+    @test V[3] isa ArbRef
+    @test !isempty(sprint(show, V[3]))
     @test precision(V[3]) == 128
 
     Arblib.add!(V, V, V, length(V))

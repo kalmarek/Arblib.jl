@@ -6,7 +6,7 @@ import LinearAlgebra
 
 using Arb_jll
 
-export Arf, Arb, Acb, AcbRef, ArbVector, AcbVector, ArbMatrix, AcbMatrix
+export Arf, Arb, ArbRef, Acb, AcbRef, ArbVector, AcbVector, ArbMatrix, AcbMatrix
 
 macro libarb(function_name)
     return (:($function_name), libarb)
