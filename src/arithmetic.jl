@@ -48,7 +48,7 @@ for f in [
     :sech,
     :asech,
 ]
-    @eval function Base.$f(x::T) where {T<:Union{Arf,Arb,ArbRef,Acb,AcbRef}}
+    @eval function Base.$f(x::T) where {T<:Union{Arb,ArbRef,Acb,AcbRef}}
         z = T(prec = max(precision(x)))
         $(Symbol(f, :!))(z, x)
         z
