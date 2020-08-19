@@ -74,10 +74,14 @@ struct AcbRef <: Number
     prec::Int
     parent::Union{acb_vec_struct,acb_mat_struct}
 end
-function AcbRef(ptr::Ptr{acb_struct}, parent::Union{acb_vec_struct,acb_mat_struct}; prec::Int)
+function AcbRef(
+    ptr::Ptr{acb_struct},
+    parent::Union{acb_vec_struct,acb_mat_struct};
+    prec::Int,
+)
     AcbRef(ptr, prec, parent)
 end
-AcbRef(;prec::Int = DEFAULT_PRECISION[]) = Acb(;prec=prec)
+AcbRef(; prec::Int = DEFAULT_PRECISION[]) = Acb(; prec = prec)
 
 
 struct Acb <: Number
