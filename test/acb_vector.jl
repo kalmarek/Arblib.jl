@@ -6,8 +6,9 @@
     x = Acb(1.5)
     V[3] = x
     @test V[3] == x
-    @test V[3] isa Acb
+    @test V[3] isa AcbRef
     @test precision(V[3]) == 128
+    @test !isempty(sprint(show, V[3]))
 
     Arblib.add!(V, V, V, length(V))
     V2 = Arblib.AcbVector(4, prec = 128)
@@ -16,4 +17,7 @@
 
     A = AcbVector([Acb(i + 1) for i = 2:5])
     @test A[end] == Acb(6)
+
+    A = AcbVector([i + j for i = 1:4 for j = 1:4])
+    @test A[16] == Acb(8)
 end

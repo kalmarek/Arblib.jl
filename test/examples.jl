@@ -92,9 +92,9 @@
                 end
 
                 prec *= 2
-                x = setprecision(x, prec, shallow = true)
-                r = setprecision(r, prec, shallow = true)
-                t = setprecision(t, prec, shallow = true)
+                x = setprecision(x, prec)
+                r = setprecision(r, prec)
+                t = setprecision(t, prec)
             end
 
             return x

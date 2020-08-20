@@ -101,7 +101,9 @@ jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
 jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
 jltype(ca::Carg{ArbVector}) = Union{ArbVector,cstructtype(ArbVector)}
 jltype(ca::Carg{AcbVector}) = Union{AcbVector,cstructtype(AcbVector)}
-jltype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbMatrix,AcbMatrix}} =
+jltype(::Carg{Acb}) = Union{Acb,cstructtype(Acb),Ptr{cstructtype(Acb)},AcbRef}
+jltype(::Carg{Arb}) = Union{Arb,cstructtype(Arb),Ptr{cstructtype(Arb)},ArbRef}
+jltype(::Carg{T}) where {T<:Union{Mag,Arf,ArbMatrix,AcbMatrix}} =
     Union{T,cstructtype(T),Ptr{cstructtype(T)}}
 
 ctype(ca::Carg) = rawtype(ca)
@@ -174,8 +176,8 @@ function jlargs(af::Arbfunction)
         default =
             if jltype(a) ∈ (
                 Union{Arf,arf_struct,Ptr{arf_struct}},
-                Union{Arb,arb_struct,Ptr{arb_struct}},
-                Union{Acb,acb_struct,Ptr{acb_struct}},
+                Union{Arb,arb_struct,Ptr{arb_struct},ArbRef},
+                Union{Acb,acb_struct,Ptr{acb_struct},AcbRef},
             )
                 :(precision($(Symbol(name(a)))))
             else

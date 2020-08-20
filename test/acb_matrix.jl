@@ -6,7 +6,7 @@
     x = Acb(1.5)
     M[2, 2] = x
     @test M[2, 2] == x
-    @test M[2, 2] isa Acb
+    @test M[2, 2] isa AcbRef
     @test precision(M[2, 2]) == 128
 
     Arblib.add!(M, M, M)
@@ -16,4 +16,7 @@
 
     A = AcbMatrix([Acb(i + j) for i = 1:4, j = 1:4])
     @test A[4, 4] == Acb(8)
+    A = AcbMatrix([i + j for i = 1:4, j = 1:4])
+    @test A[4, 4] == Acb(8)
+    @test precision(A) == precision(Acb(8))
 end
