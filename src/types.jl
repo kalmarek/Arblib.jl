@@ -177,7 +177,8 @@ end
 AcbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     AcbMatrix(acb_mat_struct(r, c), prec)
 
-const ArbTypes = Union{Arf,Arb,ArbRef,Acb,AcbRef,ArbVector,AcbVector,ArbPoly,ArbMatrix,AcbMatrix}
+const ArbTypes =
+    Union{Arf,Arb,ArbRef,Acb,AcbRef,ArbVector,AcbVector,ArbPoly,ArbMatrix,AcbMatrix}
 
 for (T, prefix) in (
     (Mag, :mag),
