@@ -1,11 +1,11 @@
-function AcbMatrix(v::AbstractVector; prec::Integer = precision(first(v)))
+function AcbMatrix(v::AbstractVector; prec::Integer = _precision(first(v)))
     M = AcbMatrix(length(v), 1; prec = prec)
     @inbounds for (i, vᵢ) in enumerate(v)
         M[i, 1] = vᵢ
     end
     return M
 end
-function AcbMatrix(A::AbstractMatrix; prec::Integer = precision(first(A)))
+function AcbMatrix(A::AbstractMatrix; prec::Integer = _precision(first(A)))
     M = AcbMatrix(size(A)...; prec = prec)
     @inbounds for j = 1:size(A, 2), i = 1:size(A, 1)
         M[i, j] = A[i, j]

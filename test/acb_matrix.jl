@@ -16,4 +16,7 @@
 
     A = AcbMatrix([Acb(i + j) for i = 1:4, j = 1:4])
     @test A[4, 4] == Acb(8)
+    A = AcbMatrix([i + j for i = 1:4, j = 1:4])
+    @test A[4, 4] == Acb(8)
+    @test precision(A) == precision(Acb(8))
 end

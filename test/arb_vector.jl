@@ -17,4 +17,7 @@
 
     A = ArbVector([Arb(i + 1) for i = 2:5])
     @test A[end] == Arb(6)
+
+    A = ArbVector([i + j for i = 1:4 for j = 1:4])
+    @test A[16] == Arb(8)
 end
