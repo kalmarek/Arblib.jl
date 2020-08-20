@@ -59,7 +59,7 @@
         x_n).
         """
         function logistic(n; x0 = Arb(0.5), r = Arb(3.75), digits = 10)
-            goalprec = digits*3.3219280948873623 + 3
+            goalprec = digits * 3.3219280948873623 + 3
 
             prec = 64
             if typeof(x0) == String
@@ -76,7 +76,7 @@
                     Arblib.set!(x, x0)
                 end
 
-                for i in 1:n
+                for i = 1:n
                     Arblib.sub!(t, x, 1)
                     Arblib.neg!(t, t)
                     Arblib.mul!(x, x, t)
@@ -92,15 +92,16 @@
                 end
 
                 prec *= 2
-                x = setprecision(x, prec, shallow = true)
-                r = setprecision(r, prec, shallow = true)
-                t = setprecision(t, prec, shallow = true)
+                x = setprecision(x, prec)
+                r = setprecision(r, prec)
+                t = setprecision(t, prec)
             end
 
             return x
         end
 
         @test string(logistic(10, digits = 10)) == "[0.645367290830930 +/- 3.45e-16]"
-        @test string(logistic(10, digits = 20)) == "[0.64536729083093027156146131423635101 +/- 5.18e-36]"
+        @test string(logistic(10, digits = 20)) ==
+              "[0.64536729083093027156146131423635101 +/- 5.18e-36]"
     end
 end
