@@ -23,10 +23,10 @@
     @test Bool(Arblib.contains(inv(A) * A, id))
 
     # mul
-    A = ArbMatrix(rand(3,2))
-    B = ArbMatrix(rand(2,4))
-    B_wrong = ArbMatrix(rand(3,4))
-    C = ArbMatrix(3,4)
+    A = ArbMatrix(rand(3, 2))
+    B = ArbMatrix(rand(2, 4))
+    B_wrong = ArbMatrix(rand(3, 4))
+    C = ArbMatrix(3, 4)
     @test_throws DimensionMismatch("Matrix sizes are not compatible.") A * B_wrong
     LinearAlgebra.mul!(C, A, B)
     @test C == A * B

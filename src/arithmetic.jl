@@ -1,5 +1,6 @@
 Base.promote_rule(::Type{Arf}, ::Type{<:Union{AbstractFloat,Integer}}) = Arf
-Base.promote_rule(::Type{Arb}, ::Type{<:Union{AbstractFloat,Integer,Rational,Arf,ArbRef}}) = Arb
+Base.promote_rule(::Type{Arb}, ::Type{<:Union{AbstractFloat,Integer,Rational,Arf,ArbRef}}) =
+    Arb
 Base.promote_rule(
     ::Type{Acb},
     ::Type{

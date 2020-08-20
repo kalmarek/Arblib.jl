@@ -36,21 +36,11 @@ Base.@propagate_inbounds function Base.getindex(A::ArbMatrix, i::Integer, j::Int
     return ArbRef(A.arb_mat[i, j], precision(A), cstruct(A))
 end
 
-function Base.setindex!(
-    A::arb_mat_struct,
-    x,
-    i::Integer,
-    j::Integer,
-)
+function Base.setindex!(A::arb_mat_struct, x, i::Integer, j::Integer)
     set!(A[i, j], x)
     return x
 end
-Base.@propagate_inbounds function Base.setindex!(
-    A::ArbMatrix,
-    x,
-    i::Integer,
-    j::Integer,
-)
+Base.@propagate_inbounds function Base.setindex!(A::ArbMatrix, x, i::Integer, j::Integer)
     @boundscheck checkbounds(A, i, j)
     A.arb_mat[i, j] = x
     return x
