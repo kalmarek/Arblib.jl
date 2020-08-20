@@ -77,7 +77,7 @@ for ArbT in (Mag, Arf, Arb)
         function dump_string(x::$ArbT)
             char_ptr = dump(x)
             str = unsafe_string(char_ptr)
-            ccall((:flint_free, libflint), Cvoid, (Cstring,), char_ptr)
+            ccall(@libflint(flint_free), Cvoid, (Cstring,), char_ptr)
             return str
         end
     end

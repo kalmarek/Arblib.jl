@@ -1,6 +1,5 @@
 module Arblib
 
-using FLINT_jll
 using Arb_jll
 import LinearAlgebra
 
@@ -11,7 +10,7 @@ macro libarb(function_name)
 end
 
 macro libflint(function_name)
-    return (:($function_name), libflint)
+    return (:($function_name), Arb_jll.libflint)
 end
 
 include("arb_types.jl")
