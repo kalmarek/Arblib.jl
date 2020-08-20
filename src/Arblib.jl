@@ -22,15 +22,12 @@ include("precision.jl")
 
 include("constructors.jl")
 
-include("arb_vector.jl")
-include("acb_vector.jl")
-include("arb_matrix.jl")
-include("acb_matrix.jl")
-
 include("predicates.jl")
 include("show.jl")
 include("arithmetic.jl")
-include("linear_algebra.jl")
+
+include("vector.jl")
+include("matrix.jl")
 
 include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")
