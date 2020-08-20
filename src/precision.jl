@@ -14,6 +14,9 @@ Base.precision(x::ArbStructTypes) = DEFAULT_PRECISION[]
 Base.precision(x::Ptr{<:ArbStructTypes}) = DEFAULT_PRECISION[]
 Base.precision(x::ArbTypes) = x.prec
 
+@inline _precision(x::ArbTypes) = precision(x)
+@inline _precision(_) = DEFAULT_PRECISION[]
+
 """
     setprecision(::Type{<:Union{Arf, Arb, Acb}}, precision::Int)
 Set the precision (in bits) to be used for `Arblib` arithmetic.
@@ -30,12 +33,8 @@ function Base.setprecision(::Type{<:ArbTypes}, precision::Integer)
     return precision
 end
 
-function Base.setprecision(
-    x::T,
-    precision::Integer;
-    shallow = false,
-) where {T<:Union{Arf,Arb,Acb}}
-    return T(x, prec = precision, shallow = shallow)
+function Base.setprecision(x::T, precision::Integer) where {T<:Union{Arf,Arb,Acb}}
+    return T(x, prec = precision)
 end
 Base.setprecision(v::ArbVector, precision::Integer) = ArbVector(v.arb_vec, precision)
 Base.setprecision(v::AcbVector, precision::Integer) = AcbVector(v.acb_vec, precision)

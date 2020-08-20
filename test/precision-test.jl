@@ -21,16 +21,28 @@
             x = T()
             @test precision(x) == precdefault
 
-            y = setprecision(x, prec, shallow = false)
-            z = setprecision(x, prec, shallow = true)
+            y = setprecision(x, prec)
             @test precision(y) == prec
-            @test precision(z) == prec
-
-            # Test that y is a normal copy and z a shallow copy
             Arblib.set!(y, 2)
             @test !isequal(x, y)
-            Arblib.set!(z, 2)
-            @test isequal(x, z)
         end
     end
+
+    @testset "setprecision 2" begin
+        x = Arb("0.1")
+        @test precision(x) == 256
+        @test precision(Arb) == 256
+        @test string(x) ==
+              "[0.1000000000000000000000000000000000000000000000000000000000000000000000000000 +/- 1.95e-78]"
+
+        setprecision(Arb, 64)
+        @test precision(x) == 256
+        @test precision(Arb) == 64
+        y = Arb("0.1")
+        @test precision(y) == 64
+        @test string(y) == "[0.100000000000000000 +/- 1.22e-20]"
+
+        setprecision(Arb, 256)
+    end
+
 end
