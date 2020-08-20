@@ -6,10 +6,7 @@ Base.promote_rule(
 ) = Acb
 
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
-    @eval function $(Expr(:., :Base, QuoteNode(jf)))(
-        x::T,
-        y::T,
-    ) where {T<:Union{Arf,Arb,ArbRef,Acb,AcbRef}}
+    @eval function Base.$jf(x::T, y::T) where {T<:Union{Arf,Arb,ArbRef,Acb,AcbRef}}
         z = T(prec = max(precision(x), precision(y)))
         $af(z, x, y)
         z
@@ -51,9 +48,7 @@ for f in [
     :sech,
     :asech,
 ]
-    @eval function $(Expr(:., :Base, QuoteNode(f)))(
-        x::T,
-    ) where {T<:Union{Arf,Arb,ArbRef,Acb,AcbRef}}
+    @eval function Base.$f(x::T) where {T<:Union{Arf,Arb,ArbRef,Acb,AcbRef}}
         z = T(prec = max(precision(x)))
         $(Symbol(f, :!))(z, x)
         z

@@ -1,8 +1,5 @@
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!)]
-    @eval function $(Expr(:., :Base, QuoteNode(jf)))(
-        A::T,
-        B::T,
-    ) where {T<:Union{ArbMatrix,AcbMatrix}}
+    @eval function Base.$jf(A::T, B::T) where {T<:Union{ArbMatrix,AcbMatrix}}
         C = T(size(A, 1), size(B, 2); prec = max(precision(A), precision(B)))
         $af(C, A, B)
         C
