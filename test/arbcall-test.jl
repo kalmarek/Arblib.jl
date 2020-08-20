@@ -290,13 +290,13 @@
         z = Arb(0)
 
         Arblib.@arbcall_str "void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)"
-        @test Arblib.add!(z, x, y) isa Nothing
+        @test Arblib.add!(z, x, y) isa Arb
         @test Arblib.add!(
             Ptr{arb_struct}(pointer_from_objref(z.arb)),
             Ptr{arb_struct}(pointer_from_objref(x.arb)),
             Ptr{arb_struct}(pointer_from_objref(y.arb)),
-        ) isa Nothing
-        @test Arblib.add!(z.arb, x.arb, y.arb) isa Nothing
+        ) isa Ptr{arb_struct}
+        @test Arblib.add!(z.arb, x.arb, y.arb) === z.arb
 
         Arblib.@arbcall_str "slong arb_rel_error_bits(const arb_t x)"
         @test Arblib.rel_error_bits(x) isa Int64
@@ -324,7 +324,7 @@
 
         Arblib.@arbcall_str "void arb_const_pi(arb_t x, slong prec)"
         res = Arb()
-        @test isnothing(Arblib.const_pi!(res))
+        @test Arblib.const_pi!(res) isa Arb
         @test Arblib.le(x, res) == 1
 
     end
