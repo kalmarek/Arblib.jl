@@ -17,7 +17,7 @@ function Base.:(-)(x::T) where {T<:Union{Arf,Arb,ArbRef,Acb,AcbRef}}
     neg!(z, x)
     z
 end
-function Base.:(^)(x::T, k::Integer) where {T<:Union{Arf,Arb,ArbRef,Acb,AcbRef}}
+function Base.:(^)(x::T, k::Integer) where {T<:Union{Arb,ArbRef,Acb,AcbRef}}
     z = T(prec = precision(x))
     pow!(z, x, convert(UInt, k))
     z
