@@ -38,7 +38,7 @@ end
 
 function Base.setindex!(
     A::arb_mat_struct,
-    x::Union{Arb,arb_struct,Ref{arb_struct}},
+    x,
     i::Integer,
     j::Integer,
 )
@@ -47,7 +47,7 @@ function Base.setindex!(
 end
 Base.@propagate_inbounds function Base.setindex!(
     A::ArbMatrix,
-    x::Union{Arb,arb_struct,Ref{arb_struct}},
+    x,
     i::Integer,
     j::Integer,
 )
