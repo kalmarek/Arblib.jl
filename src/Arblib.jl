@@ -1,15 +1,16 @@
 module Arblib
 
-using LoadFlint
-const libflint = LoadFlint.libflint
-import LinearAlgebra
-
 using Arb_jll
+import LinearAlgebra
 
 export Arf, Arb, ArbRef, Acb, AcbRef, ArbVector, AcbVector, ArbMatrix, AcbMatrix
 
 macro libarb(function_name)
     return (:($function_name), libarb)
+end
+
+macro libflint(function_name)
+    return (:($function_name), Arb_jll.libflint)
 end
 
 include("arb_types.jl")
