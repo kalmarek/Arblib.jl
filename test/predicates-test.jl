@@ -91,6 +91,10 @@
 
         x, y = Arb(0), Arb(1)
         @test x == x
+        @test x == 0
+        @test 0 == x
+        @test y == 1
+        @test 1 == y
         @test x != y
         @test x < y
         @test x <= y
@@ -99,6 +103,10 @@
 
         x, y = Acb(0), Acb(1)
         @test x == x
+        @test x == 0
+        @test 0 == x
+        @test y == 1
+        @test 1 == y
         @test x != y
     end
 
