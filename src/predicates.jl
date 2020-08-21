@@ -92,7 +92,7 @@ end
 #Base.:(<=)(x::Arf, y::Arf) = !isnan(x) && !isnan(y) && cmp(x, y) <= 0
 #Base.isequal(x::Arf, y::Arf) = !iszero(is_equal(x, y))
 
-for ArbT in (Mag, Arf, Arb, Acb)
+for ArbT in (Mag, Arf, Union{Arb,ArbRef}, Union{Acb,AcbRef})
     @eval begin
         Base.isequal(y::$ArbT, x::$ArbT) = !iszero(equal(x, y))
     end
