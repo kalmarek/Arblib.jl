@@ -45,4 +45,14 @@
         setprecision(Arb, 256)
     end
 
+    @testset "precision change: $T" for T in [ArbMatrix, AcbMatrix]
+        A = T(3, 3; prec = 96)
+        @test precision(A) == 96
+        @test precision(A[1, 1]) == 96
+        B = setprecision(A, 128)
+        @test precision(B) == 128
+        @test precision(B[1, 1]) == 128
+        A[1, 1][] = 1
+        @test A[1, 1] == B[1, 1]
+    end
 end

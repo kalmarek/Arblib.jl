@@ -92,16 +92,17 @@ end
 #Base.:(<=)(x::Arf, y::Arf) = !isnan(x) && !isnan(y) && cmp(x, y) <= 0
 #Base.isequal(x::Arf, y::Arf) = !iszero(is_equal(x, y))
 
-for ArbT in (Mag, Arf, Arb, Acb)
+for ArbT in (Mag, Arf, Union{Arb,ArbRef}, Union{Acb,AcbRef})
     @eval begin
         Base.isequal(y::$ArbT, x::$ArbT) = !iszero(equal(x, y))
     end
 
     ArbT == Mag && continue
 
+    # Comparison of non-floating point values should use ==
     @eval begin
-        Base.isequal(y::Integer, x::$ArbT) = !iszero(equal(x, y))
-        Base.isequal(x::$ArbT, y::Integer) = !iszero(equal(x, y))
+        Base.:(==)(y::Integer, x::$ArbT) = !iszero(equal(x, y))
+        Base.:(==)(x::$ArbT, y::Integer) = !iszero(equal(x, y))
     end
 end
 
