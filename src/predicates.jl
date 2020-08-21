@@ -99,9 +99,10 @@ for ArbT in (Mag, Arf, Arb, Acb)
 
     ArbT == Mag && continue
 
+    # Comparison of non-floating point values should use ==
     @eval begin
-        Base.isequal(y::Integer, x::$ArbT) = !iszero(equal(x, y))
-        Base.isequal(x::$ArbT, y::Integer) = !iszero(equal(x, y))
+        Base.:(==)(y::Integer, x::$ArbT) = !iszero(equal(x, y))
+        Base.:(==)(x::$ArbT, y::Integer) = !iszero(equal(x, y))
     end
 end
 
