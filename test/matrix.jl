@@ -53,4 +53,14 @@
         LinearAlgebra.mul!(C, A, B)
         @test C == A * B
     end
+
+    @testset "indexing" begin
+        A = ArbMatrix(3, 1)
+        A[3, 1][] = 4
+        @test A[3] == A[3, 1]
+        B = ArbMatrix(reshape(1:15, 3, 5))
+        @test B[1:15] == 1:15
+        C = ArbMatrix(reshape(1:15, 5, 3))
+        @test C[1:15] == 1:15
+    end
 end
