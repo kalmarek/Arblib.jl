@@ -52,6 +52,23 @@ end
 
 ## Common methods
 
+# linear indexing
+Base.@propagate_inbounds function Base.getindex(A::Union{ArbMatrix,AcbMatrix}, k::Integer)
+    @boundscheck (1 ≤ k ≤ length(A) || throw(BoundsError(A, k)))
+    j, i = divrem(k - 1, size(A, 1))
+    A[i+1, j+1]
+end
+Base.@propagate_inbounds function Base.setindex!(
+    A::Union{ArbMatrix,AcbMatrix},
+    x,
+    k::Integer,
+)
+    @boundscheck (1 ≤ k ≤ length(A) || throw(BoundsError(A, k)))
+    j, i = divrem(k - 1, size(A, 1))
+    A[i+1, j+1] = x
+    x
+end
+
 # General constructor
 for T in [:ArbMatrix, :AcbMatrix]
     @eval function $T(A::AbstractMatrix, prec::Integer = _precision(first(A)))
