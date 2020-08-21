@@ -9,7 +9,7 @@ using Arblib, Test, LinearAlgebra
     include("predicates-test.jl")
     include("show-test.jl")
     include("examples.jl")
+    include("arithmetic.jl")
     include("vector.jl")
     include("matrix.jl")
-
 end
