@@ -140,6 +140,12 @@ Base.ones(x::T, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(x) for _ = 1:n]
 Base.zeros(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [zero(T) for _ = 1:n]
 Base.ones(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(T) for _ = 1:n]
 
+Base.convert(::Type{ArbRef}, x::Number) = convert(Arb, x)
+Base.convert(::Type{AcbRef}, x::Number) = convert(Acb, x)
+# avoid ambiguities
+Base.convert(::Type{ArbRef}, x::ArbRef) = x
+Base.convert(::Type{AcbRef}, x::AcbRef) = x
+
 # Irrationals
 function Mag(::Irrational{:π})
     res = Mag()
