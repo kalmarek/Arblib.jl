@@ -86,5 +86,9 @@
         @test precision(zero(Acb(prec = 64))) == 64
         @test precision(one(Acb(prec = 64))) == 64
         @test precision(Acb(π, prec = 64)) == 64
+
+        x = Acb()
+        x[] = (1.0 + 2.0im)
+        @test x == Acb(1, 2)
     end
 end
