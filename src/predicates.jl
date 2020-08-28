@@ -94,12 +94,12 @@ end
 #Base.:(<=)(x::Arf, y::Arf) = !isnan(x) && !isnan(y) && cmp(x, y) <= 0
 #Base.isequal(x::Arf, y::Arf) = !iszero(is_equal(x, y))
 
-for ArbT in (Mag, Arf, Union{Arb,ArbRef}, Union{Acb,AcbRef})
+for ArbT in (Mag, Arf, Union{Arb,ArbRef}, Union{Acb,AcbRef}, ArbPoly, ArbSeries)
     @eval begin
         Base.isequal(y::$ArbT, x::$ArbT) = !iszero(equal(x, y))
     end
 
-    ArbT == Mag && continue
+    (ArbT == Mag || ArbT == ArbPoly || ArbT == ArbSeries) && continue
 
     # Comparison of non-floating point values should use ==
     @eval begin
@@ -134,4 +134,12 @@ for (ArbT, args) in (
             Base.$jlf(x::$ArbT, y::$ArbT) = !iszero($arbf(x, y))
         end
     end
+end
+
+function Base.:(==)(x::T, y::T) where {T<:Union{ArbPoly,ArbSeries}}
+    degree(x) == degree(y) || return false
+    for i = 0:degree(x)
+        x[i] == y[i] || return false
+    end
+    return true
 end
