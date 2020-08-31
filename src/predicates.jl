@@ -143,3 +143,7 @@ function Base.:(==)(x::T, y::T) where {T<:Union{ArbPoly,ArbSeries}}
     end
     return true
 end
+
+function Base.:(!=)(x::T, y::T) where {T<:Union{ArbPoly,ArbSeries}}
+    return iszero(overlaps(x, y))
+end
