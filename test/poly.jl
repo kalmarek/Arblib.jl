@@ -1,21 +1,17 @@
-@testset "ArbPoly" begin
+@testset "Poly: $TPoly" for (TPoly, T) in [(ArbPoly, Arb)]
     @testset "Constructors" begin
-        @test ArbPoly() ==
-              ArbPoly(Arb(0)) ==
-              ArbPoly(Arb[0]) ==
-              zero(ArbPoly) ==
-              zero(ArbPoly())
-        @test ArbPoly(Arb(1)) == ArbPoly(Arb[1]) == one(ArbPoly) == one(ArbPoly())
-        @test Arblib.isx(ArbPoly(Arb[0, 1]))
-        @test ArbPoly(Arb[1, 2, 0]) == ArbPoly(Arb[1, 2])
+        @test TPoly() == TPoly(Arb(0)) == TPoly(Arb[0]) == zero(TPoly) == zero(TPoly())
+        @test TPoly(T(1)) == TPoly(T[1]) == one(TPoly) == one(TPoly())
+        @test Arblib.isx(TPoly(T[0, 1]))
+        @test TPoly(T[1, 2, 0]) == TPoly(T[1, 2])
     end
 
     @testset "Interface" begin
-        for (P, l) in [(zero(ArbPoly), 0), (one(ArbPoly), 1), (ArbPoly(Arb[0, 0, 1]), 3)]
+        for (P, l) in [(zero(TPoly), 0), (one(TPoly), 1), (TPoly(Arb[0, 0, 1]), 3)]
             @test length(P) == Arblib.degree(P) + 1 == l
         end
 
-        P = ArbPoly(Arb[i for i = 0:10])
+        P = TPoly(Arb[i for i = 0:10])
         @test all(P[i] == i for i = 0:10)
         @test P[11] == 0
         @test P[12] == 0
