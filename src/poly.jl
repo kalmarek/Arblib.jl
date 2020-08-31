@@ -57,8 +57,27 @@ function ArbSeries(coeffs::AbstractVector{Arb}; prec::Integer = precision(first(
 end
 
 Base.zero(poly::ArbPoly) = ArbPoly(prec = precision(poly))
-Base.one(poly::ArbPoly) =
-    ArbPoly([Arb(1, prec = precision(series))], prec = precision(poly))
+function Base.one(poly::ArbPoly)
+    res = ArbPoly(prec = precision(poly))
+    one!(res)
+    return res
+end
 Base.zero(series::ArbSeries) = ArbSeries(degree(series), prec = precision(series))
-Base.one(series::ArbSeries) =
-    ArbSeries([Arb(1, prec = precision(series))]degree(series), prec = precision(series))
+function Base.one(series::ArbSeries)
+    res = ArbSeries(degree(series), prec = precision(series))
+    one!(res)
+    return res
+end
+
+Base.zero(::Type{ArbPoly}) = ArbPoly()
+function Base.one(::Type{ArbPoly})
+    res = ArbPoly()
+    one!(res)
+    return res
+end
+Base.zero(::Type{ArbSeries}) = ArbSeries(0)
+function Base.one(::Type{ArbSeries})
+    res = ArbSeries(0)
+    one!(res)
+    return res
+end
