@@ -105,7 +105,9 @@ jltype(ca::Carg{ArbVector}) = Union{ArbVector,cstructtype(ArbVector)}
 jltype(ca::Carg{AcbVector}) = Union{AcbVector,cstructtype(AcbVector)}
 jltype(::Carg{Acb}) = Union{Acb,cstructtype(Acb),Ptr{cstructtype(Acb)},AcbRef}
 jltype(::Carg{Arb}) = Union{Arb,cstructtype(Arb),Ptr{cstructtype(Arb)},ArbRef}
-jltype(::Carg{T}) where {T<:Union{Mag,Arf,ArbPoly,ArbSeries,ArbMatrix,AcbMatrix}} =
+jltype(::Carg{ArbPoly}) =
+    Union{ArbPoly,ArbSeries,cstructtype(ArbPoly),Ptr{cstructtype(ArbPoly)}}
+jltype(::Carg{T}) where {T<:Union{Mag,Arf,ArbMatrix,AcbMatrix}} =
     Union{T,cstructtype(T),Ptr{cstructtype(T)}}
 
 ctype(ca::Carg) = rawtype(ca)
