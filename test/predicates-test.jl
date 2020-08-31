@@ -35,9 +35,11 @@
                 ),
             ),
             (Acb, (Arblib.isexact, isfinite, isinteger, isone, isreal, iszero)),
+            (ArbPoly, (isone, Arblib.isx, iszero)),
+            (ArbSeries, (isone, Arblib.isx, iszero)),
         )
             for f in fs
-                @test f(T()) isa Bool
+                @test f(zero(T)) isa Bool
             end
         end
     end
@@ -108,6 +110,20 @@
         @test y == 1
         @test 1 == y
         @test x != y
+
+        P1 = ArbPoly(Arb[1, 2])
+        P2 = ArbPoly(Arb[1, 2, 0])
+        P3 = ArbPoly(Arb.([1, "2 +/- 1"]))
+        P4 = ArbPoly(Arb[1, 4])
+        @test P1 == P2
+        @test !(P1 != P2)
+        @test !(P1 == P3)
+        @test !(P1 != P3)
+        @test !(P1 == P4)
+        @test P1 != P4
+        @test !(P3 == P4)
+        @test P3 != P4
+        @test isequal(P3, P3)
     end
 
 end
