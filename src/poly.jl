@@ -42,14 +42,16 @@ function ArbPoly(coeffs::AbstractVector{Arb}; prec::Integer = precision(first(co
     return poly
 end
 
-function ArbSeries(coeff::Arb, N::Integer; prec::Integer = precision(coeff))
-    series = ArbSeries(N, prec = prec)
+ArbSeries(; prec::Integer = DEFAULT_PRECISION[]) = ArbSeries(0)
+
+function ArbSeries(coeff::Arb, degree::Integer; prec::Integer = precision(coeff))
+    series = ArbSeries(degree, prec = prec)
     series[0] = coeff
     return series
 end
 
 function ArbSeries(coeffs::AbstractVector{Arb}; prec::Integer = precision(first(coeffs)))
-    series = ArbSeries(length(coeffs), prec = prec)
+    series = ArbSeries(length(coeffs) - 1, prec = prec)
     @inbounds for i = 1:length(coeffs)
         series[i-1] = coeffs[i]
     end
