@@ -37,7 +37,7 @@ end
 function ArbPoly(coeffs::AbstractVector{Arb}; prec::Integer = precision(first(coeffs)))
     poly = ArbPoly(prec = prec)
     @inbounds for i = 1:length(coeffs)
-        poly[i] = coeffs[i]
+        poly[i-1] = coeffs[i]
     end
     return poly
 end
@@ -51,7 +51,7 @@ end
 function ArbSeries(coeffs::AbstractVector{Arb}; prec::Integer = precision(first(coeffs)))
     series = ArbSeries(length(coeffs), prec = prec)
     @inbounds for i = 1:length(coeffs)
-        series[i] = coeffs[i]
+        series[i-1] = coeffs[i]
     end
     return series
 end
