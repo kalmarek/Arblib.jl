@@ -118,9 +118,9 @@ arbcall"int acb_mat_approx_inv(acb_mat_t X, const acb_mat_t A, slong prec)"
 
 ### Characteristic polynomial and companion matrix
 arbcall"void _acb_mat_charpoly(acb_ptr poly, const acb_mat_t mat, slong prec)"
-# arbcall"void acb_mat_charpoly(acb_poly_t poly, const acb_mat_t mat, slong prec)"
+arbcall"void acb_mat_charpoly(acb_poly_t poly, const acb_mat_t mat, slong prec)"
 arbcall"void _acb_mat_companion(acb_mat_t mat, acb_srcptr poly, slong prec)"
-# arbcall"void acb_mat_companion(acb_mat_t mat, const acb_poly_t poly, slong prec)"
+arbcall"void acb_mat_companion(acb_mat_t mat, const acb_poly_t poly, slong prec)"
 
 ### Special functions
 arbcall"void acb_mat_exp_taylor_sum(acb_mat_t S, const acb_mat_t A, slong N, slong prec)"

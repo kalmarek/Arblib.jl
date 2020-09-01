@@ -118,6 +118,19 @@ mutable struct arb_poly_struct
     end
 end
 
+mutable struct acb_poly_struct
+    coeffs::Ptr{acb_struct}
+    length::Clong
+    alloc::Clong
+
+    function acb_poly_struct()
+        poly = new()
+        init!(poly)
+        finalizer(clear!, poly)
+        return poly
+    end
+end
+
 mutable struct arb_mat_struct
     entries::Ptr{arb_struct}
     r::Clong
@@ -153,6 +166,7 @@ const ArbStructTypes = Union{
     arb_vec_struct,
     acb_vec_struct,
     arb_poly_struct,
+    acb_poly_struct,
     arb_mat_struct,
     acb_mat_struct,
 }

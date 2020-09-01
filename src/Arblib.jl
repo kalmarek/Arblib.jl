@@ -4,7 +4,18 @@ using Arb_jll
 import LinearAlgebra
 
 export Arf,
-    Arb, ArbRef, Acb, AcbRef, ArbVector, ArbPoly, ArbSeries, AcbVector, ArbMatrix, AcbMatrix
+    Arb,
+    ArbRef,
+    Acb,
+    AcbRef,
+    ArbVector,
+    ArbPoly,
+    ArbSeries,
+    AcbPoly,
+    AcbSeries,
+    AcbVector,
+    ArbMatrix,
+    AcbMatrix
 
 macro libarb(function_name)
     return (:($function_name), libarb)
@@ -36,6 +47,7 @@ include("arbcalls/arf.jl")
 include("arbcalls/arb.jl")
 include("arbcalls/acb.jl")
 include("arbcalls/arb_poly.jl")
+include("arbcalls/acb_poly.jl")
 include("arbcalls/arb_mat.jl")
 include("arbcalls/acb_mat.jl")
 

@@ -163,6 +163,40 @@ struct ArbSeries <: Number
     end
 end
 
+struct AcbPoly
+    acb_poly::acb_poly_struct
+    prec::Int
+
+    AcbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(acb_poly_struct(), prec)
+
+    function AcbPoly(poly::acb_poly_struct; prec::Integer = DEFAULT_PRECISION[])
+        res = AcbPoly()
+        set!(res, poly)
+
+        return res
+    end
+end
+
+struct AcbSeries <: Number
+    acb_poly::acb_poly_struct
+    degree::Int
+    prec::Int
+
+    AcbSeries(degree::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+        new(acb_poly_struct(), degree, prec)
+
+    function AcbSeries(
+        poly::acb_poly_struct,
+        degree::Integer = degree(poly);
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        res = AcbSeries(degree)
+        set!(res, poly)
+
+        return res
+    end
+end
+
 struct ArbMatrix <: DenseMatrix{ArbRef}
     arb_mat::arb_mat_struct
     prec::Int
@@ -187,6 +221,8 @@ const ArbTypes = Union{
     AcbVector,
     ArbPoly,
     ArbSeries,
+    AcbPoly,
+    AcbSeries,
     ArbMatrix,
     AcbMatrix,
 }
@@ -200,6 +236,8 @@ for (T, prefix) in (
     (AcbVector, :acb_vec),
     (ArbPoly, :arb_poly),
     (ArbSeries, :arb_poly),
+    (AcbPoly, :acb_poly),
+    (AcbSeries, :acb_poly),
     (ArbMatrix, :arb_mat),
     (AcbMatrix, :acb_mat),
 )
