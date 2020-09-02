@@ -140,7 +140,8 @@ Base.ones(x::T, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(x) for _ = 1:n]
 Base.zeros(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [zero(T) for _ = 1:n]
 Base.ones(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(T) for _ = 1:n]
 
-set!(z::Acb, x::Complex{<:Base.GMP.CdoubleMax}) = set!(z, real(x), imag(x))
+set!(z::Union{Acb,AcbRef,Ptr{acb_struct},acb_struct}, x::Complex{<:Base.GMP.CdoubleMax}) =
+    set!(z, real(x), imag(x))
 # Irrationals
 function Mag(::Irrational{:π})
     res = Mag()
