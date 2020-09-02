@@ -1,7 +1,7 @@
 @testset "Series: $TSeries" for (TSeries, T) in [(ArbSeries, Arb), (AcbSeries, Acb)]
     @testset "Constructors" begin
         @test TSeries() == TSeries(T[0]) == zero(TSeries) == zero(TSeries())
-        @test TSeries(3) == TSeries(T[0], 3) == zero(TSeries(3))
+        @test TSeries(3) == TSeries(T(0), 3) == TSeries(T[0], 3) == zero(TSeries(3))
         @test TSeries(T[1]) == one(TSeries) == one(TSeries())
         @test Arblib.isx(TSeries(T[0, 1]))
         @test TSeries(T[1, 2, 0]) != TSeries(T[1, 2])
