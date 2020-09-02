@@ -2,28 +2,39 @@
     precdefault = 256
     prec = 64
 
-    @testset "precision" begin
-        for T in (Arf, Arb, Acb)
-            @test precision(T()) == precdefault
-            @test precision(T(prec = prec)) == prec
+    @testset "precision: $T" for T in
+                                 (Arf, Arb, Acb, ArbPoly, ArbSeries, AcbPoly, AcbSeries)
+        @test precision(T()) == precdefault
+        @test precision(T(prec = prec)) == prec
 
-            @test precision(Arblib.cstruct(T())) == precdefault
-            @test precision(Arblib.cstruct(T(prec = prec))) == precdefault
+        @test precision(Arblib.cstruct(T())) == precdefault
+        @test precision(Arblib.cstruct(T(prec = prec))) == precdefault
 
-            @test precision(T) == precdefault
-            @test precision(Arblib.cstructtype(T)) == precdefault
-            @test precision(Ptr{Arblib.cstructtype(T)}) == precdefault
+        @test precision(T) == precdefault
+        @test precision(Arblib.cstructtype(T)) == precdefault
+        @test precision(Ptr{Arblib.cstructtype(T)}) == precdefault
+
+        if T in [ArbPoly, ArbSeries, AcbPoly, AcbSeries]
+            @test precision(T()[0]) == precdefault
+            @test precision(T(prec = prec)[0]) == prec
         end
     end
 
-    @testset "setprecision" begin
-        for T in (Arf, Arb, Acb)
-            x = T()
-            @test precision(x) == precdefault
+    @testset "setprecision: $T" for T in
+                                    (Arf, Arb, Acb, ArbPoly, ArbSeries, AcbPoly, AcbSeries)
+        x = T()
+        @test precision(x) == precdefault
 
-            y = setprecision(x, prec)
-            @test precision(y) == prec
+        y = setprecision(x, prec)
+        @test precision(y) == prec
+        @test isequal(x, y)
+
+        if T in [Arf, Arb, Acb]
             Arblib.set!(y, 2)
+            @test !isequal(x, y)
+        elseif T in [ArbPoly, ArbSeries, AcbPoly, AcbSeries]
+            @test precision(y[0]) == prec
+            y[0] = eltype(T)(2)
             @test !isequal(x, y)
         end
     end

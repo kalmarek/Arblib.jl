@@ -136,7 +136,7 @@ struct ArbPoly
     ArbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(arb_poly_struct(), prec)
 
     function ArbPoly(poly::arb_poly_struct; prec::Integer = DEFAULT_PRECISION[])
-        res = ArbPoly()
+        res = ArbPoly(prec = prec)
         set!(res, poly)
 
         return res
@@ -156,7 +156,7 @@ struct ArbSeries <: Number
         degree::Integer = degree(poly);
         prec::Integer = DEFAULT_PRECISION[],
     )
-        res = ArbSeries(degree)
+        res = ArbSeries(degree, prec = prec)
         set!(res, poly)
 
         return res
@@ -170,7 +170,7 @@ struct AcbPoly
     AcbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(acb_poly_struct(), prec)
 
     function AcbPoly(poly::acb_poly_struct; prec::Integer = DEFAULT_PRECISION[])
-        res = AcbPoly()
+        res = AcbPoly(prec = prec)
         set!(res, poly)
 
         return res
@@ -190,7 +190,7 @@ struct AcbSeries <: Number
         degree::Integer = degree(poly);
         prec::Integer = DEFAULT_PRECISION[],
     )
-        res = AcbSeries(degree)
+        res = AcbSeries(degree, prec = prec)
         set!(res, poly)
 
         return res

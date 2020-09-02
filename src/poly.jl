@@ -24,7 +24,7 @@ Base.@propagate_inbounds function Base.getindex(
     i::Integer,
 ) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
     @boundscheck checkbounds(poly, i)
-    res = eltype(T)()
+    res = eltype(T)(prec = precision(poly))
     get_coeff!(res, poly, i)
     return res
 end
@@ -70,7 +70,7 @@ for (TPoly, T) in [(:ArbPoly, :Arb), (:AcbPoly, :Acb)]
 end
 
 for (TSeries, T) in [(:ArbSeries, :Arb), (:AcbSeries, :Acb)]
-    @eval $TSeries(; prec::Integer = DEFAULT_PRECISION[]) = $TSeries(0)
+    @eval $TSeries(; prec::Integer = DEFAULT_PRECISION[]) = $TSeries(0, prec = prec)
 
     @eval function $TSeries(coeff::$T, degree::Integer; prec::Integer = precision(coeff))
         series = $TSeries(degree, prec = prec)
