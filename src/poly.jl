@@ -79,10 +79,11 @@ for (TSeries, T) in [(:ArbSeries, :Arb), (:AcbSeries, :Acb)]
     end
 
     @eval function $TSeries(
-        coeffs::AbstractVector{$T};
+        coeffs::AbstractVector{$T},
+        degree = length(coeffs) - 1;
         prec::Integer = precision(first(coeffs)),
     )
-        series = $TSeries(length(coeffs) - 1, prec = prec)
+        series = $TSeries(degree, prec = prec)
         @inbounds for i = 1:length(coeffs)
             series[i-1] = coeffs[i]
         end

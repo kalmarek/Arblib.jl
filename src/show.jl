@@ -4,24 +4,31 @@ Base.show(io::IO, x::Mag) = print(io, _string(x))
 Base.show(io::IO, x::Union{Arb,ArbRef,Acb,AcbRef}) = print(io, string_nice(x))
 Base.show(io::IO, x::Arf) = print(io, string_decimal(x))
 
-function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries}}
+function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
     if iszero(poly)
         print(io, "0")
     end
 
-    for i = 0:degree(poly)
+    # We only want to print up until the last non-zero element, for
+    # ArbPoly and AcbPoly this is given by the degree, for ArbSeries
+    # and AcbSeries we get this by taking the degree of the underlying
+    # polynomial.
+    N = degree(cstruct(poly))
+    for i = 0:N
         x = poly[i]
         if !iszero(x)
             str =
+                ifelse(!isreal(x), "(", "") *
                 "$x" *
+                ifelse(!isreal(x), ")", "") *
                 ifelse(i > 0, "⋅x", "") *
                 ifelse(i > 1, "^$i", "") *
-                ifelse(i != degree(poly), " + ", "")
+                ifelse(i != N, " + ", "")
             print(io, str)
         end
     end
 
-    if T == ArbSeries
+    if T == ArbSeries || T == AcbSeries
         print(io, " + 𝒪(x^$(degree(poly)+1))")
     end
 end
