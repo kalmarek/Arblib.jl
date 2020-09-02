@@ -1,3 +1,4 @@
+Base.promote_rule(::Type{Mag}, ::Type{Float64}) = Mag
 Base.promote_rule(::Type{Arf}, ::Type{<:Union{AbstractFloat,Integer}}) = Arf
 Base.promote_rule(
     ::Type{<:Union{Arb,ArbRef}},
@@ -63,7 +64,7 @@ for f in [
     :asech,
 ]
     @eval function Base.$f(x::T) where {T<:Union{Arb,ArbRef,Acb,AcbRef}}
-        z = T(prec = max(precision(x)))
+        z = T(prec = precision(x))
         $(Symbol(f, :!))(z, x)
         z
     end
@@ -80,3 +81,4 @@ end
 Base.real(z::AcbLike; prec = _precision(z)) = get_real!(Arb(prec = prec), z)
 Base.imag(z::AcbLike; prec = _precision(z)) = get_imag!(Arb(prec = prec), z)
 Base.conj(z::AcbLike) = conj!(Acb(prec = _precision(z)), z)
+Base.abs(z::AcbLike) = abs!(Arb(prec = _precision(z)), z)

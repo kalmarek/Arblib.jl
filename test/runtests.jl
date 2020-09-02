@@ -12,4 +12,5 @@ using Arblib, Test, LinearAlgebra
     include("arithmetic.jl")
     include("vector.jl")
     include("matrix.jl")
+    include("eigen.jl")
 end

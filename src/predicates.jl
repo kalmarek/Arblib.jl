@@ -47,6 +47,8 @@ for (T, funcpairs) in (
             (:(Base.isone), :is_one),
             (:(Base.isreal), :is_real),
             (:(Base.iszero), :is_zero),
+            (:containszero, :contains_zero),
+            (:containsint, :contains_int),
         ),
     ),
     (ArbVector, ((:(Base.isfinite), :is_finite), (:(Base.iszero), :is_zero))),
