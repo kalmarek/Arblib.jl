@@ -58,11 +58,11 @@ end
 struct ArbRef <: Number
     arb_ptr::Ptr{arb_struct}
     prec::Int
-    parent::Union{arb_vec_struct,arb_mat_struct}
+    parent::Union{acb_struct,arb_vec_struct,arb_mat_struct}
 end
 function ArbRef(
     ptr::Ptr{arb_struct},
-    parent::Union{arb_vec_struct,arb_mat_struct};
+    parent::Union{acb_struct,arb_vec_struct,arb_mat_struct};
     prec::Int,
 )
     ArbRef(ptr, prec, parent)
@@ -143,6 +143,8 @@ end
 AcbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     AcbMatrix(acb_mat_struct(r, c), prec)
 
+const ArbLike = Union{Arb,ArbRef,Ptr{arb_struct},arb_struct}
+const AcbLike = Union{Acb,AcbRef,Ptr{acb_struct},acb_struct}
 const ArbTypes = Union{Arf,Arb,ArbRef,Acb,AcbRef,ArbVector,AcbVector,ArbMatrix,AcbMatrix}
 
 for (T, prefix) in (
@@ -163,6 +165,7 @@ for (T, prefix) in (
     @eval begin
         cprefix(::Type{$T}) = $(QuoteNode(Symbol(prefix)))
         cstruct(x::$T) = getfield(x, cprefix($T))
+        cstruct(x::$arbstruct) = x
         Base.convert(::Type{$(cstructtype(T))}, x::$T) = cstruct(x)
     end
 end
