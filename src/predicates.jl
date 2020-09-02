@@ -61,6 +61,24 @@ for (T, funcpairs) in (
     (ArbPoly, ((:(Base.isone), :is_one), (:(isx), :is_x), (:(Base.iszero), :is_zero))),
     (ArbSeries, ((:(Base.isone), :is_one), (:(isx), :is_x), (:(Base.iszero), :is_zero))),
     (
+        AcbPoly,
+        (
+            (:(Base.isone), :is_one),
+            (:(isx), :is_x),
+            (:(Base.iszero), :is_zero),
+            (:(Base.isreal), :is_real),
+        ),
+    ),
+    (
+        AcbSeries,
+        (
+            (:(Base.isone), :is_one),
+            (:(isx), :is_x),
+            (:(Base.iszero), :is_zero),
+            (:(Base.isreal), :is_real),
+        ),
+    ),
+    (
         ArbMatrix,
         (
             (:isexact, :is_exact),
@@ -94,12 +112,19 @@ end
 #Base.:(<=)(x::Arf, y::Arf) = !isnan(x) && !isnan(y) && cmp(x, y) <= 0
 #Base.isequal(x::Arf, y::Arf) = !iszero(is_equal(x, y))
 
-for ArbT in (Mag, Arf, Union{Arb,ArbRef}, Union{Acb,AcbRef}, ArbPoly, ArbSeries)
+for ArbT in
+    (Mag, Arf, Union{Arb,ArbRef}, Union{Acb,AcbRef}, ArbPoly, ArbSeries, AcbPoly, AcbSeries)
     @eval begin
         Base.isequal(y::$ArbT, x::$ArbT) = !iszero(equal(x, y))
     end
 
-    (ArbT == Mag || ArbT == ArbPoly || ArbT == ArbSeries) && continue
+    (
+        ArbT == Mag ||
+        ArbT == ArbPoly ||
+        ArbT == ArbSeries ||
+        ArbT == AcbPoly ||
+        ArbT == AcbSeries
+    ) && continue
 
     # Comparison of non-floating point values should use ==
     @eval begin
@@ -136,7 +161,7 @@ for (ArbT, args) in (
     end
 end
 
-function Base.:(==)(x::T, y::T) where {T<:Union{ArbPoly,ArbSeries}}
+function Base.:(==)(x::T, y::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
     degree(x) == degree(y) || return false
     for i = 0:degree(x)
         x[i] == y[i] || return false
@@ -144,10 +169,10 @@ function Base.:(==)(x::T, y::T) where {T<:Union{ArbPoly,ArbSeries}}
     return true
 end
 
-function Base.:(!=)(x::ArbPoly, y::ArbPoly)
+function Base.:(!=)(x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}}
     return iszero(overlaps(x, y))
 end
 
-function Base.:(!=)(x::ArbSeries, y::ArbSeries)
+function Base.:(!=)(x::T, y::T) where {T<:Union{ArbSeries,AcbSeries}}
     return (degree(x) != degree(y)) || iszero(overlaps(x, y))
 end

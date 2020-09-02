@@ -1,4 +1,4 @@
-@testset "Series: $TSeries" for (TSeries, T) in [(ArbSeries, Arb)]
+@testset "Series: $TSeries" for (TSeries, T) in [(ArbSeries, Arb), (AcbSeries, Acb)]
     @testset "Constructors" begin
         @test TSeries() == TSeries(T[0]) == zero(TSeries) == zero(TSeries())
         @test TSeries(T[1]) == one(TSeries) == one(TSeries())
