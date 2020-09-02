@@ -37,5 +37,8 @@
         P = AcbSeries([Acb[1, 2, 0, π]; Acb(1, 1)], 5, prec = prec)
         @test "$P" ==
               "1.00000000 + 2.00000000⋅x + [3.14159265 +/- 3.59e-9]⋅x^3 + (1.00000000 + 1.00000000*I)⋅x^4 + 𝒪(x^6)"
+
+        @test "$(ArbPoly())" == "$(AcbPoly())" == "0"
+        @test "$(ArbSeries())" == "$(AcbSeries())" == "𝒪(x)"
     end
 end

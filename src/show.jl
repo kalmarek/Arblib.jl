@@ -5,7 +5,7 @@ Base.show(io::IO, x::Union{Arb,ArbRef,Acb,AcbRef}) = print(io, string_nice(x))
 Base.show(io::IO, x::Arf) = print(io, string_decimal(x))
 
 function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
-    if iszero(poly)
+    if (T == ArbPoly || T == AcbPoly) && iszero(poly)
         print(io, "0")
     end
 
@@ -29,7 +29,12 @@ function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,Ac
     end
 
     if T == ArbSeries || T == AcbSeries
-        print(io, " + 𝒪(x^$(degree(poly)+1))")
+        str =
+            ifelse(iszero(poly), "", " + ") *
+            "𝒪(x" *
+            ifelse(degree(poly) == 0, "", "^$(degree(poly) + 1)") *
+            ")"
+        print(io, str)
     end
 end
 
