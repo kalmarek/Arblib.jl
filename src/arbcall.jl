@@ -22,6 +22,7 @@ end
 const arbargtypes = ArbArgTypes(
     Dict{String,DataType}(
         "void" => Cvoid,
+        "void *" => Ptr{Cvoid},
         "int" => Cint,
         "slong" => Clong,
         "ulong" => Culong,
@@ -47,6 +48,7 @@ const arbargtypes = ArbArgTypes(
     Set(["FILE *", "fmpr_t", "fmpr_rnd_t", "flint_rand_t", "bool_mat_t"]),
     Dict{DataType,String}(
         Cvoid => "void",
+        Ptr{Cvoid} => "void *",
         Cint => "int",
         Clong => "slong",
         Culong => "ulong",
