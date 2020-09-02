@@ -68,3 +68,8 @@ for f in [
         z
     end
 end
+
+function midref(x::Union{Arb,ArbRef,Ptr{arb_struct},arb_struct}, prec = _precision(x))
+    mid_ptr = ccall(@libarb(arb_mid_ptr), Ptr{arf_struct}, (Ref{arb_struct},), x)
+    ArfRef(mid_ptr, prec, cstruct(x))
+end

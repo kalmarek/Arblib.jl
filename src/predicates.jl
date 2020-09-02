@@ -9,7 +9,7 @@ for (T, funcpairs) in (
         ),
     ),
     (
-        Arf,
+        Union{Arf,ArfRef},
         (
             (:(Base.isfinite), :is_finite),
             (:(Base.isinf), :is_inf),
@@ -92,7 +92,7 @@ end
 #Base.:(<=)(x::Arf, y::Arf) = !isnan(x) && !isnan(y) && cmp(x, y) <= 0
 #Base.isequal(x::Arf, y::Arf) = !iszero(is_equal(x, y))
 
-for ArbT in (Mag, Arf, Union{Arb,ArbRef}, Union{Acb,AcbRef})
+for ArbT in (Mag, Union{Arf,ArfRef}, Union{Arb,ArbRef}, Union{Acb,AcbRef})
     @eval begin
         Base.isequal(y::$ArbT, x::$ArbT) = !iszero(equal(x, y))
     end
@@ -110,7 +110,7 @@ Base.isless(x::Mag, y::Mag) = cmp(x, y) < 0
 Base.:(<)(x::Mag, y::Mag) = cmp(x, y) < 0
 Base.:(<=)(x::Mag, y::Mag) = cmp(x, y) <= 0
 
-for jltype in (Arf, Integer, Unsigned, Base.GMP.CdoubleMax)
+for jltype in (Union{Arf,ArfRef}, Integer, Unsigned, Base.GMP.CdoubleMax)
     @eval begin
         Base.isless(x::Arf, y::$jltype) = (isnan(y) && !isnan(x)) || cmp(x, y) < 0
         Base.:(<)(x::Arf, y::$jltype) = !isnan(x) && !isnan(y) && cmp(x, y) < 0

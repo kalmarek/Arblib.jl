@@ -25,4 +25,12 @@
         @test a + 3 == 3
         @test a + 3 isa T
     end
+
+    @testset "midref" begin
+        x = Arb(0.25)
+        Arblib.midref(x) isa ArfRef
+        @test startswith(sprint(show, x), "0.250")
+        Arblib.get(Arblib.midref(x)) isa Float64
+        Arblib.get(Arblib.midref(x)) == 0.25
+    end
 end

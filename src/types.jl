@@ -19,6 +19,24 @@ struct Arf <: Real
     end
 end
 
+struct ArfRef <: Real
+    arf_ptr::Ptr{arf_struct}
+    prec::Int
+    parent::arb_struct
+end
+function ArfRef(ptr::Ptr{arf_struct}, parent::arb_struct; prec::Int)
+    ArfRef(ptr, prec, parent)
+end
+
+ArfRef(; prec::Int = DEFAULT_PRECISION[]) = Arf(; prec = prec)
+function Arf(x::ArfRef; prec::Integer = precision(x))
+    res = Arf(prec = prec)
+    set!(res, x)
+    return res
+end
+Base.getindex(x::ArfRef) = Arf(x)
+
+
 struct Mag <: Real
     mag::mag_struct
 
@@ -55,7 +73,7 @@ struct Arb <: Real
 end
 
 
-struct ArbRef <: Number
+struct ArbRef <: Real
     arb_ptr::Ptr{arb_struct}
     prec::Int
     parent::Union{arb_vec_struct,arb_mat_struct}
@@ -143,7 +161,8 @@ end
 AcbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     AcbMatrix(acb_mat_struct(r, c), prec)
 
-const ArbTypes = Union{Arf,Arb,ArbRef,Acb,AcbRef,ArbVector,AcbVector,ArbMatrix,AcbMatrix}
+const ArbTypes =
+    Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef,ArbVector,AcbVector,ArbMatrix,AcbMatrix}
 
 for (T, prefix) in (
     (Mag, :mag),
@@ -168,6 +187,12 @@ for (T, prefix) in (
 end
 
 
+cprefix(::Type{ArfRef}) = :arf_struct
+cstructtype(::Type{ArfRef}) = Ptr{arf_struct}
+cstruct(x::ArfRef) = x.arf_ptr
+Base.convert(::Type{Ptr{arf_struct}}, x::ArfRef) = cstruct(x)
+Base.cconvert(::Type{Ref{arf_struct}}, x::ArfRef) = cstruct(x)
+
 cprefix(::Type{ArbRef}) = :arb_struct
 cstructtype(::Type{ArbRef}) = Ptr{arb_struct}
 cstruct(x::ArbRef) = x.arb_ptr
@@ -180,7 +205,7 @@ cstruct(x::AcbRef) = x.acb_ptr
 Base.convert(::Type{Ptr{acb_struct}}, x::AcbRef) = cstruct(x)
 Base.cconvert(::Type{Ref{acb_struct}}, x::AcbRef) = cstruct(x)
 
-function Base.setindex!(x::Union{Mag,Arf,Arb,ArbRef,Acb,AcbRef}, z::Number)
+function Base.setindex!(x::Union{Mag,Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}, z::Number)
     set!(x, z)
     x
 end

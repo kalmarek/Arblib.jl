@@ -2,9 +2,9 @@ digits_prec(prec::Integer) = floor(Int, prec * log(2) / log(10))
 
 Base.show(io::IO, x::Mag) = print(io, _string(x))
 Base.show(io::IO, x::Union{Arb,ArbRef,Acb,AcbRef}) = print(io, string_nice(x))
-Base.show(io::IO, x::Arf) = print(io, string_decimal(x))
+Base.show(io::IO, x::Union{Arf,ArfRef}) = print(io, string_decimal(x))
 
-for ArbT in (Mag, Arf, Arb, ArbRef, Acb, AcbRef)
+for ArbT in (Mag, Arf, ArfRef, Arb, ArbRef, Acb, AcbRef)
     arbf = Symbol(cprefix(ArbT), :_, :print)
     @eval begin
         function _string(x::$ArbT)

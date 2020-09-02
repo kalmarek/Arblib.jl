@@ -19,7 +19,7 @@
                 "arf_t res",
                 "res",
                 false,
-                Union{Arf,arf_struct,Ptr{arf_struct}},
+                Union{Arf,ArfRef,arf_struct,Ptr{arf_struct}},
                 Ref{arf_struct},
             ),
             (
@@ -47,7 +47,7 @@
                 "const arf_t x",
                 "x",
                 true,
-                Union{Arf,arf_struct,Ptr{arf_struct}},
+                Union{Arf,ArfRef,arf_struct,Ptr{arf_struct}},
                 Ref{arf_struct},
             ),
             (
@@ -249,9 +249,9 @@
             (
                 "int arf_add(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)",
                 [
-                    :(res::$(Union{Arf,arf_struct,Ptr{arf_struct}})),
-                    :(x::$(Union{Arf,arf_struct,Ptr{arf_struct}})),
-                    :(y::$(Union{Arf,arf_struct,Ptr{arf_struct}})),
+                    :(res::$(Union{Arf,ArfRef,arf_struct,Ptr{arf_struct}})),
+                    :(x::$(Union{Arf,ArfRef,arf_struct,Ptr{arf_struct}})),
+                    :(y::$(Union{Arf,ArfRef,arf_struct,Ptr{arf_struct}})),
                 ],
                 [
                     Expr(:kw, :(prec::Integer), :(precision(res))),
