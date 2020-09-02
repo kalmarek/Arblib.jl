@@ -1,6 +1,6 @@
 ## ArbMatrix AbstractMatrix interface
 Base.size(A::arb_mat_struct) = (A.r, A.c)
-Base.size(A::ArbMatrix) = size(A.arb_mat)
+Base.size(A::Union{ArbMatrix,ArbRefMatrix}) = size(A.arb_mat)
 
 function Base.getindex(A::arb_mat_struct, i::Integer, j::Integer)
     return ccall(
@@ -14,11 +14,37 @@ function Base.getindex(A::arb_mat_struct, i::Integer, j::Integer)
 end
 Base.@propagate_inbounds function Base.getindex(A::ArbMatrix, i::Integer, j::Integer)
     @boundscheck checkbounds(A, i, j)
+    x = Arb(prec = precision(A))
+    x[] = A.arb_mat[i, j]
+    x
+end
+Base.@propagate_inbounds function Base.getindex(A::ArbRefMatrix, i::Integer, j::Integer)
+    @boundscheck checkbounds(A, i, j)
+    return ArbRef(A.arb_mat[i, j], precision(A), cstruct(A))
+end
+
+"""
+    ref(A::ArbMatrix, i, j)
+
+Similar to `A[i,j]` but instead of an `Arb` returns an `ArbRef` which still shares the
+memory with the `(i,j)`-th entry of `A`.
+"""
+Base.@propagate_inbounds function ref(
+    A::Union{ArbMatrix,ArbRefMatrix},
+    i::Integer,
+    j::Integer,
+)
+    @boundscheck checkbounds(A, i, j)
     return ArbRef(A.arb_mat[i, j], precision(A), cstruct(A))
 end
 
 Base.setindex!(A::arb_mat_struct, x, i::Integer, j::Integer) = (set!(A[i, j], x); x)
-Base.@propagate_inbounds function Base.setindex!(A::ArbMatrix, x, i::Integer, j::Integer)
+Base.@propagate_inbounds function Base.setindex!(
+    A::Union{ArbMatrix,ArbRefMatrix},
+    x,
+    i::Integer,
+    j::Integer,
+)
     @boundscheck checkbounds(A, i, j)
     A.arb_mat[i, j] = x
     return x
@@ -26,7 +52,7 @@ end
 
 ## AcbMatrix AbstractMatrix interface
 Base.size(A::acb_mat_struct) = (A.r, A.c)
-Base.size(A::AcbMatrix) = size(A.acb_mat)
+Base.size(A::Union{AcbMatrix,AcbRefMatrix}) = size(A.acb_mat)
 
 function Base.getindex(A::acb_mat_struct, i::Integer, j::Integer)
     return ccall(
@@ -40,11 +66,37 @@ function Base.getindex(A::acb_mat_struct, i::Integer, j::Integer)
 end
 Base.@propagate_inbounds function Base.getindex(A::AcbMatrix, i::Integer, j::Integer)
     @boundscheck checkbounds(A, i, j)
+    x = Acb(prec = precision(A))
+    x[] = A.acb_mat[i, j]
+    x
+end
+Base.@propagate_inbounds function Base.getindex(A::AcbRefMatrix, i::Integer, j::Integer)
+    @boundscheck checkbounds(A, i, j)
+    return AcbRef(A.acb_mat[i, j], precision(A), cstruct(A))
+end
+
+"""
+    ref(A::AcbMatrix, i, j)
+
+Similar to `A[i,j]` but instead of an `Acb` returns an `AcbRef` which still shares the
+memory with the `(i,j)`-th entry of `A`.
+"""
+Base.@propagate_inbounds function ref(
+    A::Union{AcbMatrix,AcbRefMatrix},
+    i::Integer,
+    j::Integer,
+)
+    @boundscheck checkbounds(A, i, j)
     return AcbRef(A.acb_mat[i, j], precision(A), cstruct(A))
 end
 
 Base.setindex!(A::acb_mat_struct, x, i::Integer, j::Integer) = (set!(A[i, j], x); x)
-Base.@propagate_inbounds function Base.setindex!(A::AcbMatrix, x, i::Integer, j::Integer)
+Base.@propagate_inbounds function Base.setindex!(
+    A::Union{AcbMatrix,AcbRefMatrix},
+    x,
+    i::Integer,
+    j::Integer,
+)
     @boundscheck checkbounds(A, i, j)
     A.acb_mat[i, j] = x
     return x
@@ -52,25 +104,8 @@ end
 
 ## Common methods
 
-# linear indexing
-Base.@propagate_inbounds function Base.getindex(A::Union{ArbMatrix,AcbMatrix}, k::Integer)
-    @boundscheck (1 ≤ k ≤ length(A) || throw(BoundsError(A, k)))
-    j, i = divrem(k - 1, size(A, 1))
-    A[i+1, j+1]
-end
-Base.@propagate_inbounds function Base.setindex!(
-    A::Union{ArbMatrix,AcbMatrix},
-    x,
-    k::Integer,
-)
-    @boundscheck (1 ≤ k ≤ length(A) || throw(BoundsError(A, k)))
-    j, i = divrem(k - 1, size(A, 1))
-    A[i+1, j+1] = x
-    x
-end
-
 # General constructor
-for T in [:ArbMatrix, :AcbMatrix]
+for T in [:ArbMatrix, :ArbRefMatrix, :AcbMatrix, :AcbRefMatrix]
     @eval function $T(A::AbstractMatrix, prec::Integer = _precision(first(A)))
         B = $T(size(A)...; prec = prec)
         # ensure to handle all kind of indices
@@ -90,24 +125,25 @@ for T in [:ArbMatrix, :AcbMatrix]
     end
 end
 
-Base.copy(A::T) where {T<:Union{ArbMatrix,AcbMatrix}} =
-    copy!(T(size(A)...; prec = precision(A)), A)
-function Base.copy!(A::T, B::T) where {T<:Union{ArbMatrix,AcbMatrix}}
-    @boundscheck size(A) == size(B) || throw(DimensionMismatch())
-    set!(A, B)
-    A
-end
-function Base.copyto!(A::T, B::T) where {T<:Union{ArbMatrix,AcbMatrix}}
-    @boundscheck size(A) == size(B) || throw(DimensionMismatch())
-    set!(A, B)
-    A
-end
-
 ## Common methods
+
+const Matrices = Union{ArbMatrix,ArbRefMatrix,AcbMatrix,AcbRefMatrix}
+
+Base.copy(A::T) where {T<:Matrices} = copy!(T(size(A)...; prec = precision(A)), A)
+function Base.copy!(A::T, B::T) where {T<:Matrices}
+    @boundscheck size(A) == size(B) || throw(DimensionMismatch())
+    set!(A, B)
+    A
+end
+function Base.copyto!(A::T, B::T) where {T<:Matrices}
+    @boundscheck size(A) == size(B) || throw(DimensionMismatch())
+    set!(A, B)
+    A
+end
 
 # Basic arithmetic
 for (jf, af) in [(:+, :add!), (:-, :sub!)]
-    @eval function Base.$jf(A::T, B::T) where {T<:Union{ArbMatrix,AcbMatrix}}
+    @eval function Base.$jf(A::T, B::T) where {T<:Matrices}
         @boundscheck (
             size(A) == size(B) ||
             throw(DimensionMismatch("Matrix sizes are not compatible."))
@@ -118,13 +154,13 @@ for (jf, af) in [(:+, :add!), (:-, :sub!)]
     end
 end
 
-function Base.:(-)(A::T) where {T<:Union{ArbMatrix,AcbMatrix}}
+function Base.:(-)(A::T) where {T<:Matrices}
     C = T(size(A)...; prec = precision(A))
     neg!(C, A)
     C
 end
 
-function LinearAlgebra.mul!(C::T, A::T, B::T) where {T<:Union{ArbMatrix,AcbMatrix}}
+function LinearAlgebra.mul!(C::T, A::T, B::T) where {T<:Matrices}
     @boundscheck (
         (size(C) == (size(A, 1), size(B, 2)) && size(A, 2) == size(B, 1)) ||
         throw(DimensionMismatch("Matrix sizes are not compatible."))
@@ -133,18 +169,18 @@ function LinearAlgebra.mul!(C::T, A::T, B::T) where {T<:Union{ArbMatrix,AcbMatri
     C
 end
 
-function Base.:(*)(A::T, B::T) where {T<:Union{ArbMatrix,AcbMatrix}}
+function Base.:(*)(A::T, B::T) where {T<:Matrices}
     C = T(size(A, 1), size(B, 2); prec = max(precision(A), precision(B)))
     LinearAlgebra.mul!(C, A, B)
 end
 
 # lu factorization
-function LinearAlgebra.lu!(A::T) where {T<:Union{ArbMatrix,AcbMatrix}}
+function LinearAlgebra.lu!(A::T) where {T<:Matrices}
     ipiv = zeros(Int, size(A, 2))
     retcode = lu!(ipiv, A, A)
     LinearAlgebra.LU(A, ipiv, retcode > 0 ? 0 : 1)
 end
-function LinearAlgebra.lu(A::T) where {T<:Union{ArbMatrix,AcbMatrix}}
+function LinearAlgebra.lu(A::T) where {T<:Matrices}
     lu = T(size(A)...; prec = precision(A))
     ipiv = zeros(Int, size(A, 2))
     retcode = lu!(ipiv, lu, A)
@@ -152,7 +188,7 @@ function LinearAlgebra.lu(A::T) where {T<:Union{ArbMatrix,AcbMatrix}}
 end
 
 # ldiv! and \
-function LinearAlgebra.ldiv!(Y::T, A::T, B::T) where {T<:Union{ArbMatrix,AcbMatrix}}
+function LinearAlgebra.ldiv!(Y::T, A::T, B::T) where {T<:Matrices}
     @boundscheck (
         (size(Y) == size(B) && size(A, 1) == size(A, 2) && size(A, 1) == size(B, 1)) ||
         throw(DimensionMismatch("Matrix sizes are not compatible."))
@@ -160,7 +196,7 @@ function LinearAlgebra.ldiv!(Y::T, A::T, B::T) where {T<:Union{ArbMatrix,AcbMatr
     LinearAlgebra.ldiv!(Y, LinearAlgebra.lu(A), B)
 end
 
-function LinearAlgebra.ldiv!(A::T, B::T) where {T<:Union{ArbMatrix,AcbMatrix}}
+function LinearAlgebra.ldiv!(A::T, B::T) where {T<:Matrices}
     @boundscheck (
         (size(A, 1) == size(A, 2)) ||
         throw(DimensionMismatch("Expected a square matrix as the left hand side."))
@@ -168,11 +204,7 @@ function LinearAlgebra.ldiv!(A::T, B::T) where {T<:Union{ArbMatrix,AcbMatrix}}
     LinearAlgebra.ldiv!(B, LinearAlgebra.lu(A), B)
 end
 
-function LinearAlgebra.ldiv!(
-    Y::T,
-    A::LinearAlgebra.LU{<:Any,T},
-    B::T,
-) where {T<:Union{ArbMatrix,AcbMatrix}}
+function LinearAlgebra.ldiv!(Y::T, A::LinearAlgebra.LU{<:Any,T}, B::T) where {T<:Matrices}
     @boundscheck (
         (size(Y) == size(B) && size(A, 1) == size(A, 2) && size(A, 1) == size(B, 1)) ||
         throw(DimensionMismatch("Matrix sizes are not compatible."))
@@ -180,22 +212,20 @@ function LinearAlgebra.ldiv!(
     Arblib.solve_lu_precomp!(Y, A.ipiv, A.factors, B)
     Y
 end
-LinearAlgebra.ldiv!(
-    A::LinearAlgebra.LU{<:Any,T},
-    B::T,
-) where {T<:Union{ArbMatrix,AcbMatrix}} = LinearAlgebra.ldiv!(B, A, B)
+LinearAlgebra.ldiv!(A::LinearAlgebra.LU{<:Any,T}, B::T) where {T<:Matrices} =
+    LinearAlgebra.ldiv!(B, A, B)
 
-function Base.:(\)(A::T, B::T) where {T<:Union{ArbMatrix,AcbMatrix}}
+function Base.:(\)(A::T, B::T) where {T<:Matrices}
     Y = T(size(A, 2), size(B, 2); prec = max(precision(A), precision(B)))
     LinearAlgebra.ldiv!(Y, A, B)
 end
-function Base.:(\)(A::LinearAlgebra.LU{<:Any,T}, B::T) where {T<:Union{ArbMatrix,AcbMatrix}}
+function Base.:(\)(A::LinearAlgebra.LU{<:Any,T}, B::T) where {T<:Matrices}
     Y = T(size(A, 2), size(B, 2); prec = max(precision(A.factors), precision(B)))
     LinearAlgebra.ldiv!(Y, A, B)
 end
 
 # inverse
-function LinearAlgebra.inv(A::T) where {T<:Union{ArbMatrix,AcbMatrix}}
+function LinearAlgebra.inv(A::T) where {T<:Matrices}
     B = T(size(A)...; prec = precision(A))
     Arblib.inv!(B, A)
     B

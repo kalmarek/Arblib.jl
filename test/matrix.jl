@@ -1,5 +1,9 @@
-@testset "Matrix: $T" for (TMat, T, TRef) in
-                          [(ArbMatrix, Arb, ArbRef), (AcbMatrix, Acb, AcbRef)]
+@testset "Matrix: $TRef" for (TMat, T, TRef) in [
+    (ArbMatrix, Arb, Arb),
+    (AcbMatrix, Acb, Acb),
+    (ArbRefMatrix, Arb, ArbRef),
+    (AcbRefMatrix, Acb, AcbRef),
+]
     @testset "Basic" begin
         M = TMat(4, 4, prec = 128)
         @test size(M) == (4, 4)
@@ -21,6 +25,8 @@
         A = TMat([i + j for i = 1:4, j = 1:4])
         @test A[4, 4] == T(8)
         @test precision(A) == precision(T(8))
+
+        @test ref(A, 3, 3) isa Union{ArbRef,AcbRef}
     end
     @testset "LinearAlgebra" begin
         A = TMat(rand(3, 3))

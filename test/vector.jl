@@ -1,5 +1,9 @@
-@testset "Vector: $T" for (TVec, T, TRef) in
-                          [(ArbVector, Arb, ArbRef), (AcbVector, Acb, AcbRef)]
+@testset "Vector: $TRef" for (TVec, T, TRef) in [
+    (ArbVector, Arb, Arb),
+    (AcbVector, Acb, Acb),
+    (ArbRefVector, Arb, ArbRef),
+    (AcbRefVector, Acb, AcbRef),
+]
     V = TVec(4, prec = 128)
     @test size(V) == (4,)
     @test precision(V) == 128
@@ -21,4 +25,6 @@
 
     A = TVec([i + j for i = 1:4 for j = 1:4])
     @test A[16] == T(8)
+
+    @test ref(A, 16) isa Union{ArbRef,AcbRef}
 end
