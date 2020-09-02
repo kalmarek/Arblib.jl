@@ -25,4 +25,17 @@
         @test a + 3 == 3
         @test a + 3 isa T
     end
+
+    @testset "real/imag" begin
+        x, y = Arb(rand()), Arb(rand())
+        z = Acb(x, y)
+
+        Arblib.realref(z) isa ArbRef
+        Arblib.realref(z) == x
+        real(z) == x
+        Arblib.imagref(z) isa ArbRef
+        Arblib.imagref(z) == y
+        imag(z) == y
+
+    end
 end
