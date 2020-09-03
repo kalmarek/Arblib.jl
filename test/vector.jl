@@ -29,4 +29,33 @@
     @test precision(A[14]) == 96
 
     @test ref(A, 16) isa Union{ArbRef,AcbRef}
+
+    # arithmetic
+    AInt = [1, 2, 3, 4]
+    BInt = [5, 6, 7, 8]
+    A = TVec(AInt; prec = 96)
+    B = TVec(BInt; prec = 96)
+    @test A - B == AInt - BInt
+    @test precision(A - B) == 96
+    @test (A - B) isa TVec
+    @test -B == -BInt
+    @test -B isa TVec
+    @test -B + A == A - B
+    @test precision(-B + A) == 96
+end
+
+@testset "VectorRef: $T" for (T, TRef) in
+                             [(ArbVector, ArbRefVector), (AcbVector, AcbRefVector)]
+    A = T(5; prec = 96)
+    A[4] = 3
+
+    B = TRef(A)
+    @test B isa TRef
+    @test precision(B) == 96
+    B[4] = 4
+    @test A[4] == 4
+    @test B[4] == 4
+    C = T(B)
+    @test C == A
+    @test C[4] == 4
 end

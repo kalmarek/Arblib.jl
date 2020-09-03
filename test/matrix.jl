@@ -28,6 +28,23 @@
 
         @test ref(A, 3, 3) isa Union{ArbRef,AcbRef}
     end
+
+    @testset "arithmetic" begin
+        AInt = [1 2; 3 4]
+        BInt = [5 6; 7 8]
+        A = TMat(AInt; prec = 96)
+        B = TMat(BInt; prec = 96)
+        @test A - B == AInt - BInt
+        @test precision(A - B) == 96
+        @test (A - B) isa TMat
+        @test -B == -BInt
+        @test -B isa TMat
+        @test -B + A == A - B
+        @test precision(-B + A) == 96
+        @test A * B == AInt * BInt
+        @test A * B isa TMat
+    end
+
     @testset "LinearAlgebra" begin
         A = TMat(rand(3, 3))
         b = TMat(rand(3))
@@ -69,4 +86,21 @@
         C = ArbMatrix(reshape(1:15, 5, 3))
         @test C[1:15] == 1:15
     end
+end
+
+
+@testset "MatrixRef: $T" for (T, TRef) in
+                             [(ArbMatrix, ArbRefMatrix), (AcbMatrix, AcbRefMatrix)]
+    A = T(2, 3; prec = 96)
+    A[1, 2] = 3
+
+    B = TRef(A)
+    @test B isa TRef
+    @test precision(B) == 96
+    B[1, 2] = 4
+    @test A[1, 2] == 4
+    @test B[1, 2] == 4
+    C = T(B)
+    @test C == A
+    @test C[1, 2] == 4
 end

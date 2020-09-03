@@ -105,16 +105,20 @@ end
 
 # Arithmetic
 for (jf, af) in [(:+, :add!), (:-, :sub!)]
-    @eval function Base.$jf(v::T, w::T) where {T<:Vectors}
+    @eval function Base.$jf(
+        v::T,
+        w::T,
+    ) where {T<:Union{ArbVector,ArbRefVector,AcbVector,AcbRefVector}}
         @boundscheck (length(v) == length(w) || throw(DimensionMismatch()))
-        C = T(size(A, 1), size(B, 2); prec = max(precision(A), precision(B)))
-        $af(C, A, B)
-        C
+        u = T(length(v); prec = max(precision(v), precision(w)))
+        $af(u, v, w, length(v))
+        u
     end
 end
 function Base.:(-)(v::T) where {T<:Vectors}
+    n = length(v)
     w = T(length(v); prec = precision(v))
-    neg!(w, v)
+    neg!(w, v, length(v))
     w
 end
 
