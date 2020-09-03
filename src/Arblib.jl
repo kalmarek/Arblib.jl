@@ -3,6 +3,8 @@ module Arblib
 using Arb_jll
 import LinearAlgebra
 
+import Base: contains
+
 export Arf,
     Arb,
     ArbRef,
