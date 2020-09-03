@@ -72,7 +72,7 @@
             @test a isa VT
             @test precision(a) == precision(A)
 
-            a = similar(A, ElT, (3,2))
+            a = similar(A, ElT, (3, 2))
             @test a isa MT
             @test precision(a) == precision(A)
         end
@@ -94,4 +94,3 @@ end
     @test C == A
     @test C[4] == 4
 end
-

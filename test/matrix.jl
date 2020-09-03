@@ -88,13 +88,13 @@
     end
 
     @testset "similar:" begin
-        A = TMat(3,5; prec = 96)
+        A = TMat(3, 5; prec = 96)
 
         a = similar(A)
         @test a isa TMat
         @test precision(a) == precision(A)
 
-        a = similar(A, TRef, (2,3))
+        a = similar(A, TRef, (2, 3))
         @test a isa TMat
         @test precision(a) == precision(A)
 
@@ -108,7 +108,7 @@
             @test a isa VT
             @test precision(a) == precision(A)
 
-            a = similar(A, ElT, (3,2))
+            a = similar(A, ElT, (3, 2))
             @test a isa MT
             @test precision(a) == precision(A)
         end
