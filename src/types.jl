@@ -183,21 +183,7 @@ end
 
 const ArbLike = Union{Arb,ArbRef,Ptr{arb_struct},arb_struct}
 const AcbLike = Union{Acb,AcbRef,Ptr{acb_struct},acb_struct}
-const ArbTypes = Union{
-    Arf,
-    Arb,
-    ArbRef,
-    Acb,
-    AcbRef,
-    ArbVector,
-    AcbVector,
-    ArbMatrix,
-    AcbMatrix,
-    ArbRefVector,
-    AcbRefVector,
-    ArbRefMatrix,
-    AcbRefMatrix,
-}
+
 
 for (T, prefix) in (
     (Mag, :mag),
@@ -222,7 +208,6 @@ for (T, prefix) in (
     end
 end
 
-
 cprefix(::Type{ArbRef}) = :arb_struct
 cstructtype(::Type{ArbRef}) = Ptr{arb_struct}
 cstruct(x::ArbRef) = x.arb_ptr
@@ -234,6 +219,30 @@ cstructtype(::Type{AcbRef}) = Ptr{acb_struct}
 cstruct(x::AcbRef) = x.acb_ptr
 Base.convert(::Type{Ptr{acb_struct}}, x::AcbRef) = cstruct(x)
 Base.cconvert(::Type{Ref{acb_struct}}, x::AcbRef) = cstruct(x)
+
+const MagLike = Union{Mag,cstructtype(Mag),Ptr{cstructtype(Mag)}}
+const ArfLike = Union{Arf,cstructtype(Arf),Ptr{cstructtype(Arf)}}
+const ArbLike = Union{Arb,ArbRef,cstructtype(Arb),Ptr{cstructtype(Arb)}}
+const AcbLike = Union{Acb,AcbRef,cstructtype(Acb),Ptr{cstructtype(Acb)}}
+const ArbVectorLike = Union{ArbVector,ArbRefVector,cstructtype(ArbVector)}
+const AcbVectorLike = Union{AcbVector,AcbRefVector,cstructtype(AcbVector)}
+const ArbMatrixLike = Union{ArbMatrix,ArbRefMatrix,cstructtype(ArbMatrix)}
+const AcbMatrixLike = Union{AcbMatrix,AcbRefMatrix,cstructtype(AcbMatrix)}
+const ArbTypes = Union{
+    Arf,
+    Arb,
+    ArbRef,
+    Acb,
+    AcbRef,
+    ArbVector,
+    AcbVector,
+    ArbMatrix,
+    AcbMatrix,
+    ArbRefVector,
+    AcbRefVector,
+    ArbRefMatrix,
+    AcbRefMatrix,
+}
 
 Base.setindex!(x::Union{Mag,Arf,Arb,ArbRef,Acb,AcbRef}, z::Number) = set!(x, z)
 Base.setindex!(x::Union{Arb,ArbRef}, z::Ptr{arb_struct}) = set!(x, z)

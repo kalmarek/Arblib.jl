@@ -82,3 +82,16 @@ for ArbT in (Mag, Arf, Arb)
         end
     end
 end
+
+for T in [
+    :MagLike,
+    :ArfLike,
+    :ArbLike,
+    :AcbLike,
+    :ArbVectorLike,
+    :AcbVectorLike,
+    :ArbMatrixLike,
+    :AcbMatrixLike,
+]
+    @eval Base.show(io::IO, ::Type{$T}) = print(io, $(QuoteNode(T)))
+end

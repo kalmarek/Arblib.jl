@@ -99,15 +99,15 @@ jltype(ca::Carg{Base.MPFR.MPFRRoundingMode}) =
 jltype(ca::Carg{Cstring}) = AbstractString
 jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
 jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
-jltype(ca::Carg{ArbVector}) = Union{ArbVector,ArbRefVector,cstructtype(ArbVector)}
-jltype(ca::Carg{AcbVector}) = Union{AcbVector,AcbRefVector,cstructtype(AcbVector)}
-jltype(::Carg{ArbMatrix}) =
-    Union{ArbMatrix,ArbRefMatrix,cstructtype(ArbMatrix),Ptr{cstructtype(ArbMatrix)}}
-jltype(::Carg{AcbMatrix}) =
-    Union{AcbMatrix,AcbRefMatrix,cstructtype(AcbMatrix),Ptr{cstructtype(AcbMatrix)}}
-jltype(::Carg{Acb}) = Union{Acb,cstructtype(Acb),Ptr{cstructtype(Acb)},AcbRef}
-jltype(::Carg{Arb}) = Union{Arb,cstructtype(Arb),Ptr{cstructtype(Arb)},ArbRef}
-jltype(::Carg{T}) where {T<:Union{Mag,Arf}} = Union{T,cstructtype(T),Ptr{cstructtype(T)}}
+
+jltype(::Carg{Mag}) = MagLike
+jltype(::Carg{Arf}) = ArfLike
+jltype(::Carg{Arb}) = ArbLike
+jltype(::Carg{Acb}) = AcbLike
+jltype(::Carg{ArbVector}) = ArbVectorLike
+jltype(::Carg{AcbVector}) = AcbVectorLike
+jltype(::Carg{ArbMatrix}) = ArbMatrixLike
+jltype(::Carg{AcbMatrix}) = AcbMatrixLike
 
 ctype(ca::Carg) = rawtype(ca)
 ctype(::Carg{T}) where {T<:Union{ArbVector,arb_vec_struct}} = Ptr{arb_struct}
@@ -163,76 +163,69 @@ function jlfname(
     return jlfname(arbfname(af), prefixes, suffixes, inplace = inplace)
 end
 
-function jlargs(af::Arbfunction)
+function jlargs(af::Arbfunction; argument_detection::Bool = true)
     cargs = arguments(af)
-    arg_names = Symbol.(name.(cargs))
-    c_types = ctype.(cargs)
-    jl_types = jltype.(cargs)
 
+    jl_arg_names_types = Tuple{Symbol,Any}[]
     kwargs = Expr[]
 
-    k = findfirst(==(:prec), arg_names)
-    if !isnothing(k)
-        @assert c_types[k] == Clong
-        p = :prec
-        a = first(cargs)
-        default =
-            if jltype(a) ∈ (
-                Union{Arf,arf_struct,Ptr{arf_struct}},
-                Union{Arb,arb_struct,Ptr{arb_struct},ArbRef},
-                Union{Acb,acb_struct,Ptr{acb_struct},AcbRef},
-            )
-                :(precision($(Symbol(name(a)))))
-            else
-                :(DEFAULT_PRECISION[])
+    prec_kwarg = false
+    rnd_kwarg = false
+    len_keywords = Set{Symbol}()
+    for (i, carg) in enumerate(cargs)
+        arg_name = Symbol(name(carg))
+
+        if !argument_detection
+            push!(jl_arg_names_types, (arg_name, jltype(carg)))
+            continue
+        end
+
+        # Automatic detection of precision argument
+        if !prec_kwarg && arg_name == :prec && ctype(carg) == Clong
+            c₁ = first(cargs)
+            push!(kwargs, Expr(:kw, :(prec::Integer), :(_precision($(Symbol(name(c₁)))))))
+            prec_kwarg = true
+
+            # Automatic detection of rounding mode argument
+        elseif !rnd_kwarg &&
+               arg_name == :rnd &&
+               ctype(carg) ∈ (arb_rnd, Base.MPFR.MPFRRoundingMode)
+
+            if ctype(carg) == arb_rnd
+                push!(
+                    kwargs,
+                    Expr(:kw, :(rnd::Union{$(arb_rnd),RoundingMode}), :(RoundNearest)),
+                )
+            else # ctype(carg) == Base.MPFR.MPFRRoundingMode
+                push!(
+                    kwargs,
+                    Expr(
+                        :kw,
+                        :(rnd::Union{Base.MPFR.MPFRRoundingMode,RoundingMode}),
+                        :(RoundNearest),
+                    ),
+                )
             end
-        push!(kwargs, Expr(:kw, :($p::Integer), default))
-        deleteat!(arg_names, k)
-        deleteat!(c_types, k)
-        deleteat!(jl_types, k)
-    end
+            rnd_kwarg = true
 
-    k = findfirst(==(:len), arg_names)
-    if !isnothing(k)
-        @assert c_types[k] == Clong
-        len = :len
-        a = first(cargs)
-        if jltype(a) ∈ (
-            Union{ArbVector,cstructtype(ArbVector),Ptr{arb_struct}},
-            Union{AcbVector,cstructtype(AcbVector),Ptr{acb_struct}},
-        )
-            push!(kwargs, Expr(:kw, :($len::Integer), :(length($(Symbol(name(a)))))))
+            # Automatic detection of length arguments for vectors
+        elseif (startswith(string(arg_name), "len") || arg_name == :n) &&
+               ctype(carg) == Clong &&
+               rawtype(cargs[i-1]) ∈ (ArbVector, AcbVector) &&
+               arg_name ∉ len_keywords
 
-            deleteat!(arg_names, k)
-            deleteat!(c_types, k)
-            deleteat!(jl_types, k)
+            vec_name = Symbol(name(cargs[i-1]))
+            push!(kwargs, Expr(:kw, :($arg_name::Integer), :(length($vec_name))))
+            push!(len_keywords, arg_name)
+
+        else
+            push!(jl_arg_names_types, (arg_name, jltype(carg)))
         end
     end
 
-    k = findfirst(==(:rnd), arg_names)
-    if !isnothing(k)
-        @assert c_types[k] == arb_rnd || c_types[k] == Base.MPFR.MPFRRoundingMode
-        r = :rnd
-        if c_types[k] == arb_rnd
-            push!(kwargs, Expr(:kw, :($r::Union{arb_rnd,RoundingMode}), :(RoundNearest)))
-        elseif c_types[k] == Base.MPFR.MPFRRoundingMode
-            push!(
-                kwargs,
-                Expr(
-                    :kw,
-                    :($r::Union{Base.MPFR.MPFRRoundingMode,RoundingMode}),
-                    :(RoundNearest),
-                ),
-            )
-        end
-        deleteat!(arg_names, k)
-        deleteat!(c_types, k)
-        deleteat!(jl_types, k)
-    end
+    args = [:($a::$T) for (a, T) in jl_arg_names_types]
 
-    args = [:($a::$T) for (a, T) in zip(arg_names, jl_types)]
-
-    return (args, kwargs)
+    return args, kwargs
 end
 
 function arbsignature(af::Arbfunction)
@@ -258,13 +251,11 @@ function arbsignature(af::Arbfunction)
     "$creturnT $(arbfname(af))($c_args)"
 end
 
-function jlcode(af::Arbfunction, jl_fname = jlfname(af))
+function assemble_jl_func(af::Arbfunction, jl_fname, jl_args, jl_kwargs)
     returnT = returntype(af)
     cargs = arguments(af)
-    args, kwargs = jlargs(af)
-
-    return :(
-        function $jl_fname($(args...); $(kwargs...))
+    :(
+        function $jl_fname($(jl_args...); $(jl_kwargs...))
             __ret = ccall(
                 Arblib.@libarb($(arbfname(af))),
                 $returnT,
@@ -280,6 +271,11 @@ function jlcode(af::Arbfunction, jl_fname = jlfname(af))
             )
         end
     )
+end
+
+function jlcode(af::Arbfunction, jl_fname = jlfname(af))
+    jl_args, jl_kwargs = jlargs(af; argument_detection = true)
+        assemble_jl_func(af, jl_fname, jl_args, jl_kwargs)
 end
 
 macro arbcall_str(str)

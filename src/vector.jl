@@ -111,14 +111,14 @@ for (jf, af) in [(:+, :add!), (:-, :sub!)]
     ) where {T<:Union{ArbVector,ArbRefVector,AcbVector,AcbRefVector}}
         @boundscheck (length(v) == length(w) || throw(DimensionMismatch()))
         u = T(length(v); prec = max(precision(v), precision(w)))
-        $af(u, v, w, length(v))
+        $af(u, v, w)
         u
     end
 end
 function Base.:(-)(v::T) where {T<:Vectors}
     n = length(v)
     w = T(length(v); prec = precision(v))
-    neg!(w, v, length(v))
+    neg!(w, v)
     w
 end
 

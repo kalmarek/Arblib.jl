@@ -15,7 +15,7 @@
     @test !isempty(sprint(show, V[3]))
     @test precision(V[3]) == 128
 
-    Arblib.add!(V, V, V, length(V))
+    Arblib.add!(V, V, V)
     V2 = TVec(4, prec = 128)
     V2[3] = T(3)
     @test V == V2
