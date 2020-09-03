@@ -22,9 +22,9 @@
 
         A = TMat([T(i + j) for i = 1:4, j = 1:4])
         @test A[4, 4] == T(8)
-        A = TMat([i + j for i = 1:4, j = 1:4])
+        A = TMat([i + j for i = 1:4, j = 1:4]; prec = 96)
         @test A[4, 4] == T(8)
-        @test precision(A) == precision(T(8))
+        @test precision(A) == precision(T(8; prec = 96)) == 96
 
         @test ref(A, 3, 3) isa Union{ArbRef,AcbRef}
     end

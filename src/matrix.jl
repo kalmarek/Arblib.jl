@@ -106,7 +106,7 @@ end
 
 # General constructor
 for T in [:ArbMatrix, :ArbRefMatrix, :AcbMatrix, :AcbRefMatrix]
-    @eval function $T(A::AbstractMatrix, prec::Integer = _precision(first(A)))
+    @eval function $T(A::AbstractMatrix; prec::Integer = _precision(first(A)))
         B = $T(size(A)...; prec = prec)
         # ensure to handle all kind of indices
         ax1, ax2 = axes(A)
@@ -116,7 +116,7 @@ for T in [:ArbMatrix, :ArbRefMatrix, :AcbMatrix, :AcbRefMatrix]
         return B
     end
 
-    @eval function $T(v::AbstractVector, prec::Integer = _precision(first(v)))
+    @eval function $T(v::AbstractVector; prec::Integer = _precision(first(v)))
         A = $T(length(v), 1; prec = prec)
         for (i, vᵢ) in enumerate(v)
             A[i, 1] = vᵢ

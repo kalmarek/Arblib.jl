@@ -23,8 +23,10 @@
     A = TVec([T(i + 1) for i = 2:5])
     @test A[end] == T(6)
 
-    A = TVec([i + j for i = 1:4 for j = 1:4])
+    A = TVec([i + j for i = 1:4 for j = 1:4]; prec = 96)
     @test A[16] == T(8)
+    @test precision(A) == 96
+    @test precision(A[14]) == 96
 
     @test ref(A, 16) isa Union{ArbRef,AcbRef}
 end

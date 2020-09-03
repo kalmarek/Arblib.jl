@@ -94,7 +94,7 @@ const Vectors = Union{ArbVector,ArbRefVector,AcbVector,AcbRefVector}
 
 # General constructor
 for T in [:ArbVector, :ArbRefVector, :AcbVector, :AcbRefVector]
-    @eval function $T(v::AbstractVector, prec::Integer = _precision(first(v)))
+    @eval function $T(v::AbstractVector; prec::Integer = _precision(first(v)))
         V = $T(length(v); prec = prec)
         @inbounds for (i, vᵢ) in enumerate(v)
             V[i] = vᵢ
