@@ -275,7 +275,17 @@ end
 
 function jlcode(af::Arbfunction, jl_fname = jlfname(af))
     jl_args, jl_kwargs = jlargs(af; argument_detection = true)
+    if isempty(jl_kwargs)
         assemble_jl_func(af, jl_fname, jl_args, jl_kwargs)
+    else
+        jl_args2, jl_kwargs2 = jlargs(af; argument_detection = false)
+        esc(quote
+            begin
+                $(assemble_jl_func(af, jl_fname, jl_args, jl_kwargs))
+                $(assemble_jl_func(af, jl_fname, jl_args2, jl_kwargs2))
+            end
+        end)
+    end
 end
 
 macro arbcall_str(str)
