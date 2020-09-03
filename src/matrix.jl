@@ -125,8 +125,6 @@ for T in [:ArbMatrix, :ArbRefMatrix, :AcbMatrix, :AcbRefMatrix]
     end
 end
 
-## Common methods
-
 const Matrices = Union{ArbMatrix,ArbRefMatrix,AcbMatrix,AcbRefMatrix}
 
 Base.copy(A::T) where {T<:Matrices} = copy!(T(size(A)...; prec = precision(A)), A)
@@ -154,11 +152,7 @@ for (jf, af) in [(:+, :add!), (:-, :sub!)]
     end
 end
 
-function Base.:(-)(A::T) where {T<:Matrices}
-    C = T(size(A)...; prec = precision(A))
-    neg!(C, A)
-    C
-end
+Base.:(-)(A::Matrices) = neg!(similar(A), A)
 
 function LinearAlgebra.mul!(C::T, A::T, B::T) where {T<:Matrices}
     @boundscheck (
@@ -180,8 +174,8 @@ function LinearAlgebra.lu!(A::T) where {T<:Matrices}
     retcode = lu!(ipiv, A, A)
     LinearAlgebra.LU(A, ipiv, retcode > 0 ? 0 : 1)
 end
-function LinearAlgebra.lu(A::T) where {T<:Matrices}
-    lu = T(size(A)...; prec = precision(A))
+function LinearAlgebra.lu(A::Matrices)
+    lu = similar(A)
     ipiv = zeros(Int, size(A, 2))
     retcode = lu!(ipiv, lu, A)
     LinearAlgebra.LU(lu, ipiv, retcode > 0 ? 0 : 1)
@@ -225,8 +219,4 @@ function Base.:(\)(A::LinearAlgebra.LU{<:Any,T}, B::T) where {T<:Matrices}
 end
 
 # inverse
-function LinearAlgebra.inv(A::T) where {T<:Matrices}
-    B = T(size(A)...; prec = precision(A))
-    Arblib.inv!(B, A)
-    B
-end
+LinearAlgebra.inv(A::Matrices) = (B = similar(A); inv!(B, A); B)

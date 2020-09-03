@@ -41,6 +41,7 @@ include("arithmetic.jl")
 
 include("vector.jl")
 include("matrix.jl")
+include("array_common.jl")
 
 include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")
