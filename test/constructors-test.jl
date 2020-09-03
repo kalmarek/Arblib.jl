@@ -11,6 +11,9 @@
         @test typeof(Mag(π)) == Mag
         @test typeof(Mag(Mag().mag)) == Mag
         @test typeof(Mag(Mag().mag)) == Mag
+        @test Float64(Mag(2.0)) isa Float64
+        # Mag doesn't guarantee exact conversions, just upper bounds
+        @test Float64(Mag(2.0)) ≥ 2.0
     end
 
     @testset "Arf" begin
@@ -31,6 +34,18 @@
         @test precision(Arf(Arf(prec = 64))) == 64
         @test precision(zero(Arf(prec = 64))) == 64
         @test precision(one(Arf(prec = 64))) == 64
+
+        @test Float64(Arf(2.0)) isa Float64
+        @test Float64(Arf(2.0)) == 2.0
+        @test convert(Float64, Arf(2.0)) isa Float64
+        @test convert(Float64, Arf(2.0)) == 2.0
+        @test Int(Arf(2.0)) isa Int
+        @test Int(Arf(2.0)) == 2
+        @test convert(Int, Arf(2.0)) isa Int
+        @test convert(Int, Arf(2.0)) == 2
+        @test Int(Arf(2.0)) == 2
+        @test Int(Arf(0.5)) == 0
+        @test Int(Arf(0.5); rnd = Arblib.ArbRoundFromZero) == 1
     end
 
     @testset "Arb" begin
