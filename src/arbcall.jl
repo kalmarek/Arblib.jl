@@ -99,12 +99,15 @@ jltype(ca::Carg{Base.MPFR.MPFRRoundingMode}) =
 jltype(ca::Carg{Cstring}) = AbstractString
 jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
 jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
-jltype(ca::Carg{ArbVector}) = Union{ArbVector,cstructtype(ArbVector)}
-jltype(ca::Carg{AcbVector}) = Union{AcbVector,cstructtype(AcbVector)}
+jltype(ca::Carg{ArbVector}) = Union{ArbVector,ArbRefVector,cstructtype(ArbVector)}
+jltype(ca::Carg{AcbVector}) = Union{AcbVector,AcbRefVector,cstructtype(AcbVector)}
+jltype(::Carg{ArbMatrix}) =
+    Union{ArbMatrix,ArbRefMatrix,cstructtype(ArbMatrix),Ptr{cstructtype(ArbMatrix)}}
+jltype(::Carg{AcbMatrix}) =
+    Union{AcbMatrix,AcbRefMatrix,cstructtype(AcbMatrix),Ptr{cstructtype(AcbMatrix)}}
 jltype(::Carg{Acb}) = Union{Acb,cstructtype(Acb),Ptr{cstructtype(Acb)},AcbRef}
 jltype(::Carg{Arb}) = Union{Arb,cstructtype(Arb),Ptr{cstructtype(Arb)},ArbRef}
-jltype(::Carg{T}) where {T<:Union{Mag,Arf,ArbMatrix,AcbMatrix}} =
-    Union{T,cstructtype(T),Ptr{cstructtype(T)}}
+jltype(::Carg{T}) where {T<:Union{Mag,Arf}} = Union{T,cstructtype(T),Ptr{cstructtype(T)}}
 
 ctype(ca::Carg) = rawtype(ca)
 ctype(::Carg{T}) where {T<:Union{ArbVector,arb_vec_struct}} = Ptr{arb_struct}

@@ -3,7 +3,20 @@ module Arblib
 using Arb_jll
 import LinearAlgebra
 
-export Arf, Arb, ArbRef, Acb, AcbRef, ArbVector, AcbVector, ArbMatrix, AcbMatrix
+export Arf,
+    Arb,
+    ArbRef,
+    Acb,
+    AcbRef,
+    ArbVector,
+    AcbVector,
+    ArbMatrix,
+    AcbMatrix,
+    ArbRefVector,
+    AcbRefVector,
+    ArbRefMatrix,
+    AcbRefMatrix,
+    ref
 
 macro libarb(function_name)
     return (:($function_name), libarb)

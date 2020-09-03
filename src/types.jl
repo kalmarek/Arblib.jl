@@ -115,55 +115,107 @@ function Acb(x::AcbRef; prec::Integer = precision(x))
 end
 Base.getindex(x::AcbRef) = Acb(x)
 
-struct ArbVector <: DenseVector{ArbRef}
+struct ArbVector <: DenseVector{Arb}
     arb_vec::arb_vec_struct
     prec::Int
 end
 ArbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     ArbVector(arb_vec_struct(n), prec)
 
-struct AcbVector <: DenseVector{AcbRef}
+struct AcbVector <: DenseVector{Acb}
     acb_vec::acb_vec_struct
     prec::Int
 end
 AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     AcbVector(acb_vec_struct(n), prec)
 
-struct ArbMatrix <: DenseMatrix{ArbRef}
+struct ArbMatrix <: DenseMatrix{Arb}
     arb_mat::arb_mat_struct
     prec::Int
 end
 ArbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     ArbMatrix(arb_mat_struct(r, c), prec)
 
-struct AcbMatrix <: DenseMatrix{AcbRef}
+struct AcbMatrix <: DenseMatrix{Acb}
     acb_mat::acb_mat_struct
     prec::Int
 end
 AcbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     AcbMatrix(acb_mat_struct(r, c), prec)
 
+struct ArbRefVector <: DenseVector{ArbRef}
+    arb_vec::arb_vec_struct
+    prec::Int
+end
+ArbRefVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+    ArbRefVector(arb_vec_struct(n), prec)
+
+struct AcbRefVector <: DenseVector{AcbRef}
+    acb_vec::acb_vec_struct
+    prec::Int
+end
+AcbRefVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+    AcbRefVector(acb_vec_struct(n), prec)
+
+struct ArbRefMatrix <: DenseMatrix{ArbRef}
+    arb_mat::arb_mat_struct
+    prec::Int
+end
+ArbRefMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+    ArbRefMatrix(arb_mat_struct(r, c), prec)
+
+struct AcbRefMatrix <: DenseMatrix{AcbRef}
+    acb_mat::acb_mat_struct
+    prec::Int
+end
+AcbRefMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+    AcbRefMatrix(acb_mat_struct(r, c), prec)
+
+# conversion between ref and non-ref arrays.
+for T in [:Arb, :Acb], A in [:Vector, :Matrix]
+    TA = Symbol(T, A)
+    TRefA = Symbol(T, :Ref, A)
+    @eval begin
+        $TRefA(M::$TA) = $TRefA(cstruct(M), precision(M))
+        $TA(M::$TRefA) = $TA(cstruct(M), precision(M))
+    end
+end
+
 const ArbLike = Union{Arb,ArbRef,Ptr{arb_struct},arb_struct}
 const AcbLike = Union{Acb,AcbRef,Ptr{acb_struct},acb_struct}
-const ArbTypes = Union{Arf,Arb,ArbRef,Acb,AcbRef,ArbVector,AcbVector,ArbMatrix,AcbMatrix}
+const ArbTypes = Union{
+    Arf,
+    Arb,
+    ArbRef,
+    Acb,
+    AcbRef,
+    ArbVector,
+    AcbVector,
+    ArbMatrix,
+    AcbMatrix,
+    ArbRefVector,
+    AcbRefVector,
+    ArbRefMatrix,
+    AcbRefMatrix,
+}
 
 for (T, prefix) in (
     (Mag, :mag),
     (Arf, :arf),
     (Arb, :arb),
     (Acb, :acb),
-    (ArbVector, :arb_vec),
-    (AcbVector, :acb_vec),
-    (ArbMatrix, :arb_mat),
-    (AcbMatrix, :acb_mat),
+    (Union{ArbVector,ArbRefVector}, :arb_vec),
+    (Union{AcbVector,AcbRefVector}, :acb_vec),
+    (Union{ArbMatrix,ArbRefMatrix}, :arb_mat),
+    (Union{AcbMatrix,AcbRefMatrix}, :acb_mat),
 )
     arbstruct = Symbol(prefix, :_struct)
     spref = "$prefix"
     @eval begin
-        cstructtype(::Type{$T}) = $arbstruct
+        cstructtype(::Type{<:$T}) = $arbstruct
     end
     @eval begin
-        cprefix(::Type{$T}) = $(QuoteNode(Symbol(prefix)))
+        cprefix(::Type{<:$T}) = $(QuoteNode(Symbol(prefix)))
         cstruct(x::$T) = getfield(x, cprefix($T))
         cstruct(x::$arbstruct) = x
         Base.convert(::Type{$(cstructtype(T))}, x::$T) = cstruct(x)
@@ -183,10 +235,9 @@ cstruct(x::AcbRef) = x.acb_ptr
 Base.convert(::Type{Ptr{acb_struct}}, x::AcbRef) = cstruct(x)
 Base.cconvert(::Type{Ref{acb_struct}}, x::AcbRef) = cstruct(x)
 
-function Base.setindex!(x::Union{Mag,Arf,Arb,ArbRef,Acb,AcbRef}, z::Number)
-    set!(x, z)
-    x
-end
+Base.setindex!(x::Union{Mag,Arf,Arb,ArbRef,Acb,AcbRef}, z::Number) = set!(x, z)
+Base.setindex!(x::Union{Arb,ArbRef}, z::Ptr{arb_struct}) = set!(x, z)
+Base.setindex!(x::Union{Acb,AcbRef}, z::Ptr{acb_struct}) = set!(x, z)
 
 Base.Float64(x::Mag) = get(x)
 function Base.Float64(
