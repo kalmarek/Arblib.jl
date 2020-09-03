@@ -14,8 +14,8 @@ macro libflint(function_name)
 end
 
 include("arb_types.jl")
-include("types.jl")
 include("rounding.jl")
+include("types.jl")
 include("arbcall.jl")
 
 include("precision.jl")

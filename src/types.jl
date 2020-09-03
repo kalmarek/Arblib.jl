@@ -187,3 +187,17 @@ function Base.setindex!(x::Union{Mag,Arf,Arb,ArbRef,Acb,AcbRef}, z::Number)
     set!(x, z)
     x
 end
+
+Base.Float64(x::Mag) = get(x)
+function Base.Float64(
+    x::Union{Arf,Ptr{arf_struct}};
+    rnd::Union{arb_rnd,RoundingMode} = RoundNearest,
+)
+    ccall(@libarb(arf_get_d), Cdouble, (Ref{arf_struct}, arb_rnd), x, rnd)
+end
+function Base.Int(
+    x::Union{Arf,Ptr{arf_struct}};
+    rnd::Union{arb_rnd,RoundingMode} = RoundNearest,
+)
+    ccall(@libarb(arf_get_si), Clong, (Ref{arf_struct}, arb_rnd), x, rnd)
+end
