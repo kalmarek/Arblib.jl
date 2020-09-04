@@ -15,7 +15,7 @@
     @test !isempty(sprint(show, V[3]))
     @test precision(V[3]) == 128
 
-    Arblib.add!(V, V, V, length(V))
+    Arblib.add!(V, V, V)
     V2 = TVec(4, prec = 128)
     V2[3] = T(3)
     @test V == V2
@@ -42,6 +42,14 @@
     @test -B isa TVec
     @test -B + A == A - B
     @test precision(-B + A) == 96
+
+    C = TVec(length(A); prec = 96)
+    Arblib.add!(C, A, B)
+    @test C == AInt + BInt
+    # test original signature
+    D = TVec(length(A); prec = 96)
+    Arblib.add!(D, A, B, length(AInt), 96)
+    @test D == AInt + BInt
 end
 
 @testset "VectorRef: $T" for (T, TRef) in
