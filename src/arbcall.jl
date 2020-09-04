@@ -194,7 +194,7 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
             # Automatic detection of rounding mode argument
         elseif carg == Carg{arb_rnd}(:rnd, false)
             @assert !rnd_kwarg
-            rnd_kwarg == true
+            rnd_kwarg = true
 
             push!(
                 kwargs,
@@ -202,7 +202,7 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
             )
         elseif carg == Carg{Base.MPFR.MPFRRoundingMode}(:rnd, false)
             @assert !rnd_kwarg
-            rnd_kwarg == true
+            rnd_kwarg = true
             push!(
                 kwargs,
                 Expr(
