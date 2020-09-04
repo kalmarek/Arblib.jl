@@ -8,62 +8,14 @@
     @testset "Carg" begin
         # Supported types
         for (str, name, isconst, jltype, ctype) in (
-            (
-                "mag_t res",
-                :res,
-                false,
-                Arblib.MagLike,
-                Ref{mag_struct},
-            ),
-            (
-                "arf_t res",
-                :res,
-                false,
-                Arblib.ArfLike,
-                Ref{arf_struct},
-            ),
-            (
-                "arb_t res",
-                :res,
-                false,
-                Arblib.ArbLike,
-                Ref{arb_struct},
-            ),
-            (
-                "acb_t res",
-                :res,
-                false,
-                Arblib.AcbLike,
-                Ref{acb_struct},
-            ),
-            (
-                "const mag_t x",
-                :x,
-                true,
-                Arblib.MagLike,
-                Ref{mag_struct},
-            ),
-            (
-                "const arf_t x",
-                :x,
-                true,
-                Arblib.ArfLike,
-                Ref{arf_struct},
-            ),
-            (
-                "const arb_t x",
-                :x,
-                true,
-                Arblib.ArbLike,
-                Ref{arb_struct},
-            ),
-            (
-                "const acb_t x",
-                :x,
-                true,
-                Arblib.AcbLike,
-                Ref{acb_struct},
-            ),
+            ("mag_t res", :res, false, Arblib.MagLike, Ref{mag_struct}),
+            ("arf_t res", :res, false, Arblib.ArfLike, Ref{arf_struct}),
+            ("arb_t res", :res, false, Arblib.ArbLike, Ref{arb_struct}),
+            ("acb_t res", :res, false, Arblib.AcbLike, Ref{acb_struct}),
+            ("const mag_t x", :x, true, Arblib.MagLike, Ref{mag_struct}),
+            ("const arf_t x", :x, true, Arblib.ArfLike, Ref{arf_struct}),
+            ("const arb_t x", :x, true, Arblib.ArbLike, Ref{arb_struct}),
+            ("const acb_t x", :x, true, Arblib.AcbLike, Ref{acb_struct}),
             (
                 "arf_rnd_t rnd",
                 :rnd,
@@ -87,34 +39,10 @@
             ("slong * x", :x, false, Vector{<:Integer}, Ref{Clong}),
             ("ulong * x", :x, false, Vector{<:Unsigned}, Ref{Culong}),
             ("const char * inp", :inp, true, AbstractString, Cstring),
-            (
-                "arb_ptr v",
-                :v,
-                false,
-                Arblib.ArbVectorLike,
-                Ptr{arb_struct},
-            ),
-            (
-                "arb_srcptr res",
-                :res,
-                true,
-                Arblib.ArbVectorLike,
-                Ptr{arb_struct},
-            ),
-            (
-                "acb_ptr v",
-                :v,
-                false,
-                Arblib.AcbVectorLike,
-                Ptr{acb_struct},
-            ),
-            (
-                "acb_srcptr res",
-                :res,
-                true,
-                Arblib.AcbVectorLike,
-                Ptr{acb_struct},
-            ),
+            ("arb_ptr v", :v, false, Arblib.ArbVectorLike, Ptr{arb_struct}),
+            ("arb_srcptr res", :res, true, Arblib.ArbVectorLike, Ptr{arb_struct}),
+            ("acb_ptr v", :v, false, Arblib.AcbVectorLike, Ptr{acb_struct}),
+            ("acb_srcptr res", :res, true, Arblib.AcbVectorLike, Ptr{acb_struct}),
         )
             arg = Arblib.Carg(str)
             @test Arblib.name(arg) == name
@@ -232,18 +160,10 @@
 
     @testset "jlargs" begin
         for (str, args, kwargs) in (
-            (
-                "void arb_init(arb_t x)",
-                [:(x::$(Arblib.ArbLike))],
-                Expr[],
-            ),
+            ("void arb_init(arb_t x)", [:(x::$(Arblib.ArbLike))], Expr[]),
             (
                 "void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)",
-                [
-                    :(z::$(Arblib.ArbLike)),
-                    :(x::$(Arblib.ArbLike)),
-                    :(y::$(Arblib.ArbLike)),
-                ],
+                [:(z::$(Arblib.ArbLike)), :(x::$(Arblib.ArbLike)), :(y::$(Arblib.ArbLike))],
                 [Expr(:kw, :(prec::Integer), :(_precision(z)))],
             ),
             (
@@ -255,7 +175,11 @@
                 ],
                 [
                     Expr(:kw, :(prec::Integer), :(_precision(res))),
-                    Expr(:kw, :(rnd::Union{$(Arblib.arb_rnd),RoundingMode}), :(RoundNearest)),
+                    Expr(
+                        :kw,
+                        :(rnd::Union{$(Arblib.arb_rnd),RoundingMode}),
+                        :(RoundNearest),
+                    ),
                 ],
             ),
         )
