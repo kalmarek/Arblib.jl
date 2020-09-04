@@ -253,44 +253,36 @@ function arbsignature(af::Arbfunction)
     "$creturnT $(arbfname(af))($c_args)"
 end
 
-function assemble_jl_func(af::Arbfunction, jl_fname, jl_args, jl_kwargs)
+function jlcode(af::Arbfunction, jl_fname = jlfname(af))
+    jl_args, jl_kwargs = jlargs(af; argument_detection = true)
+    jl_full_args, _ = jlargs(af; argument_detection = false)
+
     returnT = returntype(af)
     cargs = arguments(af)
-    :(
-        function $jl_fname($(jl_args...); $(jl_kwargs...))
+
+    func_full_args = :(
+        function $jl_fname($(jl_full_args...))
             __ret = ccall(
                 Arblib.@libarb($(arbfname(af))),
                 $returnT,
                 $(Expr(:tuple, ctype.(cargs)...)),
                 $(name.(cargs)...),
             )
-            $(
-                if returnT === Nothing && inplace(af)
-                    name(first(arguments(af)))
-                else
-                    :__ret
-                end
-            )
+            $(returnT == Nothing && inplace(af) ? name(first(arguments(af))) : :__ret)
         end
     )
-end
 
-function jlcode(af::Arbfunction, jl_fname = jlfname(af))
-    jl_args, jl_kwargs = jlargs(af; argument_detection = true)
     if isempty(jl_kwargs)
-        assemble_jl_func(af, jl_fname, jl_args, jl_kwargs)
+        func_full_args
     else
-        jl_args2, jl_kwargs2 = jlargs(af; argument_detection = false)
-        esc(quote
-            begin
-                $(assemble_jl_func(af, jl_fname, jl_args, jl_kwargs))
-                $(assemble_jl_func(af, jl_fname, jl_args2, jl_kwargs2))
-            end
-        end)
+        quote
+            $func_full_args
+            $jl_fname($(jl_args...); $(jl_kwargs...)) = $jl_fname($(name.(cargs)...))
+        end
     end
 end
 
 macro arbcall_str(str)
     af = Arbfunction(str)
-    return jlcode(af)
+    return esc(jlcode(af))
 end
