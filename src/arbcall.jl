@@ -70,9 +70,14 @@ const arbargtypes = ArbArgTypes(
 )
 
 struct Carg{ArgT}
-    name::String
+    name::Symbol
     isconst::Bool
 end
+
+Carg{T}(n::AbstractString, isconst::Bool) where {T} = Carg{T}(Symbol(n), isconst)
+
+Base.:(==)(a::Carg{T}, b::Carg{S}) where {T,S} =
+    T == S && name(a) == name(b) && isconst(a) == isconst(b)
 
 function Carg(str)
     m = match(r"(?<const>const)?\s*(?<type>\w+(\s\*)?)\s+(?<name>\w+)", str)
@@ -173,53 +178,50 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
     rnd_kwarg = false
     len_keywords = Set{Symbol}()
     for (i, carg) in enumerate(cargs)
-        arg_name = Symbol(name(carg))
-
         if !argument_detection
-            push!(jl_arg_names_types, (arg_name, jltype(carg)))
+            push!(jl_arg_names_types, (name(carg), jltype(carg)))
             continue
         end
 
         # Automatic detection of precision argument
-        if !prec_kwarg && arg_name == :prec && ctype(carg) == Clong
-            c₁ = first(cargs)
-            push!(kwargs, Expr(:kw, :(prec::Integer), :(_precision($(Symbol(name(c₁)))))))
+        if carg == Carg{Clong}(:prec, false)
+            @assert !prec_kwarg
             prec_kwarg = true
 
+            c₁ = first(cargs)
+            push!(kwargs, Expr(:kw, :(prec::Integer), :(_precision($(name(c₁))))))
+
             # Automatic detection of rounding mode argument
-        elseif !rnd_kwarg &&
-               arg_name == :rnd &&
-               ctype(carg) ∈ (arb_rnd, Base.MPFR.MPFRRoundingMode)
+        elseif carg == Carg{arb_rnd}(:rnd, false)
+            @assert !rnd_kwarg
+            rnd_kwarg == true
 
-            if ctype(carg) == arb_rnd
-                push!(
-                    kwargs,
-                    Expr(:kw, :(rnd::Union{$(arb_rnd),RoundingMode}), :(RoundNearest)),
-                )
-            else # ctype(carg) == Base.MPFR.MPFRRoundingMode
-                push!(
-                    kwargs,
-                    Expr(
-                        :kw,
-                        :(rnd::Union{Base.MPFR.MPFRRoundingMode,RoundingMode}),
-                        :(RoundNearest),
-                    ),
-                )
-            end
-            rnd_kwarg = true
-
+            push!(
+                kwargs,
+                Expr(:kw, :(rnd::Union{$(arb_rnd),RoundingMode}), :(RoundNearest)),
+            )
+        elseif carg == Carg{Base.MPFR.MPFRRoundingMode}(:rnd, false)
+            @assert !rnd_kwarg
+            rnd_kwarg == true
+            push!(
+                kwargs,
+                Expr(
+                    :kw,
+                    :(rnd::Union{Base.MPFR.MPFRRoundingMode,RoundingMode}),
+                    :(RoundNearest),
+                ),
+            )
             # Automatic detection of length arguments for vectors
-        elseif (startswith(string(arg_name), "len") || arg_name == :n) &&
-               ctype(carg) == Clong &&
+        elseif (startswith(string(name(carg)), "len") || carg == Carg{Clong}(:n, false)) &&
                rawtype(cargs[i-1]) ∈ (ArbVector, AcbVector) &&
-               arg_name ∉ len_keywords
+               name(carg) ∉ len_keywords
 
-            vec_name = Symbol(name(cargs[i-1]))
-            push!(kwargs, Expr(:kw, :($arg_name::Integer), :(length($vec_name))))
-            push!(len_keywords, arg_name)
+            vec_name = name(cargs[i-1])
+            push!(kwargs, Expr(:kw, :($(name(carg))::Integer), :(length($vec_name))))
+            push!(len_keywords, name(carg))
 
         else
-            push!(jl_arg_names_types, (arg_name, jltype(carg)))
+            push!(jl_arg_names_types, (name(carg), jltype(carg)))
         end
     end
 
@@ -260,11 +262,11 @@ function assemble_jl_func(af::Arbfunction, jl_fname, jl_args, jl_kwargs)
                 Arblib.@libarb($(arbfname(af))),
                 $returnT,
                 $(Expr(:tuple, ctype.(cargs)...)),
-                $(Symbol.(name.(cargs))...),
+                $(name.(cargs)...),
             )
             $(
-                if returnT == Nothing && inplace(af)
-                    Symbol(name(first(arguments(af))))
+                if returnT === Nothing && inplace(af)
+                    name(first(arguments(af)))
                 else
                     :__ret
                 end
