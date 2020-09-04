@@ -158,6 +158,31 @@
         end
     end
 
+    @testset "Length argument detection" begin
+        len_keywords = Set{Symbol}()
+        prev_carg = Arblib.Carg("acb_srcptr A")
+        prev_carg_bad = Arblib.Carg("acb_t x")
+        carg1 = Arblib.Carg("slong lenA")
+        carg2 = Arblib.Carg("slong len")
+        carg3 = Arblib.Carg("slong n")
+        carg4 = Arblib.Carg("slong m")
+
+        @test Arblib.is_length_argument(carg1, prev_carg, len_keywords)
+        @test Arblib.is_length_argument(carg2, prev_carg, len_keywords)
+        @test Arblib.is_length_argument(carg3, prev_carg, len_keywords)
+        @test !Arblib.is_length_argument(carg4, prev_carg, len_keywords)
+        @test !Arblib.is_length_argument(carg1, prev_carg_bad, len_keywords)
+        @test !Arblib.is_length_argument(carg2, prev_carg_bad, len_keywords)
+        @test !Arblib.is_length_argument(carg3, prev_carg_bad, len_keywords)
+        @test !Arblib.is_length_argument(carg4, prev_carg_bad, len_keywords)
+
+        kwargs = []
+        Arblib.extract_length_argument!(kwargs, len_keywords, carg1, prev_carg)
+        @test kwargs[1] == :($(Expr(:kw, :(lenA::Integer), :(length(A)))))
+        @test :lenA ∈ len_keywords
+        @test !Arblib.is_length_argument(carg1, prev_carg, len_keywords)
+    end
+
     @testset "jlargs" begin
         for (str, args, kwargs) in (
             ("void arb_init(arb_t x)", [:(x::$(Arblib.ArbLike))], Expr[]),

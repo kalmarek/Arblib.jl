@@ -168,6 +168,17 @@ function jlfname(
     return jlfname(arbfname(af), prefixes, suffixes, inplace = inplace)
 end
 
+function is_length_argument(carg, prev_carg, len_keywords)
+    (startswith(string(name(carg)), "len") || carg == Carg{Clong}(:n, false)) &&
+        rawtype(prev_carg) ∈ (ArbVector, AcbVector) &&
+        name(carg) ∉ len_keywords
+end
+function extract_length_argument!(kwargs, len_keywords, carg, prev_carg)
+    vec_name = name(prev_carg)
+    push!(kwargs, Expr(:kw, :($(name(carg))::Integer), :(length($vec_name))))
+    push!(len_keywords, name(carg))
+end
+
 function jlargs(af::Arbfunction; argument_detection::Bool = true)
     cargs = arguments(af)
 
@@ -212,14 +223,8 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
                 ),
             )
             # Automatic detection of length arguments for vectors
-        elseif (startswith(string(name(carg)), "len") || carg == Carg{Clong}(:n, false)) &&
-               rawtype(cargs[i-1]) ∈ (ArbVector, AcbVector) &&
-               name(carg) ∉ len_keywords
-
-            vec_name = name(cargs[i-1])
-            push!(kwargs, Expr(:kw, :($(name(carg))::Integer), :(length($vec_name))))
-            push!(len_keywords, name(carg))
-
+        elseif i > 2 && is_length_argument(carg, cargs[i-1], len_keywords)
+            extract_length_argument!(kwargs, len_keywords, carg, cargs[i-1])
         else
             push!(jl_arg_names_types, (name(carg), jltype(carg)))
         end
