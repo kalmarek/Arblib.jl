@@ -235,12 +235,12 @@ const ArbTypes = Union{
     Acb,
     AcbRef,
     ArbVector,
-    AcbVector,
-    ArbMatrix,
-    AcbMatrix,
     ArbRefVector,
+    AcbVector,
     AcbRefVector,
+    ArbMatrix,
     ArbRefMatrix,
+    AcbMatrix,
     AcbRefMatrix,
 }
 
