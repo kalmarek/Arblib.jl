@@ -1,6 +1,4 @@
 @testset "constructors" begin
-    Mag = Arblib.Mag
-
     @testset "Mag" begin
         @test typeof(Mag(UInt64(1))) == Mag
         @test typeof(Mag(1.0)) == Mag
@@ -105,5 +103,18 @@
         x = Acb()
         x[] = (1.0 + 2.0im)
         @test x == Acb(1, 2)
+    end
+
+    @testset "MagRef/ArfRef" begin
+        x = Arb(2.0)
+        m = Arblib.radref(x)
+        @test m isa MagRef
+        @test m[] isa Mag
+        @test m == m[]
+
+        d = Arblib.midref(x)
+        @test d isa ArfRef
+        @test d[] isa Arf
+        @test d == d[]
     end
 end

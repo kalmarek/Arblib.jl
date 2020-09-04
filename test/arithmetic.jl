@@ -30,12 +30,39 @@
         x, y = Arb(rand()), Arb(rand())
         z = Acb(x, y)
 
-        Arblib.realref(z) isa ArbRef
-        Arblib.realref(z) == x
-        real(z) == x
-        Arblib.imagref(z) isa ArbRef
-        Arblib.imagref(z) == y
-        imag(z) == y
+        @test Arblib.realref(z) isa ArbRef
+        @test Arblib.realref(z) == x
+        @test real(z) == x
+        @test Arblib.imagref(z) isa ArbRef
+        @test Arblib.imagref(z) == y
+        @test imag(z) == y
+    end
 
+    @testset "midref" begin
+        x = Arb(0.25)
+        @test Arblib.midref(x) isa ArfRef
+        @test startswith(sprint(show, x), "0.250")
+        @test Float64(Arblib.midref(x)) isa Float64
+        @test Float64(Arblib.midref(x)) == 0.25
+        @test Float64(x) == 0.25
+        @test sprint(show, x) == sprint(show, x[])
+    end
+
+    @testset "radref" begin
+        x = Arb(0.25)
+        m = Arblib.radref(x)
+        @test m isa MagRef
+        m[] = 1.0
+        @test Float64(m) ≥ 1.0
+        @test sprint(show, m) == sprint(show, m[])
+    end
+
+    @testset "convert to Float64/ComplexF64" begin
+        x = Arb(0.25)
+        @test Float64(x) isa Float64
+        @test Float64(x) == 0.25
+        z = Acb(2.0 + 0.125im)
+        @test ComplexF64(z) isa ComplexF64
+        @test ComplexF64(z) == 2.0 + 0.125im
     end
 end

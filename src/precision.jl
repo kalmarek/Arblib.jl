@@ -33,7 +33,10 @@ function Base.setprecision(::Type{<:ArbTypes}, precision::Integer)
     return precision
 end
 
-function Base.setprecision(x::T, precision::Integer) where {T<:Union{Arf,Arb,Acb}}
+function Base.setprecision(
+    x::T,
+    precision::Integer,
+) where {T<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}}
     return T(x, prec = precision)
 end
 Base.setprecision(v::ArbVector, precision::Integer) = ArbVector(v.arb_vec, precision)
