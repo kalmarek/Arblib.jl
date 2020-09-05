@@ -8,113 +8,41 @@
     @testset "Carg" begin
         # Supported types
         for (str, name, isconst, jltype, ctype) in (
-            (
-                "mag_t res",
-                "res",
-                false,
-                Union{Mag,mag_struct,Ptr{mag_struct}},
-                Ref{mag_struct},
-            ),
-            (
-                "arf_t res",
-                "res",
-                false,
-                Union{Arf,arf_struct,Ptr{arf_struct}},
-                Ref{arf_struct},
-            ),
-            (
-                "arb_t res",
-                "res",
-                false,
-                Union{Arb,ArbRef,arb_struct,Ptr{arb_struct}},
-                Ref{arb_struct},
-            ),
-            (
-                "acb_t res",
-                "res",
-                false,
-                Union{Acb,AcbRef,acb_struct,Ptr{acb_struct}},
-                Ref{acb_struct},
-            ),
-            (
-                "const mag_t x",
-                "x",
-                true,
-                Union{Mag,mag_struct,Ptr{mag_struct}},
-                Ref{mag_struct},
-            ),
-            (
-                "const arf_t x",
-                "x",
-                true,
-                Union{Arf,arf_struct,Ptr{arf_struct}},
-                Ref{arf_struct},
-            ),
-            (
-                "const arb_t x",
-                "x",
-                true,
-                Union{Arb,ArbRef,arb_struct,Ptr{arb_struct}},
-                Ref{arb_struct},
-            ),
-            (
-                "const acb_t x",
-                "x",
-                true,
-                Union{Acb,AcbRef,acb_struct,Ptr{acb_struct}},
-                Ref{acb_struct},
-            ),
+            ("mag_t res", :res, false, Arblib.MagLike, Ref{mag_struct}),
+            ("arf_t res", :res, false, Arblib.ArfLike, Ref{arf_struct}),
+            ("arb_t res", :res, false, Arblib.ArbLike, Ref{arb_struct}),
+            ("acb_t res", :res, false, Arblib.AcbLike, Ref{acb_struct}),
+            ("const mag_t x", :x, true, Arblib.MagLike, Ref{mag_struct}),
+            ("const arf_t x", :x, true, Arblib.ArfLike, Ref{arf_struct}),
+            ("const arb_t x", :x, true, Arblib.ArbLike, Ref{arb_struct}),
+            ("const acb_t x", :x, true, Arblib.AcbLike, Ref{acb_struct}),
             (
                 "arf_rnd_t rnd",
-                "rnd",
+                :rnd,
                 false,
                 Union{Arblib.arb_rnd,RoundingMode},
                 Arblib.arb_rnd,
             ),
-            ("mpfr_t x", "x", false, BigFloat, Ref{BigFloat}),
+            ("mpfr_t x", :x, false, BigFloat, Ref{BigFloat}),
             (
                 "mpfr_rnd_t rnd",
-                "rnd",
+                :rnd,
                 false,
                 Union{Base.MPFR.MPFRRoundingMode,RoundingMode},
                 Base.MPFR.MPFRRoundingMode,
             ),
-            ("mpz_t x", "x", false, BigInt, Ref{BigInt}),
-            ("int flags", "flags", false, Integer, Cint),
-            ("slong x", "x", false, Integer, Clong),
-            ("ulong x", "x", false, Unsigned, Culong),
-            ("double x", "x", false, Base.GMP.CdoubleMax, Cdouble),
-            ("slong * x", "x", false, Vector{<:Integer}, Ref{Clong}),
-            ("ulong * x", "x", false, Vector{<:Unsigned}, Ref{Culong}),
-            ("const char * inp", "inp", true, AbstractString, Cstring),
-            (
-                "arb_ptr v",
-                "v",
-                false,
-                Union{ArbVector,Arblib.arb_vec_struct},
-                Ptr{arb_struct},
-            ),
-            (
-                "arb_srcptr res",
-                "res",
-                true,
-                Union{ArbVector,Arblib.arb_vec_struct},
-                Ptr{arb_struct},
-            ),
-            (
-                "acb_ptr v",
-                "v",
-                false,
-                Union{AcbVector,Arblib.acb_vec_struct},
-                Ptr{acb_struct},
-            ),
-            (
-                "acb_srcptr res",
-                "res",
-                true,
-                Union{AcbVector,Arblib.acb_vec_struct},
-                Ptr{acb_struct},
-            ),
+            ("mpz_t x", :x, false, BigInt, Ref{BigInt}),
+            ("int flags", :flags, false, Integer, Cint),
+            ("slong x", :x, false, Integer, Clong),
+            ("ulong x", :x, false, Unsigned, Culong),
+            ("double x", :x, false, Base.GMP.CdoubleMax, Cdouble),
+            ("slong * x", :x, false, Vector{<:Integer}, Ref{Clong}),
+            ("ulong * x", :x, false, Vector{<:Unsigned}, Ref{Culong}),
+            ("const char * inp", :inp, true, AbstractString, Cstring),
+            ("arb_ptr v", :v, false, Arblib.ArbVectorLike, Ptr{arb_struct}),
+            ("arb_srcptr res", :res, true, Arblib.ArbVectorLike, Ptr{arb_struct}),
+            ("acb_ptr v", :v, false, Arblib.AcbVectorLike, Ptr{acb_struct}),
+            ("acb_srcptr res", :res, true, Arblib.AcbVectorLike, Ptr{acb_struct}),
         )
             arg = Arblib.Carg(str)
             @test Arblib.name(arg) == name
@@ -230,32 +158,53 @@
         end
     end
 
+    @testset "Length argument detection" begin
+        len_keywords = Set{Symbol}()
+        prev_carg = Arblib.Carg("acb_srcptr A")
+        prev_carg_bad = Arblib.Carg("acb_t x")
+        carg1 = Arblib.Carg("slong lenA")
+        carg2 = Arblib.Carg("slong len")
+        carg3 = Arblib.Carg("slong n")
+        carg4 = Arblib.Carg("slong m")
+
+        @test Arblib.is_length_argument(carg1, prev_carg, len_keywords)
+        @test Arblib.is_length_argument(carg2, prev_carg, len_keywords)
+        @test Arblib.is_length_argument(carg3, prev_carg, len_keywords)
+        @test !Arblib.is_length_argument(carg4, prev_carg, len_keywords)
+        @test !Arblib.is_length_argument(carg1, prev_carg_bad, len_keywords)
+        @test !Arblib.is_length_argument(carg2, prev_carg_bad, len_keywords)
+        @test !Arblib.is_length_argument(carg3, prev_carg_bad, len_keywords)
+        @test !Arblib.is_length_argument(carg4, prev_carg_bad, len_keywords)
+
+        kwargs = []
+        Arblib.extract_length_argument!(kwargs, len_keywords, carg1, prev_carg)
+        @test kwargs[1] == :($(Expr(:kw, :(lenA::Integer), :(length(A)))))
+        @test :lenA ∈ len_keywords
+        @test !Arblib.is_length_argument(carg1, prev_carg, len_keywords)
+    end
+
     @testset "jlargs" begin
         for (str, args, kwargs) in (
-            (
-                "void arb_init(arb_t x)",
-                [:(x::$(Union{Arb,ArbRef,arb_struct,Ptr{arb_struct}}))],
-                Expr[],
-            ),
+            ("void arb_init(arb_t x)", [:(x::$(Arblib.ArbLike))], Expr[]),
             (
                 "void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)",
-                [
-                    :(z::$(Union{arb_struct,Ptr{arb_struct},Arb,ArbRef})),
-                    :(x::$(Union{arb_struct,Ptr{arb_struct},Arb,ArbRef})),
-                    :(y::$(Union{arb_struct,Ptr{arb_struct},Arb,ArbRef})),
-                ],
-                [Expr(:kw, :(prec::Integer), :(precision(z)))],
+                [:(z::$(Arblib.ArbLike)), :(x::$(Arblib.ArbLike)), :(y::$(Arblib.ArbLike))],
+                [Expr(:kw, :(prec::Integer), :(_precision(z)))],
             ),
             (
                 "int arf_add(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)",
                 [
-                    :(res::$(Union{Arf,arf_struct,Ptr{arf_struct}})),
-                    :(x::$(Union{Arf,arf_struct,Ptr{arf_struct}})),
-                    :(y::$(Union{Arf,arf_struct,Ptr{arf_struct}})),
+                    :(res::$(Arblib.ArfLike)),
+                    :(x::$(Arblib.ArfLike)),
+                    :(y::$(Arblib.ArfLike)),
                 ],
                 [
-                    Expr(:kw, :(prec::Integer), :(precision(res))),
-                    Expr(:kw, :(rnd::Union{arb_rnd,RoundingMode}), :(RoundNearest)),
+                    Expr(:kw, :(prec::Integer), :(_precision(res))),
+                    Expr(
+                        :kw,
+                        :(rnd::Union{$(Arblib.arb_rnd),RoundingMode}),
+                        :(RoundNearest),
+                    ),
                 ],
             ),
         )
@@ -282,50 +231,5 @@
         )
             @test Arblib.arbsignature(Arblib.Arbfunction(str)) == str
         end
-    end
-
-    @testset "jlcode" begin
-        x = Arb(1)
-        y = Arb(2)
-        z = Arb(0)
-
-        Arblib.@arbcall_str "void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)"
-        @test Arblib.add!(z, x, y) isa Arb
-        @test Arblib.add!(
-            Ptr{arb_struct}(pointer_from_objref(z.arb)),
-            Ptr{arb_struct}(pointer_from_objref(x.arb)),
-            Ptr{arb_struct}(pointer_from_objref(y.arb)),
-        ) isa Ptr{arb_struct}
-        @test Arblib.add!(z.arb, x.arb, y.arb) === z.arb
-
-        Arblib.@arbcall_str "slong arb_rel_error_bits(const arb_t x)"
-        @test Arblib.rel_error_bits(x) isa Int64
-        @test Arblib.rel_error_bits(Ptr{arb_struct}(pointer_from_objref(x.arb))) isa Int64
-        @test Arblib.rel_error_bits(x.arb) isa Int64
-
-        Arblib.@arbcall_str "int arb_is_zero(const arb_t x)"
-        @test Arblib.is_zero(x) isa Int32
-        @test Arblib.is_zero(Ptr{arb_struct}(pointer_from_objref(x.arb))) isa Int32
-        @test Arblib.is_zero(x.arb) isa Int32
-
-        Arblib.@arbcall_str "double arf_get_d(const arf_t x, arf_rnd_t rnd)"
-        @test Arblib.get(Arf(1)) isa Float64
-        @test Arblib.get(Arf(1).arf) isa Float64
-
-        # these were needed for examples tests:
-
-        Arblib.@arbcall_str "int arb_le(const arb_t x, const arb_t y)"
-        @test Arblib.le(x, y) == 1
-        @test Arblib.le(x, x) == 1
-
-        Arblib.@arbcall_str "int arb_lt(const arb_t x, const arb_t y)"
-        @test Arblib.lt(x, y) == 1
-        @test Arblib.lt(x, x) == 0
-
-        Arblib.@arbcall_str "void arb_const_pi(arb_t x, slong prec)"
-        res = Arb()
-        @test Arblib.const_pi!(res) isa Arb
-        @test Arblib.le(x, res) == 1
-
     end
 end

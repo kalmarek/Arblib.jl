@@ -60,10 +60,10 @@ arbcall"void _arb_poly_majorant(arb_ptr res, arb_srcptr poly, slong len, slong p
 arbcall"void arb_poly_majorant(arb_poly_t res, const arb_poly_t poly, slong prec)"
 
 ### Arithmetic
-arbcall"void _arb_poly_add(arb_ptr C, arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, slong prec)"
+#arbcall"void _arb_poly_add(arb_ptr C, arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, slong prec)"
 arbcall"void arb_poly_add(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong prec)"
 arbcall"void arb_poly_add_si(arb_poly_t C, const arb_poly_t A, slong B, slong prec)"
-arbcall"void _arb_poly_sub(arb_ptr C, arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, slong prec)"
+#arbcall"void _arb_poly_sub(arb_ptr C, arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, slong prec)"
 arbcall"void arb_poly_sub(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong prec)"
 arbcall"void arb_poly_add_series(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong len, slong prec)"
 arbcall"void arb_poly_sub_series(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong len, slong prec)"

@@ -68,3 +68,15 @@ for f in [
         z
     end
 end
+
+function realref(z::AcbLike; prec = _precision(z))
+    real_ptr = ccall(@libarb(acb_real_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
+    ArbRef(real_ptr, prec, cstruct(z))
+end
+function imagref(z::AcbLike; prec = _precision(z))
+    real_ptr = ccall(@libarb(acb_imag_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
+    ArbRef(real_ptr, prec, cstruct(z))
+end
+Base.real(z::AcbLike; prec = _precision(z)) = get_real!(Arb(prec = prec), z)
+Base.imag(z::AcbLike; prec = _precision(z)) = get_imag!(Arb(prec = prec), z)
+Base.conj(z::AcbLike) = conj!(Acb(prec = _precision(z)), z)

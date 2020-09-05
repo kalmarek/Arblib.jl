@@ -9,13 +9,18 @@ export Arf,
     Acb,
     AcbRef,
     ArbVector,
+    AcbVector,
+    ArbMatrix,
+    AcbMatrix,
+    ArbRefVector,
+    AcbRefVector,
+    ArbRefMatrix,
+    AcbRefMatrix,
     ArbPoly,
     ArbSeries,
     AcbPoly,
     AcbSeries,
-    AcbVector,
-    ArbMatrix,
-    AcbMatrix
+    ref
 
 macro libarb(function_name)
     return (:($function_name), libarb)
@@ -26,8 +31,8 @@ macro libflint(function_name)
 end
 
 include("arb_types.jl")
-include("types.jl")
 include("rounding.jl")
+include("types.jl")
 include("arbcall.jl")
 
 include("precision.jl")
