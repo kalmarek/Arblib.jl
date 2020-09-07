@@ -235,7 +235,7 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
                 ),
             )
             # Automatic detection of length arguments for vectors
-        elseif i > 2 && is_length_argument(carg, cargs[i-1], len_keywords)
+        elseif i > 1 && is_length_argument(carg, cargs[i-1], len_keywords)
             extract_length_argument!(kwargs, len_keywords, carg, cargs[i-1])
         else
             push!(jl_arg_names_types, (name(carg), jltype(carg)))
