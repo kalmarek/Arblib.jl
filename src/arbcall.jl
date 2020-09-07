@@ -178,6 +178,18 @@ function extract_length_argument!(kwargs, len_keywords, carg, prev_carg)
     push!(kwargs, Expr(:kw, :($(name(carg))::Integer), :(length($vec_name))))
     push!(len_keywords, name(carg))
 end
+function ispredicate(af::Arbfunction)
+    return isconst(first(arguments(af))) &&
+           returntype(af) == Cint &&
+           (
+               any(s -> startswith(string(jlfname(af)), s), ("is_",)) ||
+               any(
+                   s -> occursin(s, string(jlfname(af))),
+                   ("_is_", "contains", "can_", "check_", "validate_"),
+               ) ||
+               any(==(jlfname(af)), (:eq, :ne, :lt, :le, :gt, :ge, :overlaps, :equal))
+           )
+end
 
 function jlargs(af::Arbfunction; argument_detection::Bool = true)
     cargs = arguments(af)
@@ -273,7 +285,15 @@ function jlcode(af::Arbfunction, jl_fname = jlfname(af))
                 $(Expr(:tuple, ctype.(cargs)...)),
                 $(name.(cargs)...),
             )
-            $(returnT == Nothing && inplace(af) ? name(first(arguments(af))) : :__ret)
+            $(
+                if returnT === Nothing && inplace(af)
+                    name(first(arguments(af)))
+                elseif ispredicate(af)
+                    :(!iszero(__ret))
+                else
+                    :__ret
+                end
+            )
         end
     )
 
