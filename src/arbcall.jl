@@ -184,7 +184,7 @@ function ispredicate(af::Arbfunction)
            (
                any(s -> startswith(string(jlfname(af)), s), ("is_",)) ||
                any(
-                   s -> contains(string(jlfname(af)), s),
+                   s -> occursin(s, string(jlfname(af))),
                    ("_is_", "contains", "can_", "check_", "validate_"),
                ) ||
                any(==(jlfname(af)), (:eq, :ne, :lt, :le, :gt, :ge, :overlaps, :equal))

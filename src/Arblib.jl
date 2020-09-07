@@ -3,7 +3,10 @@ module Arblib
 using Arb_jll
 import LinearAlgebra
 
-import Base: contains
+
+if VERSION >= v"1.5.0-DEV.639"
+    import Base: contains
+end
 
 export Arf,
     Arb,
