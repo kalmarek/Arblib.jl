@@ -94,20 +94,15 @@ end
 #Base.:(<=)(x::Arf, y::Arf) = !isnan(x) && !isnan(y) && cmp(x, y) <= 0
 #Base.isequal(x::Arf, y::Arf) = !iszero(is_equal(x, y))
 
-for ArbT in (MagLike, ArfLike, ArbLike, AcbLike)
+for ArbT in (ArfLike, ArbLike, AcbLike)
     @eval begin
         Base.isequal(y::$ArbT, x::$ArbT) = !iszero(equal(x, y))
-    end
-
-    ArbT == MagLike && continue
-
-    # Comparison of non-floating point values should use ==
-    @eval begin
+        # Comparison of non-floating point values should use ==
         Base.:(==)(y::Integer, x::$ArbT) = !iszero(equal(x, y))
         Base.:(==)(x::$ArbT, y::Integer) = !iszero(equal(x, y))
     end
 end
-
+Base.:(==)(x::MagLike, y::MagLike) = !iszero(equal(x, y))
 Base.isless(x::MagLike, y::MagLike) = cmp(x, y) < 0
 Base.:(<)(x::MagLike, y::MagLike) = cmp(x, y) < 0
 Base.:(<=)(x::MagLike, y::MagLike) = cmp(x, y) <= 0
@@ -121,6 +116,7 @@ for jltype in (Arf, Integer, Unsigned, Base.GMP.CdoubleMax)
 end
 
 for (ArbT, args) in (
+    (ArfLike, ((:(==), :equal),)),
     (
         ArbLike,
         ((:(==), :eq), (:(!=), :ne), (:(<), :lt), (:(<=), :le), (:(>), :gt), (:(>=), :ge)),
