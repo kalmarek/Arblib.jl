@@ -115,13 +115,8 @@ for (jf, af) in [(:+, :add!), (:-, :sub!)]
         u
     end
 end
-function Base.:(-)(v::T) where {T<:Vectors}
-    n = length(v)
-    w = T(length(v); prec = precision(v))
-    neg!(w, v)
-    w
-end
+Base.:(-)(v::Vectors) = neg!(similar(v), v)
 
-Base.copy(v::T) where {T<:Vectors} = copy!(T(length(v); prec = precision(v)), v)
+Base.copy(v::Vectors) = copy!(similar(v), v)
 Base.copy!(w::T, v::T) where {T<:Vectors} = set!(w, v)
 Base.copyto!(w::T, v::T) where {T<:Vectors} = set!(w, v)

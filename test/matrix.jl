@@ -78,14 +78,42 @@
     end
 
     @testset "indexing" begin
-        A = ArbMatrix(3, 1)
+        A = TMat(3, 1)
         A[3, 1][] = 4
         @test A[3] == A[3, 1]
-        B = ArbMatrix(reshape(1:15, 3, 5))
+        B = TMat(reshape(1:15, 3, 5))
         @test B[1:15] == 1:15
-        C = ArbMatrix(reshape(1:15, 5, 3))
+        C = TMat(reshape(1:15, 5, 3))
         @test C[1:15] == 1:15
     end
+
+    @testset "similar:" begin
+        A = TMat(3, 5; prec = 96)
+
+        a = similar(A)
+        @test a isa TMat
+        @test precision(a) == precision(A)
+
+        a = similar(A, TRef, (2, 3))
+        @test a isa TMat
+        @test precision(a) == precision(A)
+
+        for (ElT, VT, MT) in (
+            (Arb, ArbVector, ArbMatrix),
+            (Acb, AcbVector, AcbMatrix),
+            (ArbRef, ArbRefVector, ArbRefMatrix),
+            (AcbRef, AcbRefVector, AcbRefMatrix),
+        )
+            a = similar(A, ElT, 3)
+            @test a isa VT
+            @test precision(a) == precision(A)
+
+            a = similar(A, ElT, (3, 2))
+            @test a isa MT
+            @test precision(a) == precision(A)
+        end
+    end
+
 end
 
 
