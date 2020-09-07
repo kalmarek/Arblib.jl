@@ -34,13 +34,13 @@ include("arbcall.jl")
 include("precision.jl")
 
 include("constructors.jl")
-
 include("predicates.jl")
 include("show.jl")
 include("arithmetic.jl")
 
 include("vector.jl")
 include("matrix.jl")
+include("array_common.jl")
 
 include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")
