@@ -235,6 +235,11 @@
                     ),
                 ],
             ),
+            (
+                "int _acb_vec_is_zero(acb_srcptr vec, slong len)",
+                [:(vec::$(Arblib.AcbVectorLike))],
+                [:($(Expr(:kw, :(len::Integer), :(length(vec)))))],
+            ),
         )
             (a, k) = Arblib.jlargs(Arblib.Arbfunction(str))
             @test a == args
