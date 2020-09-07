@@ -85,15 +85,6 @@ for (T, funcpairs) in (
     end
 end
 
-#Base.isless(x::Mag, y::Mag) = cmp(x, y) < 0
-#Base.:(==)(x::Mag, y::Mag) = !iszero(is_equal(x, y))
-#
-#Base.isless(x::Arf, y::Arf) = (isnan(y) && !isnan(x)) || cmp(x, y) < 0
-#Base.:(==)(x::Arf, y::Arf) = !isnan(x) && !iszero(equal(x, y))
-#Base.:(<)(x::Arf, y::Arf) = !isnan(x) && !isnan(y) && cmp(x, y) < 0
-#Base.:(<=)(x::Arf, y::Arf) = !isnan(x) && !isnan(y) && cmp(x, y) <= 0
-#Base.isequal(x::Arf, y::Arf) = !iszero(is_equal(x, y))
-
 for ArbT in (ArfLike, ArbLike, AcbLike)
     @eval begin
         Base.isequal(y::$ArbT, x::$ArbT) = !iszero(equal(x, y))
