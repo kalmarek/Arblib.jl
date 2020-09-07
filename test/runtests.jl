@@ -13,4 +13,5 @@ using Arblib, Test, LinearAlgebra
     include("vector.jl")
     include("matrix.jl")
     include("eigen.jl")
+    include("arf_ref-test.jl")
 end
