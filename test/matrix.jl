@@ -100,8 +100,8 @@
 
         for (ElT, VT, MT) in (
             (Arb, ArbVector, ArbMatrix),
-            # (Acb, AcbVector, AcbMatrix),
-            # (ArbRef, ArbRefVector, ArbRefMatrix),
+            (Acb, AcbVector, AcbMatrix),
+            (ArbRef, ArbRefVector, ArbRefMatrix),
             (AcbRef, AcbRefVector, AcbRefMatrix),
         )
             a = similar(A, ElT, 3)
