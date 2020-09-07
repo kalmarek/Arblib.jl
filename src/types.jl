@@ -56,47 +56,6 @@ struct Arb <: Real
 end
 
 
-struct ArbRef <: Real
-    arb_ptr::Ptr{arb_struct}
-    prec::Int
-    parent::Union{acb_struct,arb_vec_struct,arb_mat_struct}
-end
-function ArbRef(
-    ptr::Ptr{arb_struct},
-    parent::Union{acb_struct,arb_vec_struct,arb_mat_struct};
-    prec::Int,
-)
-    ArbRef(ptr, prec, parent)
-end
-
-ArbRef(; prec::Int = DEFAULT_PRECISION[]) = Arb(; prec = prec)
-function Arb(x::ArbRef; prec::Integer = precision(x))
-    res = Arb(prec = prec)
-    set!(res, x)
-    return res
-end
-Base.getindex(x::ArbRef) = Arb(x)
-
-struct MagRef <: Real
-    mag_ptr::Ptr{mag_struct}
-    parent::Union{arb_struct,ArbRef}
-end
-Mag(x::MagRef) = set!(Mag(), x)
-Base.getindex(x::MagRef) = Mag(x)
-
-struct ArfRef <: Real
-    arf_ptr::Ptr{arf_struct}
-    prec::Int
-    parent::Union{arb_struct,ArbRef}
-end
-function ArfRef(ptr::Ptr{arf_struct}, parent::Union{arb_struct,ArbRef}; prec::Int)
-    ArfRef(ptr, prec, parent)
-end
-
-ArfRef(; prec::Int = DEFAULT_PRECISION[]) = Arf(; prec = prec)
-Arf(x::ArfRef; prec::Integer = precision(x)) = set!(Arf(prec = prec), x)
-Base.getindex(x::ArfRef) = Arf(x)
-
 struct Acb <: Number
     acb::acb_struct
     prec::Int
@@ -113,7 +72,7 @@ struct Acb <: Number
     end
 end
 
-
+# Refs are in reverse order to model their possible depencies
 struct AcbRef <: Number
     acb_ptr::Ptr{acb_struct}
     prec::Int
@@ -134,6 +93,48 @@ function Acb(x::AcbRef; prec::Integer = precision(x))
     return res
 end
 Base.getindex(x::AcbRef) = Acb(x)
+
+struct ArbRef <: Real
+    arb_ptr::Ptr{arb_struct}
+    prec::Int
+    parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_mat_struct}
+end
+function ArbRef(
+    ptr::Ptr{arb_struct},
+    parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_mat_struct};
+    prec::Int,
+)
+    ArbRef(ptr, prec, parent)
+end
+
+ArbRef(; prec::Int = DEFAULT_PRECISION[]) = Arb(; prec = prec)
+function Arb(x::ArbRef; prec::Integer = precision(x))
+    res = Arb(prec = prec)
+    set!(res, x)
+    return res
+end
+Base.getindex(x::ArbRef) = Arb(x)
+
+struct ArfRef <: Real
+    arf_ptr::Ptr{arf_struct}
+    prec::Int
+    parent::Union{arb_struct,ArbRef}
+end
+function ArfRef(ptr::Ptr{arf_struct}, parent::Union{arb_struct,ArbRef}; prec::Int)
+    ArfRef(ptr, prec, parent)
+end
+
+ArfRef(; prec::Int = DEFAULT_PRECISION[]) = Arf(; prec = prec)
+Arf(x::ArfRef; prec::Integer = precision(x)) = set!(Arf(prec = prec), x)
+Base.getindex(x::ArfRef) = Arf(x)
+
+struct MagRef <: Real
+    mag_ptr::Ptr{mag_struct}
+    parent::Union{arb_struct,ArbRef}
+end
+Mag(x::MagRef) = set!(Mag(), x)
+Base.getindex(x::MagRef) = Mag(x)
+
 
 struct ArbVector <: DenseVector{Arb}
     arb_vec::arb_vec_struct
