@@ -46,6 +46,7 @@ include("arithmetic.jl")
 include("vector.jl")
 include("matrix.jl")
 include("array_common.jl")
+include("eigen.jl")
 
 include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")
@@ -53,5 +54,6 @@ include("arbcalls/arb.jl")
 include("arbcalls/acb.jl")
 include("arbcalls/arb_mat.jl")
 include("arbcalls/acb_mat.jl")
+include("arbcalls/eigen.jl")
 
 end # module
