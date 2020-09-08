@@ -1,20 +1,19 @@
-Base.promote_rule(::Type{Mag}, ::Type{Float64}) = Mag
-Base.promote_rule(::Type{Arf}, ::Type{<:Union{AbstractFloat,Integer}}) = Arf
+Base.promote_rule(::Type{<:MagLike}, ::Type{Float64}) = Mag
+Base.promote_rule(::Type{<:ArfLike}, ::Type{<:Union{AbstractFloat,Integer}}) = Arf
 Base.promote_rule(
-    ::Type{<:Union{Arb,ArbRef}},
-    ::Type{<:Union{AbstractFloat,Integer,Rational,Arf,ArbRef}},
+    ::Type{<:ArbLike},
+    ::Type{<:Union{AbstractFloat,Integer,Rational,ArfLike,ArbRef}},
 ) = Arb
 Base.promote_rule(
-    ::Type{<:Union{Acb,AcbRef}},
+    ::Type{<:AcbLike},
     ::Type{
         <:Union{
             AbstractFloat,
             Integer,
             Rational,
             Complex{<:Union{AbstractFloat,Integer,Rational}},
-            Arf,
-            Arb,
-            ArbRef,
+            ArfLike,
+            ArbLike,
             AcbRef,
         },
     },
