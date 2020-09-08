@@ -31,7 +31,7 @@ end
 
 Base.@propagate_inbounds function Base.setindex!(
     poly::Union{ArbPoly,ArbSeries},
-    x::Arb,
+    x::ArbLike,
     i::Integer,
 )
     @boundscheck checkbounds(poly, i)
@@ -41,7 +41,7 @@ end
 
 Base.@propagate_inbounds function Base.setindex!(
     poly::Union{AcbPoly,AcbSeries},
-    x::Acb,
+    x::AcbLike,
     i::Integer,
 )
     @boundscheck checkbounds(poly, i)
@@ -49,18 +49,25 @@ Base.@propagate_inbounds function Base.setindex!(
     return x
 end
 
+Base.@propagate_inbounds function Base.setindex!(
+    poly::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries},
+    x,
+    i::Integer,
+)
+    @boundscheck checkbounds(poly, i)
+    set_coeff!(poly, i, convert(eltype(poly), x))
+    return x
+end
+
 # Constructors
-for (TPoly, T) in [(:ArbPoly, :Arb), (:AcbPoly, :Acb)]
-    @eval function $TPoly(coeff::$T; prec::Integer = precision(coeff))
+for TPoly in [:ArbPoly, :AcbPoly]
+    @eval function $TPoly(coeff; prec::Integer = _precision(coeff))
         poly = $TPoly(prec = prec)
         poly[0] = coeff
         return poly
     end
 
-    @eval function $TPoly(
-        coeffs::AbstractVector{$T};
-        prec::Integer = precision(first(coeffs)),
-    )
+    @eval function $TPoly(coeffs::AbstractVector; prec::Integer = _precision(first(coeffs)))
         poly = $TPoly(prec = prec)
         @inbounds for i = 1:length(coeffs)
             poly[i-1] = coeffs[i]
@@ -72,16 +79,16 @@ end
 for (TSeries, T) in [(:ArbSeries, :Arb), (:AcbSeries, :Acb)]
     @eval $TSeries(; prec::Integer = DEFAULT_PRECISION[]) = $TSeries(0, prec = prec)
 
-    @eval function $TSeries(coeff::$T, degree::Integer; prec::Integer = precision(coeff))
+    @eval function $TSeries(coeff, degree::Integer; prec::Integer = _precision(coeff))
         series = $TSeries(degree, prec = prec)
         series[0] = coeff
         return series
     end
 
     @eval function $TSeries(
-        coeffs::AbstractVector{$T},
-        degree = length(coeffs) - 1;
-        prec::Integer = precision(first(coeffs)),
+        coeffs::AbstractVector,
+        degree::Integer = length(coeffs) - 1;
+        prec::Integer = _precision(first(coeffs)),
     )
         series = $TSeries(degree, prec = prec)
         @inbounds for i = 1:length(coeffs)
@@ -92,28 +99,15 @@ for (TSeries, T) in [(:ArbSeries, :Arb), (:AcbSeries, :Acb)]
 end
 
 Base.zero(poly::T) where {T<:Union{ArbPoly,AcbPoly}} = T(prec = precision(poly))
-function Base.one(poly::T) where {T<:Union{ArbPoly,AcbPoly}}
-    res = T(prec = precision(poly))
-    one!(res)
-    return res
-end
+Base.one(poly::T) where {T<:Union{ArbPoly,AcbPoly}} = one!(T(prec = precision(poly)))
+
 Base.zero(series::T) where {T<:Union{ArbSeries,AcbSeries}} =
     T(degree(series), prec = precision(series))
-function Base.one(series::T) where {T<:Union{ArbSeries,AcbSeries}}
-    res = T(degree(series), prec = precision(series))
-    one!(res)
-    return res
-end
+Base.one(series::T) where {T<:Union{ArbSeries,AcbSeries}} =
+    one!(T(degree(series), prec = precision(series)))
 
 Base.zero(::Type{T}) where {T<:Union{ArbPoly,AcbPoly}} = T()
-function Base.one(::Type{T}) where {T<:Union{ArbPoly,AcbPoly}}
-    res = T()
-    one!(res)
-    return res
-end
+Base.one(::Type{T}) where {T<:Union{ArbPoly,AcbPoly}} = one!(T())
+
 Base.zero(::Type{T}) where {T<:Union{ArbSeries,AcbSeries}} = T(0)
-function Base.one(::Type{T}) where {T<:Union{ArbSeries,AcbSeries}}
-    res = T(0)
-    one!(res)
-    return res
-end
+Base.one(::Type{T}) where {T<:Union{ArbSeries,AcbSeries}} = one!(T(0))
