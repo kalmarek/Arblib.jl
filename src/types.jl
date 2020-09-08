@@ -281,7 +281,7 @@ Base.setindex!(x::Union{Arf,ArfRef}, z::Ptr{arf_struct}) = set!(x, z)
 Base.setindex!(x::Union{Arb,ArbRef}, z::Ptr{arb_struct}) = set!(x, z)
 Base.setindex!(x::Union{Acb,AcbRef}, z::Ptr{acb_struct}) = set!(x, z)
 
-function midref(x::Union{Arb,ArbRef}, prec = _precision(x))
+function midref(x::Union{Arb,ArbRef}, prec = precision(x))
     mid_ptr = ccall(@libarb(arb_mid_ptr), Ptr{arf_struct}, (Ref{arb_struct},), x)
     ArfRef(mid_ptr, prec, parentstruct(x))
 end
@@ -290,11 +290,11 @@ function radref(x::Union{Arb,ArbRef})
     MagRef(rad_ptr, parentstruct(x))
 end
 
-function realref(z::Union{Acb,AcbRef}; prec = _precision(z))
+function realref(z::Union{Acb,AcbRef}; prec = precision(z))
     real_ptr = ccall(@libarb(acb_real_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
     ArbRef(real_ptr, prec, parentstruct(z))
 end
-function imagref(z::Union{Acb,AcbRef}; prec = _precision(z))
+function imagref(z::Union{Acb,AcbRef}; prec = precision(z))
     real_ptr = ccall(@libarb(acb_imag_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
     ArbRef(real_ptr, prec, parentstruct(z))
 end
