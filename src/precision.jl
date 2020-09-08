@@ -13,6 +13,8 @@ Base.precision(::Type{<:Ptr{<:ArbStructTypes}}) = DEFAULT_PRECISION[]
 Base.precision(x::ArbStructTypes) = DEFAULT_PRECISION[]
 Base.precision(x::Ptr{<:ArbStructTypes}) = DEFAULT_PRECISION[]
 Base.precision(x::ArbTypes) = x.prec
+# MagLike <: ArbTypes
+Base.precision(x::MagLike) = DEFAULT_PRECISION[]
 
 @inline _precision(x::ArbTypes) = precision(x)
 @inline _precision(_) = DEFAULT_PRECISION[]
@@ -33,7 +35,10 @@ function Base.setprecision(::Type{<:ArbTypes}, precision::Integer)
     return precision
 end
 
-function Base.setprecision(x::T, precision::Integer) where {T<:Union{Arf,Arb,Acb}}
+function Base.setprecision(
+    x::T,
+    precision::Integer,
+) where {T<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}}
     return T(x, prec = precision)
 end
 Base.setprecision(v::ArbVector, precision::Integer) = ArbVector(v.arb_vec, precision)

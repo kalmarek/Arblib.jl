@@ -71,7 +71,13 @@
         tol = 1e-12
         λ_approx, R_approx = Arblib.approx_eig_qr(M, tol = tol)
 
-        @test Arblib.eig_global_enclosure!(ε, M, λ_approx, R_approx) isa Arblib.Mag
+        @test Arblib.eig_global_enclosure!(
+            ε,
+            M,
+            λ_approx,
+            R_approx;
+            prec = precision(M),
+        ) isa Arblib.Mag
 
         @info Arblib.get(ε)
         @test ε <= tol
