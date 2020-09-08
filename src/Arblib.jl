@@ -23,6 +23,10 @@ export Mag,
     AcbRefVector,
     ArbRefMatrix,
     AcbRefMatrix,
+    ArbPoly,
+    ArbSeries,
+    AcbPoly,
+    AcbSeries,
     ref
 
 macro libarb(function_name)
@@ -49,11 +53,14 @@ include("vector.jl")
 include("matrix.jl")
 include("array_common.jl")
 include("eigen.jl")
+include("poly.jl")
 
 include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")
 include("arbcalls/arb.jl")
 include("arbcalls/acb.jl")
+include("arbcalls/arb_poly.jl")
+include("arbcalls/acb_poly.jl")
 include("arbcalls/arb_mat.jl")
 include("arbcalls/acb_mat.jl")
 include("arbcalls/eigen.jl")

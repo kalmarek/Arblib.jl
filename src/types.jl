@@ -150,6 +150,74 @@ end
 AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     AcbVector(acb_vec_struct(n), prec)
 
+struct ArbPoly
+    arb_poly::arb_poly_struct
+    prec::Int
+
+    ArbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(arb_poly_struct(), prec)
+
+    function ArbPoly(poly::arb_poly_struct; prec::Integer = DEFAULT_PRECISION[])
+        res = ArbPoly(prec = prec)
+        set!(res, poly)
+
+        return res
+    end
+end
+
+struct ArbSeries <: Number
+    arb_poly::arb_poly_struct
+    degree::Int
+    prec::Int
+
+    ArbSeries(degree::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+        new(arb_poly_struct(), degree, prec)
+
+    function ArbSeries(
+        poly::arb_poly_struct,
+        degree::Integer = degree(poly);
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        res = ArbSeries(degree, prec = prec)
+        set!(res, poly)
+
+        return res
+    end
+end
+
+struct AcbPoly
+    acb_poly::acb_poly_struct
+    prec::Int
+
+    AcbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(acb_poly_struct(), prec)
+
+    function AcbPoly(poly::acb_poly_struct; prec::Integer = DEFAULT_PRECISION[])
+        res = AcbPoly(prec = prec)
+        set!(res, poly)
+
+        return res
+    end
+end
+
+struct AcbSeries <: Number
+    acb_poly::acb_poly_struct
+    degree::Int
+    prec::Int
+
+    AcbSeries(degree::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+        new(acb_poly_struct(), degree, prec)
+
+    function AcbSeries(
+        poly::acb_poly_struct,
+        degree::Integer = degree(poly);
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        res = AcbSeries(degree, prec = prec)
+        set!(res, poly)
+
+        return res
+    end
+end
+
 struct ArbMatrix <: DenseMatrix{Arb}
     arb_mat::arb_mat_struct
     prec::Int
@@ -205,7 +273,6 @@ end
 const ArbLike = Union{Arb,ArbRef,Ptr{arb_struct},arb_struct}
 const AcbLike = Union{Acb,AcbRef,Ptr{acb_struct},acb_struct}
 
-
 for (T, prefix) in (
     (Mag, :mag),
     (Arf, :arf),
@@ -215,6 +282,8 @@ for (T, prefix) in (
     (Union{AcbVector,AcbRefVector}, :acb_vec),
     (Union{ArbMatrix,ArbRefMatrix}, :arb_mat),
     (Union{AcbMatrix,AcbRefMatrix}, :acb_mat),
+    (Union{ArbPoly,ArbSeries}, :arb_poly),
+    (Union{AcbPoly,AcbSeries}, :acb_poly),
 )
     arbstruct = Symbol(prefix, :_struct)
     spref = "$prefix"
@@ -255,6 +324,8 @@ const ArbVectorLike = Union{ArbVector,ArbRefVector,cstructtype(ArbVector)}
 const AcbVectorLike = Union{AcbVector,AcbRefVector,cstructtype(AcbVector)}
 const ArbMatrixLike = Union{ArbMatrix,ArbRefMatrix,cstructtype(ArbMatrix)}
 const AcbMatrixLike = Union{AcbMatrix,AcbRefMatrix,cstructtype(AcbMatrix)}
+const ArbPolyLike = Union{ArbPoly,ArbSeries,cstructtype(ArbPoly)}
+const AcbPolyLike = Union{AcbPoly,AcbSeries,cstructtype(AcbPoly)}
 const ArbTypes = Union{
     Mag,
     MagRef,
@@ -272,6 +343,10 @@ const ArbTypes = Union{
     ArbRefMatrix,
     AcbMatrix,
     AcbRefMatrix,
+    ArbPoly,
+    ArbSeries,
+    AcbPoly,
+    AcbSeries,
 }
 
 Base.setindex!(x::Union{Mag,MagRef,Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}, z::Number) =

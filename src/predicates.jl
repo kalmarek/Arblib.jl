@@ -60,6 +60,26 @@ for (T, funcpairs) in (
             (:(Base.iszero), :is_zero),
         ),
     ),
+    (ArbPoly, ((:(Base.isone), :is_one), (:(isx), :is_x), (:(Base.iszero), :is_zero))),
+    (ArbSeries, ((:(Base.isone), :is_one), (:(isx), :is_x), (:(Base.iszero), :is_zero))),
+    (
+        AcbPoly,
+        (
+            (:(Base.isone), :is_one),
+            (:(isx), :is_x),
+            (:(Base.iszero), :is_zero),
+            (:(Base.isreal), :is_real),
+        ),
+    ),
+    (
+        AcbSeries,
+        (
+            (:(Base.isone), :is_one),
+            (:(isx), :is_x),
+            (:(Base.iszero), :is_zero),
+            (:(Base.isreal), :is_real),
+        ),
+    ),
     (
         ArbMatrixLike,
         (
@@ -121,4 +141,24 @@ for (ArbT, args) in (
             Base.$jlf(x::$ArbT, y::$ArbT) = !iszero($arbf(x, y))
         end
     end
+end
+
+Base.isequal(x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}} = !iszero(equal(x, y))
+Base.isequal(x::T, y::T) where {T<:Union{ArbSeries,AcbSeries}} =
+    degree(x) == degree(y) && !iszero(equal(x, y))
+
+function Base.:(==)(x::T, y::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
+    degree(x) == degree(y) || return false
+    for i = 0:degree(x)
+        x[i] == y[i] || return false
+    end
+    return true
+end
+
+function Base.:(!=)(x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}}
+    return iszero(overlaps(x, y))
+end
+
+function Base.:(!=)(x::T, y::T) where {T<:Union{ArbSeries,AcbSeries}}
+    return (degree(x) != degree(y)) || iszero(overlaps(x, y))
 end

@@ -4,6 +4,40 @@ Base.show(io::IO, x::Union{Mag,MagRef}) = print(io, _string(x))
 Base.show(io::IO, x::Union{Arb,ArbRef,Acb,AcbRef}) = print(io, string_nice(x))
 Base.show(io::IO, x::Union{Arf,ArfRef}) = print(io, string_decimal(x))
 
+function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
+    if (T == ArbPoly || T == AcbPoly) && iszero(poly)
+        print(io, "0")
+    end
+
+    # We only want to print up until the last non-zero element, for
+    # ArbPoly and AcbPoly this is given by the degree, for ArbSeries
+    # and AcbSeries we get this by taking the degree of the underlying
+    # polynomial.
+    N = degree(cstruct(poly))
+    for i = 0:N
+        x = poly[i]
+        if !iszero(x)
+            str =
+                ifelse(!isreal(x), "(", "") *
+                "$x" *
+                ifelse(!isreal(x), ")", "") *
+                ifelse(i > 0, "⋅x", "") *
+                ifelse(i > 1, "^$i", "") *
+                ifelse(i != N, " + ", "")
+            print(io, str)
+        end
+    end
+
+    if T == ArbSeries || T == AcbSeries
+        str =
+            ifelse(iszero(poly), "", " + ") *
+            "𝒪(x" *
+            ifelse(degree(poly) == 0, "", "^$(degree(poly) + 1)") *
+            ")"
+        print(io, str)
+    end
+end
+
 for ArbT in (Mag, MagRef, Arf, ArfRef, Arb, ArbRef, Acb, AcbRef)
     arbf = Symbol(cprefix(ArbT), :_, :print)
     @eval begin
