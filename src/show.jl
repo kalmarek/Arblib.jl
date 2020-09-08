@@ -1,8 +1,8 @@
 digits_prec(prec::Integer) = floor(Int, prec * log(2) / log(10))
 
-Base.show(io::IO, x::Mag) = print(io, _string(x))
+Base.show(io::IO, x::Union{Mag,MagRef}) = print(io, _string(x))
 Base.show(io::IO, x::Union{Arb,ArbRef,Acb,AcbRef}) = print(io, string_nice(x))
-Base.show(io::IO, x::Arf) = print(io, string_decimal(x))
+Base.show(io::IO, x::Union{Arf,ArfRef}) = print(io, string_decimal(x))
 
 function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
     if (T == ArbPoly || T == AcbPoly) && iszero(poly)
@@ -38,7 +38,7 @@ function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,Ac
     end
 end
 
-for ArbT in (Mag, Arf, Arb, ArbRef, Acb, AcbRef)
+for ArbT in (Mag, MagRef, Arf, ArfRef, Arb, ArbRef, Acb, AcbRef)
     arbf = Symbol(cprefix(ArbT), :_, :print)
     @eval begin
         function _string(x::$ArbT)
@@ -57,7 +57,7 @@ for ArbT in (Mag, Arf, Arb, ArbRef, Acb, AcbRef)
         end
     end
 
-    ArbT == Mag && continue # no mag_printd and mag_printn
+    (ArbT == Mag || ArbT == MagRef) && continue # no mag_printd and mag_printn
 
     @eval begin
         function string_decimal(x::$ArbT, digits::Integer = digits_prec(precision(x)))
@@ -76,7 +76,7 @@ for ArbT in (Mag, Arf, Arb, ArbRef, Acb, AcbRef)
         end
     end
 
-    ArbT == Arf && continue #no arf_printn
+    (ArbT == Arf || ArbT == ArfRef) && continue #no arf_printn
 
     @eval begin
         function string_nice(
@@ -100,7 +100,7 @@ for ArbT in (Mag, Arf, Arb, ArbRef, Acb, AcbRef)
     end
 end
 
-for ArbT in (Mag, Arf, Arb)
+for ArbT in (Mag, MagRef, Arf, ArfRef, Arb, ArbRef)
     @eval begin
         function load_string!(x::$ArbT, str::AbstractString)
             res = load!(x, str)

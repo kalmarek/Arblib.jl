@@ -183,6 +183,34 @@
         @test !Arblib.is_length_argument(carg1, prev_carg, len_keywords)
     end
 
+    @testset "Predicate detection" begin
+        for sig in (
+            "int acb_is_zero(const acb_t z)",
+            "int acb_is_int_2exp_si(const acb_t x, slong e)",
+            "int acb_equal_si(const acb_t x, slong y)",
+            "int arb_ne(const arb_t x, const arb_t y)",
+            "int acb_overlaps(const acb_t x, const acb_t y)",
+            "int acb_contains(const acb_t x, const acb_t y)",
+            "int acb_is_real(const acb_t x)",
+            "int _acb_vec_is_zero(acb_srcptr vec, slong len)",
+            "int _arb_vec_is_finite(arb_srcptr x, slong len)",
+        )
+            @test Arblib.ispredicate(Arblib.Arbfunction(sig))
+        end
+
+        for sig in (
+            "int acb_mat_lu_classical(slong * perm, acb_mat_t LU, const acb_mat_t A, slong prec)",
+            "int acb_mat_lu_recursive(slong * perm, acb_mat_t LU, const acb_mat_t A, slong prec)",
+            "int acb_mat_lu(slong * perm, acb_mat_t LU, const acb_mat_t A, slong prec)",
+            "int acb_mat_inv(acb_mat_t X, const acb_mat_t A, slong prec)",
+            "int arb_sgn_nonzero(const arb_t x)",
+            "int arf_set_round(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)",
+            "int arf_cmp(const arf_t x, const arf_t y)",
+        )
+            @test !Arblib.ispredicate(Arblib.Arbfunction(sig))
+        end
+    end
+
     @testset "jlargs" begin
         for (str, args, kwargs) in (
             ("void arb_init(arb_t x)", [:(x::$(Arblib.ArbLike))], Expr[]),
@@ -206,6 +234,11 @@
                         :(RoundNearest),
                     ),
                 ],
+            ),
+            (
+                "int _acb_vec_is_zero(acb_srcptr vec, slong len)",
+                [:(vec::$(Arblib.AcbVectorLike))],
+                [:($(Expr(:kw, :(len::Integer), :(length(vec)))))],
             ),
         )
             (a, k) = Arblib.jlargs(Arblib.Arbfunction(str))

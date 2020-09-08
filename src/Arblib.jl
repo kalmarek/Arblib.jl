@@ -3,7 +3,14 @@ module Arblib
 using Arb_jll
 import LinearAlgebra
 
-export Arf,
+if VERSION >= v"1.5.0-DEV.639"
+    import Base: contains
+end
+
+export Mag,
+    MagRef,
+    Arf,
+    ArfRef,
     Arb,
     ArbRef,
     Acb,
@@ -38,13 +45,14 @@ include("arbcall.jl")
 include("precision.jl")
 
 include("constructors.jl")
-
 include("predicates.jl")
 include("show.jl")
 include("arithmetic.jl")
 
 include("vector.jl")
 include("matrix.jl")
+include("array_common.jl")
+include("eigen.jl")
 include("poly.jl")
 
 include("arbcalls/mag.jl")
@@ -55,5 +63,6 @@ include("arbcalls/arb_poly.jl")
 include("arbcalls/acb_poly.jl")
 include("arbcalls/arb_mat.jl")
 include("arbcalls/acb_mat.jl")
+include("arbcalls/eigen.jl")
 
 end # module

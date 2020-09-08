@@ -1,6 +1,6 @@
 for (T, funcpairs) in (
     (
-        Mag,
+        MagLike,
         (
             (:(Base.isfinite), :is_finite),
             (:(Base.isinf), :is_inf),
@@ -9,7 +9,7 @@ for (T, funcpairs) in (
         ),
     ),
     (
-        Arf,
+        ArfLike,
         (
             (:(Base.isfinite), :is_finite),
             (:(Base.isinf), :is_inf),
@@ -24,7 +24,7 @@ for (T, funcpairs) in (
         ),
     ),
     (
-        Union{Arb,ArbRef},
+        ArbLike,
         (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
@@ -39,7 +39,7 @@ for (T, funcpairs) in (
         ),
     ),
     (
-        Union{Acb,AcbRef},
+        AcbLike,
         (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
@@ -47,11 +47,13 @@ for (T, funcpairs) in (
             (:(Base.isone), :is_one),
             (:(Base.isreal), :is_real),
             (:(Base.iszero), :is_zero),
+            (:containszero, :contains_zero),
+            (:containsint, :contains_int),
         ),
     ),
-    (ArbVector, ((:(Base.isfinite), :is_finite), (:(Base.iszero), :is_zero))),
+    (ArbVectorLike, ((:(Base.isfinite), :is_finite), (:(Base.iszero), :is_zero))),
     (
-        AcbVector,
+        AcbVectorLike,
         (
             (:(Base.isfinite), :is_finite),
             (:(Base.isreal), :is_real),
@@ -79,7 +81,7 @@ for (T, funcpairs) in (
         ),
     ),
     (
-        ArbMatrix,
+        ArbMatrixLike,
         (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
@@ -88,7 +90,7 @@ for (T, funcpairs) in (
         ),
     ),
     (
-        AcbMatrix,
+        AcbMatrixLike,
         (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
@@ -103,56 +105,36 @@ for (T, funcpairs) in (
     end
 end
 
-#Base.isless(x::Mag, y::Mag) = cmp(x, y) < 0
-#Base.:(==)(x::Mag, y::Mag) = !iszero(is_equal(x, y))
-#
-#Base.isless(x::Arf, y::Arf) = (isnan(y) && !isnan(x)) || cmp(x, y) < 0
-#Base.:(==)(x::Arf, y::Arf) = !isnan(x) && !iszero(equal(x, y))
-#Base.:(<)(x::Arf, y::Arf) = !isnan(x) && !isnan(y) && cmp(x, y) < 0
-#Base.:(<=)(x::Arf, y::Arf) = !isnan(x) && !isnan(y) && cmp(x, y) <= 0
-#Base.isequal(x::Arf, y::Arf) = !iszero(is_equal(x, y))
-
-for ArbT in
-    (Mag, Arf, Union{Arb,ArbRef}, Union{Acb,AcbRef}, ArbPoly, ArbSeries, AcbPoly, AcbSeries)
+for ArbT in (ArfLike, ArbLike, AcbLike)
     @eval begin
         Base.isequal(y::$ArbT, x::$ArbT) = !iszero(equal(x, y))
-    end
-
-    (
-        ArbT == Mag ||
-        ArbT == ArbPoly ||
-        ArbT == ArbSeries ||
-        ArbT == AcbPoly ||
-        ArbT == AcbSeries
-    ) && continue
-
-    # Comparison of non-floating point values should use ==
-    @eval begin
+        # Comparison of non-floating point values should use ==
         Base.:(==)(y::Integer, x::$ArbT) = !iszero(equal(x, y))
         Base.:(==)(x::$ArbT, y::Integer) = !iszero(equal(x, y))
     end
 end
-
-Base.isless(x::Mag, y::Mag) = cmp(x, y) < 0
-Base.:(<)(x::Mag, y::Mag) = cmp(x, y) < 0
-Base.:(<=)(x::Mag, y::Mag) = cmp(x, y) <= 0
+Base.:(==)(x::MagLike, y::MagLike) = !iszero(equal(x, y))
+Base.isless(x::MagLike, y::MagLike) = cmp(x, y) < 0
+Base.:(<)(x::MagLike, y::MagLike) = cmp(x, y) < 0
+Base.:(<=)(x::MagLike, y::MagLike) = cmp(x, y) <= 0
 
 for jltype in (Arf, Integer, Unsigned, Base.GMP.CdoubleMax)
     @eval begin
-        Base.isless(x::Arf, y::$jltype) = (isnan(y) && !isnan(x)) || cmp(x, y) < 0
-        Base.:(<)(x::Arf, y::$jltype) = !isnan(x) && !isnan(y) && cmp(x, y) < 0
-        Base.:(<=)(x::Arf, y::$jltype) = (x < y) || isequal(x, y)
+        Base.isless(x::ArfLike, y::$jltype) = (isnan(y) && !isnan(x)) || cmp(x, y) < 0
+        Base.:(<)(x::ArfLike, y::$jltype) = !isnan(x) && !isnan(y) && cmp(x, y) < 0
+        Base.:(<=)(x::ArfLike, y::$jltype) = (x < y) || isequal(x, y)
     end
 end
 
 for (ArbT, args) in (
+    (ArfLike, ((:(==), :equal),)),
     (
-        Union{Arb,ArbRef},
+        ArbLike,
         ((:(==), :eq), (:(!=), :ne), (:(<), :lt), (:(<=), :le), (:(>), :gt), (:(>=), :ge)),
     ),
-    (Union{Acb,AcbRef}, ((:(==), :eq), (:(!=), :ne))),
-    (ArbMatrix, ((:(==), :eq), (:(!=), :ne))),
-    (AcbMatrix, ((:(==), :eq), (:(!=), :ne))),
+    (AcbLike, ((:(==), :eq), (:(!=), :ne))),
+    (ArbMatrixLike, ((:(==), :eq), (:(!=), :ne))),
+    (AcbMatrixLike, ((:(==), :eq), (:(!=), :ne))),
 )
     for (jlf, arbf) in args
         @eval begin
@@ -160,6 +142,10 @@ for (ArbT, args) in (
         end
     end
 end
+
+Base.isequal(x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}} = !iszero(equal(x, y))
+Base.isequal(x::T, y::T) where {T<:Union{ArbSeries,AcbSeries}} =
+    degree(x) == degree(y) && !iszero(equal(x, y))
 
 function Base.:(==)(x::T, y::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
     degree(x) == degree(y) || return false

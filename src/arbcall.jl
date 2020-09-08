@@ -22,6 +22,7 @@ end
 const arbargtypes = ArbArgTypes(
     Dict{String,DataType}(
         "void" => Cvoid,
+        "void *" => Ptr{Cvoid},
         "int" => Cint,
         "slong" => Clong,
         "ulong" => Culong,
@@ -49,6 +50,7 @@ const arbargtypes = ArbArgTypes(
     Set(["FILE *", "fmpr_t", "fmpr_rnd_t", "flint_rand_t", "bool_mat_t"]),
     Dict{DataType,String}(
         Cvoid => "void",
+        Ptr{Cvoid} => "void *",
         Cint => "int",
         Clong => "slong",
         Culong => "ulong",
@@ -184,6 +186,18 @@ function extract_length_argument!(kwargs, len_keywords, carg, prev_carg)
     push!(kwargs, Expr(:kw, :($(name(carg))::Integer), :(length($vec_name))))
     push!(len_keywords, name(carg))
 end
+function ispredicate(af::Arbfunction)
+    return isconst(first(arguments(af))) &&
+           returntype(af) == Cint &&
+           (
+               any(s -> startswith(string(jlfname(af)), s), ("is_",)) ||
+               any(
+                   s -> occursin(s, string(jlfname(af))),
+                   ("_is_", "contains", "can_", "check_", "validate_"),
+               ) ||
+               any(==(jlfname(af)), (:eq, :ne, :lt, :le, :gt, :ge, :overlaps, :equal))
+           )
+end
 
 function jlargs(af::Arbfunction; argument_detection::Bool = true)
     cargs = arguments(af)
@@ -205,8 +219,13 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
             @assert !prec_kwarg
             prec_kwarg = true
 
-            c₁ = first(cargs)
-            push!(kwargs, Expr(:kw, :(prec::Integer), :(_precision($(name(c₁))))))
+            # If the first argument has a precision,
+            # then use this otherwise make it a mandatory kwarg
+            if rawtype(cargs[1]) <: ArbTypes && rawtype(cargs[1]) != Mag
+                push!(kwargs, Expr(:kw, :(prec::Integer), :(_precision($(name(cargs[1]))))))
+            else
+                push!(kwargs, :(prec::Integer))
+            end
 
             # Automatic detection of rounding mode argument
         elseif carg == Carg{arb_rnd}(:rnd, false)
@@ -229,7 +248,7 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
                 ),
             )
             # Automatic detection of length arguments for vectors
-        elseif i > 2 && is_length_argument(carg, cargs[i-1], len_keywords)
+        elseif i > 1 && is_length_argument(carg, cargs[i-1], len_keywords)
             extract_length_argument!(kwargs, len_keywords, carg, cargs[i-1])
         else
             push!(jl_arg_names_types, (name(carg), jltype(carg)))
@@ -279,7 +298,15 @@ function jlcode(af::Arbfunction, jl_fname = jlfname(af))
                 $(Expr(:tuple, ctype.(cargs)...)),
                 $(name.(cargs)...),
             )
-            $(returnT == Nothing && inplace(af) ? name(first(arguments(af))) : :__ret)
+            $(
+                if returnT === Nothing && inplace(af)
+                    name(first(arguments(af)))
+                elseif ispredicate(af)
+                    :(!iszero(__ret))
+                else
+                    :__ret
+                end
+            )
         end
     )
 

@@ -50,6 +50,33 @@
     D = TVec(length(A); prec = 96)
     Arblib.add!(D, A, B, length(AInt), 96)
     @test D == AInt + BInt
+
+    @testset "similar" begin
+        A = TVec(5; prec = 96)
+
+        a = similar(A)
+        @test a isa TVec
+        @test precision(a) == precision(A)
+
+        a = similar(A, TRef, 3)
+        @test a isa TVec
+        @test precision(a) == precision(A)
+
+        for (ElT, VT, MT) in (
+            (Arb, ArbVector, ArbMatrix),
+            (Acb, AcbVector, AcbMatrix),
+            (ArbRef, ArbRefVector, ArbRefMatrix),
+            (AcbRef, AcbRefVector, AcbRefMatrix),
+        )
+            a = similar(A, ElT, 3)
+            @test a isa VT
+            @test precision(a) == precision(A)
+
+            a = similar(A, ElT, (3, 2))
+            @test a isa MT
+            @test precision(a) == precision(A)
+        end
+    end
 end
 
 @testset "VectorRef: $T" for (T, TRef) in
