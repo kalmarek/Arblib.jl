@@ -171,13 +171,13 @@ end
 # lu factorization
 function LinearAlgebra.lu!(A::T) where {T<:Matrices}
     ipiv = zeros(Int, size(A, 2))
-    retcode = lu!(ipiv, A, A)
+    retcode = lu!(ipiv, A, A; prec = precision(A))
     LinearAlgebra.LU(A, ipiv, retcode > 0 ? 0 : 1)
 end
 function LinearAlgebra.lu(A::Matrices)
     lu = similar(A)
     ipiv = zeros(Int, size(A, 2))
-    retcode = lu!(ipiv, lu, A)
+    retcode = lu!(ipiv, lu, A; prec = precision(lu))
     LinearAlgebra.LU(lu, ipiv, retcode > 0 ? 0 : 1)
 end
 

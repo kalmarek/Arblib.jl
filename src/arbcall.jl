@@ -213,8 +213,13 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
             @assert !prec_kwarg
             prec_kwarg = true
 
-            c₁ = first(cargs)
-            push!(kwargs, Expr(:kw, :(prec::Integer), :(_precision($(name(c₁))))))
+            # If the first argument has a precision,
+            # then use this otherwise make it a mandatory kwarg
+            if rawtype(cargs[1]) <: ArbTypes && rawtype(cargs[1]) != Mag
+                push!(kwargs, Expr(:kw, :(prec::Integer), :(_precision($(name(cargs[1]))))))
+            else
+                push!(kwargs, :(prec::Integer))
+            end
 
             # Automatic detection of rounding mode argument
         elseif carg == Carg{arb_rnd}(:rnd, false)
