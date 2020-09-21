@@ -14,7 +14,7 @@ arbcall"void acb_poly_swap(acb_poly_t poly1, acb_poly_t poly2)"
 arbcall"slong acb_poly_allocated_bytes(const acb_poly_t x)"
 
 ### Basic properties and manipulation
-#arbcall"slong acb_poly_length(const acb_poly_t poly)"
+#mo arbcall"slong acb_poly_length(const acb_poly_t poly)" # clashes with Base.length
 arbcall"slong acb_poly_degree(const acb_poly_t poly)"
 arbcall"int acb_poly_is_zero(const acb_poly_t poly)"
 arbcall"int acb_poly_is_one(const acb_poly_t poly)"
@@ -37,28 +37,28 @@ arbcall"slong acb_poly_valuation(const acb_poly_t poly)"
 
 ### Input and output
 arbcall"void acb_poly_printd(const acb_poly_t poly, slong digits)"
-# arbcall"void acb_poly_fprintd(FILE * file, const acb_poly_t poly, slong digits)"
+#ns arbcall"void acb_poly_fprintd(FILE * file, const acb_poly_t poly, slong digits)"
 
 ### Random generation
-# arbcall"void acb_poly_randtest(acb_poly_t poly, flint_rand_t state, slong len, slong prec, slong mag_bits)"
+#ns arbcall"void acb_poly_randtest(acb_poly_t poly, flint_rand_t state, slong len, slong prec, slong mag_bits)"
 
 ### Comparisons
 arbcall"int acb_poly_equal(const acb_poly_t A, const acb_poly_t B)"
 arbcall"int acb_poly_contains(const acb_poly_t poly1, const acb_poly_t poly2)"
-# arbcall"int acb_poly_contains_fmpz_poly(const acb_poly_t poly1, const fmpz_poly_t poly2)"
-# arbcall"int acb_poly_contains_fmpq_poly(const acb_poly_t poly1, const fmpq_poly_t poly2)"
+#ni arbcall"int acb_poly_contains_fmpz_poly(const acb_poly_t poly1, const fmpz_poly_t poly2)"
+#ni arbcall"int acb_poly_contains_fmpq_poly(const acb_poly_t poly1, const fmpq_poly_t poly2)"
 arbcall"int _acb_poly_overlaps(acb_srcptr poly1, slong len1, acb_srcptr poly2, slong len2)"
 arbcall"int acb_poly_overlaps(const acb_poly_t poly1, const acb_poly_t poly2)"
-# arbcall"int acb_poly_get_unique_fmpz_poly(fmpz_poly_t z, const acb_poly_t x)"
+#ni arbcall"int acb_poly_get_unique_fmpz_poly(fmpz_poly_t z, const acb_poly_t x)"
 arbcall"int acb_poly_is_real(const acb_poly_t poly)"
 
 ### Conversions
-# arbcall"void acb_poly_set_fmpz_poly(acb_poly_t poly, const fmpz_poly_t re, slong prec)"
-# arbcall"void acb_poly_set2_fmpz_poly(acb_poly_t poly, const fmpz_poly_t re, const fmpz_poly_t im, slong prec)"
+#ni arbcall"void acb_poly_set_fmpz_poly(acb_poly_t poly, const fmpz_poly_t re, slong prec)"
+#ni arbcall"void acb_poly_set2_fmpz_poly(acb_poly_t poly, const fmpz_poly_t re, const fmpz_poly_t im, slong prec)"
 arbcall"void acb_poly_set_arb_poly(acb_poly_t poly, const arb_poly_t re)"
 arbcall"void acb_poly_set2_arb_poly(acb_poly_t poly, const arb_poly_t re, const arb_poly_t im)"
-# arbcall"void acb_poly_set_fmpq_poly(acb_poly_t poly, const fmpq_poly_t re, slong prec)"
-# arbcall"void acb_poly_set2_fmpq_poly(acb_poly_t poly, const fmpq_poly_t re, const fmpq_poly_t im, slong prec)"
+#ni arbcall"void acb_poly_set_fmpq_poly(acb_poly_t poly, const fmpq_poly_t re, slong prec)"
+#ni arbcall"void acb_poly_set2_fmpq_poly(acb_poly_t poly, const fmpq_poly_t re, const fmpq_poly_t im, slong prec)"
 arbcall"void acb_poly_set_acb(acb_poly_t poly, const acb_t src)"
 arbcall"void acb_poly_set_si(acb_poly_t poly, slong src)"
 
@@ -67,10 +67,10 @@ arbcall"void _acb_poly_majorant(arb_ptr res, acb_srcptr poly, slong len, slong p
 arbcall"void acb_poly_majorant(arb_poly_t res, const acb_poly_t poly, slong prec)"
 
 ### Arithmetic
-#arbcall"void _acb_poly_add(acb_ptr C, acb_srcptr A, slong lenA, acb_srcptr B, slong lenB, slong prec)"
+#mo arbcall"void _acb_poly_add(acb_ptr C, acb_srcptr A, slong lenA, acb_srcptr B, slong lenB, slong prec)" # clashes with _acb_vec_add
 arbcall"void acb_poly_add(acb_poly_t C, const acb_poly_t A, const acb_poly_t B, slong prec)"
 arbcall"void acb_poly_add_si(acb_poly_t C, const acb_poly_t A, slong B, slong prec)"
-#arbcall"void _acb_poly_sub(acb_ptr C, acb_srcptr A, slong lenA, acb_srcptr B, slong lenB, slong prec)"
+#mo arbcall"void _acb_poly_sub(acb_ptr C, acb_srcptr A, slong lenA, acb_srcptr B, slong lenB, slong prec)" # clashes with _acb_vec_sub
 arbcall"void acb_poly_sub(acb_poly_t C, const acb_poly_t A, const acb_poly_t B, slong prec)"
 arbcall"void acb_poly_add_series(acb_poly_t C, const acb_poly_t A, const acb_poly_t B, slong len, slong prec)"
 arbcall"void acb_poly_sub_series(acb_poly_t C, const acb_poly_t A, const acb_poly_t B, slong len, slong prec)"
@@ -145,14 +145,14 @@ arbcall"void acb_poly_evaluate2(acb_t y, acb_t z, const acb_poly_t f, const acb_
 ### Product trees
 arbcall"void _acb_poly_product_roots(acb_ptr poly, acb_srcptr xs, slong n, slong prec)"
 arbcall"void acb_poly_product_roots(acb_poly_t poly, acb_srcptr xs, slong n, slong prec)"
-# arbcall"acb_ptr * _acb_poly_tree_alloc(slong len)"
-# arbcall"void _acb_poly_tree_free(acb_ptr * tree, slong len)"
-# arbcall"void _acb_poly_tree_build(acb_ptr * tree, acb_srcptr roots, slong len, slong prec)"
+#ni arbcall"acb_ptr * _acb_poly_tree_alloc(slong len)"
+#ni arbcall"void _acb_poly_tree_free(acb_ptr * tree, slong len)"
+#ni arbcall"void _acb_poly_tree_build(acb_ptr * tree, acb_srcptr roots, slong len, slong prec)"
 
 ### Multipoint evaluation
 arbcall"void _acb_poly_evaluate_vec_iter(acb_ptr ys, acb_srcptr poly, slong plen, acb_srcptr xs, slong n, slong prec)"
 arbcall"void acb_poly_evaluate_vec_iter(acb_ptr ys, const acb_poly_t poly, acb_srcptr xs, slong n, slong prec)"
-# arbcall"void _acb_poly_evaluate_vec_fast_precomp(acb_ptr vs, acb_srcptr poly, slong plen, acb_ptr * tree, slong len, slong prec)"
+#ni arbcall"void _acb_poly_evaluate_vec_fast_precomp(acb_ptr vs, acb_srcptr poly, slong plen, acb_ptr * tree, slong len, slong prec)"
 arbcall"void _acb_poly_evaluate_vec_fast(acb_ptr ys, acb_srcptr poly, slong plen, acb_srcptr xs, slong n, slong prec)"
 arbcall"void acb_poly_evaluate_vec_fast(acb_ptr ys, const acb_poly_t poly, acb_srcptr xs, slong n, slong prec)"
 
@@ -161,8 +161,8 @@ arbcall"void _acb_poly_interpolate_newton(acb_ptr poly, acb_srcptr xs, acb_srcpt
 arbcall"void acb_poly_interpolate_newton(acb_poly_t poly, acb_srcptr xs, acb_srcptr ys, slong n, slong prec)"
 arbcall"void _acb_poly_interpolate_barycentric(acb_ptr poly, acb_srcptr xs, acb_srcptr ys, slong n, slong prec)"
 arbcall"void acb_poly_interpolate_barycentric(acb_poly_t poly, acb_srcptr xs, acb_srcptr ys, slong n, slong prec)"
-# arbcall"void _acb_poly_interpolation_weights(acb_ptr w, acb_ptr * tree, slong len, slong prec)"
-# arbcall"void _acb_poly_interpolate_fast_precomp(acb_ptr poly, acb_srcptr ys, acb_ptr * tree, acb_srcptr weights, slong len, slong prec)"
+#ni arbcall"void _acb_poly_interpolation_weights(acb_ptr w, acb_ptr * tree, slong len, slong prec)"
+#ni arbcall"void _acb_poly_interpolate_fast_precomp(acb_ptr poly, acb_srcptr ys, acb_ptr * tree, acb_srcptr weights, slong len, slong prec)"
 arbcall"void _acb_poly_interpolate_fast(acb_ptr poly, acb_srcptr xs, acb_srcptr ys, slong len, slong prec)"
 arbcall"void acb_poly_interpolate_fast(acb_poly_t poly, acb_srcptr xs, acb_srcptr ys, slong n, slong prec)"
 
@@ -243,8 +243,8 @@ arbcall"void _acb_poly_sinc_series(acb_ptr s, acb_srcptr h, slong hlen, slong n,
 arbcall"void acb_poly_sinc_series(acb_poly_t s, const acb_poly_t h, slong n, slong prec)"
 
 ### Lambert W function
-# arbcall"void _acb_poly_lambertw_series(acb_ptr res, acb_srcptr z, slong zlen, const fmpz_t k, int flags, slong len, slong prec)"
-# arbcall"void acb_poly_lambertw_series(acb_poly_t res, const acb_poly_t z, const fmpz_t k, int flags, slong len, slong prec)"
+#ni arbcall"void _acb_poly_lambertw_series(acb_ptr res, acb_srcptr z, slong zlen, const fmpz_t k, int flags, slong len, slong prec)"
+#ni arbcall"void acb_poly_lambertw_series(acb_poly_t res, const acb_poly_t z, const fmpz_t k, int flags, slong len, slong prec)"
 
 ### Gamma function
 arbcall"void _acb_poly_gamma_series(acb_ptr res, acb_srcptr h, slong hlen, slong n, slong prec)"

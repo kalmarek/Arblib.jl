@@ -13,23 +13,23 @@ arbcall"void arb_mat_window_clear(arb_mat_t window)"
 
 ### Conversions
 arbcall"void arb_mat_set(arb_mat_t dest, const arb_mat_t src)"
-# arbcall"void arb_mat_set_fmpz_mat(arb_mat_t dest, const fmpz_mat_t src)"
-# arbcall"void arb_mat_set_round_fmpz_mat(arb_mat_t dest, const fmpz_mat_t src, slong prec)"
-# arbcall"void arb_mat_set_fmpq_mat(arb_mat_t dest, const fmpq_mat_t src, slong prec)"
+#ni arbcall"void arb_mat_set_fmpz_mat(arb_mat_t dest, const fmpz_mat_t src)"
+#ni arbcall"void arb_mat_set_round_fmpz_mat(arb_mat_t dest, const fmpz_mat_t src, slong prec)"
+#ni arbcall"void arb_mat_set_fmpq_mat(arb_mat_t dest, const fmpq_mat_t src, slong prec)"
 
 ### Random generation
-# arbcall"void arb_mat_randtest(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)"
+#ns arbcall"void arb_mat_randtest(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)"
 
 ### Input and output
 arbcall"void arb_mat_printd(const arb_mat_t mat, slong digits)"
-# arbcall"void arb_mat_fprintd(FILE * file, const arb_mat_t mat, slong digits)"
+#ns arbcall"void arb_mat_fprintd(FILE * file, const arb_mat_t mat, slong digits)"
 
 ### Comparisons
 arbcall"int arb_mat_equal(const arb_mat_t mat1, const arb_mat_t mat2)"
 arbcall"int arb_mat_overlaps(const arb_mat_t mat1, const arb_mat_t mat2)"
 arbcall"int arb_mat_contains(const arb_mat_t mat1, const arb_mat_t mat2)"
-# arbcall"int arb_mat_contains_fmpz_mat(const arb_mat_t mat1, const fmpz_mat_t mat2)"
-# arbcall"int arb_mat_contains_fmpq_mat(const arb_mat_t mat1, const fmpq_mat_t mat2)"
+#ni arbcall"int arb_mat_contains_fmpz_mat(const arb_mat_t mat1, const fmpz_mat_t mat2)"
+#ni arbcall"int arb_mat_contains_fmpq_mat(const arb_mat_t mat1, const fmpq_mat_t mat2)"
 arbcall"int arb_mat_eq(const arb_mat_t mat1, const arb_mat_t mat2)"
 arbcall"int arb_mat_ne(const arb_mat_t mat1, const arb_mat_t mat2)"
 arbcall"int arb_mat_is_empty(const arb_mat_t mat)"
@@ -71,19 +71,19 @@ arbcall"void arb_mat_mul_entrywise(arb_mat_t C, const arb_mat_t A, const arb_mat
 arbcall"void arb_mat_sqr_classical(arb_mat_t B, const arb_mat_t A, slong prec)"
 arbcall"void arb_mat_sqr(arb_mat_t res, const arb_mat_t mat, slong prec)"
 arbcall"void arb_mat_pow_ui(arb_mat_t res, const arb_mat_t mat, ulong exp, slong prec)"
-# arbcall"void _arb_mat_addmul_rad_mag_fast(arb_mat_t C, mag_srcptr A, mag_srcptr B, slong ar, slong ac, slong bc)"
+#ni arbcall"void _arb_mat_addmul_rad_mag_fast(arb_mat_t C, mag_srcptr A, mag_srcptr B, slong ar, slong ac, slong bc)"
 arbcall"void arb_mat_approx_mul(arb_mat_t res, const arb_mat_t mat1, const arb_mat_t mat2, slong prec)"
 
 ### Scalar arithmetic
 arbcall"void arb_mat_scalar_mul_2exp_si(arb_mat_t B, const arb_mat_t A, slong c)"
 arbcall"void arb_mat_scalar_addmul_si(arb_mat_t B, const arb_mat_t A, slong c, slong prec)"
-# arbcall"void arb_mat_scalar_addmul_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
+#ni arbcall"void arb_mat_scalar_addmul_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
 arbcall"void arb_mat_scalar_addmul_arb(arb_mat_t B, const arb_mat_t A, const arb_t c, slong prec)"
 arbcall"void arb_mat_scalar_mul_si(arb_mat_t B, const arb_mat_t A, slong c, slong prec)"
-# arbcall"void arb_mat_scalar_mul_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
+#ni arbcall"void arb_mat_scalar_mul_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
 arbcall"void arb_mat_scalar_mul_arb(arb_mat_t B, const arb_mat_t A, const arb_t c, slong prec)"
 arbcall"void arb_mat_scalar_div_si(arb_mat_t B, const arb_mat_t A, slong c, slong prec)"
-# arbcall"void arb_mat_scalar_div_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
+#ni arbcall"void arb_mat_scalar_div_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
 arbcall"void arb_mat_scalar_div_arb(arb_mat_t B, const arb_mat_t A, const arb_t c, slong prec)"
 
 ### Gaussian elimination and solving
@@ -139,8 +139,8 @@ arbcall"void _arb_mat_diag_prod(arb_t res, const arb_mat_t mat, slong a, slong b
 arbcall"void arb_mat_diag_prod(arb_t res, const arb_mat_t mat, slong prec)"
 
 ### Sparsity structure
-# arbcall"void arb_mat_entrywise_is_zero(fmpz_mat_t dest, const arb_mat_t src)"
-# arbcall"void arb_mat_entrywise_not_is_zero(fmpz_mat_t dest, const arb_mat_t src)"
+#ni arbcall"void arb_mat_entrywise_is_zero(fmpz_mat_t dest, const arb_mat_t src)"
+#ni arbcall"void arb_mat_entrywise_not_is_zero(fmpz_mat_t dest, const arb_mat_t src)"
 arbcall"slong arb_mat_count_is_zero(const arb_mat_t mat)"
 arbcall"slong arb_mat_count_not_is_zero(const arb_mat_t mat)"
 

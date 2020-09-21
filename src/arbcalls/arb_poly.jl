@@ -13,7 +13,7 @@ arbcall"void _arb_poly_normalise(arb_poly_t poly)"
 arbcall"slong arb_poly_allocated_bytes(const arb_poly_t x)"
 
 ### Basic manipulation
-#arbcall"slong arb_poly_length(const arb_poly_t poly)"
+#mo arbcall"slong arb_poly_length(const arb_poly_t poly)" # clashes with Base.length
 arbcall"slong arb_poly_degree(const arb_poly_t poly)"
 arbcall"int arb_poly_is_zero(const arb_poly_t poly)"
 arbcall"int arb_poly_is_one(const arb_poly_t poly)"
@@ -35,35 +35,35 @@ arbcall"void arb_poly_truncate(arb_poly_t poly, slong n)"
 arbcall"slong arb_poly_valuation(const arb_poly_t poly)"
 
 ### Conversions
-# arbcall"void arb_poly_set_fmpz_poly(arb_poly_t poly, const fmpz_poly_t src, slong prec)"
-# arbcall"void arb_poly_set_fmpq_poly(arb_poly_t poly, const fmpq_poly_t src, slong prec)"
+#ni arbcall"void arb_poly_set_fmpz_poly(arb_poly_t poly, const fmpz_poly_t src, slong prec)"
+#ni arbcall"void arb_poly_set_fmpq_poly(arb_poly_t poly, const fmpq_poly_t src, slong prec)"
 arbcall"void arb_poly_set_si(arb_poly_t poly, slong src)"
 
 ### Input and output
 arbcall"void arb_poly_printd(const arb_poly_t poly, slong digits)"
-# arbcall"void arb_poly_fprintd(FILE * file, const arb_poly_t poly, slong digits)"
+#ns arbcall"void arb_poly_fprintd(FILE * file, const arb_poly_t poly, slong digits)"
 
 ### Random generation
-# arbcall"void arb_poly_randtest(arb_poly_t poly, flint_rand_t state, slong len, slong prec, slong mag_bits)"
+#ns arbcall"void arb_poly_randtest(arb_poly_t poly, flint_rand_t state, slong len, slong prec, slong mag_bits)"
 
 ### Comparisons
 arbcall"int arb_poly_contains(const arb_poly_t poly1, const arb_poly_t poly2)"
-# arbcall"int arb_poly_contains_fmpz_poly(const arb_poly_t poly1, const fmpz_poly_t poly2)"
-# arbcall"int arb_poly_contains_fmpq_poly(const arb_poly_t poly1, const fmpq_poly_t poly2)"
+#ni arbcall"int arb_poly_contains_fmpz_poly(const arb_poly_t poly1, const fmpz_poly_t poly2)"
+#ni arbcall"int arb_poly_contains_fmpq_poly(const arb_poly_t poly1, const fmpq_poly_t poly2)"
 arbcall"int arb_poly_equal(const arb_poly_t A, const arb_poly_t B)"
 arbcall"int _arb_poly_overlaps(arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2)"
 arbcall"int arb_poly_overlaps(const arb_poly_t poly1, const arb_poly_t poly2)"
-# arbcall"int arb_poly_get_unique_fmpz_poly(fmpz_poly_t z, const arb_poly_t x)"
+#ni arbcall"int arb_poly_get_unique_fmpz_poly(fmpz_poly_t z, const arb_poly_t x)"
 
 ### Bounds
 arbcall"void _arb_poly_majorant(arb_ptr res, arb_srcptr poly, slong len, slong prec)"
 arbcall"void arb_poly_majorant(arb_poly_t res, const arb_poly_t poly, slong prec)"
 
 ### Arithmetic
-#arbcall"void _arb_poly_add(arb_ptr C, arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, slong prec)"
+#mo arbcall"void _arb_poly_add(arb_ptr C, arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, slong prec)" # clashes with _arb_vec_add
 arbcall"void arb_poly_add(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong prec)"
 arbcall"void arb_poly_add_si(arb_poly_t C, const arb_poly_t A, slong B, slong prec)"
-#arbcall"void _arb_poly_sub(arb_ptr C, arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, slong prec)"
+#mo arbcall"void _arb_poly_sub(arb_ptr C, arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, slong prec)" # clashes with _arb_vec_sub
 arbcall"void arb_poly_sub(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong prec)"
 arbcall"void arb_poly_add_series(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong len, slong prec)"
 arbcall"void arb_poly_sub_series(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong len, slong prec)"
@@ -151,14 +151,14 @@ arbcall"void _arb_poly_product_roots(arb_ptr poly, arb_srcptr xs, slong n, slong
 arbcall"void arb_poly_product_roots(arb_poly_t poly, arb_srcptr xs, slong n, slong prec)"
 arbcall"void _arb_poly_product_roots_complex(arb_ptr poly, arb_srcptr r, slong rn, acb_srcptr c, slong cn, slong prec)"
 arbcall"void arb_poly_product_roots_complex(arb_poly_t poly, arb_srcptr r, slong rn, acb_srcptr c, slong cn, slong prec)"
-# arbcall"arb_ptr * _arb_poly_tree_alloc(slong len)"
-# arbcall"void _arb_poly_tree_free(arb_ptr * tree, slong len)"
-# arbcall"void _arb_poly_tree_build(arb_ptr * tree, arb_srcptr roots, slong len, slong prec)"
+#ni arbcall"arb_ptr * _arb_poly_tree_alloc(slong len)"
+#ni arbcall"void _arb_poly_tree_free(arb_ptr * tree, slong len)"
+#ni arbcall"void _arb_poly_tree_build(arb_ptr * tree, arb_srcptr roots, slong len, slong prec)"
 
 ### Multipoint evaluation
 arbcall"void _arb_poly_evaluate_vec_iter(arb_ptr ys, arb_srcptr poly, slong plen, arb_srcptr xs, slong n, slong prec)"
 arbcall"void arb_poly_evaluate_vec_iter(arb_ptr ys, const arb_poly_t poly, arb_srcptr xs, slong n, slong prec)"
-# arbcall"void _arb_poly_evaluate_vec_fast_precomp(arb_ptr vs, arb_srcptr poly, slong plen, arb_ptr * tree, slong len, slong prec)"
+#ni arbcall"void _arb_poly_evaluate_vec_fast_precomp(arb_ptr vs, arb_srcptr poly, slong plen, arb_ptr * tree, slong len, slong prec)"
 arbcall"void _arb_poly_evaluate_vec_fast(arb_ptr ys, arb_srcptr poly, slong plen, arb_srcptr xs, slong n, slong prec)"
 arbcall"void arb_poly_evaluate_vec_fast(arb_ptr ys, const arb_poly_t poly, arb_srcptr xs, slong n, slong prec)"
 
@@ -167,8 +167,8 @@ arbcall"void _arb_poly_interpolate_newton(arb_ptr poly, arb_srcptr xs, arb_srcpt
 arbcall"void arb_poly_interpolate_newton(arb_poly_t poly, arb_srcptr xs, arb_srcptr ys, slong n, slong prec)"
 arbcall"void _arb_poly_interpolate_barycentric(arb_ptr poly, arb_srcptr xs, arb_srcptr ys, slong n, slong prec)"
 arbcall"void arb_poly_interpolate_barycentric(arb_poly_t poly, arb_srcptr xs, arb_srcptr ys, slong n, slong prec)"
-# arbcall"void _arb_poly_interpolation_weights(arb_ptr w, arb_ptr * tree, slong len, slong prec)"
-# arbcall"void _arb_poly_interpolate_fast_precomp(arb_ptr poly, arb_srcptr ys, arb_ptr * tree, arb_srcptr weights, slong len, slong prec)"
+#ni arbcall"void _arb_poly_interpolation_weights(arb_ptr w, arb_ptr * tree, slong len, slong prec)"
+#ni arbcall"void _arb_poly_interpolate_fast_precomp(arb_ptr poly, arb_srcptr ys, arb_ptr * tree, arb_srcptr weights, slong len, slong prec)"
 arbcall"void _arb_poly_interpolate_fast(arb_ptr poly, arb_srcptr xs, arb_srcptr ys, slong len, slong prec)"
 arbcall"void arb_poly_interpolate_fast(arb_poly_t poly, arb_srcptr xs, arb_srcptr ys, slong n, slong prec)"
 
