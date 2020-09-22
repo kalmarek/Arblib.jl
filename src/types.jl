@@ -2,74 +2,33 @@ struct Arf <: Real
     arf::arf_struct
     prec::Int
 
-    function Arf(; prec::Integer = DEFAULT_PRECISION[])
-        res = new(arf_struct(), prec)
-        return res
-    end
+    Arf(; prec::Integer = DEFAULT_PRECISION[]) = new(arf_struct(), prec)
 
-    function Arf(x::arf_struct; prec::Integer = DEFAULT_PRECISION[])
-        res = Arf(prec = prec)
-        set!(res, x)
-        return res
-    end
-
-    function Arf(x::Union{UInt,Int}; prec::Integer = DEFAULT_PRECISION[])
-        res = new(arf_struct(x), prec)
-        return res
-    end
+    Arf(x::Union{UInt,Int}; prec::Integer = DEFAULT_PRECISION[]) = new(arf_struct(x), prec)
 end
 
 struct Mag <: Real
     mag::mag_struct
 
-    function Mag()
-        res = new(mag_struct())
-        return res
-    end
+    Mag() = new(mag_struct())
 
-    function Mag(x::mag_struct)
-        res = new(mag_struct(x))
-        return res
-    end
+    Mag(x::mag_struct) = new(mag_struct(x))
 
-    function Mag(x::Union{Mag,Arf})
-        res = new(mag_struct(cstruct(x)))
-        return res
-    end
+    Mag(x::Union{Mag,Arf}) = new(mag_struct(cstruct(x)))
 end
-
 
 struct Arb <: Real
     arb::arb_struct
     prec::Int
 
-    function Arb(; prec::Integer = DEFAULT_PRECISION[])
-        res = new(arb_struct(), prec)
-        return res
-    end
-
-    function Arb(x::arb_struct; prec::Integer = DEFAULT_PRECISION[])
-        res = Arb(prec = prec)
-        set!(res, x)
-        return res
-    end
+    Arb(; prec::Integer = DEFAULT_PRECISION[]) = new(arb_struct(), prec)
 end
-
 
 struct Acb <: Number
     acb::acb_struct
     prec::Int
 
-    function Acb(; prec::Integer = DEFAULT_PRECISION[])
-        res = new(acb_struct(), prec)
-        return res
-    end
-
-    function Acb(x::acb_struct; prec::Integer = DEFAULT_PRECISION[])
-        res = Acb(prec = prec)
-        set!(res, x)
-        return res
-    end
+    Acb(; prec::Integer = DEFAULT_PRECISION[]) = new(acb_struct(), prec)
 end
 
 # Refs are in reverse order to model their possible depencies

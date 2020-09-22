@@ -10,7 +10,7 @@ for T in (Unsigned, Base.GMP.CdoubleMax)
 end
 
 ## Arf
-for T in (Unsigned, Integer, Base.GMP.CdoubleMax, Mag)
+for T in (arf_struct, Unsigned, Integer, Base.GMP.CdoubleMax, Mag)
     @eval begin
         function Arf(x::$T; prec::Integer = DEFAULT_PRECISION[])
             res = Arf(prec = prec)
@@ -31,7 +31,7 @@ function Arf(x::Arf; prec::Integer = precision(x))
 end
 
 ## Arb
-for T in (Unsigned, Integer, Base.GMP.CdoubleMax)
+for T in (arb_struct, Unsigned, Integer, Base.GMP.CdoubleMax)
     @eval begin
         function Arb(x::$T; prec::Integer = DEFAULT_PRECISION[])
             res = Arb(prec = prec)
@@ -66,7 +66,7 @@ function Arb(x::Rational; prec::Integer = DEFAULT_PRECISION[])
 end
 
 ## Acb
-for T in (Unsigned, Integer, Base.GMP.CdoubleMax)
+for T in (acb_struct, Unsigned, Integer, Base.GMP.CdoubleMax)
     @eval begin
         function Acb(x::$T; prec::Integer = DEFAULT_PRECISION[])
             res = Acb(prec = prec)
