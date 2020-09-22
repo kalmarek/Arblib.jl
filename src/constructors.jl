@@ -77,8 +77,7 @@ for T in (acb_struct, Unsigned, Integer, Base.GMP.CdoubleMax)
 end
 function Acb(x::Arf; prec::Integer = precision(x))
     res = Acb(prec = prec)
-    # There is not set! with Acb and Arf. So create intermediate Arb :shrug:
-    set!(res, Arb(x, prec = prec))
+    set!(realref(res), x)
     return res
 end
 
