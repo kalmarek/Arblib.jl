@@ -13,26 +13,26 @@ arbcall"void acb_mat_window_clear(acb_mat_t window)"
 
 ### Conversions
 arbcall"void acb_mat_set(acb_mat_t dest, const acb_mat_t src)"
-# arbcall"void acb_mat_set_fmpz_mat(acb_mat_t dest, const fmpz_mat_t src)"
-# arbcall"void acb_mat_set_round_fmpz_mat(acb_mat_t dest, const fmpz_mat_t src, slong prec)"
-# arbcall"void acb_mat_set_fmpq_mat(acb_mat_t dest, const fmpq_mat_t src, slong prec)"
+#ni arbcall"void acb_mat_set_fmpz_mat(acb_mat_t dest, const fmpz_mat_t src)"
+#ni arbcall"void acb_mat_set_round_fmpz_mat(acb_mat_t dest, const fmpz_mat_t src, slong prec)"
+#ni arbcall"void acb_mat_set_fmpq_mat(acb_mat_t dest, const fmpq_mat_t src, slong prec)"
 arbcall"void acb_mat_set_arb_mat(acb_mat_t dest, const arb_mat_t src)"
 arbcall"void acb_mat_set_round_arb_mat(acb_mat_t dest, const arb_mat_t src, slong prec)"
 
 ### Random generation
-# arbcall"void acb_mat_randtest(acb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)"
-# arbcall"void acb_mat_randtest_eig(acb_mat_t mat, flint_rand_t state, acb_srcptr E, slong prec)"
+#ns arbcall"void acb_mat_randtest(acb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)"
+#ns arbcall"void acb_mat_randtest_eig(acb_mat_t mat, flint_rand_t state, acb_srcptr E, slong prec)"
 
 ### Input and output
 arbcall"void acb_mat_printd(const acb_mat_t mat, slong digits)"
-# arbcall"void acb_mat_fprintd(FILE * file, const acb_mat_t mat, slong digits)"
+#ns arbcall"void acb_mat_fprintd(FILE * file, const acb_mat_t mat, slong digits)"
 
 ### Comparisons
 arbcall"int acb_mat_equal(const acb_mat_t mat1, const acb_mat_t mat2)"
 arbcall"int acb_mat_overlaps(const acb_mat_t mat1, const acb_mat_t mat2)"
 arbcall"int acb_mat_contains(const acb_mat_t mat1, const acb_mat_t mat2)"
-# arbcall"int acb_mat_contains_fmpz_mat(const acb_mat_t mat1, const fmpz_mat_t mat2)"
-# arbcall"int acb_mat_contains_fmpq_mat(const acb_mat_t mat1, const fmpq_mat_t mat2)"
+#ni arbcall"int acb_mat_contains_fmpz_mat(const acb_mat_t mat1, const fmpz_mat_t mat2)"
+#ni arbcall"int acb_mat_contains_fmpq_mat(const acb_mat_t mat1, const fmpq_mat_t mat2)"
 arbcall"int acb_mat_eq(const acb_mat_t mat1, const acb_mat_t mat2)"
 arbcall"int acb_mat_ne(const acb_mat_t mat1, const acb_mat_t mat2)"
 arbcall"int acb_mat_is_real(const acb_mat_t mat)"
@@ -79,15 +79,15 @@ arbcall"void acb_mat_approx_mul(acb_mat_t res, const acb_mat_t mat1, const acb_m
 ### Scalar arithmetic
 arbcall"void acb_mat_scalar_mul_2exp_si(acb_mat_t B, const acb_mat_t A, slong c)"
 arbcall"void acb_mat_scalar_addmul_si(acb_mat_t B, const acb_mat_t A, slong c, slong prec)"
-# arbcall"void acb_mat_scalar_addmul_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec)"
+#ni arbcall"void acb_mat_scalar_addmul_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec)"
 arbcall"void acb_mat_scalar_addmul_arb(acb_mat_t B, const acb_mat_t A, const arb_t c, slong prec)"
 arbcall"void acb_mat_scalar_addmul_acb(acb_mat_t B, const acb_mat_t A, const acb_t c, slong prec)"
 arbcall"void acb_mat_scalar_mul_si(acb_mat_t B, const acb_mat_t A, slong c, slong prec)"
-# arbcall"void acb_mat_scalar_mul_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec)"
+#ni arbcall"void acb_mat_scalar_mul_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec)"
 arbcall"void acb_mat_scalar_mul_arb(acb_mat_t B, const acb_mat_t A, const arb_t c, slong prec)"
 arbcall"void acb_mat_scalar_mul_acb(acb_mat_t B, const acb_mat_t A, const acb_t c, slong prec)"
 arbcall"void acb_mat_scalar_div_si(acb_mat_t B, const acb_mat_t A, slong c, slong prec)"
-# arbcall"void acb_mat_scalar_div_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec)"
+#ni arbcall"void acb_mat_scalar_div_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec)"
 arbcall"void acb_mat_scalar_div_arb(acb_mat_t B, const acb_mat_t A, const arb_t c, slong prec)"
 arbcall"void acb_mat_scalar_div_acb(acb_mat_t B, const acb_mat_t A, const acb_t c, slong prec)"
 
