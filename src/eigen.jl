@@ -139,7 +139,7 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
             prec = precision(A),
             side = :right,
         )
-            eigvals_approx, R_eigvecs_approx = approx_eig_qr(A)
+            eigvals_approx, R_eigvecs_approx = approx_eig_qr(A, prec = prec)
             return $jlf(
                 eigvals,
                 eigvecs,
@@ -156,7 +156,7 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
             A::Union{AcbMatrix,AcbRefMatrix};
             prec = precision(A),
         )
-            λ_approx, R_approx = approx_eig_qr(A)
+            λ_approx, R_approx = approx_eig_qr(A, prec = prec)
             return $jlf(eigvals, A, λ_approx, R_approx, prec = prec)
         end
 
@@ -213,7 +213,7 @@ for f in (:eig_multiple_rump, :eig_multiple)
             A::Union{AcbMatrix,AcbRefMatrix};
             prec = precision(A),
         )
-            λ_approx, R_approx = approx_eig_qr(A)
+            λ_approx, R_approx = approx_eig_qr(A, prec = prec)
             return $f_inplace(eigvals, A, λ_approx, R_approx, prec = prec)
         end
 
