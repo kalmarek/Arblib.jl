@@ -40,7 +40,7 @@ end
 function AcbRef(
     ptr::Ptr{acb_struct},
     parent::Union{acb_vec_struct,acb_mat_struct};
-    prec::Int,
+    prec::Integer,
 )
     AcbRef(ptr, prec, parent)
 end
@@ -61,7 +61,7 @@ end
 function ArbRef(
     ptr::Ptr{arb_struct},
     parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_mat_struct};
-    prec::Int,
+    prec::Integer,
 )
     ArbRef(ptr, prec, parent)
 end
@@ -79,7 +79,7 @@ struct ArfRef <: Real
     prec::Int
     parent::Union{arb_struct,ArbRef}
 end
-function ArfRef(ptr::Ptr{arf_struct}, parent::Union{arb_struct,ArbRef}; prec::Int)
+function ArfRef(ptr::Ptr{arf_struct}, parent::Union{arb_struct,ArbRef}; prec::Integer)
     ArfRef(ptr, prec, parent)
 end
 
