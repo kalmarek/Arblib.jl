@@ -192,9 +192,6 @@ for T in [:Arb, :Acb], A in [:Vector, :Matrix]
     end
 end
 
-const ArbLike = Union{Arb,ArbRef,Ptr{arb_struct},arb_struct}
-const AcbLike = Union{Acb,AcbRef,Ptr{acb_struct},acb_struct}
-
 for (T, prefix) in (
     (Mag, :mag),
     (Arf, :arf),
