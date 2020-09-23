@@ -60,7 +60,13 @@ Base.@propagate_inbounds function Base.setindex!(
 end
 
 # Constructors
-for TPoly in [:ArbPoly, :AcbPoly]
+for (TPoly, TPolyStruct) in [(:ArbPoly, :arb_poly_struct), (:AcbPoly, :acb_poly_struct)]
+    @eval function $TPoly(poly::$TPolyStruct; prec::Integer = DEFAULT_PRECISION[])
+        res = $TPoly(prec = prec)
+        set!(res, poly)
+        return res
+    end
+
     @eval function $TPoly(coeff; prec::Integer = _precision(coeff))
         poly = $TPoly(prec = prec)
         poly[0] = coeff
@@ -76,7 +82,18 @@ for TPoly in [:ArbPoly, :AcbPoly]
     end
 end
 
-for (TSeries, T) in [(:ArbSeries, :Arb), (:AcbSeries, :Acb)]
+for (TSeries, TPolyStruct, T) in
+    [(:ArbSeries, :arb_poly_struct, :Arb), (:AcbSeries, :acb_poly_struct, :Acb)]
+    @eval function $TSeries(
+        poly::$TPolyStruct,
+        degree::Integer = degree(poly);
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        res = $TSeries(degree, prec = prec)
+        set!(res, poly)
+        return res
+    end
+
     @eval $TSeries(; prec::Integer = DEFAULT_PRECISION[]) = $TSeries(0, prec = prec)
 
     @eval function $TSeries(coeff, degree::Integer; prec::Integer = _precision(coeff))

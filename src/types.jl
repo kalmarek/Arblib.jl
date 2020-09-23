@@ -94,7 +94,6 @@ end
 Mag(x::MagRef) = set!(Mag(), x)
 Base.getindex(x::MagRef) = Mag(x)
 
-
 struct ArbVector <: DenseVector{Arb}
     arb_vec::arb_vec_struct
     prec::Int
@@ -114,13 +113,6 @@ struct ArbPoly
     prec::Int
 
     ArbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(arb_poly_struct(), prec)
-
-    function ArbPoly(poly::arb_poly_struct; prec::Integer = DEFAULT_PRECISION[])
-        res = ArbPoly(prec = prec)
-        set!(res, poly)
-
-        return res
-    end
 end
 
 struct ArbSeries <: Number
@@ -130,17 +122,6 @@ struct ArbSeries <: Number
 
     ArbSeries(degree::Integer; prec::Integer = DEFAULT_PRECISION[]) =
         new(arb_poly_struct(), degree, prec)
-
-    function ArbSeries(
-        poly::arb_poly_struct,
-        degree::Integer = degree(poly);
-        prec::Integer = DEFAULT_PRECISION[],
-    )
-        res = ArbSeries(degree, prec = prec)
-        set!(res, poly)
-
-        return res
-    end
 end
 
 struct AcbPoly
@@ -148,13 +129,6 @@ struct AcbPoly
     prec::Int
 
     AcbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(acb_poly_struct(), prec)
-
-    function AcbPoly(poly::acb_poly_struct; prec::Integer = DEFAULT_PRECISION[])
-        res = AcbPoly(prec = prec)
-        set!(res, poly)
-
-        return res
-    end
 end
 
 struct AcbSeries <: Number
@@ -164,17 +138,6 @@ struct AcbSeries <: Number
 
     AcbSeries(degree::Integer; prec::Integer = DEFAULT_PRECISION[]) =
         new(acb_poly_struct(), degree, prec)
-
-    function AcbSeries(
-        poly::acb_poly_struct,
-        degree::Integer = degree(poly);
-        prec::Integer = DEFAULT_PRECISION[],
-    )
-        res = AcbSeries(degree, prec = prec)
-        set!(res, poly)
-
-        return res
-    end
 end
 
 struct ArbMatrix <: DenseMatrix{Arb}
