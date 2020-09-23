@@ -205,15 +205,12 @@ for (T, prefix) in (
     (Union{AcbPoly,AcbSeries}, :acb_poly),
 )
     arbstruct = Symbol(prefix, :_struct)
-    spref = "$prefix"
-    @eval begin
-        cstructtype(::Type{<:$T}) = $arbstruct
-    end
     @eval begin
         cprefix(::Type{<:$T}) = $(QuoteNode(Symbol(prefix)))
         cstruct(x::$T) = getfield(x, cprefix($T))
         cstruct(x::$arbstruct) = x
-        Base.convert(::Type{$(cstructtype(T))}, x::$T) = cstruct(x)
+        cstructtype(::Type{<:$T}) = $arbstruct
+        Base.convert(::Type{$arbstruct}, x::$T) = cstruct(x)
     end
 end
 
