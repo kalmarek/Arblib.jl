@@ -49,6 +49,7 @@ include("predicates.jl")
 include("show.jl")
 include("arithmetic.jl")
 
+include("ref.jl")
 include("vector.jl")
 include("matrix.jl")
 include("array_common.jl")

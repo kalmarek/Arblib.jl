@@ -37,62 +37,23 @@ struct AcbRef <: Number
     prec::Int
     parent::Union{acb_vec_struct,acb_mat_struct}
 end
-function AcbRef(
-    ptr::Ptr{acb_struct},
-    parent::Union{acb_vec_struct,acb_mat_struct};
-    prec::Integer,
-)
-    AcbRef(ptr, prec, parent)
-end
-
-AcbRef(; prec::Int = DEFAULT_PRECISION[]) = Acb(; prec = prec)
-function Acb(x::AcbRef; prec::Integer = precision(x))
-    res = Acb(prec = prec)
-    set!(res, x)
-    return res
-end
-Base.getindex(x::AcbRef) = Acb(x)
 
 struct ArbRef <: Real
     arb_ptr::Ptr{arb_struct}
     prec::Int
     parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_mat_struct}
 end
-function ArbRef(
-    ptr::Ptr{arb_struct},
-    parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_mat_struct};
-    prec::Integer,
-)
-    ArbRef(ptr, prec, parent)
-end
-
-ArbRef(; prec::Int = DEFAULT_PRECISION[]) = Arb(; prec = prec)
-function Arb(x::ArbRef; prec::Integer = precision(x))
-    res = Arb(prec = prec)
-    set!(res, x)
-    return res
-end
-Base.getindex(x::ArbRef) = Arb(x)
 
 struct ArfRef <: Real
     arf_ptr::Ptr{arf_struct}
     prec::Int
     parent::Union{arb_struct,ArbRef}
 end
-function ArfRef(ptr::Ptr{arf_struct}, parent::Union{arb_struct,ArbRef}; prec::Integer)
-    ArfRef(ptr, prec, parent)
-end
-
-ArfRef(; prec::Int = DEFAULT_PRECISION[]) = Arf(; prec = prec)
-Arf(x::ArfRef; prec::Integer = precision(x)) = set!(Arf(prec = prec), x)
-Base.getindex(x::ArfRef) = Arf(x)
 
 struct MagRef <: Real
     mag_ptr::Ptr{mag_struct}
     parent::Union{arb_struct,ArbRef}
 end
-Mag(x::MagRef) = set!(Mag(), x)
-Base.getindex(x::MagRef) = Mag(x)
 
 struct ArbVector <: DenseVector{Arb}
     arb_vec::arb_vec_struct
@@ -271,24 +232,6 @@ Base.setindex!(x::Union{Mag,MagRef}, z::Ptr{mag_struct}) = set!(x, z)
 Base.setindex!(x::Union{Arf,ArfRef}, z::Ptr{arf_struct}) = set!(x, z)
 Base.setindex!(x::Union{Arb,ArbRef}, z::Ptr{arb_struct}) = set!(x, z)
 Base.setindex!(x::Union{Acb,AcbRef}, z::Ptr{acb_struct}) = set!(x, z)
-
-function midref(x::Union{Arb,ArbRef}, prec = precision(x))
-    mid_ptr = ccall(@libarb(arb_mid_ptr), Ptr{arf_struct}, (Ref{arb_struct},), x)
-    ArfRef(mid_ptr, prec, parentstruct(x))
-end
-function radref(x::Union{Arb,ArbRef})
-    rad_ptr = ccall(@libarb(arb_rad_ptr), Ptr{mag_struct}, (Ref{arb_struct},), x)
-    MagRef(rad_ptr, parentstruct(x))
-end
-
-function realref(z::Union{Acb,AcbRef}; prec = precision(z))
-    real_ptr = ccall(@libarb(acb_real_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
-    ArbRef(real_ptr, prec, parentstruct(z))
-end
-function imagref(z::Union{Acb,AcbRef}; prec = precision(z))
-    real_ptr = ccall(@libarb(acb_imag_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
-    ArbRef(real_ptr, prec, parentstruct(z))
-end
 
 Base.Float64(x::MagLike) = get(x)
 function Base.Float64(x::ArfLike; rnd::Union{arb_rnd,RoundingMode} = RoundNearest)
