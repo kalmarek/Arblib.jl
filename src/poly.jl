@@ -60,8 +60,8 @@ Base.@propagate_inbounds function Base.setindex!(
 end
 
 # Constructors
-for (TPoly, TPolyStruct) in [(:ArbPoly, :arb_poly_struct), (:AcbPoly, :acb_poly_struct)]
-    @eval function $TPoly(poly::$TPolyStruct; prec::Integer = DEFAULT_PRECISION[])
+for TPoly in [:ArbPoly, :AcbPoly]
+    @eval function $TPoly(poly::cstructtype($TPoly); prec::Integer = DEFAULT_PRECISION[])
         res = $TPoly(prec = prec)
         set!(res, poly)
         return res
@@ -82,10 +82,9 @@ for (TPoly, TPolyStruct) in [(:ArbPoly, :arb_poly_struct), (:AcbPoly, :acb_poly_
     end
 end
 
-for (TSeries, TPolyStruct, T) in
-    [(:ArbSeries, :arb_poly_struct, :Arb), (:AcbSeries, :acb_poly_struct, :Acb)]
+for TSeries in [:ArbSeries, :AcbSeries]
     @eval function $TSeries(
-        poly::$TPolyStruct,
+        poly::cstructtype($TSeries),
         degree::Integer = degree(poly);
         prec::Integer = DEFAULT_PRECISION[],
     )
