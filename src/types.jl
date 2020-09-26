@@ -80,26 +80,6 @@ struct MagRef <: Real
 end
 
 """
-    ArbVector <: DenseVector{Arb}
-"""
-struct ArbVector <: DenseVector{Arb}
-    arb_vec::arb_vec_struct
-    prec::Int
-end
-ArbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-    ArbVector(arb_vec_struct(n), prec)
-
-"""
-    AcbVector <: DenseVector{Acb}
-"""
-struct AcbVector <: DenseVector{Acb}
-    acb_vec::acb_vec_struct
-    prec::Int
-end
-AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-    AcbVector(acb_vec_struct(n), prec)
-
-"""
     ArbPoly
 """
 struct ArbPoly
@@ -142,6 +122,26 @@ struct AcbSeries <: Number
     AcbSeries(degree::Integer; prec::Integer = DEFAULT_PRECISION[]) =
         new(acb_poly_struct(), degree, prec)
 end
+
+"""
+    ArbVector <: DenseVector{Arb}
+"""
+struct ArbVector <: DenseVector{Arb}
+    arb_vec::arb_vec_struct
+    prec::Int
+end
+ArbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+    ArbVector(arb_vec_struct(n), prec)
+
+"""
+    AcbVector <: DenseVector{Acb}
+"""
+struct AcbVector <: DenseVector{Acb}
+    acb_vec::acb_vec_struct
+    prec::Int
+end
+AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+    AcbVector(acb_vec_struct(n), prec)
 
 """
     ArbMatrix <: DenseMatrix{Arb}
