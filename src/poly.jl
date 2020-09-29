@@ -61,6 +61,12 @@ end
 
 # Constructors
 for TPoly in [:ArbPoly, :AcbPoly]
+    @eval function $TPoly(poly::cstructtype($TPoly); prec::Integer = DEFAULT_PRECISION[])
+        res = $TPoly(prec = prec)
+        set!(res, poly)
+        return res
+    end
+
     @eval function $TPoly(coeff; prec::Integer = _precision(coeff))
         poly = $TPoly(prec = prec)
         poly[0] = coeff
@@ -76,7 +82,17 @@ for TPoly in [:ArbPoly, :AcbPoly]
     end
 end
 
-for (TSeries, T) in [(:ArbSeries, :Arb), (:AcbSeries, :Acb)]
+for TSeries in [:ArbSeries, :AcbSeries]
+    @eval function $TSeries(
+        poly::cstructtype($TSeries),
+        degree::Integer = degree(poly);
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        res = $TSeries(degree, prec = prec)
+        set!(res, poly)
+        return res
+    end
+
     @eval $TSeries(; prec::Integer = DEFAULT_PRECISION[]) = $TSeries(0, prec = prec)
 
     @eval function $TSeries(coeff, degree::Integer; prec::Integer = _precision(coeff))

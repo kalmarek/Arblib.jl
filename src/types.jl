@@ -1,169 +1,97 @@
+"""
+    Arf <: Real
+"""
 struct Arf <: Real
     arf::arf_struct
     prec::Int
 
-    function Arf(; prec::Integer = DEFAULT_PRECISION[])
-        res = new(arf_struct(), prec)
-        return res
-    end
+    Arf(; prec::Integer = DEFAULT_PRECISION[]) = new(arf_struct(), prec)
 
-    function Arf(x::arf_struct; prec::Integer = DEFAULT_PRECISION[])
-        res = Arf(prec = prec)
-        set!(res, x)
-        return res
-    end
-
-    function Arf(x::Union{UInt,Int}; prec::Integer = DEFAULT_PRECISION[])
-        res = new(arf_struct(x), prec)
-        return res
-    end
+    Arf(x::Union{UInt,Int}; prec::Integer = DEFAULT_PRECISION[]) = new(arf_struct(x), prec)
 end
 
+"""
+    Mag <: Real
+"""
 struct Mag <: Real
     mag::mag_struct
 
-    function Mag()
-        res = new(mag_struct())
-        return res
-    end
+    Mag() = new(mag_struct())
 
-    function Mag(x::mag_struct)
-        res = new(mag_struct(x))
-        return res
-    end
+    Mag(x::mag_struct) = new(mag_struct(x))
 
-    function Mag(x::Union{Mag,Arf})
-        res = new(mag_struct(cstruct(x)))
-        return res
-    end
+    Mag(x::Union{Mag,Arf}) = new(mag_struct(cstruct(x)))
 end
 
-
+"""
+    Arb <: Real
+"""
 struct Arb <: Real
     arb::arb_struct
     prec::Int
 
-    function Arb(; prec::Integer = DEFAULT_PRECISION[])
-        res = new(arb_struct(), prec)
-        return res
-    end
-
-    function Arb(x::arb_struct; prec::Integer = DEFAULT_PRECISION[])
-        res = Arb(prec = prec)
-        set!(res, x)
-        return res
-    end
+    Arb(; prec::Integer = DEFAULT_PRECISION[]) = new(arb_struct(), prec)
 end
 
-
+"""
+    Acb <: Number
+"""
 struct Acb <: Number
     acb::acb_struct
     prec::Int
 
-    function Acb(; prec::Integer = DEFAULT_PRECISION[])
-        res = new(acb_struct(), prec)
-        return res
-    end
-
-    function Acb(x::acb_struct; prec::Integer = DEFAULT_PRECISION[])
-        res = Acb(prec = prec)
-        set!(res, x)
-        return res
-    end
+    Acb(; prec::Integer = DEFAULT_PRECISION[]) = new(acb_struct(), prec)
 end
 
 # Refs are in reverse order to model their possible depencies
+"""
+    AcbRef <: Number
+"""
 struct AcbRef <: Number
     acb_ptr::Ptr{acb_struct}
     prec::Int
     parent::Union{acb_vec_struct,acb_mat_struct}
 end
-function AcbRef(
-    ptr::Ptr{acb_struct},
-    parent::Union{acb_vec_struct,acb_mat_struct};
-    prec::Int,
-)
-    AcbRef(ptr, prec, parent)
-end
 
-AcbRef(; prec::Int = DEFAULT_PRECISION[]) = Acb(; prec = prec)
-function Acb(x::AcbRef; prec::Integer = precision(x))
-    res = Acb(prec = prec)
-    set!(res, x)
-    return res
-end
-Base.getindex(x::AcbRef) = Acb(x)
-
+"""
+    ArbRef <: Real
+"""
 struct ArbRef <: Real
     arb_ptr::Ptr{arb_struct}
     prec::Int
     parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_mat_struct}
 end
-function ArbRef(
-    ptr::Ptr{arb_struct},
-    parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_mat_struct};
-    prec::Int,
-)
-    ArbRef(ptr, prec, parent)
-end
 
-ArbRef(; prec::Int = DEFAULT_PRECISION[]) = Arb(; prec = prec)
-function Arb(x::ArbRef; prec::Integer = precision(x))
-    res = Arb(prec = prec)
-    set!(res, x)
-    return res
-end
-Base.getindex(x::ArbRef) = Arb(x)
-
+"""
+    ArfRef <: Real
+"""
 struct ArfRef <: Real
     arf_ptr::Ptr{arf_struct}
     prec::Int
     parent::Union{arb_struct,ArbRef}
 end
-function ArfRef(ptr::Ptr{arf_struct}, parent::Union{arb_struct,ArbRef}; prec::Int)
-    ArfRef(ptr, prec, parent)
-end
 
-ArfRef(; prec::Int = DEFAULT_PRECISION[]) = Arf(; prec = prec)
-Arf(x::ArfRef; prec::Integer = precision(x)) = set!(Arf(prec = prec), x)
-Base.getindex(x::ArfRef) = Arf(x)
-
+"""
+    MagRef <: Real
+"""
 struct MagRef <: Real
     mag_ptr::Ptr{mag_struct}
     parent::Union{arb_struct,ArbRef}
 end
-Mag(x::MagRef) = set!(Mag(), x)
-Base.getindex(x::MagRef) = Mag(x)
 
-
-struct ArbVector <: DenseVector{Arb}
-    arb_vec::arb_vec_struct
-    prec::Int
-end
-ArbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-    ArbVector(arb_vec_struct(n), prec)
-
-struct AcbVector <: DenseVector{Acb}
-    acb_vec::acb_vec_struct
-    prec::Int
-end
-AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-    AcbVector(acb_vec_struct(n), prec)
-
+"""
+    ArbPoly
+"""
 struct ArbPoly
     arb_poly::arb_poly_struct
     prec::Int
 
     ArbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(arb_poly_struct(), prec)
-
-    function ArbPoly(poly::arb_poly_struct; prec::Integer = DEFAULT_PRECISION[])
-        res = ArbPoly(prec = prec)
-        set!(res, poly)
-
-        return res
-    end
 end
 
+"""
+    ArbSeries <: Number
+"""
 struct ArbSeries <: Number
     arb_poly::arb_poly_struct
     degree::Int
@@ -171,33 +99,21 @@ struct ArbSeries <: Number
 
     ArbSeries(degree::Integer; prec::Integer = DEFAULT_PRECISION[]) =
         new(arb_poly_struct(), degree, prec)
-
-    function ArbSeries(
-        poly::arb_poly_struct,
-        degree::Integer = degree(poly);
-        prec::Integer = DEFAULT_PRECISION[],
-    )
-        res = ArbSeries(degree, prec = prec)
-        set!(res, poly)
-
-        return res
-    end
 end
 
+"""
+    AcbPoly
+"""
 struct AcbPoly
     acb_poly::acb_poly_struct
     prec::Int
 
     AcbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(acb_poly_struct(), prec)
-
-    function AcbPoly(poly::acb_poly_struct; prec::Integer = DEFAULT_PRECISION[])
-        res = AcbPoly(prec = prec)
-        set!(res, poly)
-
-        return res
-    end
 end
 
+"""
+    AcbSeries <: Number
+"""
 struct AcbSeries <: Number
     acb_poly::acb_poly_struct
     degree::Int
@@ -205,19 +121,31 @@ struct AcbSeries <: Number
 
     AcbSeries(degree::Integer; prec::Integer = DEFAULT_PRECISION[]) =
         new(acb_poly_struct(), degree, prec)
-
-    function AcbSeries(
-        poly::acb_poly_struct,
-        degree::Integer = degree(poly);
-        prec::Integer = DEFAULT_PRECISION[],
-    )
-        res = AcbSeries(degree, prec = prec)
-        set!(res, poly)
-
-        return res
-    end
 end
 
+"""
+    ArbVector <: DenseVector{Arb}
+"""
+struct ArbVector <: DenseVector{Arb}
+    arb_vec::arb_vec_struct
+    prec::Int
+end
+ArbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+    ArbVector(arb_vec_struct(n), prec)
+
+"""
+    AcbVector <: DenseVector{Acb}
+"""
+struct AcbVector <: DenseVector{Acb}
+    acb_vec::acb_vec_struct
+    prec::Int
+end
+AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+    AcbVector(acb_vec_struct(n), prec)
+
+"""
+    ArbMatrix <: DenseMatrix{Arb}
+"""
 struct ArbMatrix <: DenseMatrix{Arb}
     arb_mat::arb_mat_struct
     prec::Int
@@ -225,6 +153,9 @@ end
 ArbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     ArbMatrix(arb_mat_struct(r, c), prec)
 
+"""
+    AcbMatrix <: DenseMatrix{Acb}
+"""
 struct AcbMatrix <: DenseMatrix{Acb}
     acb_mat::acb_mat_struct
     prec::Int
@@ -232,6 +163,9 @@ end
 AcbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     AcbMatrix(acb_mat_struct(r, c), prec)
 
+"""
+    ArbRefVector <: DenseMatrix{ArbRef}
+"""
 struct ArbRefVector <: DenseVector{ArbRef}
     arb_vec::arb_vec_struct
     prec::Int
@@ -239,6 +173,9 @@ end
 ArbRefVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     ArbRefVector(arb_vec_struct(n), prec)
 
+"""
+    AcbRefVector <: DenseMatrix{AcbRef}
+"""
 struct AcbRefVector <: DenseVector{AcbRef}
     acb_vec::acb_vec_struct
     prec::Int
@@ -246,6 +183,9 @@ end
 AcbRefVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     AcbRefVector(acb_vec_struct(n), prec)
 
+"""
+    ArbRefMatrix <: DenseMatrix{ArbRef}
+"""
 struct ArbRefMatrix <: DenseMatrix{ArbRef}
     arb_mat::arb_mat_struct
     prec::Int
@@ -253,6 +193,9 @@ end
 ArbRefMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
     ArbRefMatrix(arb_mat_struct(r, c), prec)
 
+"""
+    AcbRefMatrix <: DenseMatrix{AcbRef}
+"""
 struct AcbRefMatrix <: DenseMatrix{AcbRef}
     acb_mat::acb_mat_struct
     prec::Int
@@ -270,9 +213,6 @@ for T in [:Arb, :Acb], A in [:Vector, :Matrix]
     end
 end
 
-const ArbLike = Union{Arb,ArbRef,Ptr{arb_struct},arb_struct}
-const AcbLike = Union{Acb,AcbRef,Ptr{acb_struct},acb_struct}
-
 for (T, prefix) in (
     (Mag, :mag),
     (Arf, :arf),
@@ -286,15 +226,12 @@ for (T, prefix) in (
     (Union{AcbPoly,AcbSeries}, :acb_poly),
 )
     arbstruct = Symbol(prefix, :_struct)
-    spref = "$prefix"
-    @eval begin
-        cstructtype(::Type{<:$T}) = $arbstruct
-    end
     @eval begin
         cprefix(::Type{<:$T}) = $(QuoteNode(Symbol(prefix)))
         cstruct(x::$T) = getfield(x, cprefix($T))
         cstruct(x::$arbstruct) = x
-        Base.convert(::Type{$(cstructtype(T))}, x::$T) = cstruct(x)
+        cstructtype(::Type{<:$T}) = $arbstruct
+        Base.convert(::Type{$arbstruct}, x::$T) = cstruct(x)
     end
 end
 
@@ -355,24 +292,6 @@ Base.setindex!(x::Union{Mag,MagRef}, z::Ptr{mag_struct}) = set!(x, z)
 Base.setindex!(x::Union{Arf,ArfRef}, z::Ptr{arf_struct}) = set!(x, z)
 Base.setindex!(x::Union{Arb,ArbRef}, z::Ptr{arb_struct}) = set!(x, z)
 Base.setindex!(x::Union{Acb,AcbRef}, z::Ptr{acb_struct}) = set!(x, z)
-
-function midref(x::Union{Arb,ArbRef}, prec = precision(x))
-    mid_ptr = ccall(@libarb(arb_mid_ptr), Ptr{arf_struct}, (Ref{arb_struct},), x)
-    ArfRef(mid_ptr, prec, parentstruct(x))
-end
-function radref(x::Union{Arb,ArbRef})
-    rad_ptr = ccall(@libarb(arb_rad_ptr), Ptr{mag_struct}, (Ref{arb_struct},), x)
-    MagRef(rad_ptr, parentstruct(x))
-end
-
-function realref(z::Union{Acb,AcbRef}; prec = precision(z))
-    real_ptr = ccall(@libarb(acb_real_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
-    ArbRef(real_ptr, prec, parentstruct(z))
-end
-function imagref(z::Union{Acb,AcbRef}; prec = precision(z))
-    real_ptr = ccall(@libarb(acb_imag_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
-    ArbRef(real_ptr, prec, parentstruct(z))
-end
 
 Base.Float64(x::MagLike) = get(x)
 function Base.Float64(x::ArfLike; rnd::Union{arb_rnd,RoundingMode} = RoundNearest)
