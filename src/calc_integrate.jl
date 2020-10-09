@@ -2,22 +2,26 @@ function _acb_calc_func!(
     out::Ptr{acb_struct},
     inp::Ptr{acb_struct},
     param::Ptr{Cvoid}, # pointer to the actual function
-    order::Cint,
-    prec::Cint,
+    order::Clong,
+    prec::Clong,
 )
     @assert iszero(order) || isone(order) # ← we'd need to verify holomorphicity
     # x = Acb(unsafe_load(inp), prec=prec)
-    x = inp
-    f = unsafe_pointer_to_objref(param)
-    # @debug "Evaluating at" x
-    f(out, x, prec = prec)
+    # TODO: Make Acb allow Nothing as parent
+    tmp = AcbVector(1)
+    x = AcbRef(inp, cstruct(tmp), prec = prec)
+    res = AcbRef(out, cstruct(tmp), prec = prec)
+    f! = unsafe_pointer_to_objref(param)
+
+    f!(res, x, analytic = isone(order), prec = prec)
+
     return zero(Cint)
 end
 
 _acb_calc_cfunc!() = @cfunction(
     _acb_calc_func!,
     Cint,
-    (Ptr{acb_struct}, Ptr{acb_struct}, Ptr{Cvoid}, Cint, Cint)
+    (Ptr{acb_struct}, Ptr{acb_struct}, Ptr{Cvoid}, Clong, Clong)
 )
 
 function calc_integrate!(
@@ -31,7 +35,6 @@ function calc_integrate!(
     options::calc_integrate_opt_struct,
     prec::Clong,
 )
-    @info "ccalling in calc_integrate!"
     return ccall(
         @libarb(acb_calc_integrate),
         Cint,
@@ -95,22 +98,27 @@ function calc_integrate!(
     )
 end
 
+"""
+    _integrate!(res, f, a, b; prec, rel_goal, abs_goal, opts)
 
-function integrate!(
+Internal function for integration. Assumes that `f!` is of the type
+`f!(out::AcbRef, inp::AcbRef; analytic::Bool, prec::Integer)` and
+that all other parameters are set to valid values.
+"""
+function _integrate!(
+    f!,
     res::AcbLike,
-    f,
     a::AcbLike,
     b::AcbLike;
-    prec = max(_precision(a), _precision(b)),
-    rel_goal = prec,
+    prec::Integer = precision(res),
+    rel_goal::Integer = prec,
     abs_tol::MagLike = set_ui_2exp!(Arblib.Mag(), one(UInt), -prec),
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
 )
-
-    return calc_integrate!(
+    status = calc_integrate!(
         res,
         _acb_calc_cfunc!(),
-        f,
+        f!,
         a,
         b,
         rel_goal,
@@ -118,7 +126,97 @@ function integrate!(
         opts, # passing C_NULL uses the default options
         prec,
     )
+
+    # status:
+    # ARB_CALC_SUCCESS = 0
+    # ARB_CALC_NO_CONVERGENCE = 2
+    status == 2 && @warn "integration did not converge"
+
+    return res
 end
+
+"""
+    integrate!(f!, res::Acb, a::Acb, b::Acb;
+        prec = precision(res),
+        rtol=0.0,
+        atol=2.0^-prec,
+        opts::Union{acb_calc_integrate_opt_struct, Ptr{Cvoid}} = C_NULL)
+
+Like [`integrate`](@ref), but make use of in-place operations. In
+particular, there are three differences from `integrate`:
+
+1. The function `f!` should be of the form `f!(y, x) = set!(y, f(x))`.
+   That is, it writes the return value of the integand `f(x)` in-place
+   into its first argument `y`. (The return value of `f!` is ignored).
+
+2. `res` is set to the result.
+
+3. The default precision is taken from `res` instead of from `a` and
+   `b`.
+"""
+function integrate!(
+    f!,
+    res::Union{Acb,AcbRef},
+    a::Union{Acb,AcbRef},
+    b::Union{Acb,AcbRef};
+    check_analytic::Bool = false,
+    take_prec::Bool = false,
+    prec::Integer = precision(res),
+    rtol = 0.0,
+    atol = set_ui_2exp!(Mag(), one(UInt), -prec),
+    opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
+)
+    # rel_goal = r where rel_tol ~2^-r
+    rel_goal = iszero(rtol) ? prec : rel_goal = -floor(Int, log2(atol))
+
+    if !check_analytic && !take_prec
+        g! = (inp, out; analytic, prec) -> f!(inp, out)
+    elseif !check_analytic && take_prec
+        g! = (inp, out; analytic, prec) -> f!(inp, out, prec = prec)
+    elseif check_analytic && !take_prec
+        g! = (inp, out; analytic, prec) -> f!(inp, out, analytic = analytic)
+    else
+        g! = f!
+    end
+
+    return _integrate!(
+        g!,
+        res,
+        a,
+        b,
+        prec = prec,
+        rel_goal = rel_goal,
+        abs_tol = convert(Mag, atol),
+        opts = opts,
+    )
+end
+
+function integrate!(
+    f!,
+    res::Union{Acb,AcbRef},
+    a::Number,
+    b::Number;
+    check_analytic::Bool = false,
+    take_prec::Bool = false,
+    prec::Integer = max(_precision(a), _precision(b)),
+    rtol = 0.0,
+    atol = set_ui_2exp!(Mag(), one(UInt), -prec),
+    opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
+)
+    return integrate!(
+        f!,
+        res,
+        Acb(a, prec = prec),
+        Acb(b, prec = prec),
+        check_analytic = check_analytic,
+        take_prec = take_prec,
+        prec = prec,
+        rtol = rtol,
+        atol = atol,
+        opts = opts,
+    )
+end
+
 
 """
     integrate(f, a::Number, b::Number;
@@ -144,53 +242,57 @@ Parameters:
 information please consider arblib documentation.
 
 !!! Note: It's users responsibility to verify holomorphicity of `f`.
+
+TODO: Document `check_analytic` and `take_prec`.
+
+TODO: Add note about what type of holomorphicity is required and how
+to handle it.
 """
 function integrate(
     f,
     a::Union{Acb,AcbRef},
     b::Union{Acb,AcbRef};
+    check_analytic::Bool = false,
+    take_prec::Bool = false,
     prec = max(precision(a), precision(b)),
     rtol = 0.0,
     atol = set_ui_2exp!(Mag(), one(UInt), -prec),
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
 )
-    # rel_goal = r where rel_tol ~2^-r
-    rel_goal = iszero(rtol) ? prec : rel_goal = -floor(Int, log2(atol))
-
+    f! = (out, inp; kwargs...) -> set!(out, f(inp; kwargs...))
     res = Acb(prec = prec)
 
-    status = integrate!(
+    return integrate!(
+        f!,
         res,
-        f,
         a,
         b;
-        rel_goal = rel_goal,
-        abs_tol = convert(Mag, atol),
+        check_analytic = check_analytic,
+        take_prec = take_prec,
+        rtol = rtol,
+        atol = atol,
         opts = opts,
         prec = prec,
     )
-
-    # status:
-    # ARB_CALC_SUCCESS = 0
-    # ARB_CALC_NO_CONVERGENCE = 2
-    status == 2 &&
-        @warn "Arb integrate did not achived convergence, the result might be incorrect"
-    return res
 end
 
 function integrate(
     f,
     a::Number,
     b::Number;
-    prec::Integer,
+    check_analytic::Bool = false,
+    take_prec::Bool = false,
+    prec::Integer = max(_precision(a), _precision(b)),
     rtol = 0.0,
-    atol = 0.0,
+    atol = set_ui_2exp!(Mag(), one(UInt), -prec),
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
 )
     return integrate(
         f,
         Acb(a, prec = prec),
         Acb(b, prec = prec),
+        check_analytic = check_analytic,
+        take_prec = take_prec,
         prec = prec,
         rtol = rtol,
         atol = atol,
