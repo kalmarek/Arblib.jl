@@ -199,4 +199,3 @@ mutable struct calc_integrate_opt_struct
         return opts
     end
 end
-

@@ -5,12 +5,9 @@ function _acb_calc_func!(
     order::Clong,
     prec::Clong,
 )
-    @assert iszero(order) || isone(order) # ← we'd need to verify holomorphicity
-    # x = Acb(unsafe_load(inp), prec=prec)
-    # TODO: Make Acb allow Nothing as parent
-    tmp = AcbVector(1)
-    x = AcbRef(inp, cstruct(tmp), prec = prec)
-    res = AcbRef(out, cstruct(tmp), prec = prec)
+    @assert iszero(order) || isone(order)
+    x = AcbRef(inp, nothing, prec = prec)
+    res = AcbRef(out, nothing, prec = prec)
     f! = unsafe_pointer_to_objref(param)
 
     f!(res, x, analytic = isone(order), prec = prec)
