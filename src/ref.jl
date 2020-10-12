@@ -19,7 +19,7 @@ function ArbRef(
 end
 function AcbRef(
     ptr::Ptr{acb_struct},
-    parent::Union{acb_vec_struct,acb_mat_struct};
+    parent::Union{Nothing,acb_vec_struct,acb_mat_struct};
     prec::Integer = DEFAULT_PRECISION[],
 )
     AcbRef(ptr, prec, parent)

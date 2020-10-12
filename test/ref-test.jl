@@ -86,7 +86,7 @@ end
     v = AcbRefVector([0])
     x = v[1]
     ptr = x.acb_ptr
-    parent = v.acb_vec
+    parent = nothing
     @test AcbRef(ptr, parent) == Acb()
     @test precision(AcbRef(ptr, parent)) == Arblib.DEFAULT_PRECISION[]
     @test precision(AcbRef(ptr, parent, prec = 80)) == 80
