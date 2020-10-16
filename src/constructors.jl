@@ -1,54 +1,24 @@
-## Mag
-for T in (Unsigned, Base.GMP.CdoubleMax)
-    @eval begin
-        function Mag(x::$T)
-            res = Mag()
-            set!(res, x)
-            return res
-        end
-    end
-end
+# Mag
+Mag(x::Union{Unsigned,Base.GMP.CdoubleMax}) = set!(Mag(), x)
 
-## Arf
-for T in (arf_struct, Unsigned, Integer, Base.GMP.CdoubleMax, Mag)
-    @eval begin
-        function Arf(x::$T; prec::Integer = DEFAULT_PRECISION[])
-            res = Arf(prec = prec)
-            set!(res, x)
-            return res
-        end
-    end
-end
+# Arf
+Arf(
+    x::Union{arf_struct,Unsigned,Integer,Base.GMP.CdoubleMax,Mag};
+    prec::Integer = DEFAULT_PRECISION[],
+) = set!(Arf(prec = prec), x)
+Arf(x::Union{Arf,BigFloat}; prec::Integer = precision(x)) = set!(Arf(prec = prec), x)
 
-function Arf(x::BigFloat; prec::Integer = precision(x))
-    res = Arf(prec = prec)
-    set!(res, x)
-    return res
-end
+# Arb
+Arb(
+    x::Union{arb_struct,Unsigned,Integer,Base.GMP.CdoubleMax};
+    prec::Integer = DEFAULT_PRECISION[],
+) = set!(Arb(prec = prec), x)
+Arb(x::Union{Arf,Arb}; prec::Integer = precision(x)) = set!(Arb(prec = prec), x)
 
-function Arf(x::Arf; prec::Integer = precision(x))
-    return Arf(x.arf, prec = prec)
-end
-
-## Arb
-for T in (arb_struct, Unsigned, Integer, Base.GMP.CdoubleMax)
-    @eval begin
-        function Arb(x::$T; prec::Integer = DEFAULT_PRECISION[])
-            res = Arb(prec = prec)
-            set!(res, x)
-            return res
-        end
-    end
-end
-
-function Arb(x::Arf; prec::Integer = precision(x))
+function Arb(x::BigFloat; prec::Integer = precision(x))
     res = Arb(prec = prec)
-    set!(res, x)
+    set!(midref(res), x)
     return res
-end
-
-function Arb(x::Arb; prec::Integer = precision(x))
-    return Arb(x.arb, prec = prec)
 end
 
 function Arb(str::AbstractString; prec::Integer = DEFAULT_PRECISION[])
@@ -66,63 +36,85 @@ function Arb(x::Rational; prec::Integer = DEFAULT_PRECISION[])
 end
 
 ## Acb
-for T in (acb_struct, Unsigned, Integer, Base.GMP.CdoubleMax)
-    @eval begin
-        function Acb(x::$T; prec::Integer = DEFAULT_PRECISION[])
-            res = Acb(prec = prec)
-            set!(res, x)
-            return res
-        end
-    end
-end
+# From real part
+Acb(
+    x::Union{acb_struct,Unsigned,Integer,Base.GMP.CdoubleMax};
+    prec::Integer = DEFAULT_PRECISION[],
+) = set!(Acb(prec = prec), x)
+Acb(x::Union{Arb,Acb}; prec::Integer = precision(x)) = set!(Acb(prec = prec), x)
+
 function Acb(x::Arf; prec::Integer = precision(x))
     res = Acb(prec = prec)
     set!(realref(res), x)
     return res
 end
 
-function Acb(x::Arb; prec::Integer = precision(x))
+function Acb(x::BigFloat; prec::Integer = precision(x))
     res = Acb(prec = prec)
-    set!(res, x)
+    set!(midref(realref(res)), x)
     return res
 end
 
-function Acb(x::Acb; prec::Integer = precision(x))
-    return Acb(x.acb, prec = prec)
-end
+# Fallback version
+# TODO: We could get rid of the allocation of one Arb in many cases by
+# directly manipulating the real part of the Acb. For example when x
+# is a string, a rational or certain irrationals.
+Acb(x::Union{Real,AbstractString}; prec::Integer = DEFAULT_PRECISION[]) =
+    Acb(Arb(x, prec = prec), prec = prec)
 
-for T in (Integer, Base.GMP.CdoubleMax)
-    @eval begin
-        function Acb(re::$T, im::$T; prec::Integer = DEFAULT_PRECISION[])
-            res = Acb(prec = prec)
-            set!(res, re, im)
-            return res
-        end
+# From real and imaginary part separately
+Acb(
+    re::T,
+    im::T;
+    prec::Integer = DEFAULT_PRECISION[],
+) where {T<:Union{arb_struct,Integer,Base.GMP.CdoubleMax}} = set!(Acb(prec = prec), re, im)
+Acb(re::Arb, im::Arb; prec::Integer = max(precision(re), precision(im))) =
+    set!(Acb(prec = prec), re, im)
 
-        function Acb(z::Complex{<:$T}; prec::Integer = DEFAULT_PRECISION[])
-            res = Acb(prec = prec)
-            set!(res, real(z), imag(z))
-            return res
-        end
-    end
-end
-
-function Acb(x::Rational; prec::Integer = DEFAULT_PRECISION[])
-    Acb(Arb(x; prec = prec); prec = prec)
-end
-
-
-function Acb(re::Arb, im::Arb; prec::Integer = max(precision(re), precision(im)))
+function Acb(re::Arf, im::Union{Arf}; prec::Integer = max(precision(re), precision(im)))
     res = Acb(prec = prec)
-    set!(res, re, im)
+    set!(realref(res), re)
+    set!(imagref(res), im)
     return res
 end
 
-function Acb(z::Complex{Arb}; prec::Integer = max(precision(real(z)), precision(imag(z))))
+function Acb(
+    re::BigFloat,
+    im::Union{BigFloat};
+    prec::Integer = max(precision(re), precision(im)),
+)
     res = Acb(prec = prec)
-    set!(res, real(z), imag(z))
+    set!(midref(realref(res)), re)
+    set!(midref(imagref(res)), im)
     return res
 end
+
+# Fallback version
+# TODO: Similar for the one with only real part above we could get rid
+# of two allocations of Arb in many cases.
+# TODO: Handle the case when the inputs have a precision we want to
+# use
+Acb(
+    re::Union{Real,AbstractString},
+    im::Union{Real,AbstractString};
+    prec::Integer = DEFAULT_PRECISION[],
+) = Acb(Arb(re, prec = prec), Arb(im, prec = prec), prec = prec)
+
+# From complex
+set!(z::AcbLike, x::Complex{<:Union{ArbLike,Integer,Base.GMP.CdoubleMax}}) =
+    set!(z, real(x), imag(x))
+
+Acb(z::Complex{Arb}; prec::Integer = max(precision(real(z)), precision(imag(z)))) =
+    set!(Acb(prec = prec), real(z), imag(z))
+
+Acb(
+    z::Complex{<:Union{Arf,BigFloat}};
+    prec::Integer = max(precision(real(z)), precision(imag(z))),
+) = Acb(real(z), imag(z), prec = prec)
+
+# TODO: Handle the case when the inputs have a precision we want to
+# use
+Acb(z::Complex; prec::Integer = DEFAULT_PRECISION[]) = Acb(real(z), imag(z), prec = prec)
 
 Base.zero(::Union{Mag,Type{Mag}}) = Mag(UInt64(0))
 Base.one(::Union{Mag,Type{Mag}}) = Mag(UInt64(1))
@@ -139,29 +131,15 @@ Base.ones(x::T, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(x) for _ = 1:n]
 Base.zeros(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [zero(T) for _ = 1:n]
 Base.ones(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(T) for _ = 1:n]
 
-set!(z::Union{Acb,AcbRef,Ptr{acb_struct},acb_struct}, x::Complex{<:Base.GMP.CdoubleMax}) =
-    set!(z, real(x), imag(x))
 # Irrationals
-function Mag(::Irrational{:π})
-    res = Mag()
-    const_pi!(res)
-    return res
-end
+Mag(::Irrational{:π}) = const_pi!(Mag())
 
 for (irr, suffix) in ((:π, "pi"), (:ℯ, "e"), (:γ, "euler"))
     jlf = Symbol("const_$suffix", "!")
     IrrT = Irrational{irr}
     @eval begin
-        function Arb(::$IrrT; prec::Integer = DEFAULT_PRECISION[])
-            res = Arb(prec = prec)
-            $jlf(res)
-            return res
-        end
+        Arb(::$IrrT; prec::Integer = DEFAULT_PRECISION[]) = $jlf(Arb(prec = prec))
     end
 end
 
-function Acb(::Irrational{:π}; prec::Integer = DEFAULT_PRECISION[])
-    res = Acb(prec = prec)
-    const_pi!(res)
-    return res
-end
+Acb(::Irrational{:π}; prec::Integer = DEFAULT_PRECISION[]) = const_pi!(Acb(prec = prec))
