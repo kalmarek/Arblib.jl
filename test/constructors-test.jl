@@ -60,9 +60,13 @@
         @test Arb(3) < Arb(π) < Arb(4)
         @test Arb(2) < Arb(ℯ) < Arb(3)
         @test Arb(0) < Arb(MathConstants.γ) < Arb(1)
+        @test Arb(0) < Arb(MathConstants.catalan) < Arb(1)
+        @test Arblib.overlaps(Arb(BigFloat(MathConstants.φ)), Arb(MathConstants.φ))
         @test precision(Arb(π, prec = 80)) == 80
         @test precision(Arb(ℯ, prec = 80)) == 80
         @test precision(Arb(MathConstants.γ, prec = 80)) == 80
+        @test precision(Arb(MathConstants.catalan, prec = 80)) == 80
+        @test precision(Arb(MathConstants.φ, prec = 80)) == 80
     end
 
     @testset "Acb" begin

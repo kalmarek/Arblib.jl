@@ -134,12 +134,21 @@ Base.ones(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(T) for _ 
 # Irrationals
 Mag(::Irrational{:π}) = const_pi!(Mag())
 
-for (irr, suffix) in ((:π, "pi"), (:ℯ, "e"), (:γ, "euler"))
+for (irr, suffix) in ((:π, "pi"), (:ℯ, "e"), (:γ, "euler"), (:catalan, "catalan"))
     jlf = Symbol("const_$suffix", "!")
     IrrT = Irrational{irr}
     @eval begin
         Arb(::$IrrT; prec::Integer = DEFAULT_PRECISION[]) = $jlf(Arb(prec = prec))
     end
 end
+
+function Arb(::Irrational{:φ}; prec::Integer = DEFAULT_PRECISION[])
+    res = Arb(5, prec = prec)
+    sqrt!(res, res)
+    add!(res, res, 1)
+    div!(res, res, 2)
+    return res
+end
+
 
 Acb(::Irrational{:π}; prec::Integer = DEFAULT_PRECISION[]) = const_pi!(Acb(prec = prec))
