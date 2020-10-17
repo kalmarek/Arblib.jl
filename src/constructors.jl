@@ -128,8 +128,8 @@ Base.one(x::ArbRef) = Arb(1, prec = precision(x))
 # I.e. only allocating **one** Arf/Arb/Acb.
 Base.zeros(x::T, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [zero(x) for _ = 1:n]
 Base.ones(x::T, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(x) for _ = 1:n]
-Base.zeros(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [zero(T) for _ = 1:n]
-Base.ones(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(T) for _ = 1:n]
+Base.zeros(::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [zero(T) for _ = 1:n]
+Base.ones(::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(T) for _ = 1:n]
 
 # Irrationals
 Mag(::Irrational{:π}) = const_pi!(Mag())

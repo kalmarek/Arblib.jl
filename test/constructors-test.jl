@@ -123,4 +123,23 @@
         @test isequal(Acb(π, -1), Acb(Arb(π), Arb(-1)))
         @test isequal(Acb(BigFloat(1.3), ℯ), Acb(Arb(1.3), Arb(ℯ)))
     end
+
+    @testset "zeros/ones" begin
+        for T in [Arf, Arb, Acb]
+            @test zeros(T, 2) == [zero(T), zero(T)]
+            @test ones(T, 2) == [one(T), one(T)]
+        end
+
+        v = zeros(Arb, 2)
+        @test length(v) == 2
+        @test v[1] == v[2] == zero(Arb)
+        Arblib.set!(v[2], 1)
+        @test v[1] == zero(Arb) && v[2] == one(Arb)
+
+        v = ones(Arb, 2)
+        @test length(v) == 2
+        @test v[1] == v[2] == one(Arb)
+        Arblib.set!(v[2], 0)
+        @test v[1] == one(Arb) && v[2] == zero(Arb)
+    end
 end
