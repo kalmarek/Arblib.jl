@@ -119,16 +119,16 @@
     end
 
     @testset "Set Rational" begin
-        z = Arb(prec=64)
-        z[] = 1//2
+        z = Arb(prec = 64)
+        z[] = 1 // 2
         @test z == 0.5
 
-        z = Acb(prec=64)
-        z[] = 1//2
+        z = Acb(prec = 64)
+        z[] = 1 // 2
         @test z == 0.5
 
-        z = Acb(prec=64)
-        z[] = 1//2 + 3//4  * im
+        z = Acb(prec = 64)
+        z[] = 1 // 2 + 3 // 4 * im
         @test z == 0.5 + 0.75im
     end
 end
