@@ -1,4 +1,5 @@
 # Mag
+Mag() = Mag(mag_struct())
 Mag(x::Union{Unsigned,Base.GMP.CdoubleMax}) = set!(Mag(), x)
 
 # Arf
