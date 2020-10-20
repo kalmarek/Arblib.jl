@@ -1,10 +1,11 @@
 # Mag
 Mag() = Mag(mag_struct())
 Mag(x::Union{Unsigned,Base.GMP.CdoubleMax}) = set!(Mag(), x)
+Mag(x::Union{MagRef,ArfRef}) = Mag(mag_struct(cstruct(x)))
 
 # Arf
 Arf(
-    x::Union{arf_struct,Unsigned,Integer,Base.GMP.CdoubleMax,Mag};
+    x::Union{arf_struct,Unsigned,Integer,Base.GMP.CdoubleMax,Mag,MagRef};
     prec::Integer = DEFAULT_PRECISION[],
 ) = set!(Arf(prec = prec), x)
 Arf(x::Union{Arf,BigFloat}; prec::Integer = precision(x)) = set!(Arf(prec = prec), x)
@@ -14,7 +15,8 @@ Arb(
     x::Union{arb_struct,Unsigned,Integer,Base.GMP.CdoubleMax};
     prec::Integer = DEFAULT_PRECISION[],
 ) = set!(Arb(prec = prec), x)
-Arb(x::Union{Arf,Arb}; prec::Integer = precision(x)) = set!(Arb(prec = prec), x)
+Arb(x::Union{Arf,ArfRef,Arb,ArbRef}; prec::Integer = precision(x)) =
+    set!(Arb(prec = prec), x)
 
 function Arb(x::BigFloat; prec::Integer = precision(x))
     res = Arb(prec = prec)
@@ -42,9 +44,10 @@ Acb(
     x::Union{acb_struct,Unsigned,Integer,Base.GMP.CdoubleMax};
     prec::Integer = DEFAULT_PRECISION[],
 ) = set!(Acb(prec = prec), x)
-Acb(x::Union{Arb,Acb}; prec::Integer = precision(x)) = set!(Acb(prec = prec), x)
+Acb(x::Union{Arb,ArbRef,Acb,AcbRef}; prec::Integer = precision(x)) =
+    set!(Acb(prec = prec), x)
 
-function Acb(x::Arf; prec::Integer = precision(x))
+function Acb(x::Union{Arf,ArfRef}; prec::Integer = precision(x))
     res = Acb(prec = prec)
     set!(realref(res), x)
     return res
@@ -69,10 +72,17 @@ Acb(
     im::T;
     prec::Integer = DEFAULT_PRECISION[],
 ) where {T<:Union{arb_struct,Integer,Base.GMP.CdoubleMax}} = set!(Acb(prec = prec), re, im)
-Acb(re::Arb, im::Arb; prec::Integer = max(precision(re), precision(im))) =
-    set!(Acb(prec = prec), re, im)
+Acb(
+    re::Union{Arb,ArbRef},
+    im::Union{Arb,ArbRef};
+    prec::Integer = max(precision(re), precision(im)),
+) = set!(Acb(prec = prec), re, im)
 
-function Acb(re::Arf, im::Arf; prec::Integer = max(precision(re), precision(im)))
+function Acb(
+    re::Union{Arf,ArfRef},
+    im::Union{Arf,ArfRef};
+    prec::Integer = max(precision(re), precision(im)),
+)
     res = Acb(prec = prec)
     set!(realref(res), re)
     set!(imagref(res), im)
@@ -101,11 +111,13 @@ Acb(
 set!(z::AcbLike, x::Complex{<:Union{ArbLike,Integer,Base.GMP.CdoubleMax}}) =
     set!(z, real(x), imag(x))
 
-Acb(z::Complex{Arb}; prec::Integer = max(precision(real(z)), precision(imag(z)))) =
-    set!(Acb(prec = prec), real(z), imag(z))
+Acb(
+    z::Complex{<:Union{Arb,ArbRef}};
+    prec::Integer = max(precision(real(z)), precision(imag(z))),
+) = set!(Acb(prec = prec), real(z), imag(z))
 
 Acb(
-    z::Complex{<:Union{Arf,BigFloat}};
+    z::Complex{<:Union{Arf,ArfRef,BigFloat}};
     prec::Integer = max(precision(real(z)), precision(imag(z))),
 ) = Acb(real(z), imag(z), prec = prec)
 
