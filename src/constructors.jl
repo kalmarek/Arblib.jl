@@ -71,18 +71,14 @@ Acb(
 Acb(re::Arb, im::Arb; prec::Integer = max(precision(re), precision(im))) =
     set!(Acb(prec = prec), re, im)
 
-function Acb(re::Arf, im::Union{Arf}; prec::Integer = max(precision(re), precision(im)))
+function Acb(re::Arf, im::Arf; prec::Integer = max(precision(re), precision(im)))
     res = Acb(prec = prec)
     set!(realref(res), re)
     set!(imagref(res), im)
     return res
 end
 
-function Acb(
-    re::BigFloat,
-    im::Union{BigFloat};
-    prec::Integer = max(precision(re), precision(im)),
-)
+function Acb(re::BigFloat, im::BigFloat; prec::Integer = max(precision(re), precision(im)))
     res = Acb(prec = prec)
     set!(midref(realref(res)), re)
     set!(midref(imagref(res)), im)
