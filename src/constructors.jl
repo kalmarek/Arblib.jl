@@ -60,8 +60,7 @@ end
 
 function Arb(x::Rational; prec::Integer = DEFAULT_PRECISION[])
     num = Arb(numerator(x); prec = prec)
-    denom = Arb(denominator(x); prec = prec)
-    div!(num, num, denom)
+    div!(num, num, denominator(x))
     return num
 end
 
