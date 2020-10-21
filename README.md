@@ -24,10 +24,10 @@ From the Arb documentation:
 The following table indicates how Arb C-types can be translated to the Julia side.
 Note that all Julia structs additionally contain a `precision` field storing the precision
 used.
-For Julia types with `Ref` in their name the memory lifetime is bound to some other object
-and the user has to guarantee that the element still exists. (This is similar to how things
-   work in C by default. However since Julia has a garbage collector, there can be some suprises. The use of `GC.@preserve` might be necessary).
-All non-ref types always have their own finalizer attached and independent memory.
+Julia types with `Ref` in their name are similar to the `Ref` type in
+base Julia. They contain a pointer to an object of the corresponding
+type, as well as a reference to it parent object to protect it from
+garbage collection.
 
 | Arb  | Julia  |
 |----- |------- |
