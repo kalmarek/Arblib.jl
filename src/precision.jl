@@ -35,21 +35,20 @@ function Base.setprecision(::Type{<:ArbTypes}, precision::Integer)
     return precision
 end
 
-function Base.setprecision(
-    x::T,
-    precision::Integer,
-) where {T<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}}
-    return T(x, prec = precision)
-end
-Base.setprecision(v::ArbVector, precision::Integer) = ArbVector(v.arb_vec, precision)
-Base.setprecision(v::AcbVector, precision::Integer) = AcbVector(v.acb_vec, precision)
-Base.setprecision(poly::ArbPoly, precision::Integer) =
-    ArbPoly(poly.arb_poly, prec = precision)
-Base.setprecision(series::ArbSeries, precision::Integer) =
-    ArbSeries(series.arb_poly, degree(series); prec = precision)
-Base.setprecision(poly::AcbPoly, precision::Integer) =
-    AcbPoly(poly.acb_poly, prec = precision)
-Base.setprecision(series::AcbSeries, precision::Integer) =
-    AcbSeries(series.acb_poly, degree(series); prec = precision)
-Base.setprecision(A::ArbMatrix, precision::Integer) = ArbMatrix(A.arb_mat, precision)
-Base.setprecision(A::AcbMatrix, precision::Integer) = AcbMatrix(A.acb_mat, precision)
+Base.setprecision(x::T, prec::Integer) where {T<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}} =
+    T(x, prec = prec)
+Base.setprecision(v::T, prec::Integer) where {T<:Union{ArbVector,ArbRefVector}} =
+    T(v.arb_vec, prec)
+Base.setprecision(v::T, prec::Integer) where {T<:Union{AcbVector,AcbRefVector}} =
+    T(v.acb_vec, prec)
+Base.setprecision(A::T, prec::Integer) where {T<:Union{ArbMatrix,ArbRefMatrix}} =
+    T(A.arb_mat, prec)
+Base.setprecision(A::T, prec::Integer) where {T<:Union{AcbMatrix,AcbRefMatrix}} =
+    T(A.acb_mat, prec)
+
+Base.setprecision(poly::ArbPoly, prec::Integer) = ArbPoly(poly.arb_poly, prec = prec)
+Base.setprecision(series::ArbSeries, prec::Integer) =
+    ArbSeries(series.arb_poly, degree(series); prec = prec)
+Base.setprecision(poly::AcbPoly, prec::Integer) = AcbPoly(poly.acb_poly, prec = prec)
+Base.setprecision(series::AcbSeries, prec::Integer) =
+    AcbSeries(series.acb_poly, degree(series); prec = prec)
