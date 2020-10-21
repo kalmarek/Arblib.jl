@@ -60,8 +60,7 @@ end
 
 function Arb(x::Rational; prec::Integer = DEFAULT_PRECISION[])
     num = Arb(numerator(x); prec = prec)
-    denom = Arb(denominator(x); prec = prec)
-    div!(num, num, denom)
+    div!(num, num, denominator(x))
     return num
 end
 
@@ -141,6 +140,18 @@ Base.ones(x::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(T) for _ 
 
 set!(z::Union{Acb,AcbRef,Ptr{acb_struct},acb_struct}, x::Complex{<:Base.GMP.CdoubleMax}) =
     set!(z, real(x), imag(x))
+
+function set!(z::ArbLike, x::Rational)
+    z[] = numerator(x)
+    div!(z, z, denominator(x))
+end
+
+function set!(z::AcbLike, x::Union{Rational,Complex{<:Rational}})
+    set!(realref(z), real(x))
+    set!(imagref(z), imag(x))
+    z
+end
+
 # Irrationals
 function Mag(::Irrational{:π})
     res = Mag()
