@@ -39,10 +39,8 @@ garbage collection.
 | `acb_t* ` | `AcbVector` or `AcbRefVector` |
 | `arb_mat_t`  | `ArbMatrix` or `ArbRefMatrix` |
 | `acb_mat_t`  | `AcbMatrix` or `AcbRefMatrix`  |
-| `arb_poly_t`  | `ArbPoly` |
-| `acb_poly_t`  | `AcbPoly` |
-| `arb_poly_t`  | `ArbSeries` |
-| `acb_poly_t`  | `AcbSeries` |
+| `arb_poly_t`  | `ArbPoly` or `ArbSeries` |
+| `acb_poly_t`  | `AcbPoly` or `AcbSeries` |
 
 Indexing of an `ArbMatrix` returns an `Arb` whereas indexing `ArbRefMatrix` returns an `ArbRef`.
 An `ArbMatrix` `A` can also be index using the `ref` function , e.g, `ref(A, i, j)` to obtain
@@ -52,6 +50,11 @@ Additionally, there are multiple union types defined to capture a `Ref` and non-
 For example `Arb` and `ArbRef` are subtypes of `ArbLike`. Similarly, we provide
 `MagLike`, `ArfLike`, `ArbLike`, `AcbLike`, `ArbVectorLike`, `AcbVectorLike`, `ArbMatrixLike`,
 `AcbMatrixLike`.
+
+Both `ArbPoly` and `ArbSeries` wrap the `arb_poly_t` type. The
+difference is that `ArbSeries` has a fixed length and is therefore
+suitable for use when Taylor series are computed using the `_series`
+functions in Arb. Similar for `AcbPoly` and `AcbSeries`.
 
 **Example**:
 ```julia
