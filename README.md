@@ -117,13 +117,13 @@ Here is the naive sine compuation example form the [Arb documentation](http://ar
 ```julia
 using Arblib
 
-function sin_naive!(res, x)
+function sin_naive!(res::Arb, x::Arb)
     s, t, u = zero(x), zero(x), zero(x)
     tol = one(x)
     Arblib.mul_2exp!(tol, tol, -precision(tol))
     k = 0
     while true
-        Arblib.pow!(t, x, 2k + 1)
+        Arblib.pow!(t, x, UInt(2k + 1))
         Arblib.fac!(u, UInt(2k + 1))
         Arblib.div!(t, t, u)
         Arblib.abs!(u, t)
