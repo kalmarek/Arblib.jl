@@ -50,6 +50,8 @@
         @test typeof(Arb(UInt64(1))) == Arb
         @test typeof(Arb(1)) == Arb
         @test typeof(Arb(1.0)) == Arb
+        @test typeof(Arb(big(1.0))) == Arb
+        @test typeof(Arb(big(1))) == Arb
         @test typeof(Arb(Arf())) == Arb
         @test typeof(Arb(Arb())) == Arb
         @test typeof(Arb("1.1")) == Arb
@@ -62,6 +64,7 @@
         @test precision(Arb(UInt64(1), prec = 64)) == 64
         @test precision(Arb(1, prec = 64)) == 64
         @test precision(Arb(1.0, prec = 64)) == 64
+        @test precision(Arb(big(1.0), prec = 64)) == 64
         @test precision(Arb(Arf(prec = 64))) == 64
         @test precision(Arb(Arb(prec = 64))) == 64
         @test precision(Arb("1.1", prec = 64)) == 64
@@ -75,11 +78,15 @@
     @testset "Acb" begin
         @test typeof(Acb(UInt64(1))) == Acb
         @test typeof(Acb(1)) == Acb
+        @test typeof(Acb(big(1))) == Acb
         @test typeof(Acb(1.0)) == Acb
+        @test typeof(Acb(big(1.0))) == Acb
         @test typeof(Acb(Arb())) == Acb
         @test typeof(Acb(Acb())) == Acb
         @test typeof(Acb(1, 1)) == Acb
+        @test typeof(Acb(big(1), 1.0)) == Acb
         @test typeof(Acb(1.0, 1.0)) == Acb
+        @test typeof(Acb(big(1.0), 1.0)) == Acb
         @test typeof(Acb(Arb(), Arb())) == Acb
         @test typeof(Acb(complex(1, 1))) == Acb
         @test typeof(Acb(complex(1.0, 1.0))) == Acb
@@ -94,7 +101,9 @@
         @test precision(Acb(Arb(prec = 64))) == 64
         @test precision(Acb(Acb(prec = 64))) == 64
         @test precision(Acb(1, 1, prec = 64)) == 64
+        @test precision(Acb(big(1), 1, prec = 64)) == 64
         @test precision(Acb(1.0, 1.0, prec = 64)) == 64
+        @test precision(Acb(big(1.0), 1.0, prec = 64)) == 64
         @test precision(Acb(Arb(), Arb(), prec = 64)) == 64
         @test precision(zero(Acb(prec = 64))) == 64
         @test precision(one(Acb(prec = 64))) == 64
