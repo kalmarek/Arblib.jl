@@ -64,7 +64,7 @@ function Arb(x::Rational; prec::Integer = DEFAULT_PRECISION[])
     return num
 end
 
-Arb(x::Real; prec::Integer = _precision(x)) = Arb(Arf(x, prec=prec))
+Arb(x::Real; prec::Integer = _precision(x)) = Arb(Arf(x, prec = prec))
 
 ## Acb
 for T in (acb_struct, Unsigned, Integer, Base.GMP.CdoubleMax)
@@ -112,7 +112,7 @@ function Acb(x::Rational; prec::Integer = DEFAULT_PRECISION[])
     Acb(Arb(x; prec = prec); prec = prec)
 end
 
-Acb(x::Real; prec::Integer = _precision(x)) = Acb(Arb(x, prec=prec))
+Acb(x::Real; prec::Integer = _precision(x)) = Acb(Arb(x, prec = prec))
 
 function Acb(re::Arb, im::Arb; prec::Integer = max(precision(re), precision(im)))
     res = Acb(prec = prec)
@@ -127,10 +127,10 @@ function Acb(z::Complex{Arb}; prec::Integer = max(precision(real(z)), precision(
 end
 
 Acb(re::Real, im::Real; prec::Integer = max(_precision(re), _precision(im))) =
-    Acb(Arb(re, prec=prec), Arb(im, prec=prec))
+    Acb(Arb(re, prec = prec), Arb(im, prec = prec))
 
 Acb(z::Complex; prec::Integer = max(_precision(real(z)), _precision(imag(z)))) =
-    Acb(real(z), imag(z), prec=prec)
+    Acb(real(z), imag(z), prec = prec)
 
 Base.zero(::Union{Mag,Type{Mag}}) = Mag(UInt64(0))
 Base.one(::Union{Mag,Type{Mag}}) = Mag(UInt64(1))
