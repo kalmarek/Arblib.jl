@@ -1,5 +1,5 @@
-Base.promote_rule(::Type{<:MagLike}, ::Type{<:Union{Float64, MagLike}}) = Mag
-Base.promote_rule(::Type{<:ArfLike}, ::Type{<:Union{AbstractFloat,Integer, MagLike}}) = Arf
+Base.promote_rule(::Type{<:MagLike}, ::Type{<:Union{Float64,MagLike}}) = Mag
+Base.promote_rule(::Type{<:ArfLike}, ::Type{<:Union{AbstractFloat,Integer,MagLike}}) = Arf
 Base.promote_rule(
     ::Type{<:ArbLike},
     ::Type{<:Union{AbstractFloat,Integer,Rational,ArfLike,ArbRef}},
@@ -20,14 +20,14 @@ Base.promote_rule(
 ) = Acb
 
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
-    @eval function Base.$jf(x::T, y::T) where {T<:Union{Mag, MagRef}}
+    @eval function Base.$jf(x::T, y::T) where {T<:Union{Mag,MagRef}}
         z = T()
         $af(z, x, y)
         z
     end
 end
 
-function Base.:(^)(x::T, k::Integer) where {T<:Union{Mag, MagRef}}
+function Base.:(^)(x::T, k::Integer) where {T<:Union{Mag,MagRef}}
     z = T()
     pow!(z, x, convert(UInt, k))
     z

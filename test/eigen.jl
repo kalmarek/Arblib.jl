@@ -86,21 +86,20 @@
         Arblib.eig_simple!(λs, M, λ_approx, R_approx)
 
         for λa in λ_approx
-
             a_real = let x = real(λa)
                 m = Arblib.midref(x)
                 r = Arblib.radref(x)
-                Arblib.set_interval!(x, m - (r+ε), m + (r+ε))
+                Arblib.set_interval!(x, m - (r + ε), m + (r + ε))
             end
 
             a_imag = let x = imag(λa)
                 m = Arblib.midref(x)
                 r = Arblib.radref(x)
-                Arblib.set_interval!(x, m - (r+ε), m + (r+ε))
+                Arblib.set_interval!(x, m - (r + ε), m + (r + ε))
             end
 
             a = Acb(a_real, a_imag)
-            @test any(Arblib.containszero(a-λ) for λ in λs)
+            @test any(Arblib.containszero(a - λ) for λ in λs)
         end
 
 
