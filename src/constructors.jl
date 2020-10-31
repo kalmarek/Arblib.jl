@@ -33,10 +33,11 @@ end
 
 function Arb(x::Rational; prec::Integer = DEFAULT_PRECISION[])
     num = Arb(numerator(x); prec = prec)
-    denom = Arb(denominator(x); prec = prec)
-    div!(num, num, denom)
+    div!(num, num, denominator(x))
     return num
 end
+
+Arb(x::Real; prec::Integer = _precision(x)) = Arb(Arf(x, prec = prec))
 
 ## Acb
 # From real part
@@ -136,6 +137,17 @@ Base.zeros(x::T, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [zero(x) for _ = 1:
 Base.ones(x::T, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(x) for _ = 1:n]
 Base.zeros(::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [zero(T) for _ = 1:n]
 Base.ones(::Type{T}, n::Integer) where {T<:Union{Arf,Arb,Acb}} = [one(T) for _ = 1:n]
+
+function set!(z::ArbLike, x::Rational)
+    z[] = numerator(x)
+    div!(z, z, denominator(x))
+end
+
+function set!(z::AcbLike, x::Union{Rational,Complex{<:Rational}})
+    set!(realref(z), real(x))
+    set!(imagref(z), imag(x))
+    z
+end
 
 # Irrationals
 Mag(::Irrational{:π}) = const_pi!(Mag())
