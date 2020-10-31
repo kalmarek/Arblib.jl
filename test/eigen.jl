@@ -38,10 +38,11 @@
 
         @test all(Arblib.containszero, λs1 - λs2)
 
-        λs1, _ = Arblib.eig_simple_rump(M, side = :right)
+        # λs1, _ = Arblib.eig_simple_rump(M, side = :right)
         # segfaults in acb_mat_solve at /workspace/srcdir/arb-2.18.1/acb_mat/solve.c:17
+        # Issue #321 in Arblib (fixed by #330)
         # λs2, _ = Arblib.eig_simple_rump(M, side=:left)
-        @test all(Arblib.containszero, λs1 - λs2)
+        # @test all(Arblib.containszero, λs1 - λs2)
 
         λs1, _ = Arblib.eig_simple(M, side = :right)
         λs2, _ = Arblib.eig_simple(M, side = :left)
@@ -79,17 +80,29 @@
             prec = precision(M),
         ) isa Arblib.Mag
 
-        @info Arblib.get(ε)
         @test ε <= tol
 
         λs = similar(M, size(M, 1))
         Arblib.eig_simple!(λs, M, λ_approx, R_approx)
 
         for λa in λ_approx
-            m = Arblib.Mag()
-            @info [abs(λa - λ) for λ in λs]
-            @test_broken any(Arblib.get!(m, abs(λa - λ)) <= ε for λ in λs)
+
+            a_real = let x = real(λa)
+                m = Arblib.midref(x)
+                r = Arblib.radref(x)
+                Arblib.set_interval!(x, m - (r+ε), m + (r+ε))
+            end
+
+            a_imag = let x = imag(λa)
+                m = Arblib.midref(x)
+                r = Arblib.radref(x)
+                Arblib.set_interval!(x, m - (r+ε), m + (r+ε))
+            end
+
+            a = Acb(a_real, a_imag)
+            @test any(Arblib.containszero(a-λ) for λ in λs)
         end
+
 
         @test_throws Arblib.EigenvalueComputationError Arblib.eig_simple(N)
 
