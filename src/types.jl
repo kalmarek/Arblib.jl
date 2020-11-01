@@ -16,7 +16,7 @@ end
 struct Mag <: Real
     mag::mag_struct
 
-    Mag() = Mag(mag_struct())
+    Mag() = new(mag_struct())
 
     Mag(x::mag_struct) = new(mag_struct(x))
 
