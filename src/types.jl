@@ -16,6 +16,8 @@ end
 struct Mag <: Real
     mag::mag_struct
 
+    Mag() = Mag(mag_struct())
+
     Mag(x::mag_struct) = new(mag_struct(x))
 
     Mag(x::Union{Mag,Arf}) = new(mag_struct(cstruct(x)))
@@ -248,6 +250,7 @@ for prefix in [:mag, :arf, :arb, :acb]
 
         parentstruct(x::$T) = cstruct(x)
         parentstruct(x::$TRef) = x
+        parentstruct(x::$TStruct) = x
     end
 end
 

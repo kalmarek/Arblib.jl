@@ -13,10 +13,11 @@ Base.precision(::Type{<:Ptr{<:ArbStructTypes}}) = DEFAULT_PRECISION[]
 Base.precision(x::ArbStructTypes) = DEFAULT_PRECISION[]
 Base.precision(x::Ptr{<:ArbStructTypes}) = DEFAULT_PRECISION[]
 Base.precision(x::ArbTypes) = x.prec
-# MagLike <: ArbTypes
-Base.precision(x::MagLike) = DEFAULT_PRECISION[]
+# disambiguation
+Base.precision(::Union{Mag,MagRef}) = DEFAULT_PRECISION[]
 
 @inline _precision(x::ArbTypes) = precision(x)
+@inline _precision(x::BigFloat) = precision(x)
 @inline _precision(_) = DEFAULT_PRECISION[]
 
 """

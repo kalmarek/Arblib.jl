@@ -5,6 +5,7 @@ using Arblib, Test, LinearAlgebra
     include("types-test.jl")
     include("arbcall-test.jl")
     include("precision-test.jl")
+    include("setters-test.jl")
     include("constructors-test.jl")
     include("predicates-test.jl")
     include("show-test.jl")
