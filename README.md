@@ -110,6 +110,31 @@ becomes
 add!(z::ArbLike, x::ArbLike, y::Int; prec = precision(z))
 ```
 
+## Constructors and setters
+
+Arb defines a number of functions for setting something to a specific
+value, for example `void arb_set_si(arb_t y, slong x)`. All of these
+are renamed to `set!` and rely on multiple dispatch to choose the
+correct one. In addition to the ones defined in Arb there is a number
+of methods of `set!` added in Arblib to make it more convenient to
+work with. For example there are setters for `Rational` and all
+irrationals defined in `Base.MathConstants`.
+
+Almost all of the constructors are simple wrappers around these
+setters. This means that it's usually more informative to look at the
+methods for `set!` than for say `Arb` to figure out what constructors
+exists. Both `Arb` and `Acb` are constructed in such a way that the
+result will always enclose the input.
+
+**Example:**
+``` julia
+x = Arblib.set!(Arb(), π)
+y = Arb(π)
+
+x = Arblib.set!(Arb(), 5//13)
+y = Arb(5//13)
+```
+
 ## Example
 
 Here is the naive sine compuation example form the [Arb documentation](http://arblib.org/using.html#a-worked-example-the-sine-function) in Julia:

@@ -45,6 +45,7 @@ include("manual_overrides.jl")
 
 include("precision.jl")
 
+include("setters.jl")
 include("constructors.jl")
 include("predicates.jl")
 include("show.jl")

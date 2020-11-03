@@ -19,6 +19,7 @@ Base.precision(x::MagLike) = DEFAULT_PRECISION[]
 Base.precision(::Union{Mag,MagRef}) = DEFAULT_PRECISION[]
 
 @inline _precision(x::ArbTypes) = precision(x)
+@inline _precision(x::BigFloat) = precision(x)
 @inline _precision(@nospecialize _) = DEFAULT_PRECISION[]
 
 """

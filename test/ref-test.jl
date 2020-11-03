@@ -12,6 +12,11 @@
     z = Arblib.radref(x)[]
     Arblib.set!(z, UInt(4))
     @test Arblib.radref(x) == Mag(UInt(2))
+
+    @test isequal(zero(MagRef), zero(Mag))
+    @test isequal(zero(Arblib.radref(x)), zero(Mag))
+    @test isequal(one(MagRef), one(Mag))
+    @test isequal(one(Arblib.radref(x)), one(Mag))
 end
 
 @testset "ArfRef" begin
@@ -35,6 +40,11 @@ end
     z = Arblib.midref(x)[]
     Arblib.set!(z, 4)
     @test Arblib.midref(x) == Arf(2)
+
+    @test isequal(zero(ArfRef), zero(Arf))
+    @test isequal(zero(Arblib.midref(x)), zero(Arf))
+    @test isequal(one(ArfRef), one(Arf))
+    @test isequal(one(Arblib.midref(x)), one(Arf))
 end
 
 @testset "ArbRef" begin
@@ -60,6 +70,11 @@ end
     z = Arblib.realref(x)[]
     Arblib.set!(z, 4)
     @test Arblib.realref(x) == Arf(2)
+
+    @test isequal(zero(ArbRef), zero(Arb))
+    @test isequal(zero(Arblib.realref(x)), zero(Arb))
+    @test isequal(one(ArbRef), one(Arb))
+    @test isequal(one(Arblib.realref(x)), one(Arb))
 end
 
 @testset "AcbRef" begin
@@ -75,6 +90,11 @@ end
     @test AcbRef(ptr, parent) == Acb()
     @test precision(AcbRef(ptr, parent)) == Arblib.DEFAULT_PRECISION[]
     @test precision(AcbRef(ptr, parent, prec = 80)) == 80
+
+    @test isequal(zero(AcbRef), zero(Acb))
+    @test isequal(zero(x), zero(Acb))
+    @test isequal(one(AcbRef), one(Acb))
+    @test isequal(one(x), one(Acb))
 
     Arblib.set!(x, 2)
     @test v[1] == Acb(2)

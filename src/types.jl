@@ -250,6 +250,7 @@ for prefix in [:mag, :arf, :arb, :acb]
 
         parentstruct(x::$T) = cstruct(x)
         parentstruct(x::$TRef) = x
+        parentstruct(x::$TStruct) = x
     end
 end
 
