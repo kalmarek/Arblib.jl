@@ -254,6 +254,10 @@ for prefix in [:mag, :arf, :arb, :acb]
     end
 end
 
+const MagOrRef = Union{Mag,MagRef}
+const ArfOrRef = Union{Arf,ArfRef}
+const ArbOrRef = Union{Arb,ArbRef}
+const AcbOrRef = Union{Acb,AcbRef}
 const MagLike = Union{Mag,MagRef,cstructtype(Mag),Ptr{cstructtype(Mag)}}
 const ArfLike = Union{Arf,ArfRef,cstructtype(Arf),Ptr{cstructtype(Arf)}}
 const ArbLike = Union{Arb,ArbRef,cstructtype(Arb),Ptr{cstructtype(Arb)}}
@@ -289,7 +293,7 @@ const ArbTypes = Union{
 
 Base.setindex!(x::Union{Mag,MagRef,Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}, z::Number) =
     set!(x, z)
-Base.setindex!(x::Union{Mag,MagRef}, z::Ptr{mag_struct}) = set!(x, z)
-Base.setindex!(x::Union{Arf,ArfRef}, z::Ptr{arf_struct}) = set!(x, z)
-Base.setindex!(x::Union{Arb,ArbRef}, z::Ptr{arb_struct}) = set!(x, z)
-Base.setindex!(x::Union{Acb,AcbRef}, z::Ptr{acb_struct}) = set!(x, z)
+Base.setindex!(x::MagOrRef, z::Ptr{mag_struct}) = set!(x, z)
+Base.setindex!(x::ArfOrRef, z::Ptr{arf_struct}) = set!(x, z)
+Base.setindex!(x::ArbOrRef, z::Ptr{arb_struct}) = set!(x, z)
+Base.setindex!(x::AcbOrRef, z::Ptr{acb_struct}) = set!(x, z)

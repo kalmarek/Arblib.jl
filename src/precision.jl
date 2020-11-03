@@ -16,7 +16,7 @@ Base.precision(x::ArbTypes) = x.prec
 # MagLike <: ArbTypes
 Base.precision(x::MagLike) = DEFAULT_PRECISION[]
 # disambiguation
-Base.precision(::Union{Mag,MagRef}) = DEFAULT_PRECISION[]
+Base.precision(::MagOrRef) = DEFAULT_PRECISION[]
 
 @inline _precision(x::ArbTypes) = precision(x)
 @inline _precision(x::BigFloat) = precision(x)

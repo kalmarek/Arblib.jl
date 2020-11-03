@@ -1,6 +1,6 @@
 digits_prec(prec::Integer) = floor(Int, prec * log(2) / log(10))
 
-function _string(x::Union{Mag,MagRef})
+function _string(x::MagOrRef)
     Libc.flush_cstdio()
     Base.flush(stdout)
     io = IOStream("arb")
@@ -16,15 +16,17 @@ function _string(x::Union{Mag,MagRef})
     return read(out_rd, String)
 end
 
-function Base.show(io::IO, x::Union{Mag,MagRef})
+function Base.show(io::IO, x::MagOrRef)
     if isdefined(Main, :IJulia) && Main.IJulia.inited
         print(io, Float64(x))
     else
         print(io, _string(x))
     end
 end
-Base.show(io::IO, x::Union{Arf,ArfRef}) = print(io, BigFloat(x))
-function Base.show(io::IO, x::Union{Arb,ArbRef})
+
+Base.show(io::IO, x::ArfOrRef) = print(io, BigFloat(x))
+
+function Base.show(io::IO, x::ArbOrRef)
     cstr = ccall(
         @libarb(arb_get_str),
         Ptr{UInt8},
@@ -36,7 +38,8 @@ function Base.show(io::IO, x::Union{Arb,ArbRef})
     print(io, unsafe_string(cstr))
     ccall(@libflint(flint_free), Nothing, (Ptr{UInt8},), cstr)
 end
-function Base.show(io::IO, x::Union{Acb,AcbRef})
+
+function Base.show(io::IO, x::AcbOrRef)
     show(io, realref(x))
     if !iszero(imagref(x))
         print(io, " + ")
@@ -44,6 +47,7 @@ function Base.show(io::IO, x::Union{Acb,AcbRef})
         print(io, "im")
     end
 end
+
 function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
     if (T == ArbPoly || T == AcbPoly) && iszero(poly)
         print(io, "0")

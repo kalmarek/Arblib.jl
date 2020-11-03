@@ -1,9 +1,5 @@
-import Random
 
-const MagOrRef = Union{Mag,MagRef}
-const ArfOrRef = Union{Arf,ArfRef}
-const ArbOrRef = Union{Arb,ArbRef}
-const AcbOrRef = Union{Acb,AcbRef}
+import Random
 
 for (T, RefT) in ((Arf, ArfOrRef), (Arb, ArbOrRef), (Acb, AcbOrRef))
     @eval begin
