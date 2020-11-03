@@ -1,22 +1,19 @@
 import Random
 
-for (T, RefT) in ((Arf, ArfOrRef), (Arb, ArbOrRef), (Acb, AcbOrRef))
-    @eval begin
-        function Random.Sampler(
-            RNG::Type{<:Random.AbstractRNG},
-            st::Random.SamplerType{<:$RefT},
-            n::Random.Repetition,
-        )
-            # return Random.SamplerSimple(
-            #     Random.SamplerType{Arf}(),
-            #     Random.SamplerBigFloat(precision(Arf)),
-            # )
-            res = setprecision(BigFloat, precision($T)) do
-                Random.SamplerSimple(Random.SamplerType{$T}(), Random.Sampler(RNG, BigFloat, n))
-            end
-            return res
-        end
+function Random.Sampler(
+    RNG::Type{<:Random.AbstractRNG},
+    st::Random.SamplerType{TOrRef},
+    n::Random.Repetition,
+) where {TOrRef<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}}
+    T = _nonreftype(TOrRef)
+    # return Random.SamplerSimple(
+    #     Random.SamplerType{T}(),
+    #     Random.SamplerBigFloat(precision(T)),
+    # )
+    res = setprecision(BigFloat, precision(T)) do
+        Random.SamplerSimple(Random.SamplerType{T}(), Random.Sampler(RNG, BigFloat, n))
     end
+    return res
 end
 
 Random.rand(rng::Random.AbstractRNG, sp::Random.SamplerSimple{A,B,Arf}) where {A,B} =

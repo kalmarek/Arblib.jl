@@ -248,6 +248,8 @@ for prefix in [:mag, :arf, :arb, :acb]
         Base.convert(::Type{Ptr{$TStruct}}, x::$TRef) = cstruct(x)
         Base.cconvert(::Type{Ref{$TStruct}}, x::$TRef) = cstruct(x)
 
+        _nonreftype(::Type{<:Union{$T,$TRef}}) = $T
+
         parentstruct(x::$T) = cstruct(x)
         parentstruct(x::$TRef) = x
         parentstruct(x::$TStruct) = x
