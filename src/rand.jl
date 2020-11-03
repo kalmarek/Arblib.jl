@@ -1,4 +1,3 @@
-
 import Random
 
 for (T, RefT) in ((Arf, ArfOrRef), (Arb, ArbOrRef), (Acb, AcbOrRef))
@@ -8,11 +7,10 @@ for (T, RefT) in ((Arf, ArfOrRef), (Arb, ArbOrRef), (Acb, AcbOrRef))
             st::Random.SamplerType{<:$RefT},
             n::Random.Repetition,
         )
-            #     TODO: SamplerBigFloat(precision(Arf))
-            #     return Random.SamplerSimple(
-            #         Random.SamplerType{Arf}(),
-            #         Random.SamplerBigFloat(precision(Arf))
-            #     )
+            # return Random.SamplerSimple(
+            #     Random.SamplerType{Arf}(),
+            #     Random.SamplerBigFloat(precision(Arf)),
+            # )
             res = setprecision(BigFloat, precision($T)) do
                 Random.SamplerSimple(Random.SamplerType{$T}(), Random.Sampler(RNG, BigFloat, n))
             end
@@ -32,7 +30,7 @@ function Random.rand(
     rng::Random.AbstractRNG,
     st::Random.SamplerTrivial{A,A},
 ) where {A<:ArfOrRef}
-    # TODO: Arf(Random.SamplerBigFloat(precision(st[])))
+    # TODO: Arf(rand(rng, Random.SamplerBigFloat(precision(st[]))))
     x = setprecision(BigFloat, precision(st[])) do
         rand(rng, BigFloat)
     end
@@ -43,6 +41,7 @@ function Random.rand(
     rng::Random.AbstractRNG,
     st::Random.SamplerTrivial{A,A},
 ) where {A<:ArbOrRef}
+    # TODO: Arb(rand(rng, Random.SamplerBigFloat(precision(st[]))))
     x = setprecision(BigFloat, precision(st[])) do
         rand(rng, BigFloat)
     end
@@ -54,8 +53,9 @@ function Random.rand(
     rng::Random.AbstractRNG,
     st::Random.SamplerTrivial{A,A},
 ) where {A<:AcbOrRef}
+    # TODO: rand(rng, Random.SamplerBigFloat(precision(st[])), 2)
     re, im = setprecision(BigFloat, precision(st[])) do
-        rand(rng, BigFloat, 2) # TODO: Random.SamplerBigFloat(precision(st[]))
-    end # TODO: Random.SamplerBigFloat(precision(st[]))
+        rand(rng, BigFloat, 2)
+    end
     return Acb(re, im; prec = precision(st[]))
 end
