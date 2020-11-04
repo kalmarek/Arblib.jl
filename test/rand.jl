@@ -7,10 +7,15 @@
 
         @test precision(rand(T(prec = 128))) == 128
     end
-    a = rand(Arb)
+    a = rand(Arb(prec = 128))
     @test rand(Arblib.midref(a)) isa Arf
-    z = Acb(rand(Arb, 2)...)
+    @test precision(rand(Arblib.midref(a))) == precision(a)
+
+    z = Acb(rand(Arb(prec = 128), 2)...)
     @test rand(Arblib.realref(z)) isa Arb
-    M = AcbVector(rand(Acb, 3))
-    @test rand(Arblib.ref(M, 1)) isa Acb
+    @test precision(rand(Arblib.realref(z))) == precision(z)
+
+    V = AcbVector(rand(Acb(prec = 128), 3))
+    @test rand(Arblib.ref(V, 1)) isa Acb
+    @test precision(rand(Arblib.ref(V, 1))) == precision(V)
 end
