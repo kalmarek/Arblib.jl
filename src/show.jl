@@ -1,9 +1,46 @@
 digits_prec(prec::Integer) = floor(Int, prec * log(2) / log(10))
 
-Base.show(io::IO, x::Union{Mag,MagRef}) = print(io, _string(x))
-Base.show(io::IO, x::Union{Arb,ArbRef,Acb,AcbRef}) = print(io, string_nice(x))
-Base.show(io::IO, x::Union{Arf,ArfRef}) = print(io, string_decimal(x))
+function _string(x::Union{Mag,MagRef})
+    Libc.flush_cstdio()
+    Base.flush(stdout)
+    io = IOStream("arb")
+    redirect_stdout(io) do
+        ccall(@libarb(mag_print), Cvoid, (Ref{mag_struct},), x)
+        Libc.flush_cstdio()
+        yield()
+    end
+    close(io)
+    return read(io, String)
+end
 
+function Base.show(io::IO, x::Union{Mag,MagRef})
+    if isdefined(Main, :IJulia) && Main.IJulia.inited
+        print(io, Float64(x))
+    else
+        print(io, _string(x))
+    end
+end
+Base.show(io::IO, x::Union{Arf,ArfRef}) = print(io, BigFloat(x))
+function Base.show(io::IO, x::Union{Arb,ArbRef})
+    cstr = ccall(
+        @libarb(arb_get_str),
+        Ptr{UInt8},
+        (Ref{arb_struct}, Int, UInt),
+        x,
+        digits_prec(precision(x)),
+        UInt(0),
+    )
+    print(io, unsafe_string(cstr))
+    ccall(@libflint(flint_free), Nothing, (Ptr{UInt8},), cstr)
+end
+function Base.show(io::IO, x::Union{Acb,AcbRef})
+    show(io, real(x))
+    if !iszero(imag(x))
+        print(io, " + ")
+        show(io, imag(x))
+        print(io, "im")
+    end
+end
 function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
     if (T == ArbPoly || T == AcbPoly) && iszero(poly)
         print(io, "0")
@@ -40,44 +77,6 @@ end
 
 for ArbT in (Mag, MagRef, Arf, ArfRef, Arb, ArbRef, Acb, AcbRef)
     arbf = Symbol(cprefix(ArbT), :_, :print)
-    @eval begin
-        function _string(x::$ArbT)
-            Libc.flush_cstdio()
-            Base.flush(stdout)
-            original_stdout = stdout
-            out_rd, out_wr = redirect_stdout()
-            try
-                ccall(@libarb($arbf), Cvoid, (Ref{$(cstructtype(ArbT))},), x)
-                Libc.flush_cstdio()
-            finally
-                redirect_stdout(original_stdout)
-                close(out_wr)
-            end
-            return read(out_rd, String)
-        end
-    end
-
-    (ArbT == Mag || ArbT == MagRef) && continue # no mag_printd and mag_printn
-
-    @eval begin
-        function string_decimal(x::$ArbT, digits::Integer = digits_prec(precision(x)))
-            Libc.flush_cstdio()
-            Base.flush(stdout)
-            original_stdout = stdout
-            out_rd, out_wr = redirect_stdout()
-            try
-                printd(x, digits)
-                Libc.flush_cstdio()
-            finally
-                redirect_stdout(original_stdout)
-                close(out_wr)
-            end
-            return read(out_rd, String)
-        end
-    end
-
-    (ArbT == Arf || ArbT == ArfRef) && continue #no arf_printn
-
     @eval begin
         function string_nice(
             x::$ArbT,
