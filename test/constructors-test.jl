@@ -124,6 +124,17 @@
         @test isequal(Acb(BigFloat(1.3), ℯ), Acb(Arb(1.3), Arb(ℯ)))
     end
 
+    @testset "Others" begin
+        @test Int(Arf(2)) == 2
+        @test Float64(Mag(2.5)) ≥ 2.5
+        @test Float64(Arf(2.5)) == 2.5
+        @test Float64(Arb(2.5)) == 2.5
+        @test ComplexF64(Acb(2.25)) == 2.25 + 0im
+        @test BigFloat(Arf(2.5)) == 2.5
+        @test BigFloat(Arb(2.5)) == 2.5
+        @test precision(BigFloat(Arf(2.5; prec = 96))) == 96
+    end
+
     @testset "zeros/ones" begin
         for T in [Arf, Arb, Acb]
             @test zeros(T, 2) == [zero(T), zero(T)]
