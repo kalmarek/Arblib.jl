@@ -22,19 +22,6 @@
 
         @test precision(zero(Arf(prec = 80))) == 80
         @test precision(one(Arf(prec = 80))) == 80
-
-        # TODO: Move these to other file
-        @test Float64(Arf(2.0)) isa Float64
-        @test Float64(Arf(2.0)) == 2.0
-        @test convert(Float64, Arf(2.0)) isa Float64
-        @test convert(Float64, Arf(2.0)) == 2.0
-        @test Int(Arf(2.0)) isa Int
-        @test Int(Arf(2.0)) == 2
-        @test convert(Int, Arf(2.0)) isa Int
-        @test convert(Int, Arf(2.0)) == 2
-        @test Int(Arf(2.0)) == 2
-        @test Int(Arf(0.5)) == 0
-        @test Int(Arf(0.5); rnd = Arblib.ArbRoundFromZero) == 1
     end
 
     @testset "Arb" begin
@@ -125,7 +112,21 @@
     end
 
     @testset "Others" begin
+        # TODO: Move these to other file
+        @test Float64(Arf(2.0)) isa Float64
+        @test Float64(Arf(2.0)) == 2.0
+        @test convert(Float64, Arf(2.0)) isa Float64
+        @test convert(Float64, Arf(2.0)) == 2.0
+        @test Int(Arf(2.0)) isa Int
+        @test Int(Arf(2.0)) == 2
+        @test convert(Int, Arf(2.0)) isa Int
+        @test convert(Int, Arf(2.0)) == 2
+        @test Int(Arf(2.0)) == 2
+        @test Arblib.get_si(Arf(0.5)) == 0
+        @test Arblib.get_si(Arf(0.5); rnd = Arblib.ArbRoundFromZero) == 1
+
         @test Int(Arf(2)) == 2
+        @test_throws InexactError Int(Arf(2.5))
         @test Float64(Mag(2.5)) ≥ 2.5
         @test Float64(Arf(2.5)) == 2.5
         @test Float64(Arb(2.5)) == 2.5

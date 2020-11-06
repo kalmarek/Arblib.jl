@@ -2,6 +2,7 @@
     Mag = Arblib.Mag
     @testset "string" begin
         @test Arblib._string(Mag()) isa String
+        @test !isempty(Arblib._string(Mag(2.3)))
         @test Arblib.string_nice(Arb()) isa String
         @test Arblib.string_nice(Acb()) isa String
     end

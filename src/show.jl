@@ -4,13 +4,16 @@ function _string(x::Union{Mag,MagRef})
     Libc.flush_cstdio()
     Base.flush(stdout)
     io = IOStream("arb")
-    redirect_stdout(io) do
+    original_stdout = stdout
+    out_rd, out_wr = redirect_stdout()
+    try
         ccall(@libarb(mag_print), Cvoid, (Ref{mag_struct},), x)
         Libc.flush_cstdio()
-        yield()
+    finally
+        redirect_stdout(original_stdout)
+        close(out_wr)
     end
-    close(io)
-    return read(io, String)
+    return read(out_rd, String)
 end
 
 function Base.show(io::IO, x::Union{Mag,MagRef})
@@ -34,10 +37,10 @@ function Base.show(io::IO, x::Union{Arb,ArbRef})
     ccall(@libflint(flint_free), Nothing, (Ptr{UInt8},), cstr)
 end
 function Base.show(io::IO, x::Union{Acb,AcbRef})
-    show(io, real(x))
-    if !iszero(imag(x))
+    show(io, realref(x))
+    if !iszero(imagref(x))
         print(io, " + ")
-        show(io, imag(x))
+        show(io, imagref(x))
         print(io, "im")
     end
 end
