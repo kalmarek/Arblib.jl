@@ -2,15 +2,13 @@ import Random
 
 # TODO: remove Random.CloseOpen01{BigFloat} parameters
 # TODO: remove setprecision
-# possibly fixed by
+# possibly fixed by https://github.com/JuliaLang/julia/pull/38169
 
 function Random.Sampler(
     RNG::Type{<:Random.AbstractRNG},
-    st::Random.SamplerType{TOrRef},
+    st::Random.SamplerType{T},
     n::Random.Repetition,
-) where {TOrRef<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}}
-
-    T = _nonreftype(TOrRef)
+) where {T<:Union{Arf,Arb,Acb}}
     return Random.SamplerSimple(
         Random.SamplerType{T}(),
         Random.SamplerBigFloat{Random.CloseOpen01{BigFloat}}(precision(T)),

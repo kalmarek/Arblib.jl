@@ -1,10 +1,7 @@
 @testset "Random" begin
-    @testset "rand $T" for (T, RefT) in ((Arf, ArfRef), (Arb, ArbRef), (Acb, AcbRef))
+    @testset "rand $T" for T in (Arf, Arb, Acb)
         @test rand(T) isa T
         @test precision(rand(T)) == precision(T)
-        @test rand(RefT) isa T
-        @test precision(rand(RefT)) == precision(T)
-
         @test precision(rand(T(prec = 128))) == 128
     end
     a = rand(Arb(prec = 128))
