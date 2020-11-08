@@ -50,6 +50,7 @@ include("constructors.jl")
 include("predicates.jl")
 include("show.jl")
 include("arithmetic.jl")
+include("rand.jl")
 
 include("ref.jl")
 include("vector.jl")

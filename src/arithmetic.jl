@@ -20,27 +20,27 @@ Base.promote_rule(
 ) = Acb
 
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
-    @eval function Base.$jf(x::T, y::T) where {T<:Union{Mag,MagRef}}
+    @eval function Base.$jf(x::T, y::T) where {T<:MagOrRef}
         z = T()
         $af(z, x, y)
         z
     end
 end
 
-function Base.:(^)(x::T, k::Integer) where {T<:Union{Mag,MagRef}}
+function Base.:(^)(x::T, k::Integer) where {T<:MagOrRef}
     z = T()
     pow!(z, x, convert(UInt, k))
     z
 end
 
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
-    @eval function Base.$jf(x::T, y::T) where {T<:Union{Arf,Arb,ArbRef,Acb,AcbRef}}
+    @eval function Base.$jf(x::T, y::T) where {T<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}}
         z = T(prec = max(precision(x), precision(y)))
         $af(z, x, y)
         z
     end
 end
-function Base.:(-)(x::T) where {T<:Union{Arf,Arb,ArbRef,Acb,AcbRef}}
+function Base.:(-)(x::T) where {T<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}}
     z = T(prec = precision(x))
     neg!(z, x)
     z
