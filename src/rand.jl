@@ -27,16 +27,17 @@ function Random.Sampler(
     )
 end
 
-Random.rand(rng::Random.AbstractRNG, sp::Random.SamplerSimple{A,B,Arf}) where {A,B} =
+Random.rand(rng::Random.AbstractRNG, sp::Random.SamplerSimple{Random.SamplerType{Arf}}) =
     setprecision(BigFloat, sp.data.prec) do
         Arf(rand(rng, sp.data), prec = sp.data.prec)
     end
 
-Random.rand(rng::Random.AbstractRNG, sp::Random.SamplerSimple{A,B,Arb}) where {A,B} =
+Random.rand(rng::Random.AbstractRNG, sp::Random.SamplerSimple{Random.SamplerType{Arb}}) =
     setprecision(BigFloat, sp.data.prec) do
         Arb(rand(rng, sp.data), prec = sp.data.prec)
     end
-Random.rand(rng::Random.AbstractRNG, sp::Random.SamplerSimple{A,B,Acb}) where {A,B} =
+
+Random.rand(rng::Random.AbstractRNG, sp::Random.SamplerSimple{Random.SamplerType{Acb}}) =
     setprecision(BigFloat, sp.data.prec) do
         Acb(rand(rng, sp.data), rand(rng, sp.data), prec = sp.data.prec)
     end
