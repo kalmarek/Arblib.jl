@@ -39,7 +39,7 @@ Base.@propagate_inbounds function Base.setindex!(
     i::Integer,
 )
     @boundscheck checkbounds(v, i)
-    v.arb_vec[i] = x
+    ref(v, i)[] = x
     return x
 end
 
@@ -85,7 +85,7 @@ Base.@propagate_inbounds function Base.setindex!(
     i::Integer,
 )
     @boundscheck checkbounds(v, i)
-    v.acb_vec[i] = x
+    ref(v, i)[] = x
     return x
 end
 

@@ -114,6 +114,11 @@
         end
     end
 
+    @testset "set Rational" begin
+        A = TMat(2, 2)
+        A[1, 1] = 5 // 8
+        @test !iszero(A[1, 1])
+    end
 end
 
 
