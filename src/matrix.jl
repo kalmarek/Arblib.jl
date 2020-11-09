@@ -46,7 +46,6 @@ Base.@propagate_inbounds function Base.setindex!(
     j::Integer,
 )
     @boundscheck checkbounds(A, i, j)
-    # A.arb_mat[i, j] = x
     ref(A, i, j)[] = x
     return x
 end
