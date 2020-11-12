@@ -133,11 +133,14 @@ function _integrate!(
 end
 
 """
-    integrate!(f!, res::Acb, a::Acb, b::Acb;
-        prec = precision(res),
-        rtol=0.0,
-        atol=2.0^-prec,
-        opts::Union{acb_calc_integrate_opt_struct, Ptr{Cvoid}} = C_NULL)
+    integrate!(f!, res::Acb, a::Number, b::Number;
+        check_analytic::Bool = false,
+        take_prec::Bool = false,
+        prec::Integer = precision(res),
+        rtol = 0.0,
+        atol = 2.0^-prec,
+        opts::Union{acb_calc_integrate_opt_struct, Ptr{Cvoid}} = C_NULL,
+    )
 
 Like [`integrate`](@ref), but make use of in-place operations. In
 particular, there are three differences from `integrate`:
@@ -163,8 +166,8 @@ function integrate!(
     atol = set_ui_2exp!(Mag(), one(UInt), -prec),
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
 )
-    # rel_goal = r where rel_tol ~2^-r
-    rel_goal = iszero(rtol) ? prec : rel_goal = -floor(Int, log2(atol))
+    # rtol ≈ 2^(-rel_goal)
+    rel_goal = iszero(rtol) ? prec : max(-floor(Int, log2(atol)), 0)
 
     if !check_analytic && !take_prec
         g! = (inp, out; analytic, prec) -> f!(inp, out)
@@ -195,7 +198,7 @@ function integrate!(
     b::Number;
     check_analytic::Bool = false,
     take_prec::Bool = false,
-    prec::Integer = max(_precision(a), _precision(b)),
+    prec::Integer = precision(res),
     rtol = 0.0,
     atol = set_ui_2exp!(Mag(), one(UInt), -prec),
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
@@ -217,6 +220,8 @@ end
 
 """
     integrate(f, a::Number, b::Number;
+        check_analytic::Bool = false,
+        take_prec::Bool = false,
         prec = max(precision(a), precision(b)),
         rtol=0.0,
         atol=2.0^-prec,
@@ -224,26 +229,48 @@ end
 Computes a rigorous enclosure of the integral
 ∫ₐᵇ f(t) dt
 where `f` is any (holomorphic) julia function. From Arb docs:
+
 > The integral follows a straight-line path between the complex numbers `a` and
 > `b`. For finite results, `a`, `b` must be finite and `f` must be bounded on
 > the path of integration. To compute improper integrals, the user should
 > therefore truncate the path of integration manually (or make a regularizing
 > change of variables, if possible).
-Parameters:
- * `rtol` relative tolerance
- * `atol` absolute tolerance
- * `opts` a `C_NULL` (using the default options), or an instance of
- `acb_calc_integrate_opt_struct` controlling the algorithmic aspects of integration.
 
-!!! Note: `integrate` does not guarantee to satisfy provided tolerances. For more
-information please consider arblib documentation.
+The error estimates used require that `f` is holomorphic on certain
+ellipses around the path of integration.
+
+> The integration algorithm combines direct interval enclosures,
+> Gauss-Legendre quadrature where f is holomorphic, and adaptive
+> subdivision. This strategy supports integrands with discontinuities
+> while providing exponential convergence for typical piecewise
+> holomorphic integrands.
+
+In general the integration will work for any function which is
+holomorpic or meromorphic on the whole complex plane. For functions
+with branch cuts or other things which makes them non-holomorphic the
+argument `check_analytic` has to be set to `true`. In this case `f`
+will be given a keyword argument `analytic::Bool`, if `analytic` is
+`false` then nothing special has to be done, but if `analytic` is
+`true` then the output has to be non-finite if `f` is not
+holomorphic on the whole input ball (typically `Arb(NaN)`).
 
 !!! Note: It's users responsibility to verify holomorphicity of `f`.
 
-TODO: Document `check_analytic` and `take_prec`.
+Parameters:
+ * `take_prec` if true then `f` will be given the keyword argument
+   `prec = prec`, useful for functions requiring an explicit precision
+   to be given.
+ * `rtol` relative tolerance
+ * `atol` absolute tolerance
+ * `opts` a `C_NULL` (using the default options), or an instance of
+   `acb_calc_integrate_opt_struct` controlling the algorithmic aspects of integration.
 
-TODO: Add note about what type of holomorphicity is required and how
-to handle it.
+!!! Note: `integrate` does not guarantee to satisfy provided
+    tolerances.
+
+For more information please consider arblib documentation and the
+paper https://arxiv.org/abs/1802.07942.
+
 """
 function integrate(
     f,
