@@ -170,11 +170,11 @@ function integrate!(
     rel_goal = iszero(rtol) ? prec : max(-floor(Int, log2(atol)), 0)
 
     if !check_analytic && !take_prec
-        g! = (inp, out; analytic, prec) -> f!(inp, out)
+        g! = (res, x; analytic, prec) -> f!(res, x)
     elseif !check_analytic && take_prec
-        g! = (inp, out; analytic, prec) -> f!(inp, out, prec = prec)
+        g! = (res, x; analytic, prec) -> f!(res, x, prec = prec)
     elseif check_analytic && !take_prec
-        g! = (inp, out; analytic, prec) -> f!(inp, out, analytic = analytic)
+        g! = (res, x; analytic, prec) -> f!(res, x, analytic = analytic)
     else
         g! = f!
     end
@@ -283,7 +283,7 @@ function integrate(
     atol = set_ui_2exp!(Mag(), one(UInt), -prec),
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
 )
-    f! = (out, inp; kwargs...) -> set!(out, f(inp; kwargs...))
+    f! = (res, x; kwargs...) -> set!(res, f(x; kwargs...))
     res = Acb(prec = prec)
 
     return integrate!(
