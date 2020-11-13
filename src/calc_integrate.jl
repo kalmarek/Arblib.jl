@@ -156,9 +156,9 @@ particular, there are three differences from `integrate`:
 """
 function integrate!(
     f!,
-    res::Union{Acb,AcbRef},
-    a::Union{Acb,AcbRef},
-    b::Union{Acb,AcbRef};
+    res::AcbOrRef,
+    a::AcbOrRef,
+    b::AcbOrRef;
     check_analytic::Bool = false,
     take_prec::Bool = false,
     prec::Integer = precision(res),
@@ -193,7 +193,7 @@ end
 
 function integrate!(
     f!,
-    res::Union{Acb,AcbRef},
+    res::AcbOrRef,
     a::Number,
     b::Number;
     check_analytic::Bool = false,
@@ -274,8 +274,8 @@ paper https://arxiv.org/abs/1802.07942.
 """
 function integrate(
     f,
-    a::Union{Acb,AcbRef},
-    b::Union{Acb,AcbRef};
+    a::AcbOrRef,
+    b::AcbOrRef;
     check_analytic::Bool = false,
     take_prec::Bool = false,
     prec = max(precision(a), precision(b)),
