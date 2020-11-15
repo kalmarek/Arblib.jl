@@ -124,6 +124,9 @@
             # Underscore methods
             ("_acb_vec_set", :set),
 
+            # Removing scalar
+            ("_arb_vec_scalar_mul", :mul),
+
             # Some special cases to be aware of and maybe change
             ("mag_set_d_lower", :set_d_lower),
             ("arb_ui_div", :ui_div),
