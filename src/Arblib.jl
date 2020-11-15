@@ -58,6 +58,7 @@ include("matrix.jl")
 include("array_common.jl")
 include("eigen.jl")
 include("poly.jl")
+include("calc_integrate.jl")
 
 include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")

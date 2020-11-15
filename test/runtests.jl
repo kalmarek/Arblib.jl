@@ -15,6 +15,7 @@ using Arblib, Test, LinearAlgebra
     include("vector.jl")
     include("matrix.jl")
     include("eigen.jl")
+    include("calc_integrate.jl")
     include("ref-test.jl")
     include("poly.jl")
     include("series.jl")

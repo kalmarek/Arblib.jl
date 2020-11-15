@@ -50,7 +50,7 @@ end
 struct AcbRef <: Number
     acb_ptr::Ptr{acb_struct}
     prec::Int
-    parent::Union{acb_vec_struct,acb_mat_struct}
+    parent::Union{Nothing,acb_vec_struct,acb_mat_struct}
 end
 
 """

@@ -170,3 +170,32 @@ const ArbStructTypes = Union{
     arb_mat_struct,
     acb_mat_struct,
 }
+
+mutable struct calc_integrate_opt_struct
+    deg_limit::Clong
+    eval_limit::Clong
+    depth_limit::Clong
+    use_heap::Cint
+    verbose::Cint
+
+    function calc_integrate_opt_struct(
+        deg_limit::Integer,
+        eval_limit::Integer,
+        depth_limit::Integer,
+        use_heap::Integer = 0,
+        verbose::Integer = 0,
+    )
+        return new(deg_limit, eval_limit, depth_limit, use_heap, verbose)
+    end
+
+    function calc_integrate_opt_struct()
+        opts = new()
+        ccall(
+            @libarb(acb_calc_integrate_opt_init),
+            Cvoid,
+            (Ref{calc_integrate_opt_struct},),
+            opts,
+        )
+        return opts
+    end
+end
