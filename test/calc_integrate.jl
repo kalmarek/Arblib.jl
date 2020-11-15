@@ -28,6 +28,13 @@
     res3 = "[0.50000000000000000 +/- 2.68e-18]"
     res3! = "[0.50000000000000000 +/- 2.73e-18]"
     @test string(Arblib.integrate(f3, a, b, check_analytic = true, prec = prec)) == res3
+    @test_broken string(Arblib.integrate!(
+        f3!,
+        Acb(prec = prec),
+        a,
+        b,
+        check_analytic = true,
+    )) == res3
     @test string(Arblib.integrate!(f3!, Acb(prec = prec), a, b, check_analytic = true)) ==
           res3!
 
