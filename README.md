@@ -10,7 +10,7 @@ breaking changes.
 
 ```julia
 using Pkg
-pkg"add https://github.com/kalmarek/Arblib.jl.git"
+pkg"add Arblib"
 ```
 
 ## What is Arb?
