@@ -53,6 +53,14 @@
         take_prec = true,
         prec = prec,
     )) == res4
+    @test_broken string(Arblib.integrate!(
+        f4!,
+        Acb(prec = prec),
+        a,
+        b,
+        check_analytic = true,
+        take_prec = true,
+    )) == res4
     @test string(Arblib.integrate!(
         f4!,
         Acb(prec = prec),
