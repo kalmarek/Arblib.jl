@@ -181,7 +181,7 @@ function integrate!(
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
 )
     # rtol ≈ 2^(-rel_goal)
-    rel_goal = iszero(rtol) ? prec : max(-floor(Int, log2(atol)), 0)
+    rel_goal = iszero(rtol) ? prec : max(-floor(Int, log2(rtol)), 0)
 
     if !check_analytic && !take_prec
         g! = (res, x; analytic, prec) -> f!(res, x)
