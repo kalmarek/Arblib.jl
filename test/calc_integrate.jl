@@ -53,6 +53,14 @@
         take_prec = true,
         prec = prec,
     )) == res4
+    @test_broken string(Arblib.integrate!(
+        f4!,
+        Acb(prec = prec),
+        a,
+        b,
+        check_analytic = true,
+        take_prec = true,
+    )) == res4
     @test string(Arblib.integrate!(
         f4!,
         Acb(prec = prec),
@@ -61,4 +69,12 @@
         check_analytic = true,
         take_prec = true,
     )) == res4!
+
+    # Test with set tolerance
+    f5 = x -> sin(exp(x))
+    f5! = (res, x) -> Arblib.sin!(res, Arblib.exp!(res, x))
+    res5 = "[0.8750 +/- 5.14e-5]"
+    res5! = "[0.87495720 +/- 2.77e-9]"
+    @test string(Arblib.integrate(f5, a, b, prec = prec, rtol = 1e-4)) == res5
+    @test string(Arblib.integrate!(f5!, Acb(prec = prec), a, b, atol = 1e-8)) == res5!
 end
