@@ -1,7 +1,7 @@
 """
-    Arf <: Real
+    Arf <: AbstractFloat
 """
-struct Arf <: Real
+struct Arf <: AbstractFloat
     arf::arf_struct
     prec::Int
 
@@ -24,9 +24,9 @@ struct Mag <: Real
 end
 
 """
-    Arb <: Real
+    Arb <: AbstractFloat
 """
-struct Arb <: Real
+struct Arb <: AbstractFloat
     arb::arb_struct
     prec::Int
 
@@ -54,18 +54,18 @@ struct AcbRef <: Number
 end
 
 """
-    ArbRef <: Real
+    ArbRef <: AbstractFloat
 """
-struct ArbRef <: Real
+struct ArbRef <: AbstractFloat
     arb_ptr::Ptr{arb_struct}
     prec::Int
     parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_mat_struct}
 end
 
 """
-    ArfRef <: Real
+    ArfRef <: AbstractFloat
 """
-struct ArfRef <: Real
+struct ArfRef <: AbstractFloat
     arf_ptr::Ptr{arf_struct}
     prec::Int
     parent::Union{arb_struct,ArbRef}
