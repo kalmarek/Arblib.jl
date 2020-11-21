@@ -178,6 +178,7 @@ arbcall"void acb_tan_pi(acb_t s, const acb_t z, slong prec)"
 arbcall"void acb_cot_pi(acb_t s, const acb_t z, slong prec)"
 arbcall"void acb_sec(acb_t res, const acb_t z, slong prec)"
 arbcall"void acb_csc(acb_t res, const acb_t z, slong prec)"
+arbcall"void acb_csc_pi(acb_t res, const acb_t z, slong prec)"
 arbcall"void acb_sinc(acb_t s, const acb_t z, slong prec)"
 arbcall"void acb_sinc_pi(acb_t s, const acb_t z, slong prec)"
 

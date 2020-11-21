@@ -70,6 +70,8 @@ include("arbcalls/arb_mat.jl")
 include("arbcalls/acb_mat.jl")
 include("arbcalls/acb_hypgeom.jl")
 include("arbcalls/arb_hypgeom.jl")
+include("arbcalls/acb_elliptic.jl")
+include("arbcalls/acb_dirichlet.jl")
 include("arbcalls/eigen.jl")
 
 end # module
