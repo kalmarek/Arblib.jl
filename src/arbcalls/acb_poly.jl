@@ -284,10 +284,10 @@ arbcall"void _acb_poly_erf_series(acb_ptr res, acb_srcptr z, slong zlen, slong n
 arbcall"void acb_poly_erf_series(acb_poly_t res, const acb_poly_t z, slong n, slong prec)"
 arbcall"void _acb_poly_agm1_series(acb_ptr res, acb_srcptr z, slong zlen, slong len, slong prec)"
 arbcall"void acb_poly_agm1_series(acb_poly_t res, const acb_poly_t z, slong n, slong prec)"
-arbcall"void _acb_poly_elliptic_k_series(acb_ptr res, acb_srcptr z, slong zlen, slong len, slong prec)"
-arbcall"void acb_poly_elliptic_k_series(acb_poly_t res, const acb_poly_t z, slong n, slong prec)"
-arbcall"void _acb_poly_elliptic_p_series(acb_ptr res, acb_srcptr z, slong zlen, const acb_t tau, slong len, slong prec)"
-arbcall"void acb_poly_elliptic_p_series(acb_poly_t res, const acb_poly_t z, const acb_t tau, slong n, slong prec)"
+#mo arbcall"void _acb_poly_elliptic_k_series(acb_ptr res, acb_srcptr z, slong zlen, slong len, slong prec)" # alias to _acb_elliptic_k_series
+#mo arbcall"void acb_poly_elliptic_k_series(acb_poly_t res, const acb_poly_t z, slong n, slong prec)" # alias to acb_elliptic_k_series
+#mo arbcall"void _acb_poly_elliptic_p_series(acb_ptr res, acb_srcptr z, slong zlen, const acb_t tau, slong len, slong prec)" # alias to _acb_elliptic_p_series
+#mo arbcall"void acb_poly_elliptic_p_series(acb_poly_t res, const acb_poly_t z, const acb_t tau, slong n, slong prec)" # alias to acb_elliptic_p_series
 
 ### Root-finding
 arbcall"void _acb_poly_root_bound_fujiwara(mag_t bound, acb_srcptr poly, slong len)"

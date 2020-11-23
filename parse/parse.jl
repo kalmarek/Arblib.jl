@@ -152,15 +152,15 @@ function parse_and_generate_arbdoc(arb_doc_dir, out_dir = "src/arbcalls/")
         "acb_mat",
         "acb_hypgeom",
         "arb_hypgeom",
+        "acb_elliptic",
+        "acb_dirichlet",
     )
 
     unused_filenames = (
         "arb_fmpz_poly",
         "acb_dft",
-        "acb_elliptic",
         "acb_modular",
         "dirichlet",
-        "acb_dirichlet",
         "bernoulli",
         "hypgeom",
         "partitions",
@@ -201,6 +201,14 @@ function parse_and_generate_arbdoc(arb_doc_dir, out_dir = "src/arbcalls/")
             "clashes with _acb_vec_add",
         "void _acb_poly_sub(acb_ptr C, acb_srcptr A, slong lenA, acb_srcptr B, slong lenB, slong prec)" =>
             "clashes with _acb_vec_sub",
+        "void _acb_poly_elliptic_k_series(acb_ptr res, acb_srcptr z, slong zlen, slong len, slong prec)" =>
+            "alias to _acb_elliptic_k_series",
+        "void acb_poly_elliptic_k_series(acb_poly_t res, const acb_poly_t z, slong n, slong prec)" =>
+            "alias to acb_elliptic_k_series",
+        "void _acb_poly_elliptic_p_series(acb_ptr res, acb_srcptr z, slong zlen, const acb_t tau, slong len, slong prec)" =>
+            "alias to _acb_elliptic_p_series",
+        "void acb_poly_elliptic_p_series(acb_poly_t res, const acb_poly_t z, const acb_t tau, slong n, slong prec)" =>
+            "alias to acb_elliptic_p_series",
     )
 
     for filename in filenames
