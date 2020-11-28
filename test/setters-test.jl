@@ -8,6 +8,7 @@
     end
 
     @testset "Arb" begin
+        # MagLike and BigFloat
         @test Arblib.set!(Arb(), BigFloat(1.0)) == one(Arb)
         @test Arblib.set!(Arblib.realref(Acb()), BigFloat(1.0)) == one(Arb)
         @test Arblib.equal(Arblib.set!(Arblib.arb_struct(), BigFloat(1.0)), one(Arb))
@@ -15,10 +16,12 @@
         @test Arblib.set!(Arblib.realref(Acb()), one(Mag)) == one(Arb)
         @test Arblib.equal(Arblib.set!(Arblib.arb_struct(), one(Mag).mag), one(Arb))
 
+        # Rational
         @test Arblib.set!(Arb(), 1 // 2) == one(Arb) / 2
         @test Arblib.set!(Arblib.realref(Acb()), 1 // 2) == one(Arb) / 2
         @test Arblib.equal(Arblib.set!(Arblib.arb_struct(), 1 // 2), one(Arb) / 2)
 
+        # Irrationals
         @test Arb(3) < Arblib.set!(Arb(), π) < Arb(4)
         @test Arblib.equal(Arblib.set!(Arb(), π), Arblib.set!(Arblib.realref(Acb()), π))
         @test Arblib.equal(Arblib.set!(Arb(), π), Arblib.set!(Arblib.arb_struct(), π))
@@ -59,6 +62,43 @@
             Arblib.set!(Arb(), MathConstants.φ),
             Arblib.set!(Arblib.arb_struct(), MathConstants.φ),
         )
+
+        # Intervals: MagLike, ArfLike, BigFloat
+        @test Arblib.overlaps(
+            Arblib.set!(Arb(), (Mag(UInt64(1)), Mag(UInt64(2)))),
+            Arblib.set!(Arb(), (Arf(1), Arf(2))),
+        )
+
+        @test Arblib.equal(
+            Arblib.set!(Arb(), (Arf(1), Arf(2))),
+            Arblib.set!(Arb(), (BigFloat(1), BigFloat(2))),
+        )
+
+        @test Arblib.radref(Arblib.set!(Arb(), (Arf(1), Arf(3)))) >= Mag(UInt64(1))
+        @test Arblib.midref(Arblib.set!(Arb(), (Arf(1), Arf(3)))) >= Arf(1)
+
+        @test Arblib.radref(Arblib.set!(Arb(prec = 64), (BigFloat(π), BigFloat(π)))) >
+              Mag(UInt(0))
+        @test iszero(Arblib.radref(Arblib.set!(
+            Arb(prec = 64),
+            (BigFloat(π), BigFloat(π)),
+            prec = precision(BigFloat),
+        )))
+
+        @test_throws ArgumentError Arblib.set!(Arb(), (Arf(2), Arf(1)))
+
+        # Intervals: General
+        @test Arblib.contains(Arblib.set!(Arb(), (1, π)), Arb(π))
+        @test Arblib.contains(Arblib.set!(Arb(), (ℯ, Arb(4))), Arb(π))
+        @test Arblib.equal(
+            Arblib.set!(Arb(), (-2, 2)),
+            Arblib.set!(Arb(), (Arf(-2), Arf(2))),
+        )
+
+        @test Mag(1e-20) < Arblib.radref(Arblib.set!(Arb(prec = 64), (π, π))) < Mag(1e-10)
+        @test Mag(1e-80) <
+              Arblib.radref(Arblib.set!(Arb(prec = 64), (π, π), prec = 256)) <
+              Mag(1e-70)
     end
 
     @testset "Acb" begin
