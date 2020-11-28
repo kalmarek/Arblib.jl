@@ -20,14 +20,17 @@ function Arb(str::AbstractString; prec::Integer = DEFAULT_PRECISION[])
 end
 
 ## Acb
-Acb(x::Union{Real,arb_struct,arf_struct}; prec::Integer = _precision(x)) =
-    set!(Acb(prec = prec), x)
 Acb(
-    re::Union{Real,arb_struct,arf_struct},
-    im::Union{Real,arb_struct,arf_struct};
+    x::Union{Real,arb_struct,arf_struct,Tuple{<:Real,<:Real}};
+    prec::Integer = _precision(x),
+) = set!(Acb(prec = prec), x)
+Acb(
+    re::Union{Real,arb_struct,arf_struct,Tuple{<:Real,<:Real}},
+    im::Union{Real,arb_struct,arf_struct,Tuple{<:Real,<:Real}};
     prec::Integer = max(_precision(re), _precision(im)),
 ) = set!(Acb(prec = prec), re, im)
 
+Acb(z::NTuple{2,AcbLike}; prec::Integer = _precision(z)) = set!(Acb(prec = prec), z)
 Acb(z::Complex; prec::Integer = max(_precision(real(z)), _precision(imag(z)))) =
     set!(Acb(prec = prec), z)
 Acb(x::AcbLike; prec::Integer = precision(x)) = set!(Acb(prec = prec), x)

@@ -20,6 +20,7 @@ Base.precision(::MagOrRef) = DEFAULT_PRECISION[]
 
 @inline _precision(x::ArbTypes) = precision(x)
 @inline _precision(x::BigFloat) = precision(x)
+@inline _precision((a, b)::Tuple{S,T}) where {S,T} = max(_precision(a), _precision(b))
 @inline _precision(@nospecialize _) = DEFAULT_PRECISION[]
 
 """
