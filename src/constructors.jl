@@ -30,9 +30,7 @@ Acb(
     prec::Integer = max(_precision(re), _precision(im)),
 ) = set!(Acb(prec = prec), re, im)
 
-Acb(z::Complex; prec::Integer = max(_precision(real(z)), _precision(imag(z)))) =
-    set!(Acb(prec = prec), z)
-Acb(x::AcbLike; prec::Integer = precision(x)) = set!(Acb(prec = prec), x)
+Acb(z::Union{AcbLike,Complex}; prec::Integer = _precision(z)) = set!(Acb(prec = prec), z)
 # disambiguation
 Acb(x::Acb; prec::Integer = precision(x)) = set!(Acb(prec = prec), x)
 
