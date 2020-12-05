@@ -99,6 +99,8 @@
         @test Mag(1e-80) <
               Arblib.radref(Arblib.set!(Arb(prec = 64), (π, π), prec = 256)) <
               Mag(1e-70)
+
+        @test_throws ArgumentError Arblib.set!(Arb(), (2, 1))
     end
 
     @testset "Acb" begin
@@ -129,6 +131,12 @@
         x = Arblib.set!(Arblib.acb_struct(), π)
         @test Arblib.equal(Arblib.realref(x), Arb(π))
         @test Arblib.equal(Arblib.imagref(x), zero(Arb))
+
+        @test Arblib.equal(Arblib.set!(Acb(), (1, 2)), Arblib.set!(Acb(), Arb((1, 2))))
+        @test Arblib.equal(
+            Arblib.set!(Acb(), (1, 2), (3, 4)),
+            Arblib.set!(Acb(), Arb((1, 2)), Arb((3, 4))),
+        )
     end
 
     @testset "Set Rational" begin
