@@ -61,9 +61,5 @@ function set!(
     return res
 end
 
-# TODO: Should we check a < b (or whatever that means for complex
-# values)?
-set!(res::AcbLike, (a, b)::NTuple{2,AcbLike}) = union!(res, a, b)
-
 set!(res::AcbLike, z::Complex) = set!(res, real(z), imag(z))
 set!(res::AcbLike, ::Irrational{:π}) = const_pi!(res)
