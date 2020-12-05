@@ -58,8 +58,6 @@
         @test precision(Arb(MathConstants.γ, prec = 80)) == 80
         @test precision(Arb(MathConstants.catalan, prec = 80)) == 80
         @test precision(Arb(MathConstants.φ, prec = 80)) == 80
-
-
     end
 
     @testset "Acb" begin
