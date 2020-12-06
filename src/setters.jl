@@ -28,8 +28,24 @@ function set!(res::ArbLike, ::Irrational{:φ}; prec::Integer = precision(res))
     return div!(res, res, 2, prec)
 end
 
+function set!(
+    res::ArbLike,
+    (a, b)::NTuple{2,Union{MagLike,ArfLike,BigFloat}};
+    prec::Integer = precision(res),
+)
+    a <= b || throw(ArgumentError("must have a <= b, got a = $a and b = $b"))
+    return set_interval!(res, a, b, prec = prec)
+end
+
+function set!(res::ArbLike, (a, b)::Tuple{<:Real,<:Real}; prec::Integer = precision(res))
+    # TODO: This is not strictly required to check.
+    a > b && throw(ArgumentError("must have a <= b, got a = $a and b = $b"))
+    # TODO: If we really want to we could avoid one allocation by reusing res
+    return union!(res, Arb(a, prec = prec), Arb(b, prec = prec), prec = prec)
+end
+
 # Acb
-function set!(res::AcbLike, x::Union{Real,arf_struct,mag_struct})
+function set!(res::AcbLike, x::Union{Real,arf_struct,mag_struct,Tuple{<:Real,<:Real}})
     set!(realref(res), x)
     set!(imagref(res), 0)
     return res
@@ -37,8 +53,8 @@ end
 
 function set!(
     res::AcbLike,
-    re::Union{Real,arb_struct,arf_struct,mag_struct},
-    im::Union{Real,arb_struct,arf_struct,mag_struct},
+    re::Union{Real,arb_struct,arf_struct,mag_struct,Tuple{<:Real,<:Real}},
+    im::Union{Real,arb_struct,arf_struct,mag_struct,Tuple{<:Real,<:Real}},
 )
     set!(realref(res), re)
     set!(imagref(res), im)

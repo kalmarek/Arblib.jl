@@ -118,7 +118,7 @@ Base.isless(x::MagLike, y::MagLike) = cmp(x, y) < 0
 Base.:(<)(x::MagLike, y::MagLike) = cmp(x, y) < 0
 Base.:(<=)(x::MagLike, y::MagLike) = cmp(x, y) <= 0
 
-for jltype in (Arf, Integer, Unsigned, Base.GMP.CdoubleMax)
+for jltype in (ArfLike, Integer, Unsigned, Base.GMP.CdoubleMax)
     @eval begin
         Base.isless(x::ArfLike, y::$jltype) = (isnan(y) && !isnan(x)) || cmp(x, y) < 0
         Base.:(<)(x::ArfLike, y::$jltype) = !isnan(x) && !isnan(y) && cmp(x, y) < 0

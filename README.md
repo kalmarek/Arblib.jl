@@ -118,7 +118,9 @@ are renamed to `set!` and rely on multiple dispatch to choose the
 correct one. In addition to the ones defined in Arb there is a number
 of methods of `set!` added in Arblib to make it more convenient to
 work with. For example there are setters for `Rational` and all
-irrationals defined in `Base.MathConstants`.
+irrationals defined in `Base.MathConstants`. For `Arb` there is also a
+setter which takes a tuple `(a, b)` representing an interval and
+returns a ball containing this interval.
 
 Almost all of the constructors are simple wrappers around these
 setters. This means that it's usually more informative to look at the
@@ -133,6 +135,9 @@ y = Arb(π)
 
 x = Arblib.set!(Arb(), 5//13)
 y = Arb(5//13)
+
+x = Arblib.set!(Arb(), (0, π))
+y = Arb((0, π))
 ```
 
 ## Example
