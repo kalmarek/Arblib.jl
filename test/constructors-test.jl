@@ -31,6 +31,10 @@
             @test precision(Arb(zero(T), prec = 80)) == 80
         end
 
+        @test Arb((0, 0)) == zero(Arb)
+        @test Arb((one(Arf), one(Arf))) == one(Arb)
+        @test isequal(Arb((Arf(1), Arf(2))), Arb((1, 2)))
+
         @test Arb(zero(Arb).arb) == Arb("0.0") == zero(Arb)
         @test Arb(one(Arb).arb) == Arb("1.0") == one(Arb)
         @test precision(Arb(zero(Arb).arb, prec = 80)) ==
@@ -109,6 +113,9 @@
 
         @test isequal(Acb(π, -1), Acb(Arb(π), Arb(-1)))
         @test isequal(Acb(BigFloat(1.3), ℯ), Acb(Arb(1.3), Arb(ℯ)))
+
+        @test isequal(Acb((1, 2)), Acb(Arb((1, 2))))
+        @test isequal(Acb((1, 2), (3, 4)), Acb(Arb((1, 2)), Arb((3, 4))))
     end
 
     @testset "Others" begin
