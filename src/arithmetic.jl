@@ -54,6 +54,7 @@ end
 for f in [
     :sqrt,
     :exp,
+    :expm1,
     :log,
     :log1p,
     :sin,
