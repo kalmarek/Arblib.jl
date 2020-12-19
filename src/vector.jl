@@ -1,6 +1,6 @@
 ## ArbVector basic definitions
 function clear!(v::arb_vec_struct)
-    ccall(@libarb(_arb_vec_clear), Cvoid, (Ptr{arb_struct}, Clong), v.entries, v.n)
+    ccall(@libarb(_arb_vec_clear), Cvoid, (Ptr{arb_struct}, Int), v.entries, v.n)
 end
 Base.cconvert(::Type{Ptr{arb_struct}}, v::Union{ArbVector,ArbRefVector}) = v.arb_vec
 Base.unsafe_convert(::Type{Ptr{arb_struct}}, v::arb_vec_struct) = v.entries
@@ -46,7 +46,7 @@ end
 
 ## AcbVector basic definitions
 function clear!(v::acb_vec_struct)
-    ccall(@libarb(_acb_vec_clear), Cvoid, (Ptr{acb_struct}, Clong), v.entries, v.n)
+    ccall(@libarb(_acb_vec_clear), Cvoid, (Ptr{acb_struct}, Int), v.entries, v.n)
 end
 Base.cconvert(::Type{Ptr{acb_struct}}, v::Union{AcbVector,AcbRefVector}) = v.acb_vec
 Base.unsafe_convert(::Type{Ptr{acb_struct}}, v::acb_vec_struct) = v.entries

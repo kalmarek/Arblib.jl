@@ -88,7 +88,7 @@ mutable struct arb_vec_struct
     n::Int
 
     function arb_vec_struct(n::Integer)
-        v = new(ccall(@libarb(_arb_vec_init), Ptr{arb_struct}, (Clong,), n), n)
+        v = new(ccall(@libarb(_arb_vec_init), Ptr{arb_struct}, (Int,), n), n)
         finalizer(clear!, v)
         return v
     end
@@ -99,7 +99,7 @@ mutable struct acb_vec_struct
     n::Int
 
     function acb_vec_struct(n::Integer)
-        v = new(ccall(@libarb(_acb_vec_init), Ptr{acb_struct}, (Clong,), n), n)
+        v = new(ccall(@libarb(_acb_vec_init), Ptr{acb_struct}, (Int,), n), n)
         finalizer(clear!, v)
         return v
     end
@@ -107,8 +107,8 @@ end
 
 mutable struct arb_poly_struct
     coeffs::Ptr{arb_struct}
-    length::Clong
-    alloc::Clong
+    length::Int
+    alloc::Int
 
     function arb_poly_struct()
         poly = new()
@@ -120,8 +120,8 @@ end
 
 mutable struct acb_poly_struct
     coeffs::Ptr{acb_struct}
-    length::Clong
-    alloc::Clong
+    length::Int
+    alloc::Int
 
     function acb_poly_struct()
         poly = new()
@@ -133,8 +133,8 @@ end
 
 mutable struct arb_mat_struct
     entries::Ptr{arb_struct}
-    r::Clong
-    c::Clong
+    r::Int
+    c::Int
     rows::Ptr{Ptr{arb_struct}}
 
     function arb_mat_struct(r::Integer, c::Integer)
@@ -147,8 +147,8 @@ end
 
 mutable struct acb_mat_struct
     entries::Ptr{acb_struct}
-    r::Clong
-    c::Clong
+    r::Int
+    c::Int
     rows::Ptr{Ptr{acb_struct}}
 
     function acb_mat_struct(r::Integer, c::Integer)
@@ -172,9 +172,9 @@ const ArbStructTypes = Union{
 }
 
 mutable struct calc_integrate_opt_struct
-    deg_limit::Clong
-    eval_limit::Clong
-    depth_limit::Clong
+    deg_limit::Int
+    eval_limit::Int
+    depth_limit::Int
     use_heap::Cint
     verbose::Cint
 

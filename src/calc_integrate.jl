@@ -2,8 +2,8 @@ function _acb_calc_func!(
     out::Ptr{acb_struct},
     inp::Ptr{acb_struct},
     param::Ptr{Cvoid}, # pointer to the actual function
-    order::Clong,
-    prec::Clong,
+    order::Int,
+    prec::Int,
 )
     @assert iszero(order) || isone(order)
     x = AcbRef(inp, nothing, prec = prec)
@@ -18,7 +18,7 @@ end
 _acb_calc_cfunc!() = @cfunction(
     _acb_calc_func!,
     Cint,
-    (Ptr{acb_struct}, Ptr{acb_struct}, Ptr{Cvoid}, Clong, Clong)
+    (Ptr{acb_struct}, Ptr{acb_struct}, Ptr{Cvoid}, Int, Int)
 )
 
 function calc_integrate!(
@@ -27,10 +27,10 @@ function calc_integrate!(
     param,
     a::AcbLike,
     b::AcbLike,
-    rel_goal::Clong,
+    rel_goal::Int,
     abs_tol::MagLike,
     options::calc_integrate_opt_struct,
-    prec::Clong,
+    prec::Int,
 )
     return ccall(
         @libarb(acb_calc_integrate),
@@ -41,10 +41,10 @@ function calc_integrate!(
             Any,
             Ref{acb_struct},
             Ref{acb_struct},
-            Clong,
+            Int,
             Ref{mag_struct},
             Ref{calc_integrate_opt_struct},
-            Clong,
+            Int,
         ),
         res,
         acb_calc_cfunc,
@@ -64,10 +64,10 @@ function calc_integrate!(
     param,
     a::AcbLike,
     b::AcbLike,
-    rel_goal::Clong,
+    rel_goal::Int,
     abs_tol::MagLike,
     options::Ptr{Cvoid},
-    prec::Clong,
+    prec::Int,
 )
     return ccall(
         @libarb(acb_calc_integrate),
@@ -78,10 +78,10 @@ function calc_integrate!(
             Any,
             Ref{acb_struct},
             Ref{acb_struct},
-            Clong,
+            Int,
             Ref{mag_struct},
             Ptr{Cvoid},
-            Clong,
+            Int,
         ),
         res,
         acb_calc_func,

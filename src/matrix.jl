@@ -6,7 +6,7 @@ function Base.getindex(A::arb_mat_struct, i::Integer, j::Integer)
     return ccall(
         @libarb(arb_mat_entry_ptr),
         Ptr{arb_struct},
-        (Ref{arb_mat_struct}, Clong, Clong),
+        (Ref{arb_mat_struct}, Int, Int),
         A,
         i - 1,
         j - 1,
@@ -58,7 +58,7 @@ function Base.getindex(A::acb_mat_struct, i::Integer, j::Integer)
     return ccall(
         @libarb(acb_mat_entry_ptr),
         Ptr{acb_struct},
-        (Ref{acb_mat_struct}, Clong, Clong),
+        (Ref{acb_mat_struct}, Int, Int),
         A,
         i - 1,
         j - 1,
