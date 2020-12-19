@@ -49,6 +49,7 @@ include("setters.jl")
 include("constructors.jl")
 include("predicates.jl")
 include("show.jl")
+include("promotion.jl")
 include("arithmetic.jl")
 include("rand.jl")
 
