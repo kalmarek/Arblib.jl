@@ -11,6 +11,7 @@ Arf(x::Arf; prec::Integer = precision(x)) = set!(Arf(prec = prec), x)
 Arb(x; prec::Integer = _precision(x)) = set!(Arb(prec = prec), x)
 # disambiguation
 Arb(x::Arb; prec::Integer = precision(x)) = set!(Arb(prec = prec), x)
+Arb(x::Rational; prec::Integer = _precision(x)) = set!(Arb(prec = prec), x)
 
 function Arb(str::AbstractString; prec::Integer = DEFAULT_PRECISION[])
     res = Arb(prec = prec)
