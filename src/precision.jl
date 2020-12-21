@@ -1,4 +1,4 @@
-const DEFAULT_PRECISION = Ref{Clong}(256)
+const DEFAULT_PRECISION = Ref{Int}(256)
 
 """
     precision(<:Union{Arf, Arb, Acb, arf_struct, arb_struct, acb_struct})

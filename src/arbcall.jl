@@ -24,8 +24,8 @@ const arbargtypes = ArbArgTypes(
         "void" => Cvoid,
         "void *" => Ptr{Cvoid},
         "int" => Cint,
-        "slong" => Clong,
-        "ulong" => Culong,
+        "slong" => Int,
+        "ulong" => UInt,
         "double" => Cdouble,
         "arf_t" => Arf,
         "arb_t" => Arb,
@@ -44,16 +44,16 @@ const arbargtypes = ArbArgTypes(
         "mpfr_rnd_t" => Base.MPFR.MPFRRoundingMode,
         "mpz_t" => BigInt,
         "char *" => Cstring,
-        "slong *" => Vector{Clong},
-        "ulong *" => Vector{Culong},
+        "slong *" => Vector{Int},
+        "ulong *" => Vector{UInt},
     ),
     Set(["FILE *", "fmpr_t", "fmpr_rnd_t", "flint_rand_t", "bool_mat_t"]),
     Dict{DataType,String}(
         Cvoid => "void",
         Ptr{Cvoid} => "void *",
         Cint => "int",
-        Clong => "slong",
-        Culong => "ulong",
+        Int => "slong",
+        UInt => "ulong",
         Cdouble => "double",
         Arf => "arf_t",
         Arb => "arb_t",
@@ -70,8 +70,8 @@ const arbargtypes = ArbArgTypes(
         Base.MPFR.MPFRRoundingMode => "mpfr_rnd_t",
         BigInt => "mpz_t",
         Cstring => "char *",
-        Vector{Clong} => "slong *",
-        Vector{Culong} => "ulong *",
+        Vector{Int} => "slong *",
+        Vector{UInt} => "ulong *",
     ),
 )
 
@@ -101,15 +101,15 @@ rawtype(::Carg{T}) where {T} = T
 
 jltype(ca::Carg) = rawtype(ca)
 jltype(ca::Carg{Cint}) = Integer
-jltype(ca::Carg{Clong}) = Integer
-jltype(ca::Carg{Culong}) = Unsigned
+jltype(ca::Carg{Int}) = Integer
+jltype(ca::Carg{UInt}) = Unsigned
 jltype(ca::Carg{Cdouble}) = Base.GMP.CdoubleMax
 jltype(ca::Carg{arb_rnd}) = Union{arb_rnd,RoundingMode}
 jltype(ca::Carg{Base.MPFR.MPFRRoundingMode}) =
     Union{Base.MPFR.MPFRRoundingMode,RoundingMode}
 jltype(ca::Carg{Cstring}) = AbstractString
-jltype(ca::Carg{Vector{Clong}}) = Vector{<:Integer}
-jltype(ca::Carg{Vector{Culong}}) = Vector{<:Unsigned}
+jltype(ca::Carg{Vector{Int}}) = Vector{<:Integer}
+jltype(ca::Carg{Vector{UInt}}) = Vector{<:Unsigned}
 jltype(::Carg{Mag}) = MagLike
 jltype(::Carg{Arf}) = ArfLike
 jltype(::Carg{Arb}) = ArbLike
@@ -177,7 +177,7 @@ function jlfname(
 end
 
 function is_length_argument(carg, prev_carg, len_keywords)
-    (startswith(string(name(carg)), "len") || carg == Carg{Clong}(:n, false)) &&
+    (startswith(string(name(carg)), "len") || carg == Carg{Int}(:n, false)) &&
         rawtype(prev_carg) ∈ (ArbVector, AcbVector) &&
         name(carg) ∉ len_keywords
 end
@@ -215,7 +215,7 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
         end
 
         # Automatic detection of precision argument
-        if carg == Carg{Clong}(:prec, false)
+        if carg == Carg{Int}(:prec, false)
             @assert !prec_kwarg
             prec_kwarg = true
 
