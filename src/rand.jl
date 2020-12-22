@@ -6,9 +6,20 @@ import Random
 
 function Random.Sampler(
     RNG::Type{<:Random.AbstractRNG},
-    st::Random.SamplerType{T},
+    st::Random.SamplerType{Acb},
     n::Random.Repetition,
-) where {T<:Union{Arf,Arb,Acb}}
+)
+    return Random.SamplerSimple(
+        Random.SamplerType{Acb}(),
+        Random.SamplerBigFloat{Random.CloseOpen01{BigFloat}}(precision(Acb)),
+    )
+end
+
+function Random.Sampler(
+    ::Type{<:Random.AbstractRNG},
+    ::Random.CloseOpen01{T},
+    ::Random.Repetition,
+) where {T<:Union{Arf,Arb}}
     return Random.SamplerSimple(
         Random.SamplerType{T}(),
         Random.SamplerBigFloat{Random.CloseOpen01{BigFloat}}(precision(T)),

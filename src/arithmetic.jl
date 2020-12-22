@@ -1,24 +1,3 @@
-Base.promote_rule(::Type{<:MagLike}, ::Type{<:Union{Float64,MagLike}}) = Mag
-Base.promote_rule(::Type{<:ArfLike}, ::Type{<:Union{AbstractFloat,Integer,MagLike}}) = Arf
-Base.promote_rule(
-    ::Type{<:ArbLike},
-    ::Type{<:Union{AbstractFloat,Integer,Rational,ArfLike,ArbRef}},
-) = Arb
-Base.promote_rule(
-    ::Type{<:AcbLike},
-    ::Type{
-        <:Union{
-            AbstractFloat,
-            Integer,
-            Rational,
-            Complex{<:Union{AbstractFloat,Integer,Rational}},
-            ArfLike,
-            ArbLike,
-            AcbRef,
-        },
-    },
-) = Acb
-
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
     @eval function Base.$jf(x::T, y::T) where {T<:MagOrRef}
         z = T()
