@@ -1,7 +1,29 @@
 # Mag
 set!(res::MagLike, ::Irrational{:π}) = const_pi!(res)
 
+# Arf
+function set!(res::ArfLike, x::UInt128)
+    # Split x into x = a * 2^64 + b
+    a = UInt64(x >> 64)
+    b = x % UInt64
+    set!(res, a)
+    mul_2exp!(res, res, 64)
+    add!(res, res, b)
+    return res
+end
+
+function set!(res::ArfLike, x::Int128)
+    set!(res, UInt128(abs(x)))
+    return x < 0 ? neg!(res, res) : res
+end
+
 # Arb
+function set!(res::ArbLike, x::Union{UInt128,Int128})
+    set!(radref(res), UInt64(0))
+    set!(midref(res), x)
+    return res
+end
+
 function set!(res::ArbLike, x::Union{MagLike,BigFloat})
     set!(radref(res), UInt64(0))
     set!(midref(res), x)
@@ -45,6 +67,12 @@ function set!(res::ArbLike, (a, b)::Tuple{<:Real,<:Real}; prec::Integer = precis
 end
 
 # Acb
+function set!(res::AcbLike, x::Union{UInt128,Int128})
+    set!(realref(res), x)
+    set!(imagref(res), 0)
+    return res
+end
+
 function set!(res::AcbLike, x::Union{Real,arf_struct,mag_struct,Tuple{<:Real,<:Real}})
     set!(realref(res), x)
     set!(imagref(res), 0)
