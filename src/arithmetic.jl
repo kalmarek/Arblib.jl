@@ -22,19 +22,75 @@ Base.min(x::MagOrRef, y::MagOrRef) = min!(zero(x), x, y)
 Base.max(x::MagOrRef, y::MagOrRef) = max!(zero(x), x, y)
 Base.minmax(x::MagOrRef, y::MagOrRef) = (min(x, y), max(x, y))
 
-### Arf, Arb and Acb
+### Arf
+function Base.sign(x::ArfOrRef)
+    isnan(x) && return Arf(NaN) # Follow Julia and return NaN
+    return Arf(sgn(x))
+end
+Base.min(x::ArfOrRef, y::ArfOrRef) = min!(Arf(prec = _precision((x, y))), x, y)
+Base.max(x::ArfOrRef, y::ArfOrRef) = max!(Arf(prec = _precision((x, y))), x, y)
+Base.minmax(x::ArfOrRef, y::ArfOrRef) = (min(x, y), max(x, y))
+
+Base.abs(x::ArfOrRef) = abs!(zero(x), x)
+Base.:(-)(x::ArfOrRef) = neg!(zero(x), x)
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
-    @eval function Base.$jf(x::T, y::T) where {T<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}}
-        z = T(prec = max(precision(x), precision(y)))
+    @eval function Base.$jf(x::ArfOrRef, y::Union{ArfOrRef,UInt,Int})
+        z = Arf(prec = _precision((x, y)))
         $af(z, x, y)
-        z
+        return z
     end
 end
-function Base.:(-)(x::T) where {T<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}}
-    z = T(prec = precision(x))
-    neg!(z, x)
-    z
+function Base.:+(x::Union{UInt,Int}, y::ArfOrRef)
+    z = zero(y)
+    add!(z, y, x)
+    return z
 end
+function Base.:*(x::Union{UInt,Int}, y::ArfOrRef)
+    z = zero(y)
+    mul!(z, y, x)
+    return z
+end
+function Base.:/(x::UInt, y::ArfOrRef)
+    z = zero(y)
+    ui_div!(z, x, y)
+    return z
+end
+function Base.:/(x::Int, y::ArfOrRef)
+    z = zero(y)
+    si_div!(z, x, y)
+    return z
+end
+
+function Base.sqrt(x::ArfOrRef)
+    y = zero(x)
+    sqrt!(y, x)
+    return y
+end
+function rsqrt(x::ArfOrRef)
+    y = zero(x)
+    rsqrt!(y, x)
+    return y
+end
+function root(x::ArfOrRef, k::Integer)
+    y = zero(x)
+    root!(y, x, convert(UInt, k))
+    return y
+end
+
+### Arb and Acb
+for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
+    @eval Base.$jf(x::ArbOrRef, y::Union{ArbOrRef,ArfOrRef,Int,UInt}) =
+        $af(Arb(prec = _precision((x, y))), x, y)
+    @eval Base.$jf(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,ArfOrRef,Int,UInt}) =
+        $af(Acb(prec = _precision((x, y))), x, y)
+    if jf == :(+) || jf == :(*)
+        @eval Base.$jf(x::Union{ArfOrRef,Int,UInt}, y::ArbOrRef) =
+            $af(Arb(prec = _precision((x, y))), y, x)
+        @eval Base.$jf(x::Union{ArbOrRef,ArfOrRef,Int,UInt}, y::AcbOrRef) =
+            $af(Acb(prec = _precision((x, y))), y, x)
+    end
+end
+
 function Base.:(^)(x::T, k::Integer) where {T<:Union{Arb,ArbRef,Acb,AcbRef}}
     z = T(prec = precision(x))
     pow!(z, x, convert(UInt, k))

@@ -28,8 +28,43 @@
 
         @test min(Mag(1), Mag(2)) == Mag(1)
         @test max(Mag(1), Mag(2)) == Mag(2)
-        @test minmax(Mag(1), Mag(2)) == (Mag(1), Mag(2))
-        @test minmax(Mag(2), Mag(1)) == (Mag(1), Mag(2))
+        @test minmax(Mag(1), Mag(2)) == minmax(Mag(2), Mag(1)) == (Mag(1), Mag(2))
+    end
+
+    @testset "Arf" begin
+        @test sign(Arf(2)) == Arf(1)
+        @test sign(Arf(-2)) == Arf(-1)
+        @test sign(Arf(0)) == Arf(0)
+        @test min(Arf(1), Arf(2)) == Arf(1)
+        @test max(Arf(1), Arf(2)) == Arf(2)
+        @test minmax(Arf(1), Arf(2)) == minmax(Arf(2), Arf(1)) == (Arf(1), Arf(2))
+
+        @test abs(Arf(-2)) == abs(Arf(2)) == Arf(2)
+        @test -Arf(2) == Arf(-2)
+
+        @test Arf(1) + Arf(2) ==
+              Arf(1) + 2 ==
+              2 + Arf(1) ==
+              Arf(1) + UInt(2) ==
+              UInt(2) + Arf(1) ==
+              Arf(3)
+        @test Arf(1) - Arf(2) == Arf(1) - 2 == Arf(1) - UInt(2) == Arf(-1)
+        @test Arf(2) * Arf(3) ==
+              Arf(2) * 3 ==
+              3 * Arf(2) ==
+              Arf(2) * UInt(3) ==
+              UInt(3) * Arf(2) ==
+              Arf(6)
+        @test Arf(6) / Arf(2) ==
+              Arf(6) / 2 ==
+              6 / Arf(2) ==
+              Arf(6) / UInt(2) ==
+              UInt(6) / Arf(2) ==
+              Arf(3)
+
+        @test sqrt(Arf(4)) == Arf(2)
+        @test Arblib.rsqrt(Arf(4)) == Arf(1 // 2)
+        @test Arblib.root(Arf(8), 3) == Arf(2)
     end
 
     @testset "basic arithmetic: $T" for T in [Arb, Acb]
