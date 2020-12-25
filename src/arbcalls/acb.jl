@@ -194,7 +194,7 @@ arbcall"void acb_sinh_cosh(acb_t s, acb_t c, const acb_t z, slong prec)"
 arbcall"void acb_tanh(acb_t s, const acb_t z, slong prec)"
 arbcall"void acb_coth(acb_t s, const acb_t z, slong prec)"
 arbcall"void acb_sech(acb_t res, const acb_t z, slong prec)"
-arbcall"void acb_csch(acb_t res, const arb_t z, slong prec)"
+arbcall"void acb_csch(acb_t res, const acb_t z, slong prec)"
 
 ### Inverse hyperbolic functions
 arbcall"void acb_asinh(acb_t res, const acb_t z, slong prec)"
