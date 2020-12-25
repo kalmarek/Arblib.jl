@@ -57,6 +57,7 @@ arbcall"int arf_get_mpfr(mpfr_t res, const arf_t x, mpfr_rnd_t rnd)"
 #ni arbcall"int arf_get_fmpz_fixed_si(fmpz_t res, const arf_t x, slong e)"
 arbcall"void arf_floor(arf_t res, const arf_t x)"
 arbcall"void arf_ceil(arf_t res, const arf_t x)"
+#ni arbcall"void arf_get_fmpq(fmpq_t res, const arf_t x)"
 
 ### Comparisons and bounds
 arbcall"int arf_equal(const arf_t x, const arf_t y)"
@@ -128,7 +129,7 @@ arbcall"int arf_sub_ui(arf_t res, const arf_t x, ulong y, slong prec, arf_rnd_t 
 #ni arbcall"int arf_sub_fmpz(arf_t res, const arf_t x, const fmpz_t y, slong prec, arf_rnd_t rnd)"
 arbcall"void arf_mul_2exp_si(arf_t res, const arf_t x, slong e)"
 #ni arbcall"void arf_mul_2exp_fmpz(arf_t res, const arf_t x, const fmpz_t e)"
-arbcall"int arf_mul(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)"
+#mo arbcall"int arf_mul(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)" # defined using #DEFINE in C which doesn't work in Julia
 arbcall"int arf_mul_ui(arf_t res, const arf_t x, ulong y, slong prec, arf_rnd_t rnd)"
 arbcall"int arf_mul_si(arf_t res, const arf_t x, slong y, slong prec, arf_rnd_t rnd)"
 arbcall"int arf_mul_mpz(arf_t res, const arf_t x, const mpz_t y, slong prec, arf_rnd_t rnd)"
