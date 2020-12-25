@@ -81,54 +81,103 @@ end
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
     @eval Base.$jf(x::ArbOrRef, y::Union{ArbOrRef,ArfOrRef,Int,UInt}) =
         $af(Arb(prec = _precision((x, y))), x, y)
-    @eval Base.$jf(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,ArfOrRef,Int,UInt}) =
+    @eval Base.$jf(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,Int,UInt}) =
         $af(Acb(prec = _precision((x, y))), x, y)
     if jf == :(+) || jf == :(*)
         @eval Base.$jf(x::Union{ArfOrRef,Int,UInt}, y::ArbOrRef) =
             $af(Arb(prec = _precision((x, y))), y, x)
-        @eval Base.$jf(x::Union{ArbOrRef,ArfOrRef,Int,UInt}, y::AcbOrRef) =
+        @eval Base.$jf(x::Union{ArbOrRef,Int,UInt}, y::AcbOrRef) =
             $af(Acb(prec = _precision((x, y))), y, x)
     end
 end
 
-function Base.:(^)(x::T, k::Integer) where {T<:Union{Arb,ArbRef,Acb,AcbRef}}
-    z = T(prec = precision(x))
-    pow!(z, x, convert(UInt, k))
-    z
-end
+Base.:(-)(x::Union{ArbOrRef,AcbOrRef}) = neg!(zero(x), x)
+Base.abs(x::ArbOrRef) = abs!(zero(x), x)
+Base.:(/)(x::UInt, y::ArbOrRef) = ui_div!(zero(y), x, y)
 
+# TODO: Should we convert Int to UInt for performance reasons?
+Base.:(^)(x::ArbOrRef, y::Union{ArbOrRef,UInt}) = pow!(Arb(prec = _precision((x, y))), x, y)
+Base.:(^)(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,Int,UInt}) =
+    pow!(Acb(prec = _precision((x, y))), x, y)
+
+Base.hypot(x::ArbOrRef, y::ArbOrRef) = hypot!(Arb(prec = _precision((x, y))), x, y)
+
+root(x::Union{ArbOrRef,AcbOrRef}, k::Integer) = root!(zero(x), x, convert(UInt, k))
+
+# Unary methods in Base
 for f in [
+    :inv,
     :sqrt,
-    :exp,
-    :expm1,
     :log,
     :log1p,
+    :exp,
+    :expm1,
     :sin,
     :cos,
     :tan,
     :cot,
+    :sec,
+    :csc,
+    :atan,
     :asin,
     :acos,
-    :atan,
-    :acot,
-    :sinc,
     :sinh,
     :cosh,
     :tanh,
+    :coth,
+    :sech,
+    :csch,
+    :atanh,
     :asinh,
     :acosh,
-    :atanh,
-    :sec,
-    :asec,
-    :sech,
-    :asech,
 ]
-    @eval function Base.$f(x::T) where {T<:Union{Arb,ArbRef,Acb,AcbRef}}
-        z = T(prec = precision(x))
-        $(Symbol(f, :!))(z, x)
-        z
-    end
+    @eval Base.$f(x::Union{ArbOrRef,AcbOrRef}) = $(Symbol(f, :!))(zero(x), x)
 end
+
+sqrtpos(x::ArbOrRef) = sqrtpos!(zero(x), x)
+sqrt1pm1(x::ArbOrRef) = sqrt1pm1!(zero(x), x)
+rsqrt(x::Union{ArbOrRef,AcbOrRef}) = rsqrt!(zero(x), x)
+sqr(x::Union{ArbOrRef,AcbOrRef}) = sqr!(zero(x), x)
+
+Base.sinpi(x::Union{ArbOrRef,AcbOrRef}) = sin_pi!(zero(x), x)
+Base.cospi(x::Union{ArbOrRef,AcbOrRef}) = cos_pi!(zero(x), x)
+tanpi(x::Union{ArbOrRef,AcbOrRef}) = tan_pi!(zero(x), x)
+cotpi(x::Union{ArbOrRef,AcbOrRef}) = cot_pi!(zero(x), x)
+cscpi(x::Union{ArbOrRef,AcbOrRef}) = csc_pi!(zero(x), x)
+# Julias definition of sinc is equivalent to Arbs definition of sincpi
+Base.sinc(x::Union{ArbOrRef,AcbOrRef}) = sinc_pi!(zero(x), x)
+Base.atan(y::ArbOrRef, x::ArbOrRef) = atan2!(Arb(prec = _precision((y, x))), y, x)
+
+function Base.sincos(x::Union{ArbOrRef,AcbOrRef})
+    s, c = zero(x), zero(x)
+    sin_cos!(s, c, x)
+    return (s, c)
+end
+function sincospi(x::Union{ArbOrRef,AcbOrRef})
+    s, c = zero(x), zero(x)
+    sin_cos_pi!(s, c, x)
+    return (s, c)
+end
+function sinhcosh(x::Union{ArbOrRef,AcbOrRef})
+    s, c = zero(x), zero(x)
+    sinh_cosh!(s, c, x)
+    return (s, c)
+end
+
+### Acb
+function Base.:(*)(x::AcbOrRef, y::Complex{Bool})
+    if real(y)
+        if imag(y)
+            z = mul_onei!(zero(x), x)
+            return add!(z, x, z)
+        else
+            return Acb(x)
+        end
+    end
+    imag(y) && return mul_onei!(zero(x), x)
+    return zero(x)
+end
+Base.:(*)(x::Complex{Bool}, y::AcbOrRef) = y * x
 
 Base.real(z::AcbLike; prec = _precision(z)) = get_real!(Arb(prec = prec), z)
 Base.imag(z::AcbLike; prec = _precision(z)) = get_imag!(Arb(prec = prec), z)

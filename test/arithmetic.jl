@@ -68,23 +68,108 @@
     end
 
     @testset "$T" for T in [Arb, Acb]
-        @test T(3) + 1 == 4
-        @test T(3) + 1 isa T
-        @test T(2) + T(3) == 5
-        @test T(2) + T(3) isa T
-        @test T(3) - 1 == 2
-        @test T(3) - 1 isa T
-        @test T(2) - T(3) == -1
-        @test T(2) - T(3) isa T
-        @test T(3) * 1 == 3
-        @test T(3) * 1 isa T
-        @test Bool(Arblib.contains(T(3) / 1, T(3)))
-        @test T(3) / 1 isa T
-        @test Bool(Arblib.contains(T(3) / T(1), T(3)))
-        @test T(3) / T(1) isa T
+        @test T(1) + T(2) ==
+              T(1) + 2 ==
+              2 + T(1) ==
+              T(1) + UInt(2) ==
+              UInt(2) + T(1) ==
+              T(3)
+        @test T(1) - T(2) == T(1) - 2 == T(1) - UInt(2) == T(-1)
+        @test T(2) * T(3) ==
+              T(2) * 3 ==
+              3 * T(2) ==
+              T(2) * UInt(3) ==
+              UInt(3) * T(2) ==
+              T(6)
+        @test T(6) / T(2) == T(6) / 2 == T(6) / UInt(2) == T(3)
+
+        @test Arblib.root(T(8), 3) == T(2)
+
+        for f in [
+            inv,
+            sqrt,
+            log,
+            log1p,
+            exp,
+            expm1,
+            sin,
+            cos,
+            tan,
+            cot,
+            sec,
+            csc,
+            atan,
+            asin,
+            acos,
+            sinh,
+            cosh,
+            tanh,
+            coth,
+            sech,
+            csch,
+            atanh,
+            asinh,
+        ]
+            # TODO: Replace with ≈
+            @test abs(f(T(0.5)) - f(0.5)) <= 1e-15
+        end
+        # TODO: Replace with ≈
+        @test abs(acosh(T(2)) - acosh(2)) <= 1e-15
+
+        @test Arblib.rsqrt(T(1 // 4)) == T(2)
+        @test Arblib.sqr(T(3)) == T(9)
+
+        @test sinpi(T(1)) == T(0)
+        @test cospi(T(1)) == T(-1)
+        @test Arblib.tanpi(T(1)) == T(0)
+        # TODO: Replace with ≈
+        @test abs(Arblib.cotpi(T(0.5))) <= 1e-15
+        @test abs(Arblib.cscpi(T(0.5)) - 1) <= 1e-15
+        @test abs(sinc(T(0.5)) - sinc(0.5)) <= 1e-15
+
+        @test isequal(sincos(T(1)), (sin(T(1)), cos(T(1))))
+        @test isequal(Arblib.sincospi(T(1)), (sinpi(T(1)), cospi(T(1))))
+        @test isequal(Arblib.sinhcosh(T(1)), (sinh(T(1)), cosh(T(1))))
+    end
+
+    @testset "Arb - specific" begin
+        @test Arb(1) + Arf(2) == Arf(2) + Arb(1) == Arb(3)
+        @test Arb(1) - Arf(2) == Arb(-1)
+        @test Arb(2) * Arf(3) == Arf(3) * Arb(2) == Arb(6)
+        @test Arb(6) / Arf(2) == UInt(6) / Arb(2) == Arb(3)
+
+        @test Arb(2)^Arb(2) == Arb(2)^UInt(2) == Arb(4)
+        @test hypot(Arb(3), Arb(4)) == Arb(5)
+
+        @test Arblib.sqrtpos(Arb(4)) == Arb(2)
+        @test Arblib.sqrtpos(Arb(-4)) == Arb(0)
+        @test Arblib.sqrt1pm1(Arb(3)) == Arb(1)
+
+        # TODO: Replace with ≈
+        @test abs(atan(Arb(2), Arb(3)) - atan(2, 3)) <= 1e-15
     end
 
     @testset "Acb - specific" begin
+        @test Acb(1) + Arb(2) == Arb(2) + Acb(1) == Acb(3)
+        @test Acb(1) - Arb(2) == Acb(-1)
+        @test Acb(2) * Arb(3) == Arb(3) * Acb(2) == Acb(6)
+        @test Acb(6) / Arb(2) == Acb(3)
+
+        @test Acb(2)^Acb(2) == Acb(2)^Arb(2) == Acb(2)^2 == Acb(2)^UInt(2) == Acb(4)
+
+        @test Acb(2, 3) * Complex{Bool}(0, 0) ==
+              Complex{Bool}(0, 0) * Acb(2, 3) ==
+              Acb(2, 3) * (0 + 0im)
+        @test Acb(2, 3) * Complex{Bool}(0, 1) ==
+              Complex{Bool}(0, 1) * Acb(2, 3) ==
+              Acb(2, 3) * (0 + 1im)
+        @test Acb(2, 3) * Complex{Bool}(1, 0) ==
+              Complex{Bool}(1, 0) * Acb(2, 3) ==
+              Acb(2, 3) * (1 + 0im)
+        @test Acb(2, 3) * Complex{Bool}(1, 1) ==
+              Complex{Bool}(1, 1) * Acb(2, 3) ==
+              Acb(2, 3) * (1 + 1im)
+
         @test real(Acb(1, 2)) isa Arb
         @test real(Acb(1, 2)) == Arb(1)
         @test imag(Acb(1, 2)) isa Arb
