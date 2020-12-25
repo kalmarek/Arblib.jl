@@ -1,4 +1,37 @@
 @testset "Arithmethic" begin
+    @testset "Mag" begin
+        @test Mag(4) <= Mag(1) + Mag(3) <= Mag(5)
+        @test Mag(2) <= Mag(3) - Mag(1) <= Mag(3)
+        @test Mag(0) <= Mag(3) - Mag(5) <= Mag(1)
+        @test Mag(6) <= Mag(2) * Mag(3) <= Mag(7)
+        @test Mag(3) <= Mag(6) / Mag(2) <= Mag(4)
+
+        @test Mag(4) <= Mag(1) + 3 == 1 + Mag(3) <= Mag(5)
+        @test Mag(6) <= Mag(2) * 3 == 3 * Mag(2) <= Mag(7)
+        @test Mag(2) <= Mag(4) / 2 <= Mag(3)
+
+        @test Mag(1 / 4) <= inv(Mag(4)) <= Mag(1 / 3)
+        @test Mag(8) <= Mag(2)^3 <= Mag(9)
+        @test Mag(2) <= sqrt(Mag(4)) <= Mag(3)
+        @test Mag(1 / 2) <= Arblib.rsqrt(Mag(4)) <= Mag(1)
+        @test Mag(5) <= hypot(Mag(3), Mag(4)) <= Mag(6)
+        @test Mag(2) <= Arblib.root(Mag(8), 3) <= Mag(3)
+        @test Mag(log(8)) <= log(Mag(8)) <= Mag(log(9))
+        @test log(Mag(2)) <= Arblib.neglog(inv(Mag(2.0))) <= log(Mag(3))
+        @test log(Mag(2)) <= log1p(Mag(1)) <= log(Mag(3))
+        @test Mag(exp(2)) <= exp(Mag(2)) <= Mag(exp(3))
+        @test Mag(exp(-2)) <= Arblib.expinv(Mag(2)) <= Mag(exp(-1))
+        @test Mag(expm1(2)) <= expm1(Mag(2)) <= Mag(expm1(3))
+        @test Mag(atan(2)) <= atan(Mag(2)) <= Mag(atan(3))
+        @test Mag(cosh(2)) <= cosh(Mag(2)) <= Mag(cosh(3))
+        @test Mag(sinh(2)) <= sinh(Mag(2)) <= Mag(sinh(3))
+
+        @test min(Mag(1), Mag(2)) == Mag(1)
+        @test max(Mag(1), Mag(2)) == Mag(2)
+        @test minmax(Mag(1), Mag(2)) == (Mag(1), Mag(2))
+        @test minmax(Mag(2), Mag(1)) == (Mag(1), Mag(2))
+    end
+
     @testset "basic arithmetic: $T" for T in [Arb, Acb]
         @test T(3) + 1 == 4
         @test T(3) + 1 isa T
