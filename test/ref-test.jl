@@ -2,16 +2,16 @@
     @test isequal(MagRef(), Mag())
 
     x = Arb()
-    Arblib.set!(Arblib.radref(x), UInt(2))
-    @test Arblib.radref(x) == Mag(UInt(2))
+    Arblib.set!(Arblib.radref(x), 2)
+    @test Arblib.radref(x) == Mag(2)
 
     y = Mag(Arblib.radref(x))
-    Arblib.set!(y, UInt(3))
-    @test Arblib.radref(x) == Mag(UInt(2))
+    Arblib.set!(y, 3)
+    @test Arblib.radref(x) == Mag(2)
 
     z = Arblib.radref(x)[]
-    Arblib.set!(z, UInt(4))
-    @test Arblib.radref(x) == Mag(UInt(2))
+    Arblib.set!(z, 4)
+    @test Arblib.radref(x) == Mag(2)
 
     @test isequal(zero(MagRef), zero(Mag))
     @test isequal(zero(Arblib.radref(x)), zero(Mag))
