@@ -2,9 +2,10 @@
     @testset "Mag" begin
         # Results for doubles are only upper bounds, even for integers
         # they are quite crude
-        @test Mag() == Mag(UInt64(0)) == zero(Mag) == zero(Mag()) == Mag(0.0)
-        @test Mag(UInt64(1)) == one(Mag) == one(Mag()) <= Mag(1.0)
+        @test Mag() == Mag(UInt64(0)) == Mag(0) == zero(Mag) == zero(Mag()) == Mag(0.0)
+        @test Mag(UInt64(1)) == Mag(1) == one(Mag) == one(Mag()) <= Mag(1.0)
         @test π < Float64(Mag(π)) < 3.15
+        @test Mag(3, 4) == Mag(3 * 2^4)
     end
 
     @testset "Arf" begin

@@ -5,6 +5,9 @@
               Float64(Arblib.set!(Arblib.radref(Arb()), π)) ==
               Float64(Arblib.set!(Arblib.mag_struct(), π)) <
               3.15
+
+        @test Arblib.set!(Mag(), 1) == Arblib.set!(Mag(), UInt(1))
+        @test Arblib.set!(Mag(), 3, 4) == Arblib.set!(Mag(), 3 * 2^4)
     end
 
     @testset "Arb" begin
