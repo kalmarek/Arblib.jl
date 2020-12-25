@@ -38,11 +38,9 @@
 
         @test all(Arblib.containszero, λs1 - λs2)
 
-        # λs1, _ = Arblib.eig_simple_rump(M, side = :right)
-        # segfaults in acb_mat_solve at /workspace/srcdir/arb-2.18.1/acb_mat/solve.c:17
-        # Issue #321 in Arblib (fixed by #330)
-        # λs2, _ = Arblib.eig_simple_rump(M, side=:left)
-        # @test all(Arblib.containszero, λs1 - λs2)
+        λs1, _ = Arblib.eig_simple_rump(M, side = :right)
+        λs2, _ = Arblib.eig_simple_rump(M, side = :left)
+        @test all(Arblib.containszero, λs1 - λs2)
 
         λs1, _ = Arblib.eig_simple(M, side = :right)
         λs2, _ = Arblib.eig_simple(M, side = :left)

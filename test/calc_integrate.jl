@@ -25,26 +25,17 @@
     # https://github.com/kalmarek/Arblib.jl/issues/70. Once Arb is
     # updated so that they start to produce identical results this can
     # be updated and the issue closed.
-    res3 = "[0.50000000000000000 +/- 2.68e-18]"
-    res3! = "[0.50000000000000000 +/- 2.73e-18]"
+    res3 = "[0.50000000000000000 +/- 2.73e-18]"
     @test string(Arblib.integrate(f3, a, b, check_analytic = true, prec = prec)) == res3
-    @test_broken string(Arblib.integrate!(
-        f3!,
-        Acb(prec = prec),
-        a,
-        b,
-        check_analytic = true,
-    )) == res3
     @test string(Arblib.integrate!(f3!, Acb(prec = prec), a, b, check_analytic = true)) ==
-          res3!
+          res3
 
     # Test with a method that accepts both precision and analytic as
     # a keyword arguments
     f4 = (x; analytic, prec) -> Arblib.real_abs!(Acb(), x, analytic, prec = prec)
     f4! = (res, x; analytic, prec) -> Arblib.real_abs!(res, x, analytic, prec = prec)
     # FIXME: See above
-    res4 = "[0.50000000000000000 +/- 2.68e-18]"
-    res4! = "[0.50000000000000000 +/- 2.73e-18]"
+    res4 = "[0.50000000000000000 +/- 2.73e-18]"
     @test string(Arblib.integrate(
         f4,
         a,
@@ -53,14 +44,6 @@
         take_prec = true,
         prec = prec,
     )) == res4
-    @test_broken string(Arblib.integrate!(
-        f4!,
-        Acb(prec = prec),
-        a,
-        b,
-        check_analytic = true,
-        take_prec = true,
-    )) == res4
     @test string(Arblib.integrate!(
         f4!,
         Acb(prec = prec),
@@ -68,7 +51,7 @@
         b,
         check_analytic = true,
         take_prec = true,
-    )) == res4!
+    )) == res4
 
     # Test with set tolerance
     f5 = x -> sin(exp(x))
