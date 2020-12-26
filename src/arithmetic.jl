@@ -18,18 +18,11 @@ for f in [:inv, :sqrt, :log, :log1p, :exp, :expm1, :atan, :cosh, :sinh]
     @eval Base.$f(x::MagOrRef) = $(Symbol(f, :!))(zero(x), x)
 end
 
-Base.min(x::MagOrRef, y::MagOrRef) = min!(zero(x), x, y)
-Base.max(x::MagOrRef, y::MagOrRef) = max!(zero(x), x, y)
-Base.minmax(x::MagOrRef, y::MagOrRef) = (min(x, y), max(x, y))
-
 ### Arf
 function Base.sign(x::ArfOrRef)
     isnan(x) && return Arf(NaN) # Follow Julia and return NaN
     return Arf(sgn(x))
 end
-Base.min(x::ArfOrRef, y::ArfOrRef) = min!(Arf(prec = _precision((x, y))), x, y)
-Base.max(x::ArfOrRef, y::ArfOrRef) = max!(Arf(prec = _precision((x, y))), x, y)
-Base.minmax(x::ArfOrRef, y::ArfOrRef) = (min(x, y), max(x, y))
 
 Base.abs(x::ArfOrRef) = abs!(zero(x), x)
 Base.:(-)(x::ArfOrRef) = neg!(zero(x), x)
@@ -183,3 +176,11 @@ Base.real(z::AcbLike; prec = _precision(z)) = get_real!(Arb(prec = prec), z)
 Base.imag(z::AcbLike; prec = _precision(z)) = get_imag!(Arb(prec = prec), z)
 Base.conj(z::AcbLike) = conj!(Acb(prec = _precision(z)), z)
 Base.abs(z::AcbLike) = abs!(Arb(prec = _precision(z)), z)
+
+### min and max
+for T in [MagOrRef, ArfOrRef, ArbOrRef]
+    for op in [:min, :max]
+        @eval Base.$op(x::$T, y::$T) = $(Symbol(op, :!))(zero(x), x, y)
+    end
+    @eval Base.minmax(x::$T, y::$T) = (min(x, y), max(x, y))
+end

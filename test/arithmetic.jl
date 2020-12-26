@@ -35,9 +35,6 @@
         @test sign(Arf(2)) == Arf(1)
         @test sign(Arf(-2)) == Arf(-1)
         @test sign(Arf(0)) == Arf(0)
-        @test min(Arf(1), Arf(2)) == Arf(1)
-        @test max(Arf(1), Arf(2)) == Arf(2)
-        @test minmax(Arf(1), Arf(2)) == minmax(Arf(2), Arf(1)) == (Arf(1), Arf(2))
 
         @test abs(Arf(-2)) == abs(Arf(2)) == Arf(2)
         @test -Arf(2) == Arf(-2)
@@ -65,6 +62,10 @@
         @test sqrt(Arf(4)) == Arf(2)
         @test Arblib.rsqrt(Arf(4)) == Arf(1 // 2)
         @test Arblib.root(Arf(8), 3) == Arf(2)
+
+        @test min(Arf(1), Arf(2)) == Arf(1)
+        @test max(Arf(1), Arf(2)) == Arf(2)
+        @test minmax(Arf(1), Arf(2)) == minmax(Arf(2), Arf(1)) == (Arf(1), Arf(2))
     end
 
     @testset "$T" for T in [Arb, Acb]
@@ -147,6 +148,19 @@
 
         # TODO: Replace with ≈
         @test abs(atan(Arb(2), Arb(3)) - atan(2, 3)) <= 1e-15
+
+        @test min(Arb(1), Arb(2)) == Arb(1)
+        @test max(Arb(1), Arb(2)) == Arb(2)
+        @test minmax(Arb(1), Arb(2)) == minmax(Arb(2), Arb(1)) == (Arb(1), Arb(2))
+        @test Arblib.contains(min(Arb((0, 2)), Arb((-1, 3))), -1)
+        @test Arblib.contains(min(Arb((0, 2)), Arb((-1, 3))), 2)
+        @test !Arblib.contains(min(Arb((0, 2)), Arb((-1, 3))), 3)
+        @test Arblib.contains(max(Arb((0, 2)), Arb((-1, 3))), 0)
+        @test Arblib.contains(max(Arb((0, 2)), Arb((-1, 3))), 3)
+        @test !Arblib.contains(max(Arb((0, 2)), Arb((-1, 3))), -1)
+        @test all(Arblib.contains.(minmax(Arb((0, 2)), Arb((-1, 3))), (-1, 0)))
+        @test all(Arblib.contains.(minmax(Arb((0, 2)), Arb((-1, 3))), (2, 3)))
+        @test all(.!Arblib.contains.(minmax(Arb((0, 2)), Arb((-1, 3))), (3, -1)))
     end
 
     @testset "Acb - specific" begin
