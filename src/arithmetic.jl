@@ -180,7 +180,35 @@ Base.abs(z::AcbLike) = abs!(Arb(prec = _precision(z)), z)
 ### min and max
 for T in [MagOrRef, ArfOrRef, ArbOrRef]
     for op in [:min, :max]
+        # min/max
         @eval Base.$op(x::$T, y::$T) = $(Symbol(op, :!))(zero(x), x, y)
+        # minimum/maximum
+        # The default implementation of minimum/maximum in Julia is
+        # not correct for Arb, we implemented a correct version when
+        # no specific dimension is given. The default give correct
+        # results for Mag and Arf but wrong results for Arb in some
+        # cases, be careful!
+        @eval function Base.$(Symbol(op, :imum))(A::AbstractArray{<:$T})
+            isempty(A) &&
+                throw(ArgumentError("reducing over an empty collection is not allowed"))
+            res = copy(first(A))
+            for x in Iterators.drop(A, 1)
+                $(Symbol(op, :!))(res, res, x)
+            end
+            return res
+        end
     end
     @eval Base.minmax(x::$T, y::$T) = (min(x, y), max(x, y))
+
+    @eval function Base.extrema(A::AbstractArray{<:$T})
+        isempty(A) &&
+            throw(ArgumentError("reducing over an empty collection is not allowed"))
+        l = copy(first(A))
+        u = copy(first(A))
+        for x in Iterators.drop(A, 1)
+            min!(l, l, x)
+            max!(u, u, x)
+        end
+        return (l, u)
+    end
 end

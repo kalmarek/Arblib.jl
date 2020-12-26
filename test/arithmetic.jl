@@ -29,6 +29,9 @@
         @test min(Mag(1), Mag(2)) == Mag(1)
         @test max(Mag(1), Mag(2)) == Mag(2)
         @test minmax(Mag(1), Mag(2)) == minmax(Mag(2), Mag(1)) == (Mag(1), Mag(2))
+        @test minimum(Mag[10:20; 0:9]) == Mag(0)
+        @test maximum(Mag[10:20; 0:9]) == Mag(20)
+        @test extrema(Mag[10:20; 0:9]) == (Mag(0), Mag(20))
     end
 
     @testset "Arf" begin
@@ -66,6 +69,9 @@
         @test min(Arf(1), Arf(2)) == Arf(1)
         @test max(Arf(1), Arf(2)) == Arf(2)
         @test minmax(Arf(1), Arf(2)) == minmax(Arf(2), Arf(1)) == (Arf(1), Arf(2))
+        @test minimum(Arf[10:20; 0:9]) == Arf(0)
+        @test maximum(Arf[10:20; 0:9]) == Arf(20)
+        @test extrema(Arf[10:20; 0:9]) == (Arf(0), Arf(20))
     end
 
     @testset "$T" for T in [Arb, Acb]
@@ -161,6 +167,21 @@
         @test all(Arblib.contains.(minmax(Arb((0, 2)), Arb((-1, 3))), (-1, 0)))
         @test all(Arblib.contains.(minmax(Arb((0, 2)), Arb((-1, 3))), (2, 3)))
         @test all(.!Arblib.contains.(minmax(Arb((0, 2)), Arb((-1, 3))), (3, -1)))
+        @test minimum(Arb[10:20; 0:9]) == Arb(0)
+        @test maximum(Arb[10:20; 0:9]) == Arb(20)
+        @test extrema(Arb[10:20; 0:9]) == (Arb(0), Arb(20))
+        A = [Arb((i, i + 1)) for i = 0:10]
+        @test Arblib.contains(minimum(A), Arb((0, 1)))
+        @test Arblib.contains(minimum(reverse(A)), Arb((0, 1)))
+        @test Arblib.contains(maximum(A), Arb((10, 11)))
+        @test Arblib.contains(maximum(reverse(A)), Arb((10, 11)))
+        @test all(Arblib.contains.(extrema(A), (Arb((0, 1)), Arb((10, 11)))))
+        # These fails with the default implementation
+        @test Arblib.contains(
+            minimum([Arb((-i, -i + 1)) for i = 0:1000]),
+            Arb((-1000, -999)),
+        )
+        @test Arblib.contains(maximum([Arb((i, i + 1)) for i = 0:1000]), Arb((1000, 1001)))
     end
 
     @testset "Acb - specific" begin
