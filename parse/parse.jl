@@ -177,6 +177,8 @@ function parse_and_generate_arbdoc(arb_doc_dir, out_dir = "src/arbcalls/")
         "double arf_get_d(const arf_t x, arf_rnd_t rnd)" => "clashes with arf_get_si",
         "slong arf_get_si(const arf_t x, arf_rnd_t rnd)" => "clashes with arf_get_d",
         "void arf_print(const arf_t x)" => "clashes with Base.print",
+        "int arf_mul(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)" =>
+            "defined using #DEFINE in C which doesn't work in Julia",
         "arb_ptr _arb_vec_init(slong n)" => "clashes with similar method for acb",
         "double _arb_vec_estimate_allocated_bytes(slong len, slong prec)" =>
             "clashes with similar method for acb",
