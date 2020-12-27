@@ -5,6 +5,9 @@
               Float64(Arblib.set!(Arblib.radref(Arb()), π)) ==
               Float64(Arblib.set!(Arblib.mag_struct(), π)) <
               3.15
+
+        @test Arblib.set!(Mag(), 1) == Arblib.set!(Mag(), UInt(1))
+        @test Arblib.set!(Mag(), 3, 4) == Arblib.set!(Mag(), 3 * 2^4)
     end
 
     @testset "Arb" begin
@@ -65,7 +68,7 @@
 
         # Intervals: MagLike, ArfLike, BigFloat
         @test Arblib.overlaps(
-            Arblib.set!(Arb(), (Mag(UInt64(1)), Mag(UInt64(2)))),
+            Arblib.set!(Arb(), (Mag(1), Mag(2))),
             Arblib.set!(Arb(), (Arf(1), Arf(2))),
         )
 
@@ -74,11 +77,11 @@
             Arblib.set!(Arb(), (BigFloat(1), BigFloat(2))),
         )
 
-        @test Arblib.radref(Arblib.set!(Arb(), (Arf(1), Arf(3)))) >= Mag(UInt64(1))
+        @test Arblib.radref(Arblib.set!(Arb(), (Arf(1), Arf(3)))) >= Mag(1)
         @test Arblib.midref(Arblib.set!(Arb(), (Arf(1), Arf(3)))) >= Arf(1)
 
         @test Arblib.radref(Arblib.set!(Arb(prec = 64), (BigFloat(π), BigFloat(π)))) >
-              Mag(UInt(0))
+              Mag(0)
         @test iszero(Arblib.radref(Arblib.set!(
             Arb(prec = 64),
             (BigFloat(π), BigFloat(π)),

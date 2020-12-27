@@ -1,5 +1,7 @@
 # Mag
+set!(res::MagLike, x::Integer) = set!(res, convert(UInt, x))
 set!(res::MagLike, ::Irrational{:π}) = const_pi!(res)
+set!(res::MagLike, x::Integer, y::Integer) = set_ui_2exp!(res, convert(UInt, x), y)
 
 # Arf
 function set!(res::ArfLike, x::UInt128)
