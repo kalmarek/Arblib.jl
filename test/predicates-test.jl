@@ -68,7 +68,7 @@
     end
 
     @testset "comparison" begin
-        x, y, z = Mag(0.0), Mag(1.0), Mag(Inf)
+        x, y, z = Mag(0), Mag(1), Mag(Inf)
         @test isless(x, y)
         @test isless(y, z)
         @test x < y
@@ -84,12 +84,15 @@
         @test !(z < x)
         @test !(x <= z)
         @test !(z <= x)
-        @test x < UInt64(1)
-        @test x <= UInt64(1)
         @test x < 1
-        @test x <= UInt64(1)
-        @test x < 1.1
-        @test x <= UInt64(1)
+        @test x <= 1
+        @test x < UInt(1)
+        @test x <= UInt(1)
+        @test x < 1.0
+        @test x <= 1.0
+        @test y <= 1
+        @test y <= UInt(1)
+        @test y <= 1.0
 
         x, y = Arb(0), Arb(1)
         @test x == x

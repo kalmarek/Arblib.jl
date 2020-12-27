@@ -1,6 +1,7 @@
 # Mag
 Mag(x) = set!(Mag(), x)
 Mag(x::Union{MagRef,ArfRef}) = Mag(mag_struct(cstruct(x)))
+Mag(x, y) = set!(Mag(), x, y)
 
 # Arf
 Arf(x; prec::Integer = _precision(x)) = set!(Arf(prec = prec), x)
