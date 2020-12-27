@@ -1,3 +1,7 @@
+const _BitInteger = (Int == Int64 ? Base.BitInteger64 : Base.BitInteger32)
+const _BitSigned = (Int == Int64 ? Base.BitSigned64 : Base.BitSigned32)
+const _BitUnsigned = (Int == Int64 ? Base.BitUnsigned64 : Base.BitUnsigned32)
+
 ### Mag
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
     @eval Base.$jf(x::MagOrRef, y::MagOrRef) = $af(zero(x), x, y)
@@ -27,28 +31,28 @@ end
 Base.abs(x::ArfOrRef) = abs!(zero(x), x)
 Base.:(-)(x::ArfOrRef) = neg!(zero(x), x)
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
-    @eval function Base.$jf(x::ArfOrRef, y::Union{ArfOrRef,UInt,Int})
+    @eval function Base.$jf(x::ArfOrRef, y::Union{ArfOrRef,_BitInteger})
         z = Arf(prec = _precision((x, y)))
         $af(z, x, y)
         return z
     end
 end
-function Base.:+(x::Union{UInt,Int}, y::ArfOrRef)
+function Base.:+(x::_BitInteger, y::ArfOrRef)
     z = zero(y)
     add!(z, y, x)
     return z
 end
-function Base.:*(x::Union{UInt,Int}, y::ArfOrRef)
+function Base.:*(x::_BitInteger, y::ArfOrRef)
     z = zero(y)
     mul!(z, y, x)
     return z
 end
-function Base.:/(x::UInt, y::ArfOrRef)
+function Base.:/(x::_BitUnsigned, y::ArfOrRef)
     z = zero(y)
     ui_div!(z, x, y)
     return z
 end
-function Base.:/(x::Int, y::ArfOrRef)
+function Base.:/(x::_BitSigned, y::ArfOrRef)
     z = zero(y)
     si_div!(z, x, y)
     return z
@@ -72,25 +76,26 @@ end
 
 ### Arb and Acb
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
-    @eval Base.$jf(x::ArbOrRef, y::Union{ArbOrRef,ArfOrRef,Int,UInt}) =
+    @eval Base.$jf(x::ArbOrRef, y::Union{ArbOrRef,ArfOrRef,_BitInteger}) =
         $af(Arb(prec = _precision((x, y))), x, y)
-    @eval Base.$jf(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,Int,UInt}) =
+    @eval Base.$jf(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,_BitInteger}) =
         $af(Acb(prec = _precision((x, y))), x, y)
     if jf == :(+) || jf == :(*)
-        @eval Base.$jf(x::Union{ArfOrRef,Int,UInt}, y::ArbOrRef) =
+        @eval Base.$jf(x::Union{ArfOrRef,_BitInteger}, y::ArbOrRef) =
             $af(Arb(prec = _precision((x, y))), y, x)
-        @eval Base.$jf(x::Union{ArbOrRef,Int,UInt}, y::AcbOrRef) =
+        @eval Base.$jf(x::Union{ArbOrRef,_BitInteger}, y::AcbOrRef) =
             $af(Acb(prec = _precision((x, y))), y, x)
     end
 end
 
 Base.:(-)(x::Union{ArbOrRef,AcbOrRef}) = neg!(zero(x), x)
 Base.abs(x::ArbOrRef) = abs!(zero(x), x)
-Base.:(/)(x::UInt, y::ArbOrRef) = ui_div!(zero(y), x, y)
+Base.:(/)(x::_BitUnsigned, y::ArbOrRef) = ui_div!(zero(y), x, y)
 
 # TODO: Should we convert Int to UInt for performance reasons?
-Base.:(^)(x::ArbOrRef, y::Union{ArbOrRef,UInt}) = pow!(Arb(prec = _precision((x, y))), x, y)
-Base.:(^)(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,Int,UInt}) =
+Base.:(^)(x::ArbOrRef, y::Union{ArbOrRef,_BitUnsigned}) =
+    pow!(Arb(prec = _precision((x, y))), x, y)
+Base.:(^)(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,_BitInteger}) =
     pow!(Acb(prec = _precision((x, y))), x, y)
 
 Base.hypot(x::ArbOrRef, y::ArbOrRef) = hypot!(Arb(prec = _precision((x, y))), x, y)
