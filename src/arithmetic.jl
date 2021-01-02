@@ -101,6 +101,8 @@ end
 Base.:(^)(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,_BitInteger}) =
     pow!(Acb(prec = _precision((x, y))), x, y)
 
+Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{2}) = sqr(x)
+
 Base.hypot(x::ArbOrRef, y::ArbOrRef) = hypot!(Arb(prec = _precision((x, y))), x, y)
 
 root(x::Union{ArbOrRef,AcbOrRef}, k::Integer) = root!(zero(x), x, convert(UInt, k))

@@ -97,6 +97,7 @@
               T(6)
         @test T(6) / T(2) == T(6) / 2 == T(6) / UInt(2) == T(3)
 
+        @test Base.literal_pow(^, T(3), Val(2)) == T(3)^2 == Arblib.sqr(T(3)) == T(9)
         @test Arblib.root(T(8), 3) == T(2)
 
         for f in [
@@ -152,13 +153,13 @@
         @test Arb(2) * Arf(3) == Arf(3) * Arb(2) == Arb(6)
         @test Arb(6) / Arf(2) == UInt(6) / Arb(2) == UInt8(6) / Arb(2) == Arb(3)
 
-        @test Arb(2)^Arb(2) ==
-              Arb(2)^2 ==
-              Arb(2)^Int8(2) ==
-              Arb(2)^UInt(2) ==
-              Arb(2)^UInt8(2) ==
-              (Arb(2)^-2)^-1 ==
-              Arb(4)
+        @test Arb(2)^Arb(3) ==
+              Arb(2)^3 ==
+              Arb(2)^Int8(3) ==
+              Arb(2)^UInt(3) ==
+              Arb(2)^UInt8(3) ==
+              (Arb(2)^-3)^-1 ==
+              Arb(8)
         @test hypot(Arb(3), Arb(4)) == Arb(5)
 
         @test Arblib.sqrtpos(Arb(4)) == Arb(2)
@@ -203,14 +204,14 @@
         @test Acb(2) * Arb(3) == Arb(3) * Acb(2) == Acb(6)
         @test Acb(6) / Arb(2) == Acb(3)
 
-        @test Acb(2)^Acb(2) ==
-              Acb(2)^Arb(2) ==
-              Acb(2)^2 ==
-              Acb(2)^Int8(2) ==
-              Acb(2)^UInt(2) ==
-              Acb(2)^UInt8(2) ==
-              (Acb(2)^-2)^-1 ==
-              Acb(4)
+        @test Acb(2)^Acb(3) ==
+              Acb(2)^Arb(3) ==
+              Acb(2)^3 ==
+              Acb(2)^Int8(3) ==
+              Acb(2)^UInt(3) ==
+              Acb(2)^UInt8(3) ==
+              (Acb(2)^-3)^-1 ==
+              Acb(8)
 
         @test Acb(2, 3) * Complex{Bool}(0, 0) ==
               Complex{Bool}(0, 0) * Acb(2, 3) ==
