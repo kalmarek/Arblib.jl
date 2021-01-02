@@ -97,7 +97,14 @@
               T(6)
         @test T(6) / T(2) == T(6) / 2 == T(6) / UInt(2) == T(3)
 
-        @test Base.literal_pow(^, T(3), Val(2)) == T(3)^2 == Arblib.sqr(T(3)) == T(9)
+        @test Base.literal_pow(^, T(2), Val(-2)) ==
+              T(2)^-2 ==
+              Arblib.sqr(inv(T(2))) ==
+              T(1 // 4)
+        @test Base.literal_pow(^, T(2), Val(0)) == T(2)^0 == one(T)
+        @test Base.literal_pow(^, T(2), Val(1)) == T(2)^1 == T(2)
+        @test Base.literal_pow(^, T(2), Val(2)) == T(2)^2 == Arblib.sqr(T(2)) == T(4)
+
         @test Arblib.root(T(8), 3) == T(2)
 
         for f in [

@@ -101,6 +101,13 @@ end
 Base.:(^)(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,_BitInteger}) =
     pow!(Acb(prec = _precision((x, y))), x, y)
 
+# We define the same special cases as Arb does, this avoids some
+# overhead
+Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{-2}) =
+    (y = inv(x); sqr!(y, y))
+#Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{-1}) - implemented in Base.intfuncs.jl
+Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{0}) = one(x)
+Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{1}) = copy(x)
 Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{2}) = sqr(x)
 
 Base.hypot(x::ArbOrRef, y::ArbOrRef) = hypot!(Arb(prec = _precision((x, y))), x, y)
