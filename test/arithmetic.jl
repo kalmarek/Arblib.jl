@@ -152,7 +152,13 @@
         @test Arb(2) * Arf(3) == Arf(3) * Arb(2) == Arb(6)
         @test Arb(6) / Arf(2) == UInt(6) / Arb(2) == UInt8(6) / Arb(2) == Arb(3)
 
-        @test Arb(2)^Arb(2) == Arb(2)^UInt(2) == Arb(2)^UInt8(2) == Arb(4)
+        @test Arb(2)^Arb(2) ==
+              Arb(2)^2 ==
+              Arb(2)^Int8(2) ==
+              Arb(2)^UInt(2) ==
+              Arb(2)^UInt8(2) ==
+              (Arb(2)^-2)^-1 ==
+              Arb(4)
         @test hypot(Arb(3), Arb(4)) == Arb(5)
 
         @test Arblib.sqrtpos(Arb(4)) == Arb(2)
@@ -203,6 +209,7 @@
               Acb(2)^Int8(2) ==
               Acb(2)^UInt(2) ==
               Acb(2)^UInt8(2) ==
+              (Acb(2)^-2)^-1 ==
               Acb(4)
 
         @test Acb(2, 3) * Complex{Bool}(0, 0) ==

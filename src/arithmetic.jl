@@ -92,9 +92,12 @@ Base.:(-)(x::Union{ArbOrRef,AcbOrRef}) = neg!(zero(x), x)
 Base.abs(x::ArbOrRef) = abs!(zero(x), x)
 Base.:(/)(x::_BitUnsigned, y::ArbOrRef) = ui_div!(zero(y), x, y)
 
-# TODO: Should we convert Int to UInt for performance reasons?
-Base.:(^)(x::ArbOrRef, y::Union{ArbOrRef,_BitUnsigned}) =
-    pow!(Arb(prec = _precision((x, y))), x, y)
+Base.:(^)(x::ArbOrRef, y::ArbOrRef) = pow!(Arb(prec = _precision((x, y))), x, y)
+function Base.:(^)(x::ArbOrRef, y::_BitInteger)
+    z = zero(x)
+    x, n = (y >= 0 ? (x, y) : (inv!(z, x), -y))
+    return pow!(z, x, convert(UInt, n))
+end
 Base.:(^)(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,_BitInteger}) =
     pow!(Acb(prec = _precision((x, y))), x, y)
 
