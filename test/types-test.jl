@@ -3,6 +3,11 @@
         @test Mag() isa Mag
         @test Mag(Mag()) isa Mag
         @test Mag(Arf()) isa Mag
+        x = Mag()
+        y = copy(x)
+        Arblib.set!(x, 1)
+        @test x == Mag(1)
+        @test y == Mag(0)
     end
 
     @testset "Arf" begin
@@ -12,16 +17,31 @@
         @test precision(Arf(UInt64(1), prec = 80)) == 80
         @test Arf(1) isa Arf
         @test precision(Arf(1, prec = 80)) == 80
+        x = Arf()
+        y = copy(x)
+        Arblib.set!(x, 1)
+        @test x == Arf(1)
+        @test y == Arf(0)
     end
 
     @testset "Arb" begin
         @test Arb() isa Arb
         @test precision(Arb(prec = 80)) == 80
+        x = Arb()
+        y = copy(x)
+        Arblib.set!(x, 1)
+        @test x == Arb(1)
+        @test y == Arb(0)
     end
 
     @testset "Acb" begin
         @test Acb() isa Acb
         @test precision(Acb(prec = 80)) == 80
+        x = Acb()
+        y = copy(x)
+        Arblib.set!(x, 1)
+        @test x == Acb(1)
+        @test y == Acb(0)
     end
 
     @testset "ArbPoly" begin

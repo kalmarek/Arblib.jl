@@ -7,6 +7,7 @@ Mag(x, y) = set!(Mag(), x, y)
 Arf(x; prec::Integer = _precision(x)) = set!(Arf(prec = prec), x)
 # disambiguation
 Arf(x::Arf; prec::Integer = precision(x)) = set!(Arf(prec = prec), x)
+Arf(x::Rational; prec::Integer = _precision(x)) = set!(Arf(prec = prec), x)
 
 #Arb
 Arb(x; prec::Integer = _precision(x)) = set!(Arb(prec = prec), x)

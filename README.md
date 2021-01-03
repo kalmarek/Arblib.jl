@@ -140,9 +140,72 @@ x = Arblib.set!(Arb(), (0, π))
 y = Arb((0, π))
 ```
 
+## Pitfalls when interacting with the Julia ecosystem
+Arb is made for rigorous numerics and any functions which do not
+produce rigorous results are clearly marked as such. This is not the
+case with Julia in general and you therefore have to be careful when
+interacting with the ecosystem if you want your results to be
+completely rigorous. Below are three things which you have to be extra
+careful with.
+
+### Implicit promotion
+Julia automatically promotes types in many cases and in particular you
+have to watch out for temporary non-rigorous values. For example
+`2(π*(Arb(ℯ)))` is okay, but not `2π*Arb(ℯ)`
+
+``` julia
+julia> 2(π*(Arb(ℯ)))
+[17.079468445347134130927101739093148990069777071530229923759202260358457222314 +/- 9.19e-76]
+
+julia> 2π*Arb(ℯ)
+[17.079468445347133465140073658536286170170195258393831755094914544308087031794 +/- 7.93e-76]
+
+julia> Arblib.overlaps(2(π*(Arb(ℯ))), 2π*Arb(ℯ))
+false
+```
+
+### Non-rigorous approximations
+In many cases this is obvious, for example Julias built in methods for
+solving linear systems will not produce rigorous results.
+
+TODO: Come up with more examples
+
+### Implementation details
+In some cases the implementation in Julia implicitly makes certain
+assumptions to improve performance and this can lead to issues. For
+example the `maximum` method in Julia checks for `NaN` results (on
+which is short fuses) using `x == x`, which works for most numerical
+types but not for `Arb` (`x == x` is only true if the radius is zero).
+See <https://github.com/JuliaLang/julia/issues/36287> for some more
+details. Arblib implements its own `maximum` method which gives
+rigorous results, but it only covers the case
+`maximum(AbstractFloat{Arb})`.
+
+``` julia
+julia> f = i -> Arb((i, i + 1));
+
+julia> A = f.(0:1000);
+
+julia> maximum(A)
+[1.00e+3 +/- 1.01]
+
+julia> maximum(A, dims = 1)
+1-element Array{Arb,1}:
+ [+/- 1.01]
+
+julia> maximum(f, 0:1000)
+[+/- 1.01]
+```
+
+These types of problems are the hardest to find since they are not
+clear from the documentation but you have to read the implementation,
+`@which` and `@less` are your friends in these cases.
+
 ## Example
 
-Here is the naive sine compuation example form the [Arb documentation](http://arblib.org/using.html#a-worked-example-the-sine-function) in Julia:
+Here is the naive sine compuation example form the [Arb
+documentation](http://arblib.org/using.html#a-worked-example-the-sine-function)
+in Julia:
 
 ```julia
 using Arblib

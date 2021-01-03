@@ -19,6 +19,12 @@ function set!(res::ArfLike, x::Int128)
     return x < 0 ? neg!(res, res) : res
 end
 
+function set!(res::ArfLike, x::Rational; prec::Integer = precision(res))
+    set!(res, numerator(x))
+    div!(res, res, denominator(x), prec = prec)
+    return res
+end
+
 # Arb
 function set!(res::ArbLike, x::Union{UInt128,Int128})
     set!(radref(res), UInt64(0))

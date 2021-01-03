@@ -253,6 +253,7 @@ for prefix in [:mag, :arf, :arb, :acb]
         parentstruct(x::$T) = cstruct(x)
         parentstruct(x::$TRef) = x
         parentstruct(x::$TStruct) = x
+        Base.copy(x::Union{$T,$TRef}) = $T(x)
     end
 end
 

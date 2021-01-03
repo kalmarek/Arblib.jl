@@ -28,74 +28,219 @@
 
         @test min(Mag(1), Mag(2)) == Mag(1)
         @test max(Mag(1), Mag(2)) == Mag(2)
-        @test minmax(Mag(1), Mag(2)) == (Mag(1), Mag(2))
-        @test minmax(Mag(2), Mag(1)) == (Mag(1), Mag(2))
+        @test minmax(Mag(1), Mag(2)) == minmax(Mag(2), Mag(1)) == (Mag(1), Mag(2))
+        @test minimum(Mag[10:20; 0:9]) == Mag(0)
+        @test maximum(Mag[10:20; 0:9]) == Mag(20)
+        @test extrema(Mag[10:20; 0:9]) == (Mag(0), Mag(20))
     end
 
-    @testset "basic arithmetic: $T" for T in [Arb, Acb]
-        @test T(3) + 1 == 4
-        @test T(3) + 1 isa T
-        @test T(2) + T(3) == 5
-        @test T(2) + T(3) isa T
-        @test T(3) - 1 == 2
-        @test T(3) - 1 isa T
-        @test T(2) - T(3) == -1
-        @test T(2) - T(3) isa T
-        @test T(3) * 1 == 3
-        @test T(3) * 1 isa T
-        @test Bool(Arblib.contains(T(3) / 1, T(3)))
-        @test T(3) / 1 isa T
-        @test Bool(Arblib.contains(T(3) / T(1), T(3)))
-        @test T(3) / T(1) isa T
+    @testset "Arf" begin
+        @test sign(Arf(2)) == Arf(1)
+        @test sign(Arf(-2)) == Arf(-1)
+        @test sign(Arf(0)) == Arf(0)
+
+        @test abs(Arf(-2)) == abs(Arf(2)) == Arf(2)
+        @test -Arf(2) == Arf(-2)
+
+        @test Arf(1) + Arf(2) ==
+              Arf(1) + 2 ==
+              2 + Arf(1) ==
+              Arf(1) + UInt(2) ==
+              UInt(2) + Arf(1) ==
+              Arf(1) + UInt8(2) ==
+              Arf(1) + UInt8(2) ==
+              UInt8(2) + Arf(1) ==
+              Arf(3)
+        @test Arf(1) - Arf(2) == Arf(1) - 2 == Arf(1) - UInt(2) == Arf(-1)
+        @test Arf(2) * Arf(3) ==
+              Arf(2) * 3 ==
+              3 * Arf(2) ==
+              Arf(2) * UInt(3) ==
+              UInt(3) * Arf(2) ==
+              Arf(6)
+        @test Arf(6) / Arf(2) ==
+              Arf(6) / 2 ==
+              6 / Arf(2) ==
+              Arf(6) / UInt(2) ==
+              UInt(6) / Arf(2) ==
+              Arf(6) / UInt8(2) ==
+              UInt8(6) / Arf(2) ==
+              Arf(3)
+
+        @test sqrt(Arf(4)) == Arf(2)
+        @test Arblib.rsqrt(Arf(4)) == Arf(1 // 2)
+        @test Arblib.root(Arf(8), 3) == Arf(2)
+
+        @test min(Arf(1), Arf(2)) == Arf(1)
+        @test max(Arf(1), Arf(2)) == Arf(2)
+        @test minmax(Arf(1), Arf(2)) == minmax(Arf(2), Arf(1)) == (Arf(1), Arf(2))
+        @test minimum(Arf[10:20; 0:9]) == Arf(0)
+        @test maximum(Arf[10:20; 0:9]) == Arf(20)
+        @test extrema(Arf[10:20; 0:9]) == (Arf(0), Arf(20))
     end
 
-    @testset "promote: $T" for (T, TMat) in [(Arb, ArbMatrix), (Acb, AcbMatrix)]
-        A = TMat(3, 3)
-        # promotion of TRef to T
-        a = A[1, 1]
-        promote(a, 1) isa Tuple{T,T}
-        promote(a, T(1)) isa Tuple{T,T}
-        @test a + 3 == 3
-        @test a + 3 isa T
+    @testset "$T" for T in [Arb, Acb]
+        @test T(1) + T(2) ==
+              T(1) + 2 ==
+              2 + T(1) ==
+              T(1) + UInt(2) ==
+              UInt(2) + T(1) ==
+              T(1) + UInt8(2) ==
+              UInt8(2) + T(1) ==
+              T(3)
+        @test T(1) - T(2) == T(1) - 2 == T(1) - UInt(2) == T(-1)
+        @test T(2) * T(3) ==
+              T(2) * 3 ==
+              3 * T(2) ==
+              T(2) * UInt(3) ==
+              UInt(3) * T(2) ==
+              T(6)
+        @test T(6) / T(2) == T(6) / 2 == T(6) / UInt(2) == T(3)
+
+        @test Base.literal_pow(^, T(2), Val(-2)) ==
+              T(2)^-2 ==
+              Arblib.sqr(inv(T(2))) ==
+              T(1 // 4)
+        @test Base.literal_pow(^, T(2), Val(0)) == T(2)^0 == one(T)
+        @test Base.literal_pow(^, T(2), Val(1)) == T(2)^1 == T(2)
+        @test Base.literal_pow(^, T(2), Val(2)) == T(2)^2 == Arblib.sqr(T(2)) == T(4)
+
+        @test Arblib.root(T(8), 3) == T(2)
+
+        for f in [
+            inv,
+            sqrt,
+            log,
+            log1p,
+            exp,
+            expm1,
+            sin,
+            cos,
+            tan,
+            cot,
+            sec,
+            csc,
+            atan,
+            asin,
+            acos,
+            sinh,
+            cosh,
+            tanh,
+            coth,
+            sech,
+            csch,
+            atanh,
+            asinh,
+        ]
+            # TODO: Replace with ≈
+            @test abs(f(T(0.5)) - f(0.5)) <= 1e-15
+        end
+        # TODO: Replace with ≈
+        @test abs(acosh(T(2)) - acosh(2)) <= 1e-15
+
+        @test Arblib.rsqrt(T(1 // 4)) == T(2)
+        @test Arblib.sqr(T(3)) == T(9)
+
+        @test sinpi(T(1)) == T(0)
+        @test cospi(T(1)) == T(-1)
+        @test Arblib.tanpi(T(1)) == T(0)
+        # TODO: Replace with ≈
+        @test abs(Arblib.cotpi(T(0.5))) <= 1e-15
+        @test abs(Arblib.cscpi(T(0.5)) - 1) <= 1e-15
+        @test abs(sinc(T(0.5)) - sinc(0.5)) <= 1e-15
+
+        @test isequal(sincos(T(1)), (sin(T(1)), cos(T(1))))
+        @test isequal(Arblib.sincospi(T(1)), (sinpi(T(1)), cospi(T(1))))
+        @test isequal(Arblib.sinhcosh(T(1)), (sinh(T(1)), cosh(T(1))))
     end
 
-    @testset "real/imag" begin
-        x, y = Arb(rand()), Arb(rand())
-        z = Acb(x, y)
+    @testset "Arb - specific" begin
+        @test Arb(1) + Arf(2) == Arf(2) + Arb(1) == Arb(3)
+        @test Arb(1) - Arf(2) == Arb(-1)
+        @test Arb(2) * Arf(3) == Arf(3) * Arb(2) == Arb(6)
+        @test Arb(6) / Arf(2) == UInt(6) / Arb(2) == UInt8(6) / Arb(2) == Arb(3)
 
-        @test Arblib.realref(z) isa ArbRef
-        @test Arblib.realref(z) == x
-        @test real(z) == x
-        @test Arblib.imagref(z) isa ArbRef
-        @test Arblib.imagref(z) == y
-        @test imag(z) == y
+        @test Arb(2)^Arb(3) ==
+              Arb(2)^3 ==
+              Arb(2)^Int8(3) ==
+              Arb(2)^UInt(3) ==
+              Arb(2)^UInt8(3) ==
+              (Arb(2)^-3)^-1 ==
+              Arb(8)
+        @test hypot(Arb(3), Arb(4)) == Arb(5)
+
+        @test Arblib.sqrtpos(Arb(4)) == Arb(2)
+        @test Arblib.sqrtpos(Arb(-4)) == Arb(0)
+        @test Arblib.sqrt1pm1(Arb(3)) == Arb(1)
+
+        # TODO: Replace with ≈
+        @test abs(atan(Arb(2), Arb(3)) - atan(2, 3)) <= 1e-15
+
+        @test min(Arb(1), Arb(2)) == Arb(1)
+        @test max(Arb(1), Arb(2)) == Arb(2)
+        @test minmax(Arb(1), Arb(2)) == minmax(Arb(2), Arb(1)) == (Arb(1), Arb(2))
+        @test Arblib.contains(min(Arb((0, 2)), Arb((-1, 3))), -1)
+        @test Arblib.contains(min(Arb((0, 2)), Arb((-1, 3))), 2)
+        @test !Arblib.contains(min(Arb((0, 2)), Arb((-1, 3))), 3)
+        @test Arblib.contains(max(Arb((0, 2)), Arb((-1, 3))), 0)
+        @test Arblib.contains(max(Arb((0, 2)), Arb((-1, 3))), 3)
+        @test !Arblib.contains(max(Arb((0, 2)), Arb((-1, 3))), -1)
+        @test all(Arblib.contains.(minmax(Arb((0, 2)), Arb((-1, 3))), (-1, 0)))
+        @test all(Arblib.contains.(minmax(Arb((0, 2)), Arb((-1, 3))), (2, 3)))
+        @test all(.!Arblib.contains.(minmax(Arb((0, 2)), Arb((-1, 3))), (3, -1)))
+        @test minimum(Arb[10:20; 0:9]) == Arb(0)
+        @test maximum(Arb[10:20; 0:9]) == Arb(20)
+        @test extrema(Arb[10:20; 0:9]) == (Arb(0), Arb(20))
+        A = [Arb((i, i + 1)) for i = 0:10]
+        @test Arblib.contains(minimum(A), Arb((0, 1)))
+        @test Arblib.contains(minimum(reverse(A)), Arb((0, 1)))
+        @test Arblib.contains(maximum(A), Arb((10, 11)))
+        @test Arblib.contains(maximum(reverse(A)), Arb((10, 11)))
+        @test all(Arblib.contains.(extrema(A), (Arb((0, 1)), Arb((10, 11)))))
+        # These fails with the default implementation
+        @test Arblib.contains(
+            minimum([Arb((-i, -i + 1)) for i = 0:1000]),
+            Arb((-1000, -999)),
+        )
+        @test Arblib.contains(maximum([Arb((i, i + 1)) for i = 0:1000]), Arb((1000, 1001)))
     end
 
-    @testset "midref" begin
-        x = Arb(0.25)
-        @test Arblib.midref(x) isa ArfRef
-        @test startswith(sprint(show, x), "0.250")
-        @test Float64(Arblib.midref(x)) isa Float64
-        @test Float64(Arblib.midref(x)) == 0.25
-        @test Float64(x) == 0.25
-        @test sprint(show, x) == sprint(show, x[])
-    end
+    @testset "Acb - specific" begin
+        @test Acb(1) + Arb(2) == Arb(2) + Acb(1) == Acb(3)
+        @test Acb(1) - Arb(2) == Acb(-1)
+        @test Acb(2) * Arb(3) == Arb(3) * Acb(2) == Acb(6)
+        @test Acb(6) / Arb(2) == Acb(3)
 
-    @testset "radref" begin
-        x = Arb(0.25)
-        m = Arblib.radref(x)
-        @test m isa MagRef
-        m[] = 1.0
-        @test Float64(m) ≥ 1.0
-        @test sprint(show, m) == sprint(show, m[])
-    end
+        @test Acb(2)^Acb(3) ==
+              Acb(2)^Arb(3) ==
+              Acb(2)^3 ==
+              Acb(2)^Int8(3) ==
+              Acb(2)^UInt(3) ==
+              Acb(2)^UInt8(3) ==
+              (Acb(2)^-3)^-1 ==
+              Acb(8)
 
-    @testset "convert to Float64/ComplexF64" begin
-        x = Arb(0.25)
-        @test Float64(x) isa Float64
-        @test Float64(x) == 0.25
-        z = Acb(2.0 + 0.125im)
-        @test ComplexF64(z) isa ComplexF64
-        @test ComplexF64(z) == 2.0 + 0.125im
+        @test Acb(2, 3) * Complex{Bool}(0, 0) ==
+              Complex{Bool}(0, 0) * Acb(2, 3) ==
+              Acb(2, 3) * (0 + 0im)
+        @test Acb(2, 3) * Complex{Bool}(0, 1) ==
+              Complex{Bool}(0, 1) * Acb(2, 3) ==
+              Acb(2, 3) * (0 + 1im)
+        @test Acb(2, 3) * Complex{Bool}(1, 0) ==
+              Complex{Bool}(1, 0) * Acb(2, 3) ==
+              Acb(2, 3) * (1 + 0im)
+        @test Acb(2, 3) * Complex{Bool}(1, 1) ==
+              Complex{Bool}(1, 1) * Acb(2, 3) ==
+              Acb(2, 3) * (1 + 1im)
+
+        @test real(Acb(1, 2)) isa Arb
+        @test real(Acb(1, 2)) == Arb(1)
+        @test imag(Acb(1, 2)) isa Arb
+        @test imag(Acb(1, 2)) == Arb(2)
+
+        @test conj(Acb(1, 2)) == Acb(1, -2)
+
+        @test abs(Acb(3, 4)) isa Arb
+        @test abs(Acb(3, 4)) == Arb(5)
     end
 end
