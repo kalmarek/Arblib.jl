@@ -103,8 +103,9 @@ function generate_file(
 
                     f = Arblib.Arbfunction(s)
 
-                    s == Arblib.arbsignature(f) ||
-                        @warn( "Expected signature: $s\n Obtained signature: $(Arblib.arbsignature(f))")
+                    s == Arblib.arbsignature(f) || @warn(
+                        "Expected signature: $s\n Obtained signature: $(Arblib.arbsignature(f))"
+                    )
 
                     str *= "arbcall\"" * s * "\"\n"
                 catch e

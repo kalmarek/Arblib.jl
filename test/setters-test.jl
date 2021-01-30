@@ -82,11 +82,15 @@
 
         @test Arblib.radref(Arblib.set!(Arb(prec = 64), (BigFloat(π), BigFloat(π)))) >
               Mag(0)
-        @test iszero(Arblib.radref(Arblib.set!(
-            Arb(prec = 64),
-            (BigFloat(π), BigFloat(π)),
-            prec = precision(BigFloat),
-        )))
+        @test iszero(
+            Arblib.radref(
+                Arblib.set!(
+                    Arb(prec = 64),
+                    (BigFloat(π), BigFloat(π)),
+                    prec = precision(BigFloat),
+                ),
+            ),
+        )
 
         @test_throws ArgumentError Arblib.set!(Arb(), (Arf(2), Arf(1)))
 

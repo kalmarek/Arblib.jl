@@ -36,22 +36,19 @@
     f4! = (res, x; analytic, prec) -> Arblib.real_abs!(res, x, analytic, prec = prec)
     # FIXME: See above
     res4 = "[0.50000000000000000 +/- 2.73e-18]"
-    @test string(Arblib.integrate(
-        f4,
-        a,
-        b,
-        check_analytic = true,
-        take_prec = true,
-        prec = prec,
-    )) == res4
-    @test string(Arblib.integrate!(
-        f4!,
-        Acb(prec = prec),
-        a,
-        b,
-        check_analytic = true,
-        take_prec = true,
-    )) == res4
+    @test string(
+        Arblib.integrate(f4, a, b, check_analytic = true, take_prec = true, prec = prec),
+    ) == res4
+    @test string(
+        Arblib.integrate!(
+            f4!,
+            Acb(prec = prec),
+            a,
+            b,
+            check_analytic = true,
+            take_prec = true,
+        ),
+    ) == res4
 
     # Test with set tolerance
     f5 = x -> sin(exp(x))
