@@ -21,6 +21,18 @@ Base.precision(::MagOrRef) = DEFAULT_PRECISION[]
 @inline _precision(x::ArbTypes) = precision(x)
 @inline _precision(x::BigFloat) = precision(x)
 @inline _precision(z::Complex) = max(_precision(real(z)), _precision(imag(z)))
+@inline _precision(
+    (a, b)::Tuple{S,T},
+) where {
+    S<:Union{ArbTypes,BigFloat,Complex{<:Union{ArbTypes,BigFloat}}},
+    T<:Union{ArbTypes,BigFloat,Complex{<:Union{ArbTypes,BigFloat}}},
+} = max(_precision(a), _precision(b))
+@inline _precision(
+    (a, b)::Tuple{S,T},
+) where {S<:Union{ArbTypes,BigFloat,Complex{<:Union{ArbTypes,BigFloat}}},T} = _precision(a)
+@inline _precision(
+    (a, b)::Tuple{S,T},
+) where {S,T<:Union{ArbTypes,BigFloat,Complex{<:Union{ArbTypes,BigFloat}}}} = _precision(b)
 @inline _precision((a, b)::Tuple{S,T}) where {S,T} = max(_precision(a), _precision(b))
 @inline _precision(@nospecialize _) = DEFAULT_PRECISION[]
 
