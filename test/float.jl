@@ -7,6 +7,11 @@
         @test Arf(4, prec = 64) + eps(Arf(4, prec = 64)) > Arf(4)
         @test Arf(4, prec = 64) + eps(Arf(4, prec = 64)) / 2 == Arf(4)
 
+        @test eps(Arf) == Arf(eps(BigFloat))
+        @test eps(Arf(4)) == Arf(eps(BigFloat(4)))
+        @test Float64(eps(Arf(1, prec = 53))) == eps()
+        @test Float64(eps(Arf(4, prec = 53))) == eps(4.0)
+
         @test eps(Arf) == Arblib.eps!(zero(Arf), one(Arf))
         @test eps(Arf(4)) == Arblib.eps!(one(Arf), Arf(4))
         @test eps(Arb) == Arblib.eps!(zero(Arb), one(Arb))
