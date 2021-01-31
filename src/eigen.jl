@@ -17,10 +17,12 @@ function approx_eig_qr!(
     prec = _precision(A),
     side = :right,
 )
-    @boundscheck size(eigvals, 1) == size(A, 1) && size(eigvecs) == size(A) ||
-                 throw(DimensionMismatch("eigvals, eigvecs and A sizes are not compatible."))
-    @assert side in (:left, :right) ||
-            throw(ArgumentError("In approx_eig_qr!: `side` kwarg must be eithe :left or :right"))
+    @boundscheck size(eigvals, 1) == size(A, 1) && size(eigvecs) == size(A) || throw(
+        DimensionMismatch("eigvals, eigvecs and A sizes are not compatible."),
+    )
+    @assert side in (:left, :right) || throw(
+        ArgumentError("In approx_eig_qr!: `side` kwarg must be eithe :left or :right"),
+    )
 
     if iszero(tol)
         if side == :right
@@ -46,8 +48,9 @@ function approx_eig_qr!(
     maxiter = 0,
     prec = _precision(A),
 )
-    @boundscheck size(eigvals, 1) == size(A, 1) ||
-                 throw(DimensionMismatch("eigvals, eigvecs and A sizes are not compatible."))
+    @boundscheck size(eigvals, 1) == size(A, 1) || throw(
+        DimensionMismatch("eigvals, eigvecs and A sizes are not compatible."),
+    )
     if iszero(tol)
         approx_eig_qr!(eigvals, C_NULL, C_NULL, A, C_NULL, maxiter, prec = prec)
     else
@@ -90,13 +93,18 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
             prec = _precision(A),
             side = :right,
         )
-            @assert side in (:left, :right) ||
-                    throw(ArgumentError("In approx_eig_qr!: `side` kwarg must be either :left or :right"))
+            @assert side in (:left, :right) || throw(
+                ArgumentError(
+                    "In approx_eig_qr!: `side` kwarg must be either :left or :right",
+                ),
+            )
 
-            @boundscheck size(eigvals, 1) == size(eigvals_approx, 1) == size(A, 1) ||
-                         throw(DimensionMismatch("Eigenvalues sizes are not compatible with matrix A"))
-            @boundscheck size(eigvecs) == size(R_eigvecs_approx) == size(A) ||
-                         throw(DimensionMismatch("Eigenvectors sizes are not compatible with matrix A"))
+            @boundscheck size(eigvals, 1) == size(eigvals_approx, 1) == size(A, 1) || throw(
+                DimensionMismatch("Eigenvalues sizes are not compatible with matrix A"),
+            )
+            @boundscheck size(eigvecs) == size(R_eigvecs_approx) == size(A) || throw(
+                DimensionMismatch("Eigenvectors sizes are not compatible with matrix A"),
+            )
 
             val = if side == :left
                 $jlf(eigvals, eigvecs, C_NULL, A, eigvals_approx, R_eigvecs_approx, prec = prec)
@@ -114,10 +122,12 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
             R_eigvecs_approx::AcbMatrixLike;
             prec = _precision(A),
         )
-            @boundscheck size(eigvals_approx, 1) == size(A, 1) ||
-                         throw(DimensionMismatch("Eigenvalues sizes are not compatible with matrix A"))
-            @boundscheck size(R_eigvecs_approx) == size(A) ||
-                         throw(DimensionMismatch("Eigenvectors sizes are not compatible with matrix A"))
+            @boundscheck size(eigvals_approx, 1) == size(A, 1) || throw(
+                DimensionMismatch("Eigenvalues sizes are not compatible with matrix A"),
+            )
+            @boundscheck size(R_eigvecs_approx) == size(A) || throw(
+                DimensionMismatch("Eigenvectors sizes are not compatible with matrix A"),
+            )
 
             val = $jlf(
                 eigvals,

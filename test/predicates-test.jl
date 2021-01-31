@@ -42,6 +42,17 @@
                 @test f(zero(T)) isa Bool
             end
         end
+
+        @test isnan(Arb(NaN))
+        @test !isnan(zero(Arb))
+        @test !isnan(one(Arb))
+        @test !isnan(Arb(Inf))
+
+        @test isnan(Acb(NaN))
+        @test isnan(Acb(0, NaN))
+        @test !isnan(zero(Acb))
+        @test !isnan(one(Acb))
+        @test !isnan(Acb(Inf))
     end
 
     @testset "isequal" begin

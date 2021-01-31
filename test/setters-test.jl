@@ -18,6 +18,10 @@
         @test Arblib.set!(Arb(), one(Mag)) == one(Arb)
         @test Arblib.set!(Arblib.realref(Acb()), one(Mag)) == one(Arb)
         @test Arblib.equal(Arblib.set!(Arblib.arb_struct(), one(Mag).mag), one(Arb))
+        # Check that aliasing works
+        x = Arb()
+        Arblib.set!(Arblib.radref(x), 1)
+        @test Arblib.set!(x, Arblib.radref(x)) == one(Arb)
 
         # Rational
         @test Arblib.set!(Arb(), 1 // 2) == one(Arb) / 2
@@ -82,11 +86,15 @@
 
         @test Arblib.radref(Arblib.set!(Arb(prec = 64), (BigFloat(π), BigFloat(π)))) >
               Mag(0)
-        @test iszero(Arblib.radref(Arblib.set!(
-            Arb(prec = 64),
-            (BigFloat(π), BigFloat(π)),
-            prec = precision(BigFloat),
-        )))
+        @test iszero(
+            Arblib.radref(
+                Arblib.set!(
+                    Arb(prec = 64),
+                    (BigFloat(π), BigFloat(π)),
+                    prec = precision(BigFloat),
+                ),
+            ),
+        )
 
         @test_throws ArgumentError Arblib.set!(Arb(), (Arf(2), Arf(1)))
 

@@ -97,10 +97,9 @@
 
         @test precision(Acb(Complex(Arf(prec = 80), Arf(prec = 100)))) == 100
         @test precision(Acb(Complex(Arb(prec = 80), Arb(prec = 100)))) == 100
-        @test precision(Acb(Complex(
-            BigFloat(0, precision = 80),
-            BigFloat(0, precision = 100),
-        ))) == 100
+        @test precision(
+            Acb(Complex(BigFloat(0, precision = 80), BigFloat(0, precision = 100))),
+        ) == 100
 
         @test precision(zero(Arb(prec = 80))) == 80
         @test precision(one(Arb(prec = 80))) == 80

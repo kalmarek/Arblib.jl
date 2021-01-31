@@ -13,6 +13,7 @@ using Arblib, Test, LinearAlgebra
     include("examples.jl")
     include("arithmetic.jl")
     include("rand.jl")
+    include("float.jl")
     include("vector.jl")
     include("matrix.jl")
     include("eigen.jl")

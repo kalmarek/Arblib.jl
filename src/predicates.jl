@@ -105,6 +105,9 @@ for (T, funcpairs) in (
     end
 end
 
+Base.isnan(x::ArbOrRef) = isnan(midref(x))
+Base.isnan(x::AcbOrRef) = isnan(midref(realref(x))) || isnan(midref(imagref(x)))
+
 for ArbT in (ArfLike, ArbLike, AcbLike)
     @eval begin
         Base.isequal(y::$ArbT, x::$ArbT) = !iszero(equal(x, y))
