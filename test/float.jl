@@ -34,5 +34,12 @@
         @test Arblib.eps!(x, x) == eps(Arf(4))
         x = Arb(4)
         @test Arblib.eps!(x, x) == eps(Arb(4))
+
+        @test isnan(eps(zero(Arf)))
+        @test isnan(eps(zero(Arb)))
+        @test isnan(eps(Arf(Inf)))
+        @test isnan(eps(Arb(Inf)))
+        @test isnan(eps(Arf(NaN)))
+        @test isnan(eps(Arb(NaN)))
     end
 end

@@ -1,13 +1,11 @@
 function eps!(res::ArfOrRef, x::ArfOrRef)
-    # FIXME: Should we return NaN here?
-    isspecial(x) && throw(ArgumentError("eps not defined for special values, got $x"))
+    isspecial(x) && return nan!(res)
     return set!(res, set_ulp!(Mag(), x, prec = precision(x)))
 end
 
 function eps!(res::ArbOrRef, x::ArbOrRef)
-    # FIXME: Should we return NaN here?
     mid_x = midref(x)
-    isspecial(mid_x) && throw(ArgumentError("eps not defined for special values, got $x"))
+    isspecial(mid_x) && return indeterminate!(res)
     rad_res = radref(res)
     set_ulp!(rad_res, mid_x, prec = precision(x))
     return set!(res, rad_res)
