@@ -31,21 +31,19 @@ SpecialFunctions.digamma(x::Union{ArbOrRef,AcbOrRef}) = digamma!(zero(x), x)
 #SpecialFunctions.invdigamma(x)
 # Not implemented by Arb
 
-SpecialFunctions.trigamma(x::AcbOrRef) =
-    polygamma(3one(x), x)
+SpecialFunctions.trigamma(x::AcbOrRef) = polygamma(Acb(3, prec = precision(x)), x)
 
-SpecialFunctions.polygamma(s::AcbOrRef, x::AcbOrRef) =
-    polygamma!(zero(x), s, x)
+SpecialFunctions.polygamma(s::AcbOrRef, x::AcbOrRef) = polygamma!(zero(x), s, x)
 
 function SpecialFunctions.gamma_inc(a::ArbOrRef, x::ArbOrRef)
     Γ = hypgeom_gamma_upper!(zero(x), a, x, 1)
     γ = 1 - Γ
-    return (Γ, γ)
+    return (γ, Γ)
 end
 function SpecialFunctions.gamma_inc(a::AcbOrRef, x::AcbOrRef)
     Γ = hypgeom_gamma_upper!(zero(x), a, x, 1)
     γ = 1 - Γ
-    return (Γ, γ)
+    return (γ, Γ)
 end
 
 #gamma_inc_inv(a, p, q)
@@ -63,8 +61,7 @@ function SpecialFunctions.beta_inc(a::AcbOrRef, b::AcbOrRef, x::AcbOrRef)
 end
 
 #loggamma(x)
-SpecialFunctions.loggamma(x::Union{ArbOrRef,AcbOrRef}) =
-    lgamma!(zero(x), x)
+SpecialFunctions.loggamma(x::Union{ArbOrRef,AcbOrRef}) = lgamma!(zero(x), x)
 
 #logabsgamma(x)
 # Not implemented by Arb
@@ -91,10 +88,8 @@ SpecialFunctions.loggamma(x::Union{ArbOrRef,AcbOrRef}) =
 # The version when ν is not specified could be defined directly, but
 # it would likely be better if it was defined in SpecialFunctions
 # directly.
-SpecialFunctions.expint(ν::ArbOrRef, x::ArbOrRef) =
-    hypgeom_expint!(zero(x), ν, x)
-SpecialFunctions.expint(ν::AcbOrRef, x::AcbOrRef) =
-    hypgeom_expint!(zero(x), ν, x)
+SpecialFunctions.expint(ν::ArbOrRef, x::ArbOrRef) = hypgeom_expint!(zero(x), ν, x)
+SpecialFunctions.expint(ν::AcbOrRef, x::AcbOrRef) = hypgeom_expint!(zero(x), ν, x)
 
 SpecialFunctions.expinti(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_ei!(zero(x), x)
 
@@ -113,7 +108,7 @@ SpecialFunctions.erf(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_erf!(zero(x), x)
 #Not implemented by Arb
 
 #SpecialFunctions.erfc(x)
-SpecialFunctions.erfc(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_erc!(zero(x), x)
+SpecialFunctions.erfc(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_erfc!(zero(x), x)
 
 #SpecialFunctions.erfcinv(x)
 #Not implemented by Arb
@@ -193,16 +188,16 @@ end
 ##
 
 #SpecialFunctions.besselj(nu, z)
-SpecialFunctions.besselj(ν::ArbOrRef, z::ArbOrRef) =
-    hypgeom_bessel_j!(zero(z), ν, z)
-SpecialFunctions.besselj(ν::AcbOrRef, z::AcbOrRef) =
-    hypgeom_bessel_j!(zero(z), ν, z)
+SpecialFunctions.besselj(ν::ArbOrRef, z::ArbOrRef) = hypgeom_bessel_j!(zero(z), ν, z)
+SpecialFunctions.besselj(ν::AcbOrRef, z::AcbOrRef) = hypgeom_bessel_j!(zero(z), ν, z)
 
 #SpecialFunctions.besselj0(z)
-SpecialFunctions.besselj0(z::Union{ArbOrRef,AcbOrRef}) = hypgeom_bessel_j!(zero(z), zero(z), z)
+SpecialFunctions.besselj0(z::Union{ArbOrRef,AcbOrRef}) =
+    hypgeom_bessel_j!(zero(z), zero(z), z)
 
 #SpecialFunctions.besselj1(z)
-SpecialFunctions.besselj1(z::Union{ArbOrRef,AcbOrRef}) = hypgeom_bessel_j!(zero(z), one(z), z)
+SpecialFunctions.besselj1(z::Union{ArbOrRef,AcbOrRef}) =
+    hypgeom_bessel_j!(zero(z), one(z), z)
 
 #SpecialFunctions.besseljx(nu,z)
 # Arb doesn't implement a scaled version
@@ -210,19 +205,20 @@ SpecialFunctions.besselj1(z::Union{ArbOrRef,AcbOrRef}) = hypgeom_bessel_j!(zero(
 #SpecialFunctions.sphericalbesselj(nu,z)
 # The general method implemented by SpecialFunctions is not completely
 # rigorous since it makes a cutoff for small values
-sphericalbesselj(ν::ArbOrRef, x::ArbOrRef) = √((float(T))(π)/2x) * besselj(nu + one(nu)/2, x)
+SpecialFunctions.sphericalbesselj(ν::ArbOrRef, x::ArbOrRef) =
+    sqrt(π / 2x) * SpecialFunctions.besselj(ν + 1 // 2, x)
 
 #SpecialFunctions.bessely(nu,z)
-SpecialFunctions.bessely(ν::ArbOrRef, z::ArbOrRef) =
-    hypgeom_bessel_y!(zero(z), ν, z)
-SpecialFunctions.bessely(ν::AcbOrRef, z::AcbOrRef) =
-    hypgeom_bessel_y!(zero(z), ν, z)
+SpecialFunctions.bessely(ν::ArbOrRef, z::ArbOrRef) = hypgeom_bessel_y!(zero(z), ν, z)
+SpecialFunctions.bessely(ν::AcbOrRef, z::AcbOrRef) = hypgeom_bessel_y!(zero(z), ν, z)
 
 #SpecialFunctions.bessely0(z)
-SpecialFunctions.bessely0(z::Union{ArbOrRef,AcbOrRef}) = hypgeom_bessel_y!(zero(z), zero(z), z)
+SpecialFunctions.bessely0(z::Union{ArbOrRef,AcbOrRef}) =
+    hypgeom_bessel_y!(zero(z), zero(z), z)
 
 #SpecialFunctions.bessely1(z)
-SpecialFunctions.bessely1(z::Union{ArbOrRef,AcbOrRef}) = hypgeom_bessel_y!(zero(z), one(z), z)
+SpecialFunctions.bessely1(z::Union{ArbOrRef,AcbOrRef}) =
+    hypgeom_bessel_y!(zero(z), one(z), z)
 
 #SpecialFunctions.besselyx(nu,z)
 # Arb doesn't implement a scaled version
@@ -230,13 +226,15 @@ SpecialFunctions.bessely1(z::Union{ArbOrRef,AcbOrRef}) = hypgeom_bessel_y!(zero(
 #SpecialFunctions.sphericalbessely(nu,z)
 
 #SpecialFunctions.besselh(nu,k,z)
-function SpecialFunctions.besselh(ν::AcbOrRef, k, z::AcbOrRef)
-    J = zero(z), Y = zero(z)
+SpecialFunctions.besselh(ν::ArbOrRef, k::Integer, z::ArbOrRef) =
+    SpecialFunctions.besselh(Acb(ν), k, Acb(z))
+function SpecialFunctions.besselh(ν::AcbOrRef, k::Integer, z::AcbOrRef)
+    J, Y = zero(z), zero(z)
     hypgeom_bessel_jy!(J, Y, ν, z)
     if k == 1
-        return J + im*Y
+        return J + im * Y
     elseif k == 2
-        return J - im*Y
+        return J - im * Y
     else
         throw(SpecialFunctions.AmosException(1)) # This is what SpecialFunctions throw
     end
@@ -255,20 +253,16 @@ end
 # Aliased to besselhx(nu, 2, z)
 
 #SpecialFunctions.besseli(nu,z)
-SpecialFunctions.besseli(ν::ArbOrRef, z::ArbOrRef) =
-    hypgeom_bessel_i!(zero(z), ν, z)
-SpecialFunctions.besseli(ν::AcbOrRef, z::AcbOrRef) =
-    hypgeom_bessel_i!(zero(z), ν, z)
+SpecialFunctions.besseli(ν::ArbOrRef, z::ArbOrRef) = hypgeom_bessel_i!(zero(z), ν, z)
+SpecialFunctions.besseli(ν::AcbOrRef, z::AcbOrRef) = hypgeom_bessel_i!(zero(z), ν, z)
 
 #SpecialFunctions.besselix(nu,z)
 # The scaling used by Arb seems to be different from that used by
 # SpecialFunctions.
 
 #SpecialFunctions.besselk(nu,z)
-SpecialFunctions.besselk(ν::ArbOrRef, z::ArbOrRef) =
-    hypgeom_bessel_k!(zero(z), ν, z)
-SpecialFunctions.besselk(ν::AcbOrRef, z::AcbOrRef) =
-    hypgeom_bessel_k!(zero(z), ν, z)
+SpecialFunctions.besselk(ν::ArbOrRef, z::ArbOrRef) = hypgeom_bessel_k!(zero(z), ν, z)
+SpecialFunctions.besselk(ν::AcbOrRef, z::AcbOrRef) = hypgeom_bessel_k!(zero(z), ν, z)
 
 #SpecialFunctions.besselkx(nu,z)
 SpecialFunctions.besselkx(ν::ArbOrRef, z::ArbOrRef) =

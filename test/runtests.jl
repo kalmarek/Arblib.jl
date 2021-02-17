@@ -1,4 +1,4 @@
-using Arblib, Test, LinearAlgebra
+using Arblib, Test, LinearAlgebra, SpecialFunctions
 
 @testset "Arblib" begin
     include("arb_types-test.jl")
@@ -21,4 +21,5 @@ using Arblib, Test, LinearAlgebra
     include("ref-test.jl")
     include("poly.jl")
     include("series.jl")
+    include("special-functions.jl")
 end
