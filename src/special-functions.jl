@@ -1,25 +1,3 @@
-# TODO: How to handle scaled (or in some other way simply modified)
-# version not implemented by Arb? Should we just make a naive
-# implementation? The user might assume that they are optimized for
-# the scaled version, on the other hand the user will always get a
-# bound on the error so knows if more precision is needed. Discuss
-# with the developers of SpecialFunctions?
-
-# TODO: Which input to take precision from?
-
-# TODO: Should we handle promotion in any way? Would be better if
-# SpecialFunctions could handle this directly.
-
-# TODO: Some (which?) Arb functions are more general than those in
-# SpecialFunctions. How should we handle that?
-
-# TODO: I have not checked that the branch cuts are the same for
-# SpecialFunctions and Arb, I believe in most cases they are.
-
-# TODO: Should we add documentation for the methods which are not
-# identical to those in SpecialFunctions (which are these?)? Should we
-# just refer to Arbs documentation?
-
 ##
 ## Gamma Function
 ##
@@ -204,7 +182,8 @@ SpecialFunctions.besselj1(z::Union{ArbOrRef,AcbOrRef}) =
 
 #SpecialFunctions.sphericalbesselj(nu,z)
 # The general method implemented by SpecialFunctions is not completely
-# rigorous since it makes a cutoff for small values
+# rigorous since it makes a cutoff for small values.
+# TODO: We could check for the special case x = 0
 SpecialFunctions.sphericalbesselj(ν::ArbOrRef, x::ArbOrRef) =
     sqrt(π / 2x) * SpecialFunctions.besselj(ν + 1 // 2, x)
 
@@ -224,6 +203,7 @@ SpecialFunctions.bessely1(z::Union{ArbOrRef,AcbOrRef}) =
 # Arb doesn't implement a scaled version
 
 #SpecialFunctions.sphericalbessely(nu,z)
+# Aliased to √((float(T))(π)/2x) * bessely(nu + one(nu)/2, x) which works fine
 
 #SpecialFunctions.besselh(nu,k,z)
 SpecialFunctions.besselh(ν::ArbOrRef, k::Integer, z::ArbOrRef) =
@@ -290,6 +270,7 @@ SpecialFunctions.ellipe(m::AcbOrRef) = elliptic_e!(zero(m), m)
 #SpecialFunctions.eta(x)
 SpecialFunctions.eta(x::AcbOrRef) = dirichlet_eta!(zero(x), x)
 
+#SpecialFunctions.zeta(x)
 SpecialFunctions.zeta(s::Union{ArbOrRef,AcbOrRef}) = zeta!(zero(s), s)
 SpecialFunctions.zeta(s::ArbOrRef, z::ArbOrRef) = hurwitz_zeta!(zero(s), s, z)
 SpecialFunctions.zeta(s::AcbOrRef, z::AcbOrRef) = hurwitz_zeta!(zero(s), s, z)
