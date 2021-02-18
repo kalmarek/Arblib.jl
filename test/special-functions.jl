@@ -10,6 +10,9 @@
         @test digamma(Acb(2 + 2im)) ≈ digamma(2 + 2im)
         @test digamma(Acb(3 + 3im)) ≈ digamma(3 + 3im)
 
+        @test trigamma(Acb(2 + 2im)) ≈ trigamma(2 + 2im)
+        @test trigamma(Acb(3 + 3im)) ≈ trigamma(3 + 3im)
+
         @test polygamma(Acb(2), Acb(3 + 3im)) ≈ polygamma(2, 3 + 3im)
         @test polygamma(Acb(3), Acb(4 + 4im)) ≈ polygamma(3, 4 + 4im)
 

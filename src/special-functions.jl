@@ -9,7 +9,8 @@ SpecialFunctions.digamma(x::Union{ArbOrRef,AcbOrRef}) = digamma!(zero(x), x)
 #SpecialFunctions.invdigamma(x)
 # Not implemented by Arb
 
-SpecialFunctions.trigamma(x::AcbOrRef) = polygamma(Acb(3, prec = precision(x)), x)
+SpecialFunctions.trigamma(x::AcbOrRef) =
+    SpecialFunctions.polygamma(Acb(1, prec = precision(x)), x)
 
 SpecialFunctions.polygamma(s::AcbOrRef, x::AcbOrRef) = polygamma!(zero(x), s, x)
 
