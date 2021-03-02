@@ -9,19 +9,25 @@ SpecialFunctions.digamma(x::Union{ArbOrRef,AcbOrRef}) = digamma!(zero(x), x)
 #SpecialFunctions.invdigamma(x)
 # Not implemented by Arb
 
-SpecialFunctions.trigamma(x::AcbOrRef) =
-    SpecialFunctions.polygamma(Acb(1, prec = precision(x)), x)
+function SpecialFunctions.trigamma(x::AcbOrRef)
+    res = one(x)
+    return polygamma!(res, res, x)
+end
 
 SpecialFunctions.polygamma(s::AcbOrRef, x::AcbOrRef) = polygamma!(zero(x), s, x)
 
 function SpecialFunctions.gamma_inc(a::ArbOrRef, x::ArbOrRef)
-    Γ = hypgeom_gamma_upper!(zero(x), a, x, 1)
-    γ = 1 - Γ
+    Γ = hypgeom_gamma_upper!(Arb(0, prec = _precision((a, x))), a, x, 1)
+    # γ = 1 - Γ
+    γ = neg!(Arb(0, prec = _precision((a, x))), Γ)
+    add!(γ, γ, 1)
     return (γ, Γ)
 end
 function SpecialFunctions.gamma_inc(a::AcbOrRef, x::AcbOrRef)
-    Γ = hypgeom_gamma_upper!(zero(x), a, x, 1)
-    γ = 1 - Γ
+    Γ = hypgeom_gamma_upper!(Acb(0, prec = _precision((a, x))), a, x, 1)
+    # γ = 1 - Γ
+    γ = neg!(Acb(0, prec = _precision((a, x))), Γ)
+    add!(γ, γ, 1)
     return (γ, Γ)
 end
 
@@ -29,14 +35,18 @@ end
 # Not implemented by Arb
 
 function SpecialFunctions.beta_inc(a::ArbOrRef, b::ArbOrRef, x::ArbOrRef)
-    β = hypgeom_beta_lower!(zero(x), a, b, x, 1)
-    B = 1 - β
-    return (β, B)
+    β = hypgeom_beta_lower!(Arb(prec = _precision((a, x))), a, b, x, 1)
+    # Β = 1 - β
+    Β = neg!(Arb(0, prec = _precision((a, x))), β)
+    add!(Β, Β, 1)
+    return (β, Β)
 end
 function SpecialFunctions.beta_inc(a::AcbOrRef, b::AcbOrRef, x::AcbOrRef)
-    β = hypgeom_beta_lower!(zero(x), a, b, x, 1)
-    B = 1 - β
-    return (β, B)
+    β = hypgeom_beta_lower!(Acb(prec = _precision((a, x))), a, b, x, 1)
+    # Β = 1 - β
+    Β = neg!(Acb(0, prec = _precision((a, x))), β)
+    add!(Β, Β, 1)
+    return (β, Β)
 end
 
 #loggamma(x)
@@ -67,8 +77,10 @@ SpecialFunctions.loggamma(x::Union{ArbOrRef,AcbOrRef}) = lgamma!(zero(x), x)
 # The version when ν is not specified could be defined directly, but
 # it would likely be better if it was defined in SpecialFunctions
 # directly.
-SpecialFunctions.expint(ν::ArbOrRef, x::ArbOrRef) = hypgeom_expint!(zero(x), ν, x)
-SpecialFunctions.expint(ν::AcbOrRef, x::AcbOrRef) = hypgeom_expint!(zero(x), ν, x)
+SpecialFunctions.expint(ν::ArbOrRef, x::ArbOrRef) =
+    hypgeom_expint!(Arb(prec = _precision((ν, x))), ν, x)
+SpecialFunctions.expint(ν::AcbOrRef, x::AcbOrRef) =
+    hypgeom_expint!(Acb(prec = _precision((ν, x))), ν, x)
 
 SpecialFunctions.expinti(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_ei!(zero(x), x)
 
@@ -115,38 +127,136 @@ SpecialFunctions.erfc(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_erfc!(zero(x), x)
 ##
 
 #SpecialFunctions.airyai(z)
-# TODO: If we could pass NULL for the three unused values we could
-# speed up the computation.
-function SpecialFunctions.airyai(z::Union{ArbOrRef,AcbOrRef})
+function SpecialFunctions.airyai(z::ArbOrRef)
     ai = zero(z)
-    hypgeom_airy!(ai, zero(z), zero(z), zero(z), z)
+    ccall(
+        @libarb(arb_hypgeom_airy),
+        Cvoid,
+        (Ref{arb_struct}, Ref{Cvoid}, Ref{Cvoid}, Ref{Cvoid}, Ref{arb_struct}, Int64),
+        ai,
+        C_NULL,
+        C_NULL,
+        C_NULL,
+        z,
+        precision(z),
+    )
+    return ai
+end
+function SpecialFunctions.airyai(z::AcbOrRef)
+    ai = zero(z)
+    ccall(
+        @libarb(acb_hypgeom_airy),
+        Cvoid,
+        (Ref{acb_struct}, Ref{Cvoid}, Ref{Cvoid}, Ref{Cvoid}, Ref{acb_struct}, Int64),
+        ai,
+        C_NULL,
+        C_NULL,
+        C_NULL,
+        z,
+        precision(z),
+    )
     return ai
 end
 
 #SpecialFunctions.airyaiprime(z)
 # TODO: If we could pass NULL for the three unused values we could
 # speed up the computation.
-function SpecialFunctions.airyaiprime(z::Union{ArbOrRef,AcbOrRef})
+function SpecialFunctions.airyaiprime(z::ArbOrRef)
     ai_prime = zero(z)
-    hypgeom_airy!(zero(z), ai_prime, zero(z), zero(z), z)
+    ccall(
+        @libarb(arb_hypgeom_airy),
+        Cvoid,
+        (Ref{Cvoid}, Ref{arb_struct}, Ref{Cvoid}, Ref{Cvoid}, Ref{arb_struct}, Int64),
+        C_NULL,
+        ai_prime,
+        C_NULL,
+        C_NULL,
+        z,
+        precision(z),
+    )
+    return ai_prime
+end
+function SpecialFunctions.airyaiprime(z::AcbOrRef)
+    ai_prime = zero(z)
+    ccall(
+        @libarb(acb_hypgeom_airy),
+        Cvoid,
+        (Ref{Cvoid}, Ref{acb_struct}, Ref{Cvoid}, Ref{Cvoid}, Ref{acb_struct}, Int64),
+        C_NULL,
+        ai_prime,
+        C_NULL,
+        C_NULL,
+        z,
+        precision(z),
+    )
     return ai_prime
 end
 
 #SpecialFunctions.airybi(z)
 # TODO: If we could pass NULL for the three unused values we could
 # speed up the computation.
-function SpecialFunctions.airybi(z::Union{ArbOrRef,AcbOrRef})
+function SpecialFunctions.airybi(z::ArbOrRef)
     bi = zero(z)
-    hypgeom_airy!(zero(z), zero(z), bi, zero(z), z)
+    ccall(
+        @libarb(arb_hypgeom_airy),
+        Cvoid,
+        (Ref{Cvoid}, Ref{Cvoid}, Ref{arb_struct}, Ref{Cvoid}, Ref{arb_struct}, Int64),
+        C_NULL,
+        C_NULL,
+        bi,
+        C_NULL,
+        z,
+        precision(z),
+    )
+    return bi
+end
+function SpecialFunctions.airybi(z::AcbOrRef)
+    bi = zero(z)
+    ccall(
+        @libarb(acb_hypgeom_airy),
+        Cvoid,
+        (Ref{Cvoid}, Ref{Cvoid}, Ref{acb_struct}, Ref{Cvoid}, Ref{acb_struct}, Int64),
+        C_NULL,
+        C_NULL,
+        bi,
+        C_NULL,
+        z,
+        precision(z),
+    )
     return bi
 end
 
 #SpecialFunctions.airybiprime(z)
 # TODO: If we could pass NULL for the three unused values we could
 # speed up the computation.
-function SpecialFunctions.airybiprime(z::Union{ArbOrRef,AcbOrRef})
+function SpecialFunctions.airybiprime(z::ArbOrRef)
     bi_prime = zero(z)
-    hypgeom_airy!(zero(z), zero(z), zero(z), bi_prime, z)
+    ccall(
+        @libarb(arb_hypgeom_airy),
+        Cvoid,
+        (Ref{Cvoid}, Ref{Cvoid}, Ref{Cvoid}, Ref{arb_struct}, Ref{arb_struct}, Int64),
+        C_NULL,
+        C_NULL,
+        C_NULL,
+        bi_prime,
+        z,
+        precision(z),
+    )
+    return bi_prime
+end
+function SpecialFunctions.airybiprime(z::AcbOrRef)
+    bi_prime = zero(z)
+    ccall(
+        @libarb(acb_hypgeom_airy),
+        Cvoid,
+        (Ref{Cvoid}, Ref{Cvoid}, Ref{Cvoid}, Ref{acb_struct}, Ref{acb_struct}, Int64),
+        C_NULL,
+        C_NULL,
+        C_NULL,
+        bi_prime,
+        z,
+        precision(z),
+    )
     return bi_prime
 end
 
@@ -167,16 +277,22 @@ end
 ##
 
 #SpecialFunctions.besselj(nu, z)
-SpecialFunctions.besselj(ν::ArbOrRef, z::ArbOrRef) = hypgeom_bessel_j!(zero(z), ν, z)
-SpecialFunctions.besselj(ν::AcbOrRef, z::AcbOrRef) = hypgeom_bessel_j!(zero(z), ν, z)
+SpecialFunctions.besselj(ν::ArbOrRef, z::ArbOrRef) =
+    hypgeom_bessel_j!(Arb(0, prec = _precision((ν, z))), ν, z)
+SpecialFunctions.besselj(ν::AcbOrRef, z::AcbOrRef) =
+    hypgeom_bessel_j!(Acb(0, prec = _precision((ν, z))), ν, z)
 
 #SpecialFunctions.besselj0(z)
-SpecialFunctions.besselj0(z::Union{ArbOrRef,AcbOrRef}) =
-    hypgeom_bessel_j!(zero(z), zero(z), z)
+function SpecialFunctions.besselj0(z::Union{ArbOrRef,AcbOrRef})
+    res = zero(z)
+    return hypgeom_bessel_j!(res, res, z)
+end
 
 #SpecialFunctions.besselj1(z)
-SpecialFunctions.besselj1(z::Union{ArbOrRef,AcbOrRef}) =
-    hypgeom_bessel_j!(zero(z), one(z), z)
+function SpecialFunctions.besselj1(z::Union{ArbOrRef,AcbOrRef})
+    res = one(z)
+    return hypgeom_bessel_j!(res, res, z)
+end
 
 #SpecialFunctions.besseljx(nu,z)
 # Arb doesn't implement a scaled version
@@ -185,20 +301,38 @@ SpecialFunctions.besselj1(z::Union{ArbOrRef,AcbOrRef}) =
 # The general method implemented by SpecialFunctions is not completely
 # rigorous since it makes a cutoff for small values.
 # TODO: We could check for the special case x = 0
-SpecialFunctions.sphericalbesselj(ν::ArbOrRef, x::ArbOrRef) =
-    sqrt(π / 2x) * SpecialFunctions.besselj(ν + 1 // 2, x)
+function SpecialFunctions.sphericalbesselj(ν::ArbOrRef, x::ArbOrRef)
+    # res = besselj(ν + 1 // 2, x)
+    res = Arb(1 // 2, prec = _precision((ν, x)))
+    add!(res, res, ν)
+    hypgeom_bessel_j!(res, res, x)
+
+    # factor = sqrt(π / 2x)
+    factor = Arb(π, prec = _precision((ν, x)))
+    div!(factor, factor, x)
+    mul_2exp!(factor, factor, -1)
+    sqrt!(factor, factor)
+
+    return mul!(res, factor, res)
+end
 
 #SpecialFunctions.bessely(nu,z)
-SpecialFunctions.bessely(ν::ArbOrRef, z::ArbOrRef) = hypgeom_bessel_y!(zero(z), ν, z)
-SpecialFunctions.bessely(ν::AcbOrRef, z::AcbOrRef) = hypgeom_bessel_y!(zero(z), ν, z)
+SpecialFunctions.bessely(ν::ArbOrRef, z::ArbOrRef) =
+    hypgeom_bessel_y!(Arb(0, prec = _precision((ν, z))), ν, z)
+SpecialFunctions.bessely(ν::AcbOrRef, z::AcbOrRef) =
+    hypgeom_bessel_y!(Acb(0, prec = _precision((ν, z))), ν, z)
 
 #SpecialFunctions.bessely0(z)
-SpecialFunctions.bessely0(z::Union{ArbOrRef,AcbOrRef}) =
-    hypgeom_bessel_y!(zero(z), zero(z), z)
+function SpecialFunctions.bessely0(z::Union{ArbOrRef,AcbOrRef})
+    res = zero(z)
+    return hypgeom_bessel_y!(res, res, z)
+end
 
 #SpecialFunctions.bessely1(z)
-SpecialFunctions.bessely1(z::Union{ArbOrRef,AcbOrRef}) =
-    hypgeom_bessel_y!(zero(z), one(z), z)
+function SpecialFunctions.bessely1(z::Union{ArbOrRef,AcbOrRef})
+    res = one(z)
+    return hypgeom_bessel_y!(res, res, z)
+end
 
 #SpecialFunctions.besselyx(nu,z)
 # Arb doesn't implement a scaled version
@@ -210,12 +344,13 @@ SpecialFunctions.bessely1(z::Union{ArbOrRef,AcbOrRef}) =
 SpecialFunctions.besselh(ν::ArbOrRef, k::Integer, z::ArbOrRef) =
     SpecialFunctions.besselh(Acb(ν), k, Acb(z))
 function SpecialFunctions.besselh(ν::AcbOrRef, k::Integer, z::AcbOrRef)
-    J, Y = zero(z), zero(z)
+    J, Y = Acb(prec = _precision((ν, z))), Acb(prec = _precision((ν, z)))
     hypgeom_bessel_jy!(J, Y, ν, z)
+    mul_onei!(Y, Y)
     if k == 1
-        return J + im * Y
+        return add!(J, J, Y)
     elseif k == 2
-        return J - im * Y
+        return sub!(J, J, Y)
     else
         throw(SpecialFunctions.AmosException(1)) # This is what SpecialFunctions throw
     end
@@ -234,22 +369,26 @@ end
 # Aliased to besselhx(nu, 2, z)
 
 #SpecialFunctions.besseli(nu,z)
-SpecialFunctions.besseli(ν::ArbOrRef, z::ArbOrRef) = hypgeom_bessel_i!(zero(z), ν, z)
-SpecialFunctions.besseli(ν::AcbOrRef, z::AcbOrRef) = hypgeom_bessel_i!(zero(z), ν, z)
+SpecialFunctions.besseli(ν::ArbOrRef, z::ArbOrRef) =
+    hypgeom_bessel_i!(Arb(prec = _precision((ν, z))), ν, z)
+SpecialFunctions.besseli(ν::AcbOrRef, z::AcbOrRef) =
+    hypgeom_bessel_i!(Acb(prec = _precision((ν, z))), ν, z)
 
 #SpecialFunctions.besselix(nu,z)
 # The scaling used by Arb seems to be different from that used by
 # SpecialFunctions.
 
 #SpecialFunctions.besselk(nu,z)
-SpecialFunctions.besselk(ν::ArbOrRef, z::ArbOrRef) = hypgeom_bessel_k!(zero(z), ν, z)
-SpecialFunctions.besselk(ν::AcbOrRef, z::AcbOrRef) = hypgeom_bessel_k!(zero(z), ν, z)
+SpecialFunctions.besselk(ν::ArbOrRef, z::ArbOrRef) =
+    hypgeom_bessel_k!(Arb(prec = _precision((ν, z))), ν, z)
+SpecialFunctions.besselk(ν::AcbOrRef, z::AcbOrRef) =
+    hypgeom_bessel_k!(Acb(prec = _precision((ν, z))), ν, z)
 
 #SpecialFunctions.besselkx(nu,z)
 SpecialFunctions.besselkx(ν::ArbOrRef, z::ArbOrRef) =
-    hypgeom_bessel_k_scaled!(zero(z), ν, z)
+    hypgeom_bessel_k_scaled!(Arb(prec = _precision((ν, z))), ν, z)
 SpecialFunctions.besselkx(ν::AcbOrRef, z::AcbOrRef) =
-    hypgeom_bessel_k_scaled!(zero(z), ν, z)
+    hypgeom_bessel_k_scaled!(Acb(prec = _precision((ν, z))), ν, z)
 
 #jinc(x)
 # Aliased to 2 * besselj1(π*x) / (π*x) which works fine
@@ -273,5 +412,7 @@ SpecialFunctions.eta(x::AcbOrRef) = dirichlet_eta!(zero(x), x)
 
 #SpecialFunctions.zeta(x)
 SpecialFunctions.zeta(s::Union{ArbOrRef,AcbOrRef}) = zeta!(zero(s), s)
-SpecialFunctions.zeta(s::ArbOrRef, z::ArbOrRef) = hurwitz_zeta!(zero(s), s, z)
-SpecialFunctions.zeta(s::AcbOrRef, z::AcbOrRef) = hurwitz_zeta!(zero(s), s, z)
+SpecialFunctions.zeta(s::ArbOrRef, z::ArbOrRef) =
+    hurwitz_zeta!(Arb(prec = _precision((s, z))), s, z)
+SpecialFunctions.zeta(s::AcbOrRef, z::AcbOrRef) =
+    hurwitz_zeta!(Acb(prec = _precision((s, z))), s, z)
