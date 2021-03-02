@@ -247,3 +247,18 @@ let prec = 64
     end
 end
 ```
+
+## Special functions
+Arblib extends the methods from
+[SpecialFunctions.jl](https://github.com/JuliaMath/SpecialFunctions.jl)
+with versions from Arb. In some cases the Arb version is more general
+than the version in SpecialFunctions, for example `ellipk` is not
+implemented for complex arguments in SpecialFunctions but it is in
+Arb. We refer to the Arb documentation for details about the
+Arb-versions.
+
+Some methods from SpecialFunctions are however not implemented in Arb
+and does are not extended, these are mostly scaled version of methods.
+Arb does however implement many special functions that are not in
+SpecialFunction and at the moment there is no user friendly interface
+for most of them.
