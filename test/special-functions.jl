@@ -5,6 +5,11 @@
         @test gamma(Acb(2 + 2im)) ≈ gamma(2 + 2im)
         @test gamma(Acb(3 + 3im)) ≈ gamma(3 + 3im)
 
+        @test loggamma(Arb(2)) ≈ loggamma(2)
+        @test loggamma(Arb(3)) ≈ loggamma(3)
+        @test loggamma(Acb(2 + 2im)) ≈ loggamma(2 + 2im)
+        @test loggamma(Acb(3 + 3im)) ≈ loggamma(3 + 3im)
+
         @test digamma(Arb(2)) ≈ digamma(2)
         @test digamma(Arb(3)) ≈ digamma(3)
         @test digamma(Acb(2 + 2im)) ≈ digamma(2 + 2im)
@@ -16,6 +21,11 @@
         @test polygamma(Acb(2), Acb(3 + 3im)) ≈ polygamma(2, 3 + 3im)
         @test polygamma(Acb(3), Acb(4 + 4im)) ≈ polygamma(3, 4 + 4im)
 
+        @test gamma(Arb(2), Arb(3)) ≈ gamma(2, 3)
+        @test gamma(Arb(3), Arb(4)) ≈ gamma(3, 4)
+        @test gamma(Acb(2 + 2im), Acb(3 + 3im)) ≈ gamma(2 + 2im, 3 + 3im)
+        @test gamma(Acb(3 + 3im), Acb(4 + 4im)) ≈ gamma(3 + 3im, 4 + 4im)
+
         @test all(gamma_inc(Arb(2), Arb(3)) .≈ gamma_inc(2, 3))
         @test all(gamma_inc(Arb(3), Arb(4)) .≈ gamma_inc(3, 4))
         @test all(gamma_inc(Acb(2), Acb(3)) .≈ gamma_inc(2, 3))
@@ -24,11 +34,6 @@
         @test all(beta_inc(Arb(3), Arb(4), Arb(1 // 4)) .≈ beta_inc(3.0, 4.0, 0.25))
         @test all(beta_inc(Acb(2), Acb(3), Acb(1 // 2)) .≈ beta_inc(2.0, 3.0, 0.5))
         @test all(beta_inc(Acb(3), Acb(4), Acb(1 // 4)) .≈ beta_inc(3.0, 4.0, 0.25))
-
-        @test loggamma(Arb(2)) ≈ loggamma(2)
-        @test loggamma(Arb(3)) ≈ loggamma(3)
-        @test loggamma(Acb(2 + 2im)) ≈ loggamma(2 + 2im)
-        @test loggamma(Acb(3 + 3im)) ≈ loggamma(3 + 3im)
     end
 
     @testset "Trigonometric Integrals" begin
@@ -36,6 +41,11 @@
         @test expint(Arb(3), Arb(4)) ≈ expint(3, 4)
         @test expint(Acb(2 + 2im), Acb(3 + 3im)) ≈ expint(2 + 2im, 3 + 3im)
         @test expint(Acb(3 + 3im), Acb(4 + 4im)) ≈ expint(3 + 3im, 4 + 4im)
+
+        @test expint(Arb(2)) ≈ expint(2)
+        @test expint(Arb(3)) ≈ expint(3)
+        @test expint(Acb(2 + 2im)) ≈ expint(2 + 2im)
+        @test expint(Acb(3 + 3im)) ≈ expint(3 + 3im)
 
         @test expinti(Arb(2)) ≈ expinti(2)
         @test expinti(Arb(3)) ≈ expinti(3)

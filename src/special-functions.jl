@@ -4,6 +4,14 @@
 
 SpecialFunctions.gamma(z::Union{ArbOrRef,AcbOrRef}) = gamma!(zero(z), z)
 
+SpecialFunctions.loggamma(x::Union{ArbOrRef,AcbOrRef}) = lgamma!(zero(x), x)
+
+#SpecialFunctions.logabsgamma(x)
+# Not implemented by Arb
+
+#SpecialFunctions.logfactorial(x)
+# Only relevant for Arblib
+
 SpecialFunctions.digamma(x::Union{ArbOrRef,AcbOrRef}) = digamma!(zero(x), x)
 
 #SpecialFunctions.invdigamma(x)
@@ -15,6 +23,14 @@ function SpecialFunctions.trigamma(x::AcbOrRef)
 end
 
 SpecialFunctions.polygamma(s::AcbOrRef, x::AcbOrRef) = polygamma!(zero(x), s, x)
+
+SpecialFunctions.gamma(a::ArbOrRef, z::ArbOrRef) =
+    hypgeom_gamma_upper!(Arb(0, prec = _precision((a, z))), a, z, 0)
+SpecialFunctions.gamma(a::AcbOrRef, z::AcbOrRef) =
+    hypgeom_gamma_upper!(Acb(0, prec = _precision((a, z))), a, z, 0)
+
+#loggamma(a,z)
+# Not implemented by Arb
 
 function SpecialFunctions.gamma_inc(a::ArbOrRef, x::ArbOrRef)
     Γ = hypgeom_gamma_upper!(Arb(0, prec = _precision((a, x))), a, x, 1)
@@ -31,9 +47,6 @@ function SpecialFunctions.gamma_inc(a::AcbOrRef, x::AcbOrRef)
     return (γ, Γ)
 end
 
-#gamma_inc_inv(a, p, q)
-# Not implemented by Arb
-
 function SpecialFunctions.beta_inc(a::ArbOrRef, b::ArbOrRef, x::ArbOrRef)
     β = hypgeom_beta_lower!(Arb(prec = _precision((a, x))), a, b, x, 1)
     # Β = 1 - β
@@ -49,14 +62,8 @@ function SpecialFunctions.beta_inc(a::AcbOrRef, b::AcbOrRef, x::AcbOrRef)
     return (β, Β)
 end
 
-#loggamma(x)
-SpecialFunctions.loggamma(x::Union{ArbOrRef,AcbOrRef}) = lgamma!(zero(x), x)
-
-#logabsgamma(x)
+#gamma_inc_inv(a, p, q)
 # Not implemented by Arb
-
-#logfactorial(x)
-# Only relevant for integers, which doesn't apply to Arblib
 
 #beta(x,y)
 # Not implemented directly by Arb, could use beta_inc or gamma to implement it?
@@ -71,7 +78,7 @@ SpecialFunctions.loggamma(x::Union{ArbOrRef,AcbOrRef}) = lgamma!(zero(x), x)
 #Not implemented by Arb
 
 ##
-## Trigonometric Integrals
+## Exponential and Trigonometric Integrals
 ##
 
 # The version when ν is not specified could be defined directly, but
@@ -82,7 +89,15 @@ SpecialFunctions.expint(ν::ArbOrRef, x::ArbOrRef) =
 SpecialFunctions.expint(ν::AcbOrRef, x::AcbOrRef) =
     hypgeom_expint!(Acb(prec = _precision((ν, x))), ν, x)
 
+function SpecialFunctions.expint(x::Union{ArbOrRef,AcbOrRef})
+    ν = one(x)
+    return hypgeom_expint!(ν, ν, x)
+end
+
 SpecialFunctions.expinti(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_ei!(zero(x), x)
+
+#expintx(x)
+# Not implemented by arb
 
 SpecialFunctions.sinint(x::Union{ArbOrRef,AcbOrRef}) = hypgeom!(zero(x), x)
 
@@ -92,41 +107,38 @@ SpecialFunctions.cosint(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_ci!(zero(x), x)
 ## Error Functions, Dawson’s and Fresnel Integrals
 ##
 
-#SpecialFunctions.erf(x)
 SpecialFunctions.erf(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_erf!(zero(x), x)
 
 #SpecialFunctions.erf(x,y)
-#Not implemented by Arb
+# Not implemented by Arb
 
-#SpecialFunctions.erfc(x)
 SpecialFunctions.erfc(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_erfc!(zero(x), x)
 
 #SpecialFunctions.erfcinv(x)
-#Not implemented by Arb
+# Not implemented by Arb
 
 #SpecialFunctions.erfcx(x)
-#Not implemented by Arb
+# Not implemented by Arb
 
 #SpecialFunctions.logerfc(x)
-#Not implemented by Arb
+# Not implemented by Arb
 
 #SpecialFunctions.logerfcx(x)
-#Not implemented by Arb
+# Not implemented by Arb
 
 #SpecialFunctions.erfi(x)
-#Not implemented by Arb
+# Not implemented by Arb
 
 #SpecialFunctions.erfinv(x)
-#Not implemented by Arb
+# Not implemented by Arb
 
 #SpecialFunctions.dawson(x)
-#Not implemented by Arb
+# Not implemented by Arb
 
 ##
 ## Airy and Related Functions
 ##
 
-#SpecialFunctions.airyai(z)
 function SpecialFunctions.airyai(z::ArbOrRef)
     ai = zero(z)
     ccall(
@@ -158,9 +170,6 @@ function SpecialFunctions.airyai(z::AcbOrRef)
     return ai
 end
 
-#SpecialFunctions.airyaiprime(z)
-# TODO: If we could pass NULL for the three unused values we could
-# speed up the computation.
 function SpecialFunctions.airyaiprime(z::ArbOrRef)
     ai_prime = zero(z)
     ccall(
@@ -192,9 +201,6 @@ function SpecialFunctions.airyaiprime(z::AcbOrRef)
     return ai_prime
 end
 
-#SpecialFunctions.airybi(z)
-# TODO: If we could pass NULL for the three unused values we could
-# speed up the computation.
 function SpecialFunctions.airybi(z::ArbOrRef)
     bi = zero(z)
     ccall(
@@ -226,9 +232,6 @@ function SpecialFunctions.airybi(z::AcbOrRef)
     return bi
 end
 
-#SpecialFunctions.airybiprime(z)
-# TODO: If we could pass NULL for the three unused values we could
-# speed up the computation.
 function SpecialFunctions.airybiprime(z::ArbOrRef)
     bi_prime = zero(z)
     ccall(
@@ -261,41 +264,38 @@ function SpecialFunctions.airybiprime(z::AcbOrRef)
 end
 
 #SpecialFunctions.airyaix(z)
-#Not implemented by Arb
+# Not implemented by Arb
 
 #SpecialFunctions.airyaiprimex(z)
-#Not implemented by Arb
+# Not implemented by Arb
 
 #SpecialFunctions.airybix(z)
-#Not implemented by Arb
+# Not implemented by Arb
 
 #SpecialFunctions.airybiprimex(z)
-#Not implemented by Arb
+# Not implemented by Arb
 
 ##
 ## Bessel Functions
 ##
 
-#SpecialFunctions.besselj(nu, z)
 SpecialFunctions.besselj(ν::ArbOrRef, z::ArbOrRef) =
     hypgeom_bessel_j!(Arb(0, prec = _precision((ν, z))), ν, z)
 SpecialFunctions.besselj(ν::AcbOrRef, z::AcbOrRef) =
     hypgeom_bessel_j!(Acb(0, prec = _precision((ν, z))), ν, z)
 
-#SpecialFunctions.besselj0(z)
 function SpecialFunctions.besselj0(z::Union{ArbOrRef,AcbOrRef})
     res = zero(z)
     return hypgeom_bessel_j!(res, res, z)
 end
 
-#SpecialFunctions.besselj1(z)
 function SpecialFunctions.besselj1(z::Union{ArbOrRef,AcbOrRef})
     res = one(z)
     return hypgeom_bessel_j!(res, res, z)
 end
 
 #SpecialFunctions.besseljx(nu,z)
-# Arb doesn't implement a scaled version
+# Not implemented by Arb
 
 #SpecialFunctions.sphericalbesselj(nu,z)
 # The general method implemented by SpecialFunctions is not completely
@@ -316,31 +316,27 @@ function SpecialFunctions.sphericalbesselj(ν::ArbOrRef, x::ArbOrRef)
     return mul!(res, factor, res)
 end
 
-#SpecialFunctions.bessely(nu,z)
 SpecialFunctions.bessely(ν::ArbOrRef, z::ArbOrRef) =
     hypgeom_bessel_y!(Arb(0, prec = _precision((ν, z))), ν, z)
 SpecialFunctions.bessely(ν::AcbOrRef, z::AcbOrRef) =
     hypgeom_bessel_y!(Acb(0, prec = _precision((ν, z))), ν, z)
 
-#SpecialFunctions.bessely0(z)
 function SpecialFunctions.bessely0(z::Union{ArbOrRef,AcbOrRef})
     res = zero(z)
     return hypgeom_bessel_y!(res, res, z)
 end
 
-#SpecialFunctions.bessely1(z)
 function SpecialFunctions.bessely1(z::Union{ArbOrRef,AcbOrRef})
     res = one(z)
     return hypgeom_bessel_y!(res, res, z)
 end
 
 #SpecialFunctions.besselyx(nu,z)
-# Arb doesn't implement a scaled version
+# Not implemented by Arb
 
 #SpecialFunctions.sphericalbessely(nu,z)
 # Aliased to √((float(T))(π)/2x) * bessely(nu + one(nu)/2, x) which works fine
 
-#SpecialFunctions.besselh(nu,k,z)
 SpecialFunctions.besselh(ν::ArbOrRef, k::Integer, z::ArbOrRef) =
     SpecialFunctions.besselh(Acb(ν), k, Acb(z))
 function SpecialFunctions.besselh(ν::AcbOrRef, k::Integer, z::AcbOrRef)
@@ -356,6 +352,9 @@ function SpecialFunctions.besselh(ν::AcbOrRef, k::Integer, z::AcbOrRef)
     end
 end
 
+#SpecialFunctions.besselhx(nu,k,z)
+# Not implemented by Arb
+
 #SpecialFunctions.hankelh1(nu,z)
 # Aliased to besselh(nu, 1, z)
 
@@ -368,7 +367,6 @@ end
 #SpecialFunctions.hankelh2x(nu,z)
 # Aliased to besselhx(nu, 2, z)
 
-#SpecialFunctions.besseli(nu,z)
 SpecialFunctions.besseli(ν::ArbOrRef, z::ArbOrRef) =
     hypgeom_bessel_i!(Arb(prec = _precision((ν, z))), ν, z)
 SpecialFunctions.besseli(ν::AcbOrRef, z::AcbOrRef) =
@@ -378,13 +376,11 @@ SpecialFunctions.besseli(ν::AcbOrRef, z::AcbOrRef) =
 # The scaling used by Arb seems to be different from that used by
 # SpecialFunctions.
 
-#SpecialFunctions.besselk(nu,z)
 SpecialFunctions.besselk(ν::ArbOrRef, z::ArbOrRef) =
     hypgeom_bessel_k!(Arb(prec = _precision((ν, z))), ν, z)
 SpecialFunctions.besselk(ν::AcbOrRef, z::AcbOrRef) =
     hypgeom_bessel_k!(Acb(prec = _precision((ν, z))), ν, z)
 
-#SpecialFunctions.besselkx(nu,z)
 SpecialFunctions.besselkx(ν::ArbOrRef, z::ArbOrRef) =
     hypgeom_bessel_k_scaled!(Arb(prec = _precision((ν, z))), ν, z)
 SpecialFunctions.besselkx(ν::AcbOrRef, z::AcbOrRef) =
@@ -397,20 +393,16 @@ SpecialFunctions.besselkx(ν::AcbOrRef, z::AcbOrRef) =
 ## Elliptic Integrals
 ##
 
-#SpecialFunctions.ellipk(m)
 SpecialFunctions.ellipk(m::AcbOrRef) = elliptic_k!(zero(m), m)
 
-#SpecialFunctions.ellipe(m)
 SpecialFunctions.ellipe(m::AcbOrRef) = elliptic_e!(zero(m), m)
 
 ##
 ## Zeta and Related Functions
 ##
 
-#SpecialFunctions.eta(x)
 SpecialFunctions.eta(x::AcbOrRef) = dirichlet_eta!(zero(x), x)
 
-#SpecialFunctions.zeta(x)
 SpecialFunctions.zeta(s::Union{ArbOrRef,AcbOrRef}) = zeta!(zero(s), s)
 SpecialFunctions.zeta(s::ArbOrRef, z::ArbOrRef) =
     hurwitz_zeta!(Arb(prec = _precision((s, z))), s, z)
