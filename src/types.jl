@@ -257,6 +257,10 @@ for prefix in [:mag, :arf, :arb, :acb]
     end
 end
 
+# ArbSeries and AcbSeries don't have Ref types but are often used in
+# similar code. It's convenient to have this method then.
+_nonreftype(::Type{T}) where {T<:Union{ArbSeries,AcbSeries}} = T
+
 const MagOrRef = Union{Mag,MagRef}
 const ArfOrRef = Union{Arf,ArfRef}
 const ArbOrRef = Union{Arb,ArbRef}
