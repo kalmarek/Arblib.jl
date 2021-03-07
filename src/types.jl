@@ -97,7 +97,7 @@ struct ArbSeries <: Number
     degree::Int
     prec::Int
 
-    ArbSeries(degree::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+    ArbSeries(; degree::Integer = 0, prec::Integer = DEFAULT_PRECISION[]) =
         new(arb_poly_struct(), degree, prec)
 end
 
@@ -119,7 +119,7 @@ struct AcbSeries <: Number
     degree::Int
     prec::Int
 
-    AcbSeries(degree::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+    AcbSeries(; degree::Integer = 0, prec::Integer = DEFAULT_PRECISION[]) =
         new(acb_poly_struct(), degree, prec)
 end
 

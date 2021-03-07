@@ -50,9 +50,9 @@
     end
 
     @testset "ArbSeries" begin
-        @test ArbSeries(3) isa ArbSeries
-        @test precision(ArbSeries(3, prec = 80)) == 80
-        @test ArbSeries(3).degree == 3
+        @test ArbSeries() isa ArbSeries
+        @test precision(ArbSeries(prec = 80)) == 80
+        @test ArbSeries(degree = 3).degree == 3
     end
 
     @testset "AcbPoly" begin
@@ -61,8 +61,8 @@
     end
 
     @testset "AcbSeries" begin
-        @test AcbSeries(3) isa AcbSeries
-        @test precision(AcbSeries(3, prec = 80)) == 80
-        @test AcbSeries(3).degree == 3
+        @test AcbSeries() isa AcbSeries
+        @test precision(AcbSeries(prec = 80)) == 80
+        @test AcbSeries(degree = 3).degree == 3
     end
 end

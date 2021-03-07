@@ -84,29 +84,27 @@ end
 
 for TSeries in [:ArbSeries, :AcbSeries]
     @eval function $TSeries(
-        poly::cstructtype($TSeries),
-        degree::Integer = degree(poly);
+        poly::cstructtype($TSeries);
+        degree::Integer = degree(poly),
         prec::Integer = DEFAULT_PRECISION[],
     )
-        res = $TSeries(degree, prec = prec)
+        res = $TSeries(degree = degree, prec = prec)
         set!(res, poly)
         return res
     end
 
-    @eval $TSeries(; prec::Integer = DEFAULT_PRECISION[]) = $TSeries(0, prec = prec)
-
-    @eval function $TSeries(coeff, degree::Integer; prec::Integer = _precision(coeff))
-        series = $TSeries(degree, prec = prec)
+    @eval function $TSeries(coeff; degree::Integer = 0, prec::Integer = _precision(coeff))
+        series = $TSeries(degree = degree, prec = prec)
         series[0] = coeff
         return series
     end
 
     @eval function $TSeries(
-        coeffs::AbstractVector,
-        degree::Integer = length(coeffs) - 1;
+        coeffs::AbstractVector;
+        degree::Integer = length(coeffs) - 1,
         prec::Integer = _precision(first(coeffs)),
     )
-        series = $TSeries(degree, prec = prec)
+        series = $TSeries(degree = degree, prec = prec)
         @inbounds for i = 1:length(coeffs)
             series[i-1] = coeffs[i]
         end
@@ -118,12 +116,12 @@ Base.zero(poly::T) where {T<:Union{ArbPoly,AcbPoly}} = T(prec = precision(poly))
 Base.one(poly::T) where {T<:Union{ArbPoly,AcbPoly}} = one!(T(prec = precision(poly)))
 
 Base.zero(series::T) where {T<:Union{ArbSeries,AcbSeries}} =
-    T(degree(series), prec = precision(series))
+    T(degree = degree(series), prec = precision(series))
 Base.one(series::T) where {T<:Union{ArbSeries,AcbSeries}} =
-    one!(T(degree(series), prec = precision(series)))
+    one!(T(degree = degree(series), prec = precision(series)))
 
 Base.zero(::Type{T}) where {T<:Union{ArbPoly,AcbPoly}} = T()
 Base.one(::Type{T}) where {T<:Union{ArbPoly,AcbPoly}} = one!(T())
 
-Base.zero(::Type{T}) where {T<:Union{ArbSeries,AcbSeries}} = T(0)
-Base.one(::Type{T}) where {T<:Union{ArbSeries,AcbSeries}} = one!(T(0))
+Base.zero(::Type{T}) where {T<:Union{ArbSeries,AcbSeries}} = T()
+Base.one(::Type{T}) where {T<:Union{ArbSeries,AcbSeries}} = one!(T())

@@ -1,17 +1,20 @@
 @testset "Series: $TSeries" for (TSeries, T) in [(ArbSeries, Arb), (AcbSeries, Acb)]
     @testset "Constructors" begin
         @test TSeries() == TSeries(T[0]) == zero(TSeries) == zero(TSeries())
-        @test TSeries(3) == TSeries(T(0), 3) == TSeries(T[0], 3) == zero(TSeries(3))
+        @test TSeries(degree = 3) ==
+              TSeries(T(0), degree = 3) ==
+              TSeries(T[0], degree = 3) ==
+              zero(TSeries(degree = 3))
         @test TSeries(T[1]) == one(TSeries) == one(TSeries())
         @test Arblib.isx(TSeries(T[0, 1]))
         @test TSeries(T[1, 2, 0]) != TSeries(T[1, 2])
         @test TSeries([5.0]) == TSeries([5]) == TSeries(T[5])
 
-        @test precision(TSeries(1, prec = 64)) == 64
-        @test precision(TSeries(0, 1, prec = 64)) == 64
+        @test precision(TSeries(degree = 1, prec = 64)) == 64
+        @test precision(TSeries(0, degree = 1, prec = 64)) == 64
         @test precision(TSeries([0], prec = 64)) == 64
-        @test precision(zero(TSeries(1, prec = 64))) == 64
-        @test precision(one(TSeries(1, prec = 64))) == 64
+        @test precision(zero(TSeries(degree = 1, prec = 64))) == 64
+        @test precision(one(TSeries(degree = 1, prec = 64))) == 64
     end
 
     @testset "Interface" begin
@@ -19,7 +22,7 @@
             (zero(TSeries), 1),
             (one(TSeries), 1),
             (TSeries(T[0, 1, 0]), 3),
-            (TSeries(T[0, 1], 4), 5),
+            (TSeries(T[0, 1], degree = 4), 5),
         ]
             @test length(P) == Arblib.degree(P) + 1 == l
         end
