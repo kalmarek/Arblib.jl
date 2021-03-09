@@ -2,6 +2,7 @@ module Arblib
 
 using Arb_jll
 import LinearAlgebra
+import SpecialFunctions
 
 if VERSION >= v"1.5.0-DEV.639"
     import Base: contains
@@ -61,6 +62,7 @@ include("array_common.jl")
 include("eigen.jl")
 include("poly.jl")
 include("calc_integrate.jl")
+include("special-functions.jl")
 
 include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")
