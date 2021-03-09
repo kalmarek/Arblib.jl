@@ -11,6 +11,11 @@
         @test precision(TPoly(T[0], prec = 64)) == 64
         @test precision(zero(TPoly(prec = 64))) == 64
         @test precision(one(TPoly(prec = 64))) == 64
+
+        if TPoly == AcbPoly
+            @test TPoly(ArbPoly([1, 2])) == TPoly([1, 2])
+            @test precision(TPoly(ArbPoly(prec = 64))) == 64
+        end
     end
 
     @testset "Interface" begin

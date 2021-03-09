@@ -15,6 +15,12 @@
         @test precision(TSeries([0], prec = 64)) == 64
         @test precision(zero(TSeries(degree = 1, prec = 64))) == 64
         @test precision(one(TSeries(degree = 1, prec = 64))) == 64
+
+        if TSeries == AcbSeries
+            @test TSeries(ArbSeries([1, 2])) == TSeries([1, 2])
+            @test Arblib.degree(TSeries(ArbSeries(degree = 4))) == 4
+            @test precision(TSeries(ArbSeries(prec = 64))) == 64
+        end
     end
 
     @testset "Interface" begin

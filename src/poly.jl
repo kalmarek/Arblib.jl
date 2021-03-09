@@ -81,6 +81,13 @@ for TPoly in [:ArbPoly, :AcbPoly]
         return poly
     end
 end
+function AcbPoly(poly::ArbPoly; prec = precision(poly))
+    res = AcbPoly(prec = prec)
+    @inbounds for i = 0:Arblib.degree(poly)
+        res[i] = poly[i]
+    end
+    return res
+end
 
 for TSeries in [:ArbSeries, :AcbSeries]
     @eval function $TSeries(
@@ -110,6 +117,13 @@ for TSeries in [:ArbSeries, :AcbSeries]
         end
         return series
     end
+end
+function AcbSeries(series::ArbSeries; degree = degree(series), prec = precision(series))
+    res = AcbSeries(degree = degree, prec = prec)
+    @inbounds for i = 0:Arblib.degree(series)
+        res[i] = series[i]
+    end
+    return res
 end
 
 Base.zero(poly::T) where {T<:Union{ArbPoly,AcbPoly}} = T(prec = precision(poly))
