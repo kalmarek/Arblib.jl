@@ -1,4 +1,34 @@
 @testset "Poly: $TPoly" for (TPoly, T) in [(ArbPoly, Arb), (AcbPoly, Acb)]
+    @testset "Length and degree" begin
+        for (p, l) in [(zero(TPoly), 0), (one(TPoly), 1), (TPoly(T[0, 0, 1, 0]), 3)]
+            @test length(p) == Arblib.degree(p) + 1 == l
+        end
+    end
+
+    @testset "Get and set coefficients" begin
+        @test eltype(TPoly()) == T
+
+        p = TPoly(T[i for i = 0:10])
+        @test all(p[i] == i for i = 0:10)
+        @test p[11] == 0
+        @test p[12] == 0
+
+        p[3] = T(7)
+        @test p[3] == 7
+        p[4] = 8
+        @test p[4] == 8
+        p[5] = π
+        @test isequal(p[5], T(π))
+        if T == Arb
+            p[6] = ArbRefVector(T[9])[1]
+        else
+            p[6] = AcbRefVector(T[9])[1]
+        end
+        @test p[6] == 9
+
+        @test_throws BoundsError p[-1]
+    end
+
     @testset "Constructors" begin
         @test TPoly() == TPoly(T(0)) == TPoly(T[0]) == zero(TPoly) == zero(TPoly())
         @test TPoly(T(1)) == TPoly(T[1]) == one(TPoly) == one(TPoly())
@@ -16,33 +46,5 @@
             @test TPoly(ArbPoly([1, 2])) == TPoly([1, 2])
             @test precision(TPoly(ArbPoly(prec = 64))) == 64
         end
-    end
-
-    @testset "Interface" begin
-        @test eltype(TPoly()) == T
-
-        for (P, l) in [(zero(TPoly), 0), (one(TPoly), 1), (TPoly(T[0, 0, 1]), 3)]
-            @test length(P) == Arblib.degree(P) + 1 == l
-        end
-
-        P = TPoly(T[i for i = 0:10])
-        @test all(P[i] == i for i = 0:10)
-        @test P[11] == 0
-        @test P[12] == 0
-
-        P[3] = T(7)
-        @test P[3] == 7
-        P[4] = 8
-        @test P[4] == 8
-        P[5] = π
-        @test isequal(P[5], T(π))
-        if T == Arb
-            P[6] = ArbRefVector(T[9])[1]
-        else
-            P[6] = AcbRefVector(T[9])[1]
-        end
-        @test P[6] == 9
-
-        @test_throws BoundsError P[-1]
     end
 end

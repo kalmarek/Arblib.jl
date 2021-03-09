@@ -1,109 +1,107 @@
-# Interface
-Base.length(poly::Union{arb_poly_struct,ArbPoly}) =
-    ccall(@libarb(arb_poly_length), Int, (Ref{arb_poly_struct},), poly)
-Base.length(poly::Union{acb_poly_struct,AcbPoly}) =
-    ccall(@libarb(acb_poly_length), Int, (Ref{acb_poly_struct},), poly)
-Base.length(series::Union{ArbSeries,AcbSeries}) = series.degree + 1
+const Poly = Union{ArbPoly,AcbPoly}
+const Series = Union{ArbSeries,AcbSeries}
+
+##
+## Length and degree
+##
+Base.length(p::Union{arb_poly_struct,ArbPoly}) =
+    ccall(@libarb(arb_poly_length), Int, (Ref{arb_poly_struct},), p)
+Base.length(p::Union{acb_poly_struct,AcbPoly}) =
+    ccall(@libarb(acb_poly_length), Int, (Ref{acb_poly_struct},), p)
+Base.length(p::Series) = p.degree + 1
 
 # We have to define these separately so that it overrides the default
 # correctly
-degree(series::ArbSeries) = series.degree
-degree(series::AcbSeries) = series.degree
+degree(p::ArbSeries) = p.degree
+degree(p::AcbSeries) = p.degree
+
+##
+## Get and set coefficients
+##
 
 Base.eltype(::Type{<:Union{ArbPoly,ArbSeries}}) = Arb
 Base.eltype(::Type{<:Union{AcbPoly,AcbSeries}}) = Acb
 
-Base.checkbounds(::Type{Bool}, poly::Union{ArbPoly,AcbPoly}, i::Integer) = i >= 0
-Base.checkbounds(::Type{Bool}, series::Union{ArbSeries,AcbSeries}, i::Integer) =
-    0 <= i <= degree(series)
-Base.checkbounds(poly::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}, i::Integer) =
-    checkbounds(Bool, poly, i) || throw(BoundsError(poly, i))
+Base.checkbounds(::Type{Bool}, ::Poly, i::Integer) = i >= 0
+Base.checkbounds(::Type{Bool}, p::Series, i::Integer) = 0 <= i <= degree(p)
+Base.checkbounds(p::Union{Poly,Series}, i::Integer) =
+    checkbounds(Bool, p, i) || throw(BoundsError(p, i))
 
 Base.@propagate_inbounds function Base.getindex(
-    poly::T,
+    p::T,
     i::Integer,
-) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
-    @boundscheck checkbounds(poly, i)
-    res = eltype(T)(prec = precision(poly))
-    get_coeff!(res, poly, i)
-    return res
+) where {T<:Union{Poly,Series}}
+    @boundscheck checkbounds(p, i)
+    return get_coeff!(eltype(T)(prec = precision(p)), p, i)
 end
 
 Base.@propagate_inbounds function Base.setindex!(
-    poly::Union{ArbPoly,ArbSeries},
+    p::Union{ArbPoly,ArbSeries},
     x::ArbLike,
     i::Integer,
 )
-    @boundscheck checkbounds(poly, i)
-    set_coeff!(poly, i, x)
+    @boundscheck checkbounds(p, i)
+    set_coeff!(p, i, x)
     return x
 end
 
 Base.@propagate_inbounds function Base.setindex!(
-    poly::Union{AcbPoly,AcbSeries},
+    p::Union{AcbPoly,AcbSeries},
     x::AcbLike,
     i::Integer,
 )
-    @boundscheck checkbounds(poly, i)
-    set_coeff!(poly, i, x)
+    @boundscheck checkbounds(p, i)
+    set_coeff!(p, i, x)
     return x
 end
 
-Base.@propagate_inbounds function Base.setindex!(
-    poly::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries},
-    x,
-    i::Integer,
-)
-    @boundscheck checkbounds(poly, i)
-    set_coeff!(poly, i, convert(eltype(poly), x))
+Base.@propagate_inbounds function Base.setindex!(p::Union{Poly,Series}, x, i::Integer)
+    @boundscheck checkbounds(p, i)
+    set_coeff!(p, i, convert(eltype(p), x))
     return x
 end
 
-# Constructors
+##
+## Constructors
+##
+
 for TPoly in [:ArbPoly, :AcbPoly]
-    @eval function $TPoly(poly::cstructtype($TPoly); prec::Integer = DEFAULT_PRECISION[])
-        res = $TPoly(prec = prec)
-        set!(res, poly)
-        return res
-    end
+    @eval $TPoly(p::cstructtype($TPoly); prec::Integer = DEFAULT_PRECISION[]) =
+        set!($TPoly(prec = prec), p)
 
     @eval function $TPoly(coeff; prec::Integer = _precision(coeff))
-        poly = $TPoly(prec = prec)
-        poly[0] = coeff
-        return poly
+        p = $TPoly(prec = prec)
+        p[0] = coeff
+        return p
     end
 
     @eval function $TPoly(coeffs::AbstractVector; prec::Integer = _precision(first(coeffs)))
-        poly = $TPoly(prec = prec)
+        p = $TPoly(prec = prec)
         @inbounds for i = 1:length(coeffs)
-            poly[i-1] = coeffs[i]
+            p[i-1] = coeffs[i]
         end
-        return poly
+        return p
     end
 end
-function AcbPoly(poly::ArbPoly; prec = precision(poly))
+function AcbPoly(p::ArbPoly; prec = precision(p))
     res = AcbPoly(prec = prec)
-    @inbounds for i = 0:Arblib.degree(poly)
-        res[i] = poly[i]
+    @inbounds for i = 0:Arblib.degree(p)
+        res[i] = p[i]
     end
     return res
 end
 
 for TSeries in [:ArbSeries, :AcbSeries]
-    @eval function $TSeries(
-        poly::cstructtype($TSeries);
-        degree::Integer = degree(poly),
+    @eval $TSeries(
+        p::cstructtype($TSeries);
+        degree::Integer = degree(p),
         prec::Integer = DEFAULT_PRECISION[],
-    )
-        res = $TSeries(degree = degree, prec = prec)
-        set!(res, poly)
-        return res
-    end
+    ) = set!($TSeries(degree = degree, prec = prec), p)
 
     @eval function $TSeries(coeff; degree::Integer = 0, prec::Integer = _precision(coeff))
-        series = $TSeries(degree = degree, prec = prec)
-        series[0] = coeff
-        return series
+        p = $TSeries(degree = degree, prec = prec)
+        p[0] = coeff
+        return p
     end
 
     @eval function $TSeries(
@@ -111,31 +109,26 @@ for TSeries in [:ArbSeries, :AcbSeries]
         degree::Integer = length(coeffs) - 1,
         prec::Integer = _precision(first(coeffs)),
     )
-        series = $TSeries(degree = degree, prec = prec)
+        p = $TSeries(degree = degree, prec = prec)
         @inbounds for i = 1:length(coeffs)
-            series[i-1] = coeffs[i]
+            p[i-1] = coeffs[i]
         end
-        return series
+        return p
     end
 end
-function AcbSeries(series::ArbSeries; degree = degree(series), prec = precision(series))
+function AcbSeries(p::ArbSeries; degree = degree(p), prec = precision(p))
     res = AcbSeries(degree = degree, prec = prec)
-    @inbounds for i = 0:Arblib.degree(series)
-        res[i] = series[i]
+    @inbounds for i = 0:Arblib.degree(p)
+        res[i] = p[i]
     end
     return res
 end
 
-Base.zero(poly::T) where {T<:Union{ArbPoly,AcbPoly}} = T(prec = precision(poly))
-Base.one(poly::T) where {T<:Union{ArbPoly,AcbPoly}} = one!(T(prec = precision(poly)))
+Base.zero(p::T) where {T<:Poly} = T(prec = precision(p))
+Base.one(p::Poly) = one!(zero(p))
 
-Base.zero(series::T) where {T<:Union{ArbSeries,AcbSeries}} =
-    T(degree = degree(series), prec = precision(series))
-Base.one(series::T) where {T<:Union{ArbSeries,AcbSeries}} =
-    one!(T(degree = degree(series), prec = precision(series)))
+Base.zero(p::T) where {T<:Series} = T(degree = degree(p), prec = precision(p))
+Base.one(p::Series) = one!(zero(p))
 
-Base.zero(::Type{T}) where {T<:Union{ArbPoly,AcbPoly}} = T()
-Base.one(::Type{T}) where {T<:Union{ArbPoly,AcbPoly}} = one!(T())
-
-Base.zero(::Type{T}) where {T<:Union{ArbSeries,AcbSeries}} = T()
-Base.one(::Type{T}) where {T<:Union{ArbSeries,AcbSeries}} = one!(T())
+Base.zero(::Type{T}) where {T<:Union{Poly,Series}} = T()
+Base.one(::Type{T}) where {T<:Union{Poly,Series}} = one!(zero(T))

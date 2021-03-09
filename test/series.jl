@@ -1,4 +1,36 @@
 @testset "Series: $TSeries" for (TSeries, T) in [(ArbSeries, Arb), (AcbSeries, Acb)]
+    @testset "Length and degree" begin
+        for (p, l) in [
+            (zero(TSeries), 1),
+            (one(TSeries), 1),
+            (TSeries(T[0, 1, 0]), 3),
+            (TSeries(T[0, 1], degree = 4), 5),
+        ]
+            @test length(p) == Arblib.degree(p) + 1 == l
+        end
+    end
+
+    @testset "Get and set coefficients" begin
+        p = TSeries(T[i for i = 0:10])
+        @test all(p[i] == i for i = 0:10)
+
+        p[3] = T(7)
+        @test p[3] == 7
+        p[4] = 8
+        @test p[4] == 8
+        p[5] = π
+        @test isequal(p[5], T(π))
+        if T == Arb
+            p[6] = ArbRefVector(T[9])[1]
+        else
+            p[6] = AcbRefVector(T[9])[1]
+        end
+        @test p[6] == 9
+
+        @test_throws BoundsError p[-1]
+        @test_throws BoundsError p[11]
+    end
+
     @testset "Constructors" begin
         @test TSeries() == TSeries(T[0]) == zero(TSeries) == zero(TSeries())
         @test TSeries(degree = 3) ==
@@ -21,35 +53,5 @@
             @test Arblib.degree(TSeries(ArbSeries(degree = 4))) == 4
             @test precision(TSeries(ArbSeries(prec = 64))) == 64
         end
-    end
-
-    @testset "Interface" begin
-        for (P, l) in [
-            (zero(TSeries), 1),
-            (one(TSeries), 1),
-            (TSeries(T[0, 1, 0]), 3),
-            (TSeries(T[0, 1], degree = 4), 5),
-        ]
-            @test length(P) == Arblib.degree(P) + 1 == l
-        end
-
-        P = TSeries(T[i for i = 0:10])
-        @test all(P[i] == i for i = 0:10)
-
-        P[3] = T(7)
-        @test P[3] == 7
-        P[4] = 8
-        @test P[4] == 8
-        P[5] = π
-        @test isequal(P[5], T(π))
-        if T == Arb
-            P[6] = ArbRefVector(T[9])[1]
-        else
-            P[6] = AcbRefVector(T[9])[1]
-        end
-        @test P[6] == 9
-
-        @test_throws BoundsError P[-1]
-        @test_throws BoundsError P[11]
     end
 end
