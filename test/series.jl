@@ -6,12 +6,24 @@
             (TSeries(T[0, 1, 0]), 3),
             (TSeries(T[0, 1], degree = 4), 5),
         ]
-            @test length(p) == Arblib.degree(p) + 1 == l
+            @test firstindex(p) == 0
+            @test size(p) == ()
+            @test size(p, 1) == 1
+            @test length(p) == Arblib.degree(p) + 1 == lastindex(p) + 1 == l
         end
     end
 
     @testset "Get and set coefficients" begin
+        @test eltype(TSeries()) == T
+
         p = TSeries(T[i for i = 0:10])
+
+        @test firstindex(p) == 0
+        @test lastindex(p) == 10
+        @test lastindex(TSeries(degree = 5)) == 5
+
+        @test Arblib.coeffs(p) == p[:] == 0:10
+
         @test all(p[i] == i for i = 0:10)
 
         p[3] = T(7)

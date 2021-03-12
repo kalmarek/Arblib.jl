@@ -1,7 +1,9 @@
 @testset "Poly: $TPoly" for (TPoly, T) in [(ArbPoly, Arb), (AcbPoly, Acb)]
     @testset "Length and degree" begin
         for (p, l) in [(zero(TPoly), 0), (one(TPoly), 1), (TPoly(T[0, 0, 1, 0]), 3)]
-            @test length(p) == Arblib.degree(p) + 1 == l
+            @test firstindex(p) == 0
+            @test size(p) == (l,)
+            @test length(p) == size(p, 1) == Arblib.degree(p) + 1 == lastindex(p) + 1 == l
         end
     end
 
@@ -9,7 +11,15 @@
         @test eltype(TPoly()) == T
 
         p = TPoly(T[i for i = 0:10])
+
+        @test firstindex(p) == 0
+        @test lastindex(p) == 10
+
+        @test Arblib.coeffs(p) == p[:] == 0:10
+
         @test all(p[i] == i for i = 0:10)
+        @test p[0:2] == 0:2
+
         @test p[11] == 0
         @test p[12] == 0
 
