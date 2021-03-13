@@ -74,6 +74,15 @@ Base.@propagate_inbounds function Base.setindex!(p::Union{Poly,Series}, x, i::In
     return x
 end
 
+# TODO: Add a ref method for getting references to the coefficients.
+# The main issue with this is how to handle access to indices outside
+# the length, in particular for series.
+#function ref(p::Union{ArbPoly,ArbSeries}, i::Integer)
+#    0 <= i <= length(cstruct(p)) || throw(BoundsError(p, i))
+#    ptr = cstruct(p).coeffs + i * sizeof(arb_struct)
+#    return ArbRef(ptr, precision(p), cstruct(p))
+#end
+
 ##
 ## Constructors
 ##
@@ -89,7 +98,7 @@ for TPoly in [:ArbPoly, :AcbPoly]
     end
 
     @eval function $TPoly(coeffs::AbstractVector; prec::Integer = _precision(first(coeffs)))
-        p = $TPoly(prec = prec)
+        p = fit_length!($TPoly(prec = prec), length(coeffs))
         @inbounds for i = 1:length(coeffs)
             p[i-1] = coeffs[i]
         end
@@ -97,8 +106,8 @@ for TPoly in [:ArbPoly, :AcbPoly]
     end
 end
 function AcbPoly(p::ArbPoly; prec = precision(p))
-    res = AcbPoly(prec = prec)
-    @inbounds for i = 0:Arblib.degree(p)
+    res = fit_length!(AcbPoly(prec = prec), length(p))
+    @inbounds for i = 0:degree(p)
         res[i] = p[i]
     end
     return res
@@ -122,16 +131,16 @@ for TSeries in [:ArbSeries, :AcbSeries]
         degree::Integer = length(coeffs) - 1,
         prec::Integer = _precision(first(coeffs)),
     )
-        p = $TSeries(degree = degree, prec = prec)
-        @inbounds for i = 1:length(coeffs)
+        p = fit_length!($TSeries(degree = degree, prec = prec), degree + 1)
+        @inbounds for i = 1:min(length(coeffs), degree + 1)
             p[i-1] = coeffs[i]
         end
         return p
     end
 end
 function AcbSeries(p::ArbSeries; degree = degree(p), prec = precision(p))
-    res = AcbSeries(degree = degree, prec = prec)
-    @inbounds for i = 0:Arblib.degree(p)
+    res = fit_length!(AcbSeries(degree = degree, prec = prec), degree + 1)
+    @inbounds for i = 0:min(Arblib.degree(p), degree)
         res[i] = p[i]
     end
     return res

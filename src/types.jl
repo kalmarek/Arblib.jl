@@ -98,7 +98,7 @@ struct ArbSeries <: Number
     prec::Int
 
     ArbSeries(; degree::Integer = 0, prec::Integer = DEFAULT_PRECISION[]) =
-        new(arb_poly_struct(), degree, prec)
+        fit_length!(new(arb_poly_struct(), degree, prec), degree + 1)
 end
 
 """
@@ -120,7 +120,7 @@ struct AcbSeries <: Number
     prec::Int
 
     AcbSeries(; degree::Integer = 0, prec::Integer = DEFAULT_PRECISION[]) =
-        new(acb_poly_struct(), degree, prec)
+        fit_length!(new(acb_poly_struct(), degree, prec), degree + 1)
 end
 
 """
