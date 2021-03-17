@@ -154,3 +154,37 @@ Base.one(p::Series) = one!(zero(p))
 
 Base.zero(::Type{T}) where {T<:Union{Poly,Series}} = T()
 Base.one(::Type{T}) where {T<:Union{Poly,Series}} = one!(zero(T))
+
+fromroots(::Type{ArbPoly}, roots::ArbVector; prec::Integer = DEFAULT_PRECISION[]) =
+    product_roots!(ArbPoly(prec = prec), roots)
+fromroots(::Type{ArbPoly}, roots::AbstractVector; prec::Integer = DEFAULT_PRECISION[]) =
+    fromroots(ArbPoly, ArbVector(roots, prec = prec), prec = prec)
+
+fromroots(
+    ::Type{ArbPoly},
+    real_roots::ArbVector,
+    complex_roots::AcbVector;
+    prec::Integer = DEFAULT_PRECISION[],
+) = product_roots_complex!(
+    ArbPoly(prec = prec),
+    real_roots,
+    length(real_roots),
+    complex_roots,
+    length(complex_roots),
+)
+fromroots(
+    ::Type{ArbPoly},
+    real_roots::AbstractVector,
+    complex_roots::AbstractVector;
+    prec::Integer = DEFAULT_PRECISION[],
+) = fromroots(
+    ArbPoly,
+    ArbVector(real_roots, prec = prec),
+    AcbVector(complex_roots, prec = prec),
+    prec = prec,
+)
+
+fromroots(::Type{AcbPoly}, roots::AcbVector; prec::Integer = DEFAULT_PRECISION[]) =
+    product_roots!(AcbPoly(prec = prec), roots)
+fromroots(::Type{AcbPoly}, roots::AbstractVector; prec::Integer = DEFAULT_PRECISION[]) =
+    fromroots(AcbPoly, AcbVector(roots, prec = prec), prec = prec)

@@ -56,5 +56,19 @@
             @test TPoly(ArbPoly([1, 2])) == TPoly([1, 2])
             @test precision(TPoly(ArbPoly(prec = 64))) == 64
         end
+
+        if TPoly == ArbPoly
+            @test Arblib.fromroots(TPoly, []) == one(TPoly)
+            @test Arblib.fromroots(TPoly, [1, -1]) == TPoly([-1, 0, 1])
+            @test Arblib.fromroots(TPoly, [], []) == one(TPoly)
+            @test Arblib.fromroots(TPoly, [0], [im]) == TPoly([0, 1, 0, 1])
+            @test Arblib.fromroots(TPoly, [], [im]) == TPoly([1, 0, 1])
+            @test Arblib.fromroots(TPoly, [1, -1], []) == TPoly([-1, 0, 1])
+        else
+            @test Arblib.fromroots(TPoly, []) == one(TPoly)
+            @test Arblib.fromroots(TPoly, [0, im]) == TPoly([0, -im, 1])
+            @test Arblib.fromroots(TPoly, [0, im, -im]) == TPoly([0, 1, 0, 1])
+        end
+    end
     end
 end
