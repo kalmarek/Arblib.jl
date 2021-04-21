@@ -54,6 +54,7 @@ include("promotion.jl")
 include("arithmetic.jl")
 include("rand.jl")
 include("float.jl")
+include("interval.jl")
 
 include("ref.jl")
 include("vector.jl")
