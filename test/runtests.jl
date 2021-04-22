@@ -14,6 +14,7 @@ using Arblib, Test, LinearAlgebra, SpecialFunctions
     include("arithmetic.jl")
     include("rand.jl")
     include("float.jl")
+    include("interval.jl")
     include("vector.jl")
     include("matrix.jl")
     include("eigen.jl")
