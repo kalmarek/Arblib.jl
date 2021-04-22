@@ -1,5 +1,4 @@
-export radius,
-    midpoint, lbound, ubound, abs_lbound, abs_ubound, getinterval, getball, intersection
+export radius, midpoint, lbound, ubound, abs_lbound, abs_ubound, getinterval, getball
 
 """
     radius([T, ] x::ArbOrRef)
@@ -144,19 +143,19 @@ Base.union(x::AcbOrRef, y::AcbOrRef, z::AcbOrRef, xs...) =
     foldl(union, xs, init = union(union(x, y), z))
 
 """
-    intersection(x::ArbOrRef, y::ArbOrRef)
-    intersection(x::AcbOrRef, y::AcbOrRef)
-    intersection(x, y, z...)
+    intersect(x::ArbOrRef, y::ArbOrRef)
+    intersect(x::AcbOrRef, y::AcbOrRef)
+    intersect(x, y, z...)
 
-`intersection(x, y)` returns a ball containing the intersection of `x`
+`intersect(x, y)` returns a ball containing the intersection of `x`
 and `y`. If `x` and `y` do not overlap (as given by `overlaps(a, b)`)
 throws an `ArgumentError`.
 
-`intersection(x, y, z...)` returns a ball containing the intersection of
+`intersect(x, y, z...)` returns a ball containing the intersection of
 all given balls. If all the balls do not overlap throws an
 `ArgumentError`.
 """
-function intersection(x::ArbOrRef, y::ArbOrRef)
+function Base.intersect(x::ArbOrRef, y::ArbOrRef)
     overlaps(x, y) ||
         throw(ArgumentError("intersection of non-intersecting balls not allowed"))
     res = Arb(prec = _precision((x, y)))
@@ -164,5 +163,5 @@ function intersection(x::ArbOrRef, y::ArbOrRef)
     return res
 end
 # TODO: Could be optimized, both for performance and enclosure
-intersection(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...) =
-    foldl(intersection, xs, init = intersection(intersection(x, y), z))
+Base.intersect(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...) =
+    foldl(intersect, xs, init = intersect(intersect(x, y), z))

@@ -196,17 +196,17 @@
         @test precision(union([Acb(prec = p) for p = 70:10:100]...)) == 100
     end
 
-    @testset "intersection" begin
+    @testset "intersect" begin
         xs = [Arb((0, i)) for i in vcat(1:10, 10:-1:1)]
 
-        @test contains(intersection(Arb((0, 2)), Arb((1, 3))), Arb((1, 2)))
-        @test contains(intersection(xs...), Arb((0, 1)))
-        @test !contains(intersection(xs...), Arb(2))
+        @test contains(intersect(Arb((0, 2)), Arb((1, 3))), Arb((1, 2)))
+        @test contains(intersect(xs...), Arb((0, 1)))
+        @test !contains(intersect(xs...), Arb(2))
 
-        @test precision(intersection(Arb(prec = 80), Arb(prec = 90))) == 90
-        @test precision(intersection([Arb(prec = p) for p = 70:10:100]...)) == 100
+        @test precision(intersect(Arb(prec = 80), Arb(prec = 90))) == 90
+        @test precision(intersect([Arb(prec = p) for p = 70:10:100]...)) == 100
 
-        @test_throws ArgumentError Arblib.intersection(Arb(1), Arb(2))
-        @test_throws ArgumentError Arblib.intersection([xs; Arb(2)]...)
+        @test_throws ArgumentError intersect(Arb(1), Arb(2))
+        @test_throws ArgumentError intersect([xs; Arb(2)]...)
     end
 end
