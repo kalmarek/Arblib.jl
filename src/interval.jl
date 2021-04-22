@@ -88,7 +88,7 @@ end
 abs_ubound(x::Union{ArbOrRef,AcbOrRef}) = abs_ubound(Arf, x)
 
 """
-    getinterval([T, ] x::Union{ArbOrRef,AcbOrRef})
+    getinterval([T, ] x::ArbOrRef)
 
 Returns a tuple `(l, u)` representing an interval `[l, u]` enclosing
 the ball `x`, both of them are of type `Arf`. If `T` is given convert
@@ -114,11 +114,11 @@ end
 getinterval(x::ArbOrRef) = getinterval(Arf, x)
 
 """
-    getinterval([T, ] x::Union{ArbOrRef,AcbOrRef})
+    getball([T, ] x::ArbOrRef)
 
-Returns a tuple `(m, r)` where `m` is the midpoint of the ball and `r`
-is the radius, `m` is of type `Arf` and `r` of type `Mag`. If `T` is
-given convert both `m` and `r` to this type, supports `Arb`.
+Returns a tuple `(m::Arf, r::Mag)` where `m` is the midpoint of the
+ball and `r` is the radius. If `T` is given convert both `m` and `r`
+to this type, supports `Arb`.
 """
 getball(x::ArbOrRef) = (Arf(midref(x)), Mag(radref(x)))
 getball(::Type{Arb}, x::ArbOrRef) = (Arb(midref(x)), Arb(radref(x), prec = precision(x)))
@@ -132,7 +132,6 @@ getball(::Type{Arb}, x::ArbOrRef) = (Arb(midref(x)), Arb(radref(x), prec = preci
 
 `union(x, y, z...)` returns a ball containing the union of all given
 balls.
-
 """
 Base.union(x::ArbOrRef, y::ArbOrRef) = union!(Arb(prec = _precision((x, y))), x, y)
 Base.union(x::AcbOrRef, y::AcbOrRef) = union!(Acb(prec = _precision((x, y))), x, y)

@@ -1,17 +1,4 @@
 @testset "interval" begin
-    # TODO: Remove this once we decide what to export
-    import Arblib:
-        radius,
-        midpoint,
-        lbound,
-        ubound,
-        abs_lbound,
-        abs_ubound,
-        getinterval,
-        getball,
-        intersection
-    # TODO: Add test checking precision is preserved
-
     @testset "radius" begin
         x = Arb(2)
         y = Arb(2)
