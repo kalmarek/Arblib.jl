@@ -173,7 +173,7 @@ function Base.:(*)(c::ArbLike, A::T) where {T <: Matrices}
     C = T(size(A,1),size(A,2),prec = precision(A))
     Arblib.mul!(C,A,c)
 end
-function Base.:(*)(c::AcbLike, A::AcbMatLike)
+function Base.:(*)(c::AcbLike, A::AcbMatrixLike)
     C = similar(A)
     Arblib.mul!(C,A,c)
 end
