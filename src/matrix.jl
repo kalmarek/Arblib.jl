@@ -181,8 +181,8 @@ function Base.:(*)(c::AcbLike, A::ArbMatrixLike)
     C = AcbMatrix(A)
     Arblib.mul!(C,AcbMatrix(A),c)
 end
-Base.:(*)(A::T, c::AcbLike) = c*A
-Base.:(*)(A::T, c::ArbLike) = c*A
+Base.:(*)(A::T, c::AcbLike) where {T <: Matrices} = c*A
+Base.:(*)(A::T, c::ArbLike) where {T <: Matrices} = c*A
 
 # scalar division
 function Base.:(\)(c::ArbLike, A::T) where {T <: Matrices}
@@ -197,8 +197,8 @@ function Base.:(\)(c::AcbLike, A::ArbMatrixLike)
     C = AcbMatrix(A)
     Arblib.div!(C,AcbMatrix(A),c)
 end
-Base.:(/)(A::T, c::AcbLike) = c\A
-Base.:(/)(A::T, c::ArbLike) = c\A
+Base.:(/)(A::T, c::AcbLike) where {T <: Matrices} = c\A
+Base.:(/)(A::T, c::ArbLike) where {T <: Matrices} = c\A
 
 # lu factorization
 function LinearAlgebra.lu!(A::T) where {T<:Matrices}
