@@ -184,8 +184,6 @@ end
 Base.:(*)(A::T, c::AcbLike) = c*A
 Base.:(*)(A::T, c::ArbLike) = c*A
 
-
-
 # scalar division
 function Base.:(\)(c::ArbLike, A::T) where {T <: Matrices}
     C = T(size(A,1),size(A,2),prec = precision(A))
@@ -201,7 +199,6 @@ function Base.:(\)(c::AcbLike, A::ArbMatrixLike)
 end
 Base.:(/)(A::T, c::AcbLike) = c\A
 Base.:(/)(A::T, c::ArbLike) = c\A
-
 
 # lu factorization
 function LinearAlgebra.lu!(A::T) where {T<:Matrices}
