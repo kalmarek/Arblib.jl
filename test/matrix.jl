@@ -44,6 +44,17 @@
         @test A * B == AInt * BInt
         @test A * B isa TMat
     end
+    
+    @testset "scalar arithmetic" begin
+        AInt = [2 4; 6 8]
+        A = TMat(AInt; prec = 96)
+        cInt = 2
+        c = T(cInt; prec= 96)
+        @test c*A isa TMat
+        @test c*A == cInt*AInt
+        @test c\A isa TMat
+        @test c\A == cInt\AInt
+    end
 
     @testset "LinearAlgebra" begin
         A = TMat(rand(3, 3))
