@@ -50,10 +50,26 @@
         A = TMat(AInt; prec = 96)
         cInt = 2
         c = T(cInt; prec= 96)
-        @test c*A isa TMat
-        @test c*A == cInt*AInt
-        @test c\A isa TMat
-        @test c\A == cInt\AInt
+        @test c * A isa TMat
+        @test c * A == cInt * AInt
+        @test A * c isa TMat
+        @test A * c == AInt * cInt
+        
+        @test c \ A isa TMat
+        @test c \ A == cInt \ AInt
+        @test A / c isa TMat
+        @test A / c == AInt / cInt
+        if TRef <: Real
+            @test Acb(c) * A is AcbMatrix
+            @test Acb(c) * A == c * A
+            @test A * Acb(c) is AcbMatrix
+            @test A * Acb(c) == A * c
+            
+            @test Acb(c) \ A is AcbMatrix
+            @test Acb(c) \ A == c \ A
+            @test A / Acb(c) is AcbMatrix
+            @test A / Acb(c) == A / c
+        end
     end
 
     @testset "LinearAlgebra" begin
