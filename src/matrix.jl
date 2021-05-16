@@ -170,7 +170,7 @@ end
 
 # scalar multiplication
 function Base.:(*)(c::ArbLike, A::T) where {T <: Matrices}
-    C = T(size(A,1),size(A,2),prec = precision(A))
+    C = similar(A)
     Arblib.mul!(C,A,c)
 end
 function Base.:(*)(c::AcbLike, A::AcbMatrixLike)
@@ -179,14 +179,14 @@ function Base.:(*)(c::AcbLike, A::AcbMatrixLike)
 end
 function Base.:(*)(c::AcbLike, A::ArbMatrixLike)
     C = AcbMatrix(A)
-    Arblib.mul!(C,AcbMatrix(A),c)
+    Arblib.mul!(C,C,c)
 end
 Base.:(*)(A::T, c::AcbLike) where {T <: Matrices} = c*A
 Base.:(*)(A::T, c::ArbLike) where {T <: Matrices} = c*A
 
 # scalar division
 function Base.:(\)(c::ArbLike, A::T) where {T <: Matrices}
-    C = T(size(A,1),size(A,2),prec = precision(A))
+    C = similar(A)
     Arblib.div!(C,A,c)
 end
 function Base.:(\)(c::AcbLike, A::AcbMatrixLike)
@@ -195,7 +195,7 @@ function Base.:(\)(c::AcbLike, A::AcbMatrixLike)
 end
 function Base.:(\)(c::AcbLike, A::ArbMatrixLike)
     C = AcbMatrix(A)
-    Arblib.div!(C,AcbMatrix(A),c)
+    Arblib.div!(C,C,c)
 end
 Base.:(/)(A::T, c::AcbLike) where {T <: Matrices} = c\A
 Base.:(/)(A::T, c::ArbLike) where {T <: Matrices} = c\A
