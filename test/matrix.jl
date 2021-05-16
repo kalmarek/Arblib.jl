@@ -49,12 +49,12 @@
         AInt = [2 4; 6 8]
         A = TMat(AInt; prec = 96)
         cInt = 2
-        c = T(cInt; prec= 96)
+        c = T(cInt; prec = 96)
         @test c * A isa TMat
         @test c * A == cInt * AInt
         @test A * c isa TMat
         @test A * c == AInt * cInt
-        
+
         @test c \ A isa TMat
         @test c \ A == cInt \ AInt
         @test A / c isa TMat
@@ -64,7 +64,7 @@
             @test Acb(c) * A == c * A
             @test A * Acb(c) is AcbMatrix
             @test A * Acb(c) == A * c
-            
+
             @test Acb(c) \ A is AcbMatrix
             @test Acb(c) \ A == c \ A
             @test A / Acb(c) is AcbMatrix
