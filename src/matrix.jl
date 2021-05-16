@@ -169,36 +169,36 @@ function Base.:(*)(A::T, B::T) where {T<:Matrices}
 end
 
 # scalar multiplication
-function Base.:(*)(c::ArbLike, A::T) where {T <: Matrices}
+function Base.:(*)(c::ArbLike, A::T) where {T<:Matrices}
     C = similar(A)
-    Arblib.mul!(C,A,c)
+    Arblib.mul!(C, A, c)
 end
 function Base.:(*)(c::AcbLike, A::AcbMatrixLike)
     C = similar(A)
-    Arblib.mul!(C,A,c)
+    Arblib.mul!(C, A, c)
 end
 function Base.:(*)(c::AcbLike, A::ArbMatrixLike)
     C = AcbMatrix(A)
-    Arblib.mul!(C,C,c)
+    Arblib.mul!(C, C, c)
 end
-Base.:(*)(A::T, c::AcbLike) where {T <: Matrices} = c*A
-Base.:(*)(A::T, c::ArbLike) where {T <: Matrices} = c*A
+Base.:(*)(A::T, c::AcbLike) where {T<:Matrices} = c * A
+Base.:(*)(A::T, c::ArbLike) where {T<:Matrices} = c * A
 
 # scalar division
-function Base.:(\)(c::ArbLike, A::T) where {T <: Matrices}
+function Base.:(\)(c::ArbLike, A::T) where {T<:Matrices}
     C = similar(A)
-    Arblib.div!(C,A,c)
+    Arblib.div!(C, A, c)
 end
 function Base.:(\)(c::AcbLike, A::AcbMatrixLike)
     C = similar(A)
-    Arblib.div!(C,A,c)
+    Arblib.div!(C, A, c)
 end
 function Base.:(\)(c::AcbLike, A::ArbMatrixLike)
     C = AcbMatrix(A)
-    Arblib.div!(C,C,c)
+    Arblib.div!(C, C, c)
 end
-Base.:(/)(A::T, c::AcbLike) where {T <: Matrices} = c\A
-Base.:(/)(A::T, c::ArbLike) where {T <: Matrices} = c\A
+Base.:(/)(A::T, c::AcbLike) where {T<:Matrices} = c \ A
+Base.:(/)(A::T, c::ArbLike) where {T<:Matrices} = c \ A
 
 # lu factorization
 function LinearAlgebra.lu!(A::T) where {T<:Matrices}
