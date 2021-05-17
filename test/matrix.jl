@@ -60,14 +60,14 @@
         @test A / c isa TMat
         @test A / c == AInt / cInt
         if TRef <: Real
-            @test Acb(c) * A is AcbMatrix
+            @test Acb(c) * A isa AcbMatrix
             @test Acb(c) * A == c * A
-            @test A * Acb(c) is AcbMatrix
+            @test A * Acb(c) isa AcbMatrix
             @test A * Acb(c) == A * c
 
-            @test Acb(c) \ A is AcbMatrix
+            @test Acb(c) \ A isa AcbMatrix
             @test Acb(c) \ A == c \ A
-            @test A / Acb(c) is AcbMatrix
+            @test A / Acb(c) isa AcbMatrix
             @test A / Acb(c) == A / c
         end
     end
