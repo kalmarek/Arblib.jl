@@ -44,7 +44,7 @@
         @test A * B == AInt * BInt
         @test A * B isa TMat
     end
-    
+
     @testset "scalar arithmetic" begin
         AInt = [2 4; 6 8]
         A = TMat(AInt; prec = 96)
