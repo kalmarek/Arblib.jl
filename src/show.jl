@@ -62,12 +62,9 @@ function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,Ac
         x = poly[i]
         if !iszero(x)
             str =
-                ifelse(!isreal(x), "(", "") *
-                "$x" *
-                ifelse(!isreal(x), ")", "") *
+                ifelse(!isreal(x), "(", "") * "$x" * ifelse(!isreal(x), ")", "") *
                 ifelse(i > 0, "⋅x", "") *
-                ifelse(i > 1, "^$i", "") *
-                ifelse(i != N, " + ", "")
+                ifelse(i > 1, "^$i", "") * ifelse(i != N, " + ", "")
             print(io, str)
         end
     end
@@ -76,8 +73,7 @@ function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,Ac
         str =
             ifelse(iszero(poly), "", " + ") *
             "𝒪(x" *
-            ifelse(degree(poly) == 0, "", "^$(degree(poly) + 1)") *
-            ")"
+            ifelse(degree(poly) == 0, "", "^$(degree(poly) + 1)") * ")"
         print(io, str)
     end
 end
