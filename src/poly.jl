@@ -189,6 +189,8 @@ fromroots(::Type{AcbPoly}, roots::AcbVector; prec::Integer = DEFAULT_PRECISION[]
 fromroots(::Type{AcbPoly}, roots::AbstractVector; prec::Integer = DEFAULT_PRECISION[]) =
     fromroots(AcbPoly, AcbVector(roots, prec = prec), prec = prec)
 
+Base.copy(p::Union{Poly,Series}) = set!(zero(p), p)
+
 ##
 ## Evaluation
 ##
