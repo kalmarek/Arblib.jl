@@ -66,4 +66,19 @@
             @test precision(TSeries(ArbSeries(prec = 64))) == 64
         end
     end
+
+    @testset "Evaluation" begin
+        p = TSeries([1, 2, 3])
+
+        @test p(Arb(2)) == p(2) == p(2.0) == 17
+        @test p(Acb(1, 2)) == p(1 + 2im) == p(1.0 + 2.0im) == -6 + 16im
+
+        @test Arblib.evaluate2(p, Arb(2)) == Arblib.evaluate2(p, 2) == (17, 14)
+        @test Arblib.evaluate2(p, Acb(1, 2)) ==
+              Arblib.evaluate2(p, 1 + 2im) ==
+              (-6 + 16im, 8 + 12im)
+
+        @test precision(p(T())) == precision(p(T(prec = 2precision(p)))) == precision(p)
+        @test precision(TSeries(prec = 80)(T())) == 80
+    end
 end

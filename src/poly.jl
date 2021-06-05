@@ -188,3 +188,36 @@ fromroots(::Type{AcbPoly}, roots::AcbVector; prec::Integer = DEFAULT_PRECISION[]
     product_roots!(AcbPoly(prec = prec), roots)
 fromroots(::Type{AcbPoly}, roots::AbstractVector; prec::Integer = DEFAULT_PRECISION[]) =
     fromroots(AcbPoly, AcbVector(roots, prec = prec), prec = prec)
+
+##
+## Evaluation
+##
+
+(p::Union{ArbPoly,ArbSeries})(x::ArbOrRef) = evaluate!(Arb(prec = precision(p)), p, x)
+
+(p::Union{ArbPoly,ArbSeries})(x::Real) =
+    evaluate!(Arb(prec = precision(p)), p, convert(Arb, x))
+
+(p::Union{Poly,Series})(x::AcbOrRef) = evaluate!(Acb(prec = precision(p)), p, x)
+
+(p::Union{Poly,Series})(x) = evaluate!(Acb(prec = precision(p)), p, convert(Acb, x))
+
+function evaluate2(p::Union{ArbPoly,ArbSeries}, x::ArbOrRef)
+    res1, res2 = Arb(prec = precision(p)), Arb(prec = precision(p))
+    evaluate2!(res1, res2, p, x)
+    return (res1, res2)
+end
+
+function evaluate2(p::Union{ArbPoly,ArbSeries}, x::Real)
+    res1, res2 = Arb(prec = precision(p)), Arb(prec = precision(p))
+    evaluate2!(res1, res2, p, convert(Arb, x))
+    return (res1, res2)
+end
+
+function evaluate2(p::Union{Poly,Series}, x::AcbOrRef)
+    res1, res2 = Acb(prec = precision(p)), Acb(prec = precision(p))
+    evaluate2!(res1, res2, p, x)
+    return (res1, res2)
+end
+
+evaluate2(p::Union{Poly,Series}, x::T) where {T} = evaluate2(p, convert(Acb, x))
