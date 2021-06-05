@@ -85,5 +85,16 @@
         @test precision(p(T())) == precision(p(T(prec = 2precision(p)))) == precision(p)
         @test precision(TPoly(prec = 80)(T())) == 80
     end
+
+    @testset "Differentiation and integration" begin
+        p = TPoly([1, 2, 3])
+
+        @test Arblib.derivative(p) == TPoly([2, 6])
+        @test Arblib.integral(p) == TPoly([0, 1, 1, 1])
+
+        @test precision(Arblib.derivative(p)) == precision(p)
+        @test precision(Arblib.integral(p)) == precision(p)
+        @test precision(Arblib.derivative(TPoly(prec = 80))) == 80
+        @test precision(Arblib.integral(TPoly(prec = 80))) == 80
     end
 end

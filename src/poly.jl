@@ -223,3 +223,15 @@ function evaluate2(p::Union{Poly,Series}, x::AcbOrRef)
 end
 
 evaluate2(p::Union{Poly,Series}, x::T) where {T} = evaluate2(p, convert(Acb, x))
+
+##
+## Differentiation and integration
+##
+
+derivative(p::Poly) = derivative!(zero(p), p)
+derivative(p::T) where {T<:Series} =
+    derivative!(T(degree = degree(p) - 1, prec = precision(p)), p)
+
+integral(p::Poly) = integral!(zero(p), p)
+integral(p::T) where {T<:Series} =
+    integral!(T(degree = degree(p) + 1, prec = precision(p)), p)

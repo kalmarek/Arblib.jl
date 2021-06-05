@@ -81,4 +81,19 @@
         @test precision(p(T())) == precision(p(T(prec = 2precision(p)))) == precision(p)
         @test precision(TSeries(prec = 80)(T())) == 80
     end
+
+    @testset "Differentiation and integration" begin
+        p = TSeries([1, 2, 3])
+
+        @test Arblib.derivative(p) == TSeries([2, 6])
+        @test Arblib.integral(p) == TSeries([0, 1, 1, 1])
+
+        @test precision(Arblib.derivative(p)) == precision(p)
+        @test precision(Arblib.integral(p)) == precision(p)
+        @test precision(Arblib.derivative(TSeries(prec = 80))) == 80
+        @test precision(Arblib.integral(TSeries(prec = 80))) == 80
+
+        @test Arblib.degree(Arblib.derivative(p)) == 1
+        @test Arblib.degree(Arblib.integral(p)) == 3
+    end
 end
