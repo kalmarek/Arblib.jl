@@ -20,6 +20,8 @@ Base.size(p::Poly, d::Integer) = d < 1 ? throw(BoundsError()) : d == 1 ? length(
 degree(p::ArbSeries) = p.degree
 degree(p::AcbSeries) = p.degree
 
+_degree(p::Series, q::Series) = min(degree(p), degree(q))
+
 ##
 ## Get and set coefficients
 ##
@@ -191,6 +193,153 @@ fromroots(::Type{AcbPoly}, roots::AbstractVector; prec::Integer = DEFAULT_PRECIS
 
 Base.copy(p::Union{Poly,Series}) = set!(zero(p), p)
 
+##
+## Arithmetic
+##
+
+Base.:-(p::Union{Poly,Series}) = neg!(zero(p), p)
+
+Base.:+(p::T, q::T) where {T<:Poly} = add!(T(prec = _precision((p, q))), p, q)
+Base.:-(p::T, q::T) where {T<:Poly} = sub!(T(prec = _precision((p, q))), p, q)
+Base.:*(p::T, q::T) where {T<:Poly} = mul!(T(prec = _precision((p, q))), p, q)
+
+function Base.:+(p::AcbPoly, q::ArbPoly)
+    res = AcbPoly(q, prec = _precision((p, q)))
+    return add!(res, p, res)
+end
+Base.:+(p::ArbPoly, q::AcbPoly) = q + p
+
+function Base.:-(p::AcbPoly, q::ArbPoly)
+    res = AcbPoly(q, prec = _precision((p, q)))
+    return sub!(res, p, res)
+end
+function Base.:-(p::ArbPoly, q::AcbPoly)
+    res = AcbPoly(p, prec = _precision((p, q)))
+    return sub!(res, res, q)
+end
+
+function Base.:*(p::AcbPoly, q::ArbPoly)
+    res = AcbPoly(q, prec = _precision((p, q)))
+    return mul!(res, p, res)
+end
+Base.:*(p::ArbPoly, q::AcbPoly) = q * p
+
+# We can't define these as `(p::T, q::T) where {T <: Series}` due to
+# method ambiguity issues.
+for T in [ArbSeries, AcbSeries]
+    @eval function Base.:+(p::$T, q::$T)
+        deg = _degree(p, q)
+        return add_series!($T(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
+    end
+    @eval function Base.:-(p::$T, q::$T)
+        deg = _degree(p, q)
+        return sub_series!($T(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
+    end
+    @eval function Base.:*(p::$T, q::$T)
+        deg = _degree(p, q)
+        return mullow!($T(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
+    end
+    @eval function Base.:/(p::$T, q::$T)
+        deg = _degree(p, q)
+        return div_series!($T(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
+    end
+end
+
+function Base.:+(p::AcbSeries, q::ArbSeries)
+    deg = _degree(p, q)
+    res = AcbSeries(q, degree = deg, prec = _precision((p, q)))
+    return add_series!(res, p, res, deg + 1)
+end
+Base.:+(p::ArbSeries, q::AcbSeries) = q + p
+
+function Base.:-(p::AcbSeries, q::ArbSeries)
+    deg = _degree(p, q)
+    res = AcbSeries(q, degree = deg, prec = _precision((p, q)))
+    return sub_series!(res, p, res, deg + 1)
+end
+function Base.:-(p::ArbSeries, q::AcbSeries)
+    deg = _degree(p, q)
+    res = AcbSeries(p, degree = deg, prec = _precision((p, q)))
+    return sub_series!(res, res, q, deg + 1)
+end
+
+function Base.:*(p::AcbSeries, q::ArbSeries)
+    deg = _degree(p, q)
+    res = AcbSeries(q, degree = deg, prec = _precision((p, q)))
+    return mullow!(res, p, res, deg + 1)
+end
+Base.:*(p::ArbSeries, q::AcbSeries) = q * p
+
+function Base.:/(p::AcbSeries, q::ArbSeries)
+    deg = _degree(p, q)
+    res = AcbSeries(q, degree = deg, prec = _precision((p, q)))
+    return div_series!(res, p, res, deg + 1)
+end
+function Base.:/(p::ArbSeries, q::AcbSeries)
+    deg = _degree(p, q)
+    res = AcbSeries(p, degree = deg, prec = _precision((p, q)))
+    return div_series!(res, res, q, deg + 1)
+end
+
+Base.inv(p::Series) = inv_series!(zero(p), p, degree(p) + 1)
+
+# TODO: Implement separate ÷ and rem as well? They are only
+# implemented for vectors in Arb so we would have to call those
+# functions manually.
+function Base.divrem(p::T, q::T) where {T<:Poly}
+    quotient = T(prec = _precision((p, q)))
+    remainder = T(prec = _precision((p, q)))
+    divrem!(quotient, remainder, p, q)
+    return quotient, remainder
+end
+
+##
+## Scalar arithmetic
+##
+
+# TODO: Promotion from ArbPoly to AcbPoly when needed?
+# TODO: Avoid conversion of Ref-types.
+# TODO: Avoid the extra allocation required for addition and
+# subtraction to extract the first coefficient.
+# TODO: How do we want to handle precision? Prioritize polynomial?
+# TODO: Take precision of polynomial into account when converting?
+for (T, Tel) in [(Union{ArbPoly,ArbSeries}, Real), (Union{AcbPoly,AcbSeries}, Number)]
+    @eval function Base.:+(p::$T, c::$Tel)
+        res = copy(p)
+        res[0] += c
+        return res
+    end
+    @eval function Base.:+(c::$Tel, p::$T)
+        res = copy(p)
+        res[0] += c
+        return res
+    end
+
+    @eval function Base.:-(p::$T, c::$Tel)
+        res = copy(p)
+        res[0] -= c
+        return res
+    end
+    @eval function Base.:-(c::$Tel, p::$T)
+        res = -p
+        res[0] += c
+        return res
+    end
+
+    @eval Base.:*(p::$T, c::$Tel) = mul!(zero(p), p, convert(eltype(p), c))
+    @eval Base.:*(c::$Tel, p::$T) = mul!(zero(p), p, convert(eltype(p), c))
+
+    @eval Base.:/(p::$T, c::$Tel) = div!(zero(p), p, convert(eltype(p), c))
+end
+
+function Base.:/(c::Real, p::ArbSeries)
+    res = inv(p)
+    return mul!(res, res, convert(Arb, c))
+end
+function Base.:/(c::Number, p::AcbSeries)
+    res = inv(p)
+    return mul!(res, res, convert(Acb, c))
+end
 ##
 ## Evaluation
 ##

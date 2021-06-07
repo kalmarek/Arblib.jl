@@ -71,6 +71,101 @@
         end
     end
 
+    @testset "Arithmetic" begin
+        p = TSeries([1, 2, 3])
+        q = TSeries([2, 3, 4])
+
+        @test p + q == TSeries([3, 5, 7])
+        @test p - q == TSeries([-1, -1, -1])
+        @test p * q == TSeries([2, 7, 16])
+        @test q / p == TSeries([2, -1, 0])
+
+        @test -p == TSeries([-1, -2, -3])
+
+        @test inv(p) == TSeries([1, -2, 1])
+
+        let p = setprecision(p, 80), q = setprecision(q, 90)
+            @test precision(p + q) == 90
+            @test precision(p - q) == 90
+            @test precision(p * q) == 90
+            @test precision(p / q) == 90
+            @test precision(-p) == 80
+            @test precision(inv(p)) == 80
+        end
+
+        if TSeries == AcbSeries
+            q = ArbSeries([2, 3, 4])
+            @test p + q == q + p == TSeries([3, 5, 7])
+            @test p - q == TSeries([-1, -1, -1])
+            @test q - p == TSeries([1, 1, 1])
+            @test p * q == q * p == TSeries([2, 7, 16])
+            @test p / ArbSeries(1, degree = 2) == p
+            @test q / AcbSeries(1, degree = 2) == AcbSeries(q)
+        end
+    end
+
+    @testset "Scalar arithmetic" begin
+        p = TSeries([1, 2, 3])
+
+        @test p + T(2) ==
+              T(2) + p ==
+              p + 2 ==
+              2 + p ==
+              p + 2.0 ==
+              2.0 + p ==
+              TSeries([3, 2, 3])
+        @test p - T(2) == p - 2 == p - 2.0 == TSeries([-1, 2, 3])
+        @test T(2) - p == 2 - p == 2.0 - p == TSeries([1, -2, -3])
+        @test p * T(2) ==
+              T(2) * p ==
+              p * 2 ==
+              2 * p ==
+              p * 2.0 ==
+              2.0 * p ==
+              TSeries([2, 4, 6])
+        @test p / T(2) == p / 2 == p / 2.0 == TSeries([0.5, 1, 1.5])
+        @test T(2) / p == 2 / p == 2.0 / p == TSeries([2, -4, 2])
+
+        # TODO: Take precision of series into account when
+        # converting? So that these tests would pass.
+        #let p = setprecision(p, 512)
+        #    @test Arblib.rel_accuracy_bits((p + π)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((π + p)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((p - π)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((π - p)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((p * π)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((π * p)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((p / π)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((π / p)[0]) > 500
+        #end
+
+        let p = setprecision(p, 80)
+            @test precision(p + T(2)) ==
+                  precision(T(2) + p) ==
+                  precision(2 + p) ==
+                  precision(p + 2) ==
+                  80
+            @test precision(p - T(2)) == precision(p - 2) == 80
+            @test precision(T(2) - p) == precision(2 - p) == 80
+            @test precision(p * T(2)) ==
+                  precision(T(2) * p) ==
+                  precision(2 * p) ==
+                  precision(p * 2) ==
+                  80
+            @test precision(p / T(2)) == precision(p / 2) == 80
+            @test precision(T(2) / p) == precision(2 / p) == 80
+        end
+
+        if TSeries == AcbSeries
+            @test p + Arb(2) == Arb(2) + p == TSeries([3, 2, 3])
+            @test p - Arb(2) == TSeries([-1, 2, 3])
+            @test Arb(2) - p == TSeries([1, -2, -3])
+            @test p * Arb(2) == Arb(2) * p == TSeries([2, 4, 6])
+            @test p / Arb(2) == TSeries([0.5, 1, 1.5])
+            @test Arb(2) / p == TSeries([2, -4, 2])
+        end
+    end
+
     @testset "Evaluation" begin
         p = TSeries([1, 2, 3])
 

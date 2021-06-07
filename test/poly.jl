@@ -75,6 +75,91 @@
         end
     end
 
+    @testset "Arithmetic" begin
+        p = TPoly([1, 2, 3])
+        q = TPoly([2, 3, 4])
+
+        @test p + q == TPoly([3, 5, 7])
+        @test p - q == TPoly([-1, -1, -1])
+        @test p * q == TPoly([2, 7, 16, 17, 12])
+
+        @test -p == TPoly([-1, -2, -3])
+
+        @test divrem(p, TPoly([0, 1])) == (TPoly([2, 3]), TPoly([1]))
+
+        @test precision(setprecision(p, 80) + setprecision(q, 90)) == 90
+        @test precision(setprecision(p, 80) - setprecision(q, 90)) == 90
+        @test precision(setprecision(p, 80) * setprecision(q, 90)) == 90
+        @test precision(-setprecision(p, 80)) == 80
+        @test precision.(divrem(setprecision(p, 80), TPoly([0, 1], prec = 90))) == (90, 90)
+
+        if TPoly == AcbPoly
+            q = ArbPoly([2, 3, 4])
+            @test p + q == q + p == TPoly([3, 5, 7])
+            @test p - q == TPoly([-1, -1, -1])
+            @test q - p == TPoly([1, 1, 1])
+            @test p * q == q * p == TPoly([2, 7, 16, 17, 12])
+        end
+    end
+
+    @testset "Scalar arithmetic" begin
+        p = TPoly([1, 2, 3])
+
+        @test p + T(2) ==
+              T(2) + p ==
+              p + 2 ==
+              2 + p ==
+              p + 2.0 ==
+              2.0 + p ==
+              TPoly([3, 2, 3])
+        @test p - T(2) == p - 2 == p - 2.0 == TPoly([-1, 2, 3])
+        @test T(2) - p == 2 - p == 2.0 - p == TPoly([1, -2, -3])
+        @test p * T(2) ==
+              T(2) * p ==
+              p * 2 ==
+              2 * p ==
+              p * 2.0 ==
+              2.0 * p ==
+              TPoly([2, 4, 6])
+        @test p / T(2) == p / 2 == p / 2.0 == TPoly([0.5, 1, 1.5])
+
+        # TODO: Take precision of polynomial into account when
+        # converting? So that these tests would pass.
+        #let p = setprecision(p, 512)
+        #    @test Arblib.rel_accuracy_bits((p + π)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((π + p)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((p - π)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((π - p)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((p * π)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((π * p)[0]) > 500
+        #    @test Arblib.rel_accuracy_bits((p / π)[0]) > 500
+        #end
+
+        let p = setprecision(p, 80)
+            @test precision(p + T(2)) ==
+                  precision(T(2) + p) ==
+                  precision(2 + p) ==
+                  precision(p + 2) ==
+                  80
+            @test precision(p - T(2)) == precision(p - 2) == 80
+            @test precision(T(2) - p) == precision(2 - p) == 80
+            @test precision(p * T(2)) ==
+                  precision(T(2) * p) ==
+                  precision(2 * p) ==
+                  precision(p * 2) ==
+                  80
+            @test precision(p / T(2)) == precision(p / 2) == 80
+        end
+
+        if TPoly == AcbPoly
+            @test p + Arb(2) == Arb(2) + p == TPoly([3, 2, 3])
+            @test p - Arb(2) == TPoly([-1, 2, 3])
+            @test Arb(2) - p == TPoly([1, -2, -3])
+            @test p * Arb(2) == Arb(2) * p == TPoly([2, 4, 6])
+            @test p / Arb(2) == TPoly([0.5, 1, 1.5])
+        end
+    end
+
     @testset "Evaluation" begin
         p = TPoly([1, 2, 3])
 
