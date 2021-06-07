@@ -70,7 +70,7 @@ end
 
 Base.@propagate_inbounds function Base.setindex!(p::Union{Poly,Series}, x, i::Integer)
     @boundscheck checkbounds(p, i)
-    set_coeff!(p, i, convert(eltype(p), x))
+    set_coeff!(p, i, eltype(p)(x, prec = precision(p)))
     return x
 end
 

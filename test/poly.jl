@@ -36,6 +36,10 @@
         end
         @test p[6] == 9
 
+        q = TPoly(prec = 512)
+        q[0] = π
+        @test Arblib.rel_accuracy_bits(q[0]) > 500
+
         @test_throws BoundsError p[-1]
     end
 
