@@ -195,4 +195,21 @@
         @test Arblib.degree(Arblib.derivative(p)) == 1
         @test Arblib.degree(Arblib.integral(p)) == 3
     end
+
+    @testset "Power methods" begin
+        p = TSeries([1, 2, 3])
+        q = TSeries([2, 3, 0])
+
+        @test p^q == TSeries([1, 4, 16])
+
+        @test p^T(2) == p^Int(2) == p^UInt(2) == p^2.0 == p^2 == TSeries([1, 4, 10])
+        @test p^T(-1) == p^Int(-1) == p^-1.0 == p^-1 == TSeries([1, -2, 1])
+
+        @test precision(setprecision(p, 80)^setprecision(q, 90)) == 90
+        @test precision(setprecision(p, 80)^T(2)) == 80
+    end
+
+    @testset "Series methods" begin
+
+    end
 end

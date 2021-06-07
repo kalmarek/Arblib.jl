@@ -186,4 +186,14 @@
         @test precision(Arblib.derivative(TPoly(prec = 80))) == 80
         @test precision(Arblib.integral(TPoly(prec = 80))) == 80
     end
+
+    @testset "Power methods" begin
+        p = TPoly([1, 2, 3])
+
+        @test p^2 == p^Int(2) == p^UInt(2) == TPoly([1, 4, 10, 12, 9])
+
+        @test precision(TPoly([1, 2, 3], prec = 80)^Int(2)) == 80
+
+        @test_throws InexactError p^Int(-1)
+    end
 end

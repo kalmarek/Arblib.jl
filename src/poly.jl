@@ -384,3 +384,31 @@ derivative(p::T) where {T<:Series} =
 integral(p::Poly) = integral!(zero(p), p)
 integral(p::T) where {T<:Series} =
     integral!(T(degree = degree(p) + 1, prec = precision(p)), p)
+
+##
+## Power methods
+##
+
+Base.:^(p::Poly, e::Integer) = pow!(zero(p), p, convert(UInt, e))
+
+function Base.:^(p::ArbSeries, q::ArbSeries)
+    deg = _degree(p, q)
+    return pow_series!(ArbSeries(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
+end
+function Base.:^(p::AcbSeries, q::AcbSeries)
+    deg = _degree(p, q)
+    return pow_series!(AcbSeries(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
+end
+
+# TODO: ArbSeries to a complex power
+Base.:^(p::ArbSeries, e::Real) = pow_arb_series!(zero(p), p, convert(Arb, e), length(p))
+function Base.:^(p::ArbSeries, e::Number)
+    res = AcbSeries(p)
+    return pow_acb_series!(res, res, convert(Acb, e), length(p))
+end
+
+Base.:^(p::AcbSeries, e::Number) = pow_acb_series!(zero(p), p, convert(Acb, e), length(p))
+
+# Disambiguation
+Base.:^(p::ArbSeries, e::Integer) = pow_arb_series!(zero(p), p, convert(Arb, e), length(p))
+Base.:^(p::AcbSeries, e::Integer) = pow_acb_series!(zero(p), p, convert(Acb, e), length(p))
