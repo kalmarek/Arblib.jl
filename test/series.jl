@@ -166,6 +166,24 @@
         end
     end
 
+    @testset "Composition" begin
+        p = TSeries([1, 2])
+        q = TSeries([0, 3])
+
+        @test Arblib.taylor_shift(p, T(2)) == Arblib.taylor_shift(p, 2) == TSeries([5, 2])
+        @test Arblib.compose(p, q) == TSeries([1, 6])
+        @test Arblib.revert(TSeries([0, 2])) == TSeries([0, 0.5])
+
+        @test precision(Arblib.taylor_shift(setprecision(p, 80), T(2))) == 80
+        @test precision(Arblib.compose(setprecision(p, 80), setprecision(q, 90))) == 90
+        @test precision(Arblib.revert(TSeries([0, 2], prec = 80))) == 80
+
+        @test_throws ArgumentError Arblib.compose(p, TSeries([1, 1]))
+        @test_throws ArgumentError Arblib.revert(TSeries([0]))
+        @test_throws ArgumentError Arblib.revert(TSeries([1, 1]))
+        @test_throws ArgumentError Arblib.revert(TSeries([0, 0, 1]))
+    end
+
     @testset "Evaluation" begin
         p = TSeries([1, 2, 3])
 

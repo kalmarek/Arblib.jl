@@ -160,6 +160,17 @@
         end
     end
 
+    @testset "Composition" begin
+        p = TPoly([1, 2])
+        q = TPoly([2, 3])
+
+        @test Arblib.taylor_shift(p, T(2)) == Arblib.taylor_shift(p, 2) == TPoly([5, 2])
+        @test Arblib.compose(p, q) == TPoly([5, 6])
+
+        @test precision(Arblib.taylor_shift(setprecision(p, 80), T(2))) == 80
+        @test precision(Arblib.compose(setprecision(p, 80), setprecision(q, 90))) == 90
+    end
+
     @testset "Evaluation" begin
         p = TPoly([1, 2, 3])
 
