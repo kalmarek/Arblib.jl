@@ -437,3 +437,38 @@ Base.:^(p::AcbSeries, e::Number) = pow_acb_series!(zero(p), p, convert(Acb, e), 
 # Disambiguation
 Base.:^(p::ArbSeries, e::Integer) = pow_arb_series!(zero(p), p, convert(Arb, e), length(p))
 Base.:^(p::AcbSeries, e::Integer) = pow_acb_series!(zero(p), p, convert(Acb, e), length(p))
+
+##
+## Series methods
+##
+
+for f in [:sqrt, :log, :log1p, :exp, :sin, :cos, :tan, :atan, :sinh, :cosh]
+    @eval Base.$f(p::Series) = $(Symbol(f, :_series!))(zero(p), p, length(p))
+end
+
+Base.asin(p::ArbSeries) = asin_series(zero(p), p, length(p))
+Base.acos(p::ArbSeries) = asin_series(zero(p), p, length(p))
+
+rsqrt(p::Series) = rsqrt_series!(zero(p), p, length(p))
+
+Base.sinpi(p::Series) = sin_pi_series!(zero(p), p, length(p))
+Base.cospi(p::Series) = cos_pi_series!(zero(p), p, length(p))
+cotpi(p::Series) = cot_pi_series!(zero(p), p, length(p))
+# Julias definition of sinc is equivalent to Arbs definition of sincpi
+Base.sinc(p::ArbSeries) = sinc_pi_series!(zero(p), p, length(p))
+
+function Base.sincos(p::Series)
+    s, c = zero(p), zero(p)
+    sin_cos_series!(s, c, p, length(p))
+    return (s, c)
+end
+function sincospi(p::Series)
+    s, c = zero(p), zero(p)
+    sin_cos_pi_series!(s, c, p, length(p))
+    return (s, c)
+end
+function sinhcosh(p::Series)
+    s, c = zero(p), zero(p)
+    sinh_cosh_series!(s, c, p, length(p))
+    return (s, c)
+end

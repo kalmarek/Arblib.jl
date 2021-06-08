@@ -228,6 +228,42 @@
     end
 
     @testset "Series methods" begin
+        x = T(0.8)
+        p = TSeries([x, 1])
 
+        for f in [
+            sqrt,
+            log,
+            log1p,
+            exp,
+            sin,
+            cos,
+            tan,
+            atan,
+            sinh,
+            cosh,
+            sinpi,
+            cospi,
+            Arblib.cotpi,
+            Arblib.rsqrt,
+        ]
+            res = f(p)
+            @test res[0] ≈ f(x)
+            @test !iszero(res[1])
+            iszero(res[1]) && @show f
+        end
+
+        @test all(isequal.(sincos(p), (sin(p), cos(p))))
+        @test all(Arblib.coeffs(Arblib.sincospi(p)[1]) .≈ Arblib.coeffs(sinpi(p)))
+        @test all(Arblib.coeffs(Arblib.sincospi(p)[2]) .≈ Arblib.coeffs(cospi(p)))
+        @test all(isequal.(Arblib.sinhcosh(p), (sinh(p), cosh(p))))
+
+        if TSeries == ArbPoly
+            for f in [asin, acos, sinc]
+                res = f(p)
+                @test res[0] ≈ f(x)
+                @test !iszero(res[1])
+            end
+        end
     end
 end
