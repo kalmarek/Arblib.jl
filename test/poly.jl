@@ -49,15 +49,20 @@
         @test Arblib.isx(TPoly(T[0, 1]))
         @test TPoly(T[1, 2, 0]) == TPoly(T[1, 2])
         @test TPoly(5) == TPoly(5.0) == TPoly([5.0]) == TPoly(T(5))
+        @test TPoly(TPoly([1, 2])) == TPoly(ArbSeries([1, 2])) == TPoly([1, 2])
 
         @test precision(TPoly(prec = 64)) == 64
         @test precision(TPoly(T(0), prec = 64)) == 64
         @test precision(TPoly(T[0], prec = 64)) == 64
         @test precision(zero(TPoly(prec = 64))) == 64
         @test precision(one(TPoly(prec = 64))) == 64
+        @test precision(TPoly(TPoly([1, 2], prec = 64))) == 64
+        @test precision(TPoly(ArbSeries([1, 2], prec = 64))) == 64
 
         if TPoly == AcbPoly
-            @test TPoly(ArbPoly([1, 2])) == TPoly([1, 2])
+            @test TPoly(AcbSeries([1, 2])) == TPoly(ArbPoly([1, 2])) == TPoly([1, 2])
+
+            @test precision(TPoly(AcbSeries(prec = 64))) == 64
             @test precision(TPoly(ArbPoly(prec = 64))) == 64
         end
 

@@ -89,7 +89,7 @@ end
 ## Constructors
 ##
 
-for TPoly in [:ArbPoly, :AcbPoly]
+for (TPoly, TSeries) in [(:ArbPoly, :ArbSeries), (:AcbPoly, :AcbSeries)]
     @eval $TPoly(p::cstructtype($TPoly); prec::Integer = DEFAULT_PRECISION[]) =
         set!($TPoly(prec = prec), p)
 
@@ -106,8 +106,11 @@ for TPoly in [:ArbPoly, :AcbPoly]
         end
         return p
     end
+
+    @eval $TPoly(p::Union{$TPoly,$TSeries}; prec::Integer = precision(p)) =
+        set!($TPoly(prec = prec), p)
 end
-function AcbPoly(p::ArbPoly; prec = precision(p))
+function AcbPoly(p::Union{ArbPoly,ArbSeries}; prec = precision(p))
     res = fit_length!(AcbPoly(prec = prec), length(p))
     @inbounds for i = 0:degree(p)
         res[i] = p[i]
@@ -115,7 +118,7 @@ function AcbPoly(p::ArbPoly; prec = precision(p))
     return res
 end
 
-for TSeries in [:ArbSeries, :AcbSeries]
+for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
     @eval $TSeries(
         p::cstructtype($TSeries);
         degree::Integer = degree(p),
@@ -139,9 +142,12 @@ for TSeries in [:ArbSeries, :AcbSeries]
         end
         return p
     end
+
+    @eval $TSeries(p::Union{$TPoly,$TSeries}; prec::Integer = precision(p)) =
+        set!($TSeries(degree = degree(p), prec = prec), p)
 end
-function AcbSeries(p::ArbSeries; degree = degree(p), prec = precision(p))
-    res = fit_length!(AcbSeries(degree = degree, prec = prec), degree + 1)
+function AcbSeries(p::Union{ArbPoly,ArbSeries}; degree = degree(p), prec = precision(p))
+    res = AcbSeries(degree = degree, prec = prec)
     @inbounds for i = 0:min(Arblib.degree(p), degree)
         res[i] = p[i]
     end

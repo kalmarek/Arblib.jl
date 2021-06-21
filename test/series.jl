@@ -57,16 +57,20 @@
         @test Arblib.isx(TSeries(T[0, 1]))
         @test TSeries(T[1, 2, 0]) != TSeries(T[1, 2])
         @test TSeries([5.0]) == TSeries([5]) == TSeries(T[5])
+        @test TSeries(TSeries([1, 2])) == TSeries(ArbPoly([1, 2])) == TSeries([1, 2])
 
         @test precision(TSeries(degree = 1, prec = 64)) == 64
         @test precision(TSeries(0, degree = 1, prec = 64)) == 64
         @test precision(TSeries([0], prec = 64)) == 64
         @test precision(zero(TSeries(degree = 1, prec = 64))) == 64
         @test precision(one(TSeries(degree = 1, prec = 64))) == 64
+        @test precision(TSeries(TSeries([1, 2], prec = 64))) == 64
+        @test precision(TSeries(ArbPoly([1, 2], prec = 64))) == 64
 
         if TSeries == AcbSeries
-            @test TSeries(ArbSeries([1, 2])) == TSeries([1, 2])
+            @test TSeries(AcbPoly([1, 2])) == TSeries(ArbSeries([1, 2])) == TSeries([1, 2])
             @test Arblib.degree(TSeries(ArbSeries(degree = 4))) == 4
+            @test precision(TSeries(AcbPoly(prec = 64))) == 64
             @test precision(TSeries(ArbSeries(prec = 64))) == 64
         end
     end
