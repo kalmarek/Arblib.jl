@@ -260,7 +260,7 @@
         @test all(Arblib.coeffs(Arblib.sincospi(p)[2]) .≈ Arblib.coeffs(cospi(p)))
         @test all(isequal.(Arblib.sinhcosh(p), (sinh(p), cosh(p))))
 
-        if TSeries == ArbPoly
+        if TSeries == ArbSeries
             for f in [asin, acos, sinc]
                 res = f(p)
                 @test res[0] ≈ f(x)

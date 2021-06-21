@@ -445,8 +445,8 @@ for f in [:sqrt, :log, :log1p, :exp, :sin, :cos, :tan, :atan, :sinh, :cosh]
     @eval Base.$f(p::Series) = $(Symbol(f, :_series!))(zero(p), p, length(p))
 end
 
-Base.asin(p::ArbSeries) = asin_series(zero(p), p, length(p))
-Base.acos(p::ArbSeries) = asin_series(zero(p), p, length(p))
+Base.asin(p::ArbSeries) = asin_series!(zero(p), p, length(p))
+Base.acos(p::ArbSeries) = acos_series!(zero(p), p, length(p))
 
 rsqrt(p::Series) = rsqrt_series!(zero(p), p, length(p))
 
