@@ -303,19 +303,11 @@ end
 ## Scalar arithmetic
 ##
 
-# TODO: Promotion from ArbPoly to AcbPoly when needed?
 # TODO: Avoid conversion of Ref-types.
 # TODO: Avoid the extra allocation required for addition and
 # subtraction to extract the first coefficient.
-# TODO: How do we want to handle precision? Prioritize polynomial?
-# TODO: Take precision of polynomial into account when converting?
 for (T, Tel) in [(Union{ArbPoly,ArbSeries}, Real), (Union{AcbPoly,AcbSeries}, Number)]
     @eval function Base.:+(p::$T, c::$Tel)
-        res = copy(p)
-        res[0] += c
-        return res
-    end
-    @eval function Base.:+(c::$Tel, p::$T)
         res = copy(p)
         res[0] += c
         return res
@@ -333,14 +325,51 @@ for (T, Tel) in [(Union{ArbPoly,ArbSeries}, Real), (Union{AcbPoly,AcbSeries}, Nu
     end
 
     @eval Base.:*(p::$T, c::$Tel) = mul!(zero(p), p, convert(eltype(p), c))
-    @eval Base.:*(c::$Tel, p::$T) = mul!(zero(p), p, convert(eltype(p), c))
 
     @eval Base.:/(p::$T, c::$Tel) = div!(zero(p), p, convert(eltype(p), c))
 end
 
+# Promotion to complex
+for (T, complexT) in [(ArbPoly, AcbPoly), (ArbSeries, AcbSeries)]
+    @eval function Base.:+(p::$T, c::Union{AcbOrRef,Complex})
+        res = $complexT(p)
+        res[0] += c
+        return res
+    end
+
+    @eval function Base.:-(p::$T, c::Union{AcbOrRef,Complex})
+        res = $complexT(p)
+        res[0] -= c
+        return res
+    end
+    @eval function Base.:-(c::Union{AcbOrRef,Complex}, p::$T)
+        res = $complexT(p)
+        neg!(res, res)
+        res[0] += c
+        return res
+    end
+
+    @eval function Base.:*(p::$T, c::Union{AcbOrRef,Complex})
+        res = $complexT(p)
+        return mul!(res, res, convert(Acb, c))
+    end
+
+    @eval function Base.:/(p::$T, c::Union{AcbOrRef,Complex})
+        res = $complexT(p)
+        return div!(res, res, convert(Acb, c))
+    end
+end
+
+Base.:+(c::Number, p::Union{Poly,Series}) = p + c
+Base.:*(c::Number, p::Union{Poly,Series}) = p * c
+
 function Base.:/(c::Real, p::ArbSeries)
     res = inv(p)
     return mul!(res, res, convert(Arb, c))
+end
+function Base.:/(c::Union{AcbOrRef,Complex}, p::ArbSeries)
+    res = AcbSeries(inv(p))
+    return mul!(res, res, convert(Acb, c))
 end
 function Base.:/(c::Number, p::AcbSeries)
     res = inv(p)

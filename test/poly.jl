@@ -128,18 +128,6 @@
               TPoly([2, 4, 6])
         @test p / T(2) == p / 2 == p / 2.0 == TPoly([0.5, 1, 1.5])
 
-        # TODO: Take precision of polynomial into account when
-        # converting? So that these tests would pass.
-        #let p = setprecision(p, 512)
-        #    @test Arblib.rel_accuracy_bits((p + π)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((π + p)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((p - π)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((π - p)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((p * π)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((π * p)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((p / π)[0]) > 500
-        #end
-
         let p = setprecision(p, 80)
             @test precision(p + T(2)) ==
                   precision(T(2) + p) ==
@@ -154,6 +142,22 @@
                   precision(p * 2) ==
                   80
             @test precision(p / T(2)) == precision(p / 2) == 80
+        end
+
+        if TPoly == ArbPoly
+            @test p + im == p + Acb(im) == AcbPoly([1 + im, 2, 3])
+            @test p - im == p - Acb(im) == AcbPoly([1 - im, 2, 3])
+            @test im - p == Acb(im) - p == AcbPoly([im - 1, -2, -3])
+            @test p * im == p * Acb(im) == AcbPoly([im, 2im, 3im])
+            @test p / im == p / Acb(im) == AcbPoly([-im, -2im, -3im])
+
+            let p = setprecision(p, 80)
+                @test precision(p + im) == 80
+                @test precision(p - im) == 80
+                @test precision(im - p) == 80
+                @test precision(p * im) == 80
+                @test precision(p / im) == 80
+            end
         end
 
         if TPoly == AcbPoly

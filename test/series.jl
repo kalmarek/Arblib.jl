@@ -130,19 +130,6 @@
         @test p / T(2) == p / 2 == p / 2.0 == TSeries([0.5, 1, 1.5])
         @test T(2) / p == 2 / p == 2.0 / p == TSeries([2, -4, 2])
 
-        # TODO: Take precision of series into account when
-        # converting? So that these tests would pass.
-        #let p = setprecision(p, 512)
-        #    @test Arblib.rel_accuracy_bits((p + π)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((π + p)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((p - π)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((π - p)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((p * π)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((π * p)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((p / π)[0]) > 500
-        #    @test Arblib.rel_accuracy_bits((π / p)[0]) > 500
-        #end
-
         let p = setprecision(p, 80)
             @test precision(p + T(2)) ==
                   precision(T(2) + p) ==
@@ -158,6 +145,23 @@
                   80
             @test precision(p / T(2)) == precision(p / 2) == 80
             @test precision(T(2) / p) == precision(2 / p) == 80
+        end
+
+        if TSeries == ArbSeries
+            @test p + im == p + Acb(im) == AcbSeries([1 + im, 2, 3])
+            @test p - im == p - Acb(im) == AcbSeries([1 - im, 2, 3])
+            @test im - p == Acb(im) - p == AcbSeries([im - 1, -2, -3])
+            @test p * im == p * Acb(im) == AcbSeries([im, 2im, 3im])
+            @test p / im == p / Acb(im) == AcbSeries([-im, -2im, -3im])
+            @test im / p == Acb(im) / p == AcbSeries([im, -2im, im])
+
+            let p = setprecision(p, 80)
+                @test precision(p + im) == 80
+                @test precision(p - im) == 80
+                @test precision(im - p) == 80
+                @test precision(p * im) == 80
+                @test precision(p / im) == 80
+            end
         end
 
         if TSeries == AcbSeries
