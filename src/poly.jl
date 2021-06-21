@@ -425,7 +425,6 @@ function Base.:^(p::AcbSeries, q::AcbSeries)
     return pow_series!(AcbSeries(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
 end
 
-# TODO: ArbSeries to a complex power
 Base.:^(p::ArbSeries, e::Real) = pow_arb_series!(zero(p), p, convert(Arb, e), length(p))
 function Base.:^(p::ArbSeries, e::Number)
     res = AcbSeries(p)
