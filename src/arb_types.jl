@@ -30,7 +30,7 @@ mutable struct mag_struct
         return res
     end
 
-    function mag_struct(x::Union{mag_struct,arf_struct})
+    function mag_struct(x::Union{mag_struct,arf_struct,Ptr{arf_struct}})
         res = new()
         init_set!(res, x)
         finalizer(clear!, res)

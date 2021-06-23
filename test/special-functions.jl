@@ -4,16 +4,22 @@
         @test gamma(Arb(3)) ≈ gamma(3)
         @test gamma(Acb(2 + 2im)) ≈ gamma(2 + 2im)
         @test gamma(Acb(3 + 3im)) ≈ gamma(3 + 3im)
+        @test gamma(ArbSeries([2, 1]))[0] ≈ gamma(2)
+        @test gamma(AcbSeries([2 + 2im, 1]))[0] ≈ gamma(2 + 2im)
 
         @test loggamma(Arb(2)) ≈ loggamma(2)
         @test loggamma(Arb(3)) ≈ loggamma(3)
         @test loggamma(Acb(2 + 2im)) ≈ loggamma(2 + 2im)
         @test loggamma(Acb(3 + 3im)) ≈ loggamma(3 + 3im)
+        @test loggamma(ArbSeries([2, 1]))[0] ≈ loggamma(2)
+        @test loggamma(AcbSeries([2 + 2im, 1]))[0] ≈ loggamma(2 + 2im)
 
         @test digamma(Arb(2)) ≈ digamma(2)
         @test digamma(Arb(3)) ≈ digamma(3)
         @test digamma(Acb(2 + 2im)) ≈ digamma(2 + 2im)
         @test digamma(Acb(3 + 3im)) ≈ digamma(3 + 3im)
+        @test digamma(ArbSeries([2, 1]))[0] ≈ digamma(2)
+        @test digamma(AcbSeries([2 + 2im, 1]))[0] ≈ digamma(2 + 2im)
 
         @test trigamma(Acb(2 + 2im)) ≈ trigamma(2 + 2im)
         @test trigamma(Acb(3 + 3im)) ≈ trigamma(3 + 3im)
@@ -25,15 +31,29 @@
         @test gamma(Arb(3), Arb(4)) ≈ gamma(3, 4)
         @test gamma(Acb(2 + 2im), Acb(3 + 3im)) ≈ gamma(2 + 2im, 3 + 3im)
         @test gamma(Acb(3 + 3im), Acb(4 + 4im)) ≈ gamma(3 + 3im, 4 + 4im)
+        @test gamma(Arb(2), ArbSeries([3, 1]))[0] ≈ gamma(2, 3)
+        @test gamma(Acb(2 + 2im), AcbSeries([3 + 3im, 1]))[0] ≈ gamma(2 + 2im, 3 + 3im)
 
         @test all(gamma_inc(Arb(2), Arb(3)) .≈ gamma_inc(2, 3))
         @test all(gamma_inc(Arb(3), Arb(4)) .≈ gamma_inc(3, 4))
         @test all(gamma_inc(Acb(2), Acb(3)) .≈ gamma_inc(2, 3))
+        @test all(gamma_inc(Acb(3), Acb(4)) .≈ gamma_inc(3, 4))
+        @test all(getindex.(gamma_inc(Arb(2), ArbSeries([3, 1])), 0) .≈ gamma_inc(2, 3))
+        @test all(getindex.(gamma_inc(Acb(2), AcbSeries([3, 1])), 0) .≈ gamma_inc(2, 3))
+
 
         @test all(beta_inc(Arb(2), Arb(3), Arb(1 // 2)) .≈ beta_inc(2.0, 3.0, 0.5))
         @test all(beta_inc(Arb(3), Arb(4), Arb(1 // 4)) .≈ beta_inc(3.0, 4.0, 0.25))
         @test all(beta_inc(Acb(2), Acb(3), Acb(1 // 2)) .≈ beta_inc(2.0, 3.0, 0.5))
         @test all(beta_inc(Acb(3), Acb(4), Acb(1 // 4)) .≈ beta_inc(3.0, 4.0, 0.25))
+        @test all(
+            getindex.(beta_inc(Arb(2), Arb(3), ArbSeries([1 // 2, 1])), 0) .≈
+            beta_inc(2.0, 3.0, 0.5),
+        )
+        @test all(
+            getindex.(beta_inc(Acb(2), Acb(3), AcbSeries([1 // 2, 1])), 0) .≈
+            beta_inc(2.0, 3.0, 0.5),
+        )
     end
 
     @testset "Trigonometric Integrals" begin
@@ -41,26 +61,36 @@
         @test expint(Arb(3), Arb(4)) ≈ expint(3, 4)
         @test expint(Acb(2 + 2im), Acb(3 + 3im)) ≈ expint(2 + 2im, 3 + 3im)
         @test expint(Acb(3 + 3im), Acb(4 + 4im)) ≈ expint(3 + 3im, 4 + 4im)
+        @test expint(Arb(2), ArbSeries([3, 1]))[0] ≈ expint(2, 3)
+        @test expint(Acb(2 + 2im), AcbSeries([3 + 3im, 1]))[0] ≈ expint(2 + 2im, 3 + 3im)
 
         @test expint(Arb(2)) ≈ expint(2)
         @test expint(Arb(3)) ≈ expint(3)
         @test expint(Acb(2 + 2im)) ≈ expint(2 + 2im)
         @test expint(Acb(3 + 3im)) ≈ expint(3 + 3im)
+        @test expint(ArbSeries([2, 1]))[0] ≈ expint(2)
+        @test expint(AcbSeries([2 + 2im, 1]))[0] ≈ expint(2 + 2im)
 
         @test expinti(Arb(2)) ≈ expinti(2)
         @test expinti(Arb(3)) ≈ expinti(3)
         @test expinti(Acb(2)) ≈ expinti(2)
         @test expinti(Acb(3)) ≈ expinti(3)
+        @test expinti(ArbSeries([2, 1]))[0] ≈ expinti(2)
+        @test expinti(AcbSeries([2, 1]))[0] ≈ expinti(2)
 
         @test sinint(Arb(2)) ≈ sinint(2)
         @test sinint(Arb(3)) ≈ sinint(3)
         @test sinint(Acb(2)) ≈ sinint(2)
         @test sinint(Acb(3)) ≈ sinint(3)
+        @test sinint(ArbSeries([2, 1]))[0] ≈ sinint(2)
+        @test sinint(AcbSeries([2, 1]))[0] ≈ sinint(2)
 
         @test cosint(Arb(2)) ≈ cosint(2)
         @test cosint(Arb(3)) ≈ cosint(3)
         @test cosint(Acb(2)) ≈ cosint(2)
         @test cosint(Acb(3)) ≈ cosint(3)
+        @test cosint(ArbSeries([2, 1]))[0] ≈ cosint(2)
+        @test cosint(AcbSeries([2, 1]))[0] ≈ cosint(2)
     end
 
     @testset "Error Functions" begin
@@ -68,11 +98,15 @@
         @test erf(Arb(3)) ≈ erf(3)
         @test erf(Acb(2 + 2im)) ≈ erf(2 + 2im)
         @test erf(Acb(3 + 3im)) ≈ erf(3 + 3im)
+        @test erf(ArbSeries([2, 1]))[0] ≈ erf(2)
+        @test erf(AcbSeries([2 + 2im, 1]))[0] ≈ erf(2 + 2im)
 
         @test erfc(Arb(2)) ≈ erfc(2)
         @test erfc(Arb(3)) ≈ erfc(3)
         @test erfc(Acb(2 + 2im)) ≈ erfc(2 + 2im)
         @test erfc(Acb(3 + 3im)) ≈ erfc(3 + 3im)
+        @test erfc(ArbSeries([2, 1]))[0] ≈ erfc(2)
+        @test erfc(AcbSeries([2 + 2im, 1]))[0] ≈ erfc(2 + 2im)
     end
 
     @testset "Airy Functions" begin
@@ -80,21 +114,29 @@
         @test airyai(Arb(3)) ≈ airyai(3)
         @test airyai(Acb(2 + 2im)) ≈ airyai(2 + 2im)
         @test airyai(Acb(3 + 3im)) ≈ airyai(3 + 3im)
+        @test airyai(ArbSeries([2, 1]))[0] ≈ airyai(2)
+        @test airyai(AcbSeries([2 + 2im, 1]))[0] ≈ airyai(2 + 2im)
 
         @test airyaiprime(Arb(2)) ≈ airyaiprime(2)
         @test airyaiprime(Arb(3)) ≈ airyaiprime(3)
         @test airyaiprime(Acb(2 + 2im)) ≈ airyaiprime(2 + 2im)
         @test airyaiprime(Acb(3 + 3im)) ≈ airyaiprime(3 + 3im)
+        @test airyaiprime(ArbSeries([2, 1]))[0] ≈ airyaiprime(2)
+        @test airyaiprime(AcbSeries([2 + 2im, 1]))[0] ≈ airyaiprime(2 + 2im)
 
         @test airybi(Arb(2)) ≈ airybi(2)
         @test airybi(Arb(3)) ≈ airybi(3)
         @test airybi(Acb(2 + 2im)) ≈ airybi(2 + 2im)
         @test airybi(Acb(3 + 3im)) ≈ airybi(3 + 3im)
+        @test airybi(ArbSeries([2, 1]))[0] ≈ airybi(2)
+        @test airybi(AcbSeries([2 + 2im, 1]))[0] ≈ airybi(2 + 2im)
 
         @test airybiprime(Arb(2)) ≈ airybiprime(2)
         @test airybiprime(Arb(3)) ≈ airybiprime(3)
         @test airybiprime(Acb(2 + 2im)) ≈ airybiprime(2 + 2im)
         @test airybiprime(Acb(3 + 3im)) ≈ airybiprime(3 + 3im)
+        @test airybiprime(ArbSeries([2, 1]))[0] ≈ airybiprime(2)
+        @test airybiprime(AcbSeries([2 + 2im, 1]))[0] ≈ airybiprime(2 + 2im)
     end
 
     @testset "Bessel Functions" begin
@@ -165,6 +207,7 @@
     @testset "Elliptic Integrals" begin
         @test ellipk(Acb(-1)) ≈ ellipk(-1)
         @test ellipk(Acb(-2)) ≈ ellipk(-2)
+        @test ellipk(AcbSeries([-1, 1]))[0] ≈ ellipk(-1)
 
         @test ellipe(Acb(-1)) ≈ ellipe(-1)
         @test ellipe(Acb(-2)) ≈ ellipe(-2)
@@ -178,9 +221,13 @@
         @test zeta(Arb(3)) ≈ zeta(3)
         @test zeta(Acb(2 + 2im)) ≈ zeta(2 + 2im)
         @test zeta(Acb(3 + 3im)) ≈ zeta(3 + 3im)
+        @test zeta(ArbSeries([2, 1]))[0] ≈ zeta(2)
+        @test zeta(AcbSeries([2 + 2im, 1]))[0] ≈ zeta(2 + 2im)
         @test zeta(Arb(2), Arb(3)) ≈ zeta(2, 3)
         @test zeta(Arb(3), Arb(4)) ≈ zeta(3, 4)
         @test zeta(Acb(2 + 2im), Acb(3 + 3im)) ≈ zeta(2 + 2im, 3 + 3im)
         @test zeta(Acb(3 + 3im), Acb(4 + 4im)) ≈ zeta(3 + 3im, 4 + 4im)
+        @test zeta(ArbSeries([2, 1]), Arb(3))[0] ≈ zeta(2, 3)
+        @test zeta(AcbSeries([2 + 2im, 1]), Acb(3 + 3im))[0] ≈ zeta(2 + 2im, 3 + 3im)
     end
 end

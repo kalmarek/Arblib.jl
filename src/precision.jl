@@ -65,7 +65,7 @@ Base.setprecision(A::T, prec::Integer) where {T<:Union{AcbMatrix,AcbRefMatrix}} 
 
 Base.setprecision(poly::ArbPoly, prec::Integer) = ArbPoly(poly.arb_poly, prec = prec)
 Base.setprecision(series::ArbSeries, prec::Integer) =
-    ArbSeries(series.arb_poly, degree(series); prec = prec)
+    ArbSeries(series.arb_poly, degree = degree(series), prec = prec)
 Base.setprecision(poly::AcbPoly, prec::Integer) = AcbPoly(poly.acb_poly, prec = prec)
 Base.setprecision(series::AcbSeries, prec::Integer) =
-    AcbSeries(series.acb_poly, degree(series); prec = prec)
+    AcbSeries(series.acb_poly, degree = degree(series), prec = prec)

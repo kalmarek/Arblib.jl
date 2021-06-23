@@ -97,8 +97,8 @@ struct ArbSeries <: Number
     degree::Int
     prec::Int
 
-    ArbSeries(degree::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-        new(arb_poly_struct(), degree, prec)
+    ArbSeries(; degree::Integer = 0, prec::Integer = DEFAULT_PRECISION[]) =
+        fit_length!(new(arb_poly_struct(), degree, prec), degree + 1)
 end
 
 """
@@ -119,8 +119,8 @@ struct AcbSeries <: Number
     degree::Int
     prec::Int
 
-    AcbSeries(degree::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-        new(acb_poly_struct(), degree, prec)
+    AcbSeries(; degree::Integer = 0, prec::Integer = DEFAULT_PRECISION[]) =
+        fit_length!(new(acb_poly_struct(), degree, prec), degree + 1)
 end
 
 """
@@ -256,6 +256,10 @@ for prefix in [:mag, :arf, :arb, :acb]
         Base.copy(x::Union{$T,$TRef}) = $T(x)
     end
 end
+
+# ArbSeries and AcbSeries don't have Ref types but are often used in
+# similar code. It's convenient to have this method then.
+_nonreftype(::Type{T}) where {T<:Union{ArbSeries,AcbSeries}} = T
 
 const MagOrRef = Union{Mag,MagRef}
 const ArfOrRef = Union{Arf,ArfRef}
