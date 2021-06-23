@@ -132,11 +132,9 @@
             atanh,
             asinh,
         ]
-            # TODO: Replace with ≈
-            @test abs(f(T(0.5)) - f(0.5)) <= 1e-15
+            @test f(T(0.5)) ≈ f(0.5)
         end
-        # TODO: Replace with ≈
-        @test abs(acosh(T(2)) - acosh(2)) <= 1e-15
+        @test acosh(T(2)) ≈ acosh(2)
 
         @test Arblib.rsqrt(T(1 // 4)) == T(2)
         @test Arblib.sqr(T(3)) == T(9)
@@ -144,13 +142,16 @@
         @test sinpi(T(1)) == T(0)
         @test cospi(T(1)) == T(-1)
         @test Arblib.tanpi(T(1)) == T(0)
-        # TODO: Replace with ≈
-        @test abs(Arblib.cotpi(T(0.5))) <= 1e-15
-        @test abs(Arblib.cscpi(T(0.5)) - 1) <= 1e-15
-        @test abs(sinc(T(0.5)) - sinc(0.5)) <= 1e-15
+        @test Arblib.cotpi(T(0.5)) == 0
+        @test Arblib.cscpi(T(0.5)) == 1
+        @test sinc(T(0.5)) ≈ sinc(0.5)
 
         @test isequal(sincos(T(1)), (sin(T(1)), cos(T(1))))
-        @test isequal(Arblib.sincospi(T(1)), (sinpi(T(1)), cospi(T(1))))
+        if VERSION >= v"1.6"
+            @test isequal(sincospi(T(1)), (sinpi(T(1)), cospi(T(1))))
+        else
+            @test isequal(Arblib.sincospi(T(1)), (sinpi(T(1)), cospi(T(1))))
+        end
         @test isequal(Arblib.sinhcosh(T(1)), (sinh(T(1)), cosh(T(1))))
     end
 
@@ -173,8 +174,7 @@
         @test Arblib.sqrtpos(Arb(-4)) == Arb(0)
         @test Arblib.sqrt1pm1(Arb(3)) == Arb(1)
 
-        # TODO: Replace with ≈
-        @test abs(atan(Arb(2), Arb(3)) - atan(2, 3)) <= 1e-15
+        @test atan(Arb(2), Arb(3)) ≈ atan(2, 3)
 
         @test min(Arb(1), Arb(2)) == Arb(1)
         @test max(Arb(1), Arb(2)) == Arb(2)
@@ -197,7 +197,7 @@
         @test Arblib.contains(maximum(A), Arb((10, 11)))
         @test Arblib.contains(maximum(reverse(A)), Arb((10, 11)))
         @test all(Arblib.contains.(extrema(A), (Arb((0, 1)), Arb((10, 11)))))
-        # These fails with the default implementation
+        # These fails with the default implementation of minimum and maximum
         @test Arblib.contains(
             minimum([Arb((-i, -i + 1)) for i = 0:1000]),
             Arb((-1000, -999)),
