@@ -150,7 +150,11 @@
         @test abs(sinc(T(0.5)) - sinc(0.5)) <= 1e-15
 
         @test isequal(sincos(T(1)), (sin(T(1)), cos(T(1))))
-        @test isequal(Arblib.sincospi(T(1)), (sinpi(T(1)), cospi(T(1))))
+        if VERSION >= v"1.6"
+            @test isequal(sincospi(T(1)), (sinpi(T(1)), cospi(T(1))))
+        else
+            @test isequal(Arblib.sincospi(T(1)), (sinpi(T(1)), cospi(T(1))))
+        end
         @test isequal(Arblib.sinhcosh(T(1)), (sinh(T(1)), cosh(T(1))))
     end
 
