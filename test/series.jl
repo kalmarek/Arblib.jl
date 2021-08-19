@@ -228,8 +228,14 @@
 
         @test p^q == TSeries([1, 4, 16])
 
-        @test p^T(2) == p^Int(2) == p^UInt(2) == p^2.0 == p^2 == TSeries([1, 4, 10])
-        @test p^T(-1) == p^Int(-1) == p^-1.0 == p^-1 == TSeries([1, -2, 1])
+        @test p^T(2) ==
+              p^Int(2) ==
+              p^UInt(2) ==
+              p^(2 // 1) ==
+              p^2.0 ==
+              p^2 ==
+              TSeries([1, 4, 10])
+        @test p^T(-1) == p^Int(-1) == p^(-1 // 1) == p^-1.0 == p^-1 == TSeries([1, -2, 1])
 
         @test p^(2 + 2im) == AcbSeries([1, 4 + 4im, 2 + 18im])
 

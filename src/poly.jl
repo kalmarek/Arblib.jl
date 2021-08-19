@@ -471,6 +471,8 @@ Base.:^(p::AcbSeries, e::Number) = pow_acb_series!(zero(p), p, convert(Acb, e), 
 # Disambiguation
 Base.:^(p::ArbSeries, e::Integer) = pow_arb_series!(zero(p), p, convert(Arb, e), length(p))
 Base.:^(p::AcbSeries, e::Integer) = pow_acb_series!(zero(p), p, convert(Acb, e), length(p))
+Base.:^(p::ArbSeries, e::Rational) = pow_arb_series!(zero(p), p, convert(Arb, e), length(p))
+Base.:^(p::AcbSeries, e::Rational) = pow_acb_series!(zero(p), p, convert(Acb, e), length(p))
 
 ##
 ## Series methods
