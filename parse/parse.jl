@@ -178,40 +178,26 @@ function parse_and_generate_arbdoc(arb_doc_dir, out_dir = "src/arbcalls/")
         "double arf_get_d(const arf_t x, arf_rnd_t rnd)" => "clashes with arf_get_si",
         "slong arf_get_si(const arf_t x, arf_rnd_t rnd)" => "clashes with arf_get_d",
         "void arf_print(const arf_t x)" => "clashes with Base.print",
-        "int arf_mul(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)" =>
-            "defined using #DEFINE in C which doesn't work in Julia",
+        "int arf_mul(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)" => "defined using #DEFINE in C which doesn't work in Julia",
         "arb_ptr _arb_vec_init(slong n)" => "clashes with similar method for acb",
-        "double _arb_vec_estimate_allocated_bytes(slong len, slong prec)" =>
-            "clashes with similar method for acb",
+        "double _arb_vec_estimate_allocated_bytes(slong len, slong prec)" => "clashes with similar method for acb",
         "void arb_print(const arb_t x)" => "clashes with Base.print",
-        "int arb_can_round_arf(const arb_t x, slong prec, arf_rnd_t rnd)" =>
-            "clashes with arb_can_round_mpfr",
-        "int arb_can_round_mpfr(const arb_t x, slong prec, mpfr_rnd_t rnd)" =>
-            "clashes with arb_can_round_arf",
-        "void arb_root(arb_t z, const arb_t x, ulong k, slong prec)" =>
-            "alias to arb_root_ui",
+        "int arb_can_round_arf(const arb_t x, slong prec, arf_rnd_t rnd)" => "clashes with arb_can_round_mpfr",
+        "int arb_can_round_mpfr(const arb_t x, slong prec, mpfr_rnd_t rnd)" => "clashes with arb_can_round_arf",
+        "void arb_root(arb_t z, const arb_t x, ulong k, slong prec)" => "alias to arb_root_ui",
         "acb_ptr _acb_vec_init(slong n)" => "clashes with similar method for arb",
-        "double _acb_vec_estimate_allocated_bytes(slong len, slong prec)" =>
-            "clashes with similar method for arb",
+        "double _acb_vec_estimate_allocated_bytes(slong len, slong prec)" => "clashes with similar method for arb",
         "void acb_print(const acb_t x)" => "clashes with Base.print",
         "slong arb_poly_length(const arb_poly_t poly)" => "clashes with Base.length",
-        "void _arb_poly_add(arb_ptr C, arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, slong prec)" =>
-            "clashes with _arb_vec_add",
-        "void _arb_poly_sub(arb_ptr C, arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, slong prec)" =>
-            "clashes with _arb_vec_sub",
+        "void _arb_poly_add(arb_ptr C, arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, slong prec)" => "clashes with _arb_vec_add",
+        "void _arb_poly_sub(arb_ptr C, arb_srcptr A, slong lenA, arb_srcptr B, slong lenB, slong prec)" => "clashes with _arb_vec_sub",
         "slong acb_poly_length(const acb_poly_t poly)" => "clashes with Base.length",
-        "void _acb_poly_add(acb_ptr C, acb_srcptr A, slong lenA, acb_srcptr B, slong lenB, slong prec)" =>
-            "clashes with _acb_vec_add",
-        "void _acb_poly_sub(acb_ptr C, acb_srcptr A, slong lenA, acb_srcptr B, slong lenB, slong prec)" =>
-            "clashes with _acb_vec_sub",
-        "void _acb_poly_elliptic_k_series(acb_ptr res, acb_srcptr z, slong zlen, slong len, slong prec)" =>
-            "alias to _acb_elliptic_k_series",
-        "void acb_poly_elliptic_k_series(acb_poly_t res, const acb_poly_t z, slong n, slong prec)" =>
-            "alias to acb_elliptic_k_series",
-        "void _acb_poly_elliptic_p_series(acb_ptr res, acb_srcptr z, slong zlen, const acb_t tau, slong len, slong prec)" =>
-            "alias to _acb_elliptic_p_series",
-        "void acb_poly_elliptic_p_series(acb_poly_t res, const acb_poly_t z, const acb_t tau, slong n, slong prec)" =>
-            "alias to acb_elliptic_p_series",
+        "void _acb_poly_add(acb_ptr C, acb_srcptr A, slong lenA, acb_srcptr B, slong lenB, slong prec)" => "clashes with _acb_vec_add",
+        "void _acb_poly_sub(acb_ptr C, acb_srcptr A, slong lenA, acb_srcptr B, slong lenB, slong prec)" => "clashes with _acb_vec_sub",
+        "void _acb_poly_elliptic_k_series(acb_ptr res, acb_srcptr z, slong zlen, slong len, slong prec)" => "alias to _acb_elliptic_k_series",
+        "void acb_poly_elliptic_k_series(acb_poly_t res, const acb_poly_t z, slong n, slong prec)" => "alias to acb_elliptic_k_series",
+        "void _acb_poly_elliptic_p_series(acb_ptr res, acb_srcptr z, slong zlen, const acb_t tau, slong len, slong prec)" => "alias to _acb_elliptic_p_series",
+        "void acb_poly_elliptic_p_series(acb_poly_t res, const acb_poly_t z, const acb_t tau, slong n, slong prec)" => "alias to acb_elliptic_p_series",
     )
 
     for filename in filenames

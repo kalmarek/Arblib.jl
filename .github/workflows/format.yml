@@ -18,8 +18,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install JuliaFormatter and format
         run: |
-          julia  -e 'using Pkg; Pkg.add(PackageSpec(name="JuliaFormatter", version="0.14.1"))'
-          julia  -e 'using JuliaFormatter; format(["./src", "./test"], verbose=true)'
+          julia  -e 'using Pkg; Pkg.add(PackageSpec(name="JuliaFormatter", version="0.15.7"))'
+          julia  -e 'using JuliaFormatter; format(["./src", "./test", "./parse"], verbose=true)'
       - name: Format check
         run: |
           julia -e '
