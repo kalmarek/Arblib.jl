@@ -108,6 +108,11 @@ end
 Base.isnan(x::ArbOrRef) = isnan(midref(x))
 Base.isnan(x::AcbOrRef) = isnan(midref(realref(x))) || isnan(midref(imagref(x)))
 
+Base.isnan(p::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}) =
+    any(isnan, @inbounds p[i] for i = 0:degree(p))
+Base.isfinite(p::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}) =
+    all(isfinite, @inbounds p[i] for i = 0:degree(p))
+
 for ArbT in (ArfLike, ArbLike, AcbLike)
     @eval begin
         Base.isequal(y::$ArbT, x::$ArbT) = !iszero(equal(x, y))
