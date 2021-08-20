@@ -465,12 +465,26 @@ function Base.:^(p::ArbSeries, e::Number)
     res = AcbSeries(p)
     return pow_acb_series!(res, res, convert(Acb, e), length(p))
 end
+function Base.:^(x::Real, p::ArbSeries)
+    res = ArbSeries(x, degree = degree(p), prec = precision(p))
+    return pow_series!(res, res, p, length(p))
+end
+function Base.:^(x::Number, p::ArbSeries)
+    res = AcbSeries(x, degree = degree(p), prec = precision(p))
+    return pow_series!(res, res, AcbSeries(p), length(p))
+end
 
 Base.:^(p::AcbSeries, e::Number) = pow_acb_series!(zero(p), p, convert(Acb, e), length(p))
+function Base.:^(x::Number, p::AcbSeries)
+    res = AcbSeries(x, degree = degree(p), prec = precision(p))
+    return pow_series!(res, res, p, length(p))
+end
 
 # Disambiguation
 Base.:^(p::ArbSeries, e::Integer) = pow_arb_series!(zero(p), p, convert(Arb, e), length(p))
 Base.:^(p::AcbSeries, e::Integer) = pow_acb_series!(zero(p), p, convert(Acb, e), length(p))
+Base.:^(p::ArbSeries, e::Rational) = pow_arb_series!(zero(p), p, convert(Arb, e), length(p))
+Base.:^(p::AcbSeries, e::Rational) = pow_acb_series!(zero(p), p, convert(Acb, e), length(p))
 
 ##
 ## Series methods

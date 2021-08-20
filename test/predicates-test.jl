@@ -53,6 +53,23 @@
         @test !isnan(zero(Acb))
         @test !isnan(one(Acb))
         @test !isnan(Acb(Inf))
+
+        for T in [ArbPoly, ArbSeries, AcbPoly, AcbSeries]
+            @test isnan(T(NaN))
+            @test isnan(T([NaN, 0]))
+            @test isnan(T([0, NaN]))
+            @test !isnan(T(1))
+            @test !isnan(T([0, 1]))
+
+            @test isfinite(T(1))
+            @test isfinite(T([0, 1]))
+            @test !isfinite(T(NaN))
+            @test !isfinite(T([NaN, 0]))
+            @test !isfinite(T([0, NaN]))
+            @test !isfinite(T(Inf))
+            @test !isfinite(T([Inf, 0]))
+            @test !isfinite(T([0, Inf]))
+        end
     end
 
     @testset "isequal" begin
