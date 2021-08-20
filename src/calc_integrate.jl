@@ -110,6 +110,7 @@ function _integrate!(
     prec::Integer = precision(res),
     rel_goal::Integer = prec,
     abs_tol::MagLike = set_ui_2exp!(Arblib.Mag(), one(UInt), -prec),
+    warn_on_no_convergence = true,
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
 )
     status = calc_integrate!(
@@ -127,7 +128,7 @@ function _integrate!(
     # status:
     # ARB_CALC_SUCCESS = 0
     # ARB_CALC_NO_CONVERGENCE = 2
-    status == 2 && @warn "integration did not converge"
+    warn_on_no_convergence && status == 2 && @warn "integration did not converge"
 
     return res
 end
@@ -139,6 +140,7 @@ end
         prec::Integer = precision(res),
         rtol = 0.0,
         atol = 2.0^-prec,
+        warn_on_no_convergence = true,
         opts::Union{acb_calc_integrate_opt_struct, Ptr{Cvoid}} = C_NULL,
     )
 
@@ -178,6 +180,7 @@ function integrate!(
     prec::Integer = precision(res),
     rtol = 0.0,
     atol = set_ui_2exp!(Mag(), one(UInt), -prec),
+    warn_on_no_convergence = true,
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
 )
     # rtol ≈ 2^(-rel_goal)
@@ -201,6 +204,7 @@ function integrate!(
         prec = prec,
         rel_goal = rel_goal,
         abs_tol = convert(Mag, atol),
+        warn_on_no_convergence = warn_on_no_convergence,
         opts = opts,
     )
 end
@@ -215,6 +219,7 @@ function integrate!(
     prec::Integer = precision(res),
     rtol = 0.0,
     atol = set_ui_2exp!(Mag(), one(UInt), -prec),
+    warn_on_no_convergence = true,
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
 )
     return integrate!(
@@ -227,6 +232,7 @@ function integrate!(
         prec = prec,
         rtol = rtol,
         atol = atol,
+        warn_on_no_convergence = warn_on_no_convergence,
         opts = opts,
     )
 end
@@ -237,8 +243,9 @@ end
         check_analytic::Bool = false,
         take_prec::Bool = false,
         prec = max(precision(a), precision(b)),
-        rtol=0.0,
-        atol=2.0^-prec,
+        rtol = 0.0,
+        atol = 2.0^-prec,
+        warn_on_no_convergence = true,
         opts::Union{acb_calc_integrate_opt_struct, Ptr{Cvoid}} = C_NULL)
 Computes a rigorous enclosure of the integral ∫ₐᵇ f(x) dx where
 `f(x::AcbRef)` is any (holomorphic) julia function. From Arb docs:
@@ -275,6 +282,8 @@ Parameters:
    to be given.
  * `rtol` relative tolerance
  * `atol` absolute tolerance
+ * `warn_on_no_convergence` set this to false to avoid printing a
+   warning in case the integration doesn't converge.
  * `opts` a `C_NULL` (using the default options), or an instance of
    `acb_calc_integrate_opt_struct` controlling the algorithmic aspects of integration.
 
@@ -318,6 +327,7 @@ function integrate(
     prec = max(precision(a), precision(b)),
     rtol = 0.0,
     atol = set_ui_2exp!(Mag(), one(UInt), -prec),
+    warn_on_no_convergence = true,
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
 )
     f! = (res, x; kwargs...) -> set!(res, f(x; kwargs...))
@@ -332,6 +342,7 @@ function integrate(
         take_prec = take_prec,
         rtol = rtol,
         atol = atol,
+        warn_on_no_convergence = warn_on_no_convergence,
         opts = opts,
         prec = prec,
     )
@@ -346,6 +357,7 @@ function integrate(
     prec::Integer = max(_precision(a), _precision(b)),
     rtol = 0.0,
     atol = set_ui_2exp!(Mag(), one(UInt), -prec),
+    warn_on_no_convergence = true,
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
 )
     return integrate(
@@ -357,6 +369,7 @@ function integrate(
         prec = prec,
         rtol = rtol,
         atol = atol,
+        warn_on_no_convergence = warn_on_no_convergence,
         opts = opts,
     )
 end
