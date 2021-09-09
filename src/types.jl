@@ -50,7 +50,7 @@ end
 struct AcbRef <: Number
     acb_ptr::Ptr{acb_struct}
     prec::Int
-    parent::Union{Nothing,acb_vec_struct,acb_mat_struct}
+    parent::Union{Nothing,acb_vec_struct,acb_poly_struct,acb_mat_struct}
 end
 
 """
@@ -59,7 +59,7 @@ end
 struct ArbRef <: AbstractFloat
     arb_ptr::Ptr{arb_struct}
     prec::Int
-    parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_mat_struct}
+    parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_poly_struct,arb_mat_struct}
 end
 
 """

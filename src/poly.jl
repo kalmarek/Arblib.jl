@@ -76,14 +76,17 @@ Base.@propagate_inbounds function Base.setindex!(p::Union{Poly,Series}, x, i::In
     return x
 end
 
-# TODO: Add a ref method for getting references to the coefficients.
-# The main issue with this is how to handle access to indices outside
-# the length, in particular for series.
-#function ref(p::Union{ArbPoly,ArbSeries}, i::Integer)
-#    0 <= i <= length(cstruct(p)) || throw(BoundsError(p, i))
-#    ptr = cstruct(p).coeffs + i * sizeof(arb_struct)
-#    return ArbRef(ptr, precision(p), cstruct(p))
-#end
+Base.@propagate_inbounds function ref(p::Union{ArbPoly,ArbSeries}, i::Integer)
+    @boundscheck 0 <= i <= degree(p) || throw(BoundsError(p, i))
+    ptr = cstruct(p).coeffs + i * sizeof(arb_struct)
+    return ArbRef(ptr, precision(p), cstruct(p))
+end
+
+Base.@propagate_inbounds function ref(p::Union{AcbPoly,AcbSeries}, i::Integer)
+    @boundscheck 0 <= i <= degree(p) || throw(BoundsError(p, i))
+    ptr = cstruct(p).coeffs + i * sizeof(acb_struct)
+    return AcbRef(ptr, precision(p), cstruct(p))
+end
 
 ##
 ## Constructors
