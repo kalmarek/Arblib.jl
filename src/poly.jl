@@ -387,7 +387,7 @@ taylor_shift(p::Union{Poly,Series}, c) = taylor_shift!(zero(p), p, convert(eltyp
 
 compose(p::T, q::T) where {T<:Poly} = compose!(T(prec = _precision((p, q))), p, q)
 function compose(p::T, q::T) where {T<:Series}
-    iszero(q[0]) ||
+    iszero(ref(q, 0)) ||
         throw(ArgumentError("constant term of q must be zero, got q[0] = $(q[0])"))
     deg = _degree(p, q)
     res = T(degree = deg, prec = _precision((p, q)))
@@ -396,9 +396,9 @@ end
 
 function revert(p::Series)
     degree(p) >= 1 || throw(ArgumentError("p must have degree at least 1"))
-    iszero(p[0]) ||
+    iszero(ref(p, 0)) ||
         throw(ArgumentError("constant term of p must be zero, got p[0] = $(p[0])"))
-    !iszero(p[1]) ||
+    !iszero(ref(p, 1)) ||
         throw(ArgumentError("linear term of p must be non-zero, got p[0] = $(p[0])"))
     return revert_series!(zero(p), p, degree(p) + 1)
 end
