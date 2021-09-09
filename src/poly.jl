@@ -76,14 +76,17 @@ Base.@propagate_inbounds function Base.setindex!(p::Union{Poly,Series}, x, i::In
     return x
 end
 
-# TODO: Add a ref method for getting references to the coefficients.
-# The main issue with this is how to handle access to indices outside
-# the length, in particular for series.
-#function ref(p::Union{ArbPoly,ArbSeries}, i::Integer)
-#    0 <= i <= length(cstruct(p)) || throw(BoundsError(p, i))
-#    ptr = cstruct(p).coeffs + i * sizeof(arb_struct)
-#    return ArbRef(ptr, precision(p), cstruct(p))
-#end
+Base.@propagate_inbounds function ref(p::Union{ArbPoly,ArbSeries}, i::Integer)
+    @boundscheck 0 <= i <= degree(p) || throw(BoundsError(p, i))
+    ptr = cstruct(p).coeffs + i * sizeof(arb_struct)
+    return ArbRef(ptr, precision(p), cstruct(p))
+end
+
+Base.@propagate_inbounds function ref(p::Union{AcbPoly,AcbSeries}, i::Integer)
+    @boundscheck 0 <= i <= degree(p) || throw(BoundsError(p, i))
+    ptr = cstruct(p).coeffs + i * sizeof(acb_struct)
+    return AcbRef(ptr, precision(p), cstruct(p))
+end
 
 ##
 ## Constructors
@@ -303,62 +306,83 @@ end
 ## Scalar arithmetic
 ##
 
-# TODO: Avoid conversion of Ref-types.
-# TODO: Avoid the extra allocation required for addition and
-# subtraction to extract the first coefficient.
-for (T, Tel) in [(Union{ArbPoly,ArbSeries}, Real), (Union{AcbPoly,AcbSeries}, Number)]
-    @eval function Base.:+(p::$T, c::$Tel)
+for (T, Tel, Tel_inplace) in [
+    (Union{ArbPoly,ArbSeries}, Real, Union{ArbOrRef,ArfLike,Unsigned,Integer}),
+    (Union{AcbPoly,AcbSeries}, Number, Union{AcbOrRef,ArbOrRef,Unsigned,Integer}),
+]
+    @eval function Base.:+(p::$T, c::$Tel_inplace)
         res = copy(p)
-        res[0] += c
+        res0 = ref(res, 0)
+        add!(res0, res0, c)
         return res
     end
+    @eval Base.:+(p::$T, c::$Tel) = p + convert(eltype(p), c)
 
-    @eval function Base.:-(p::$T, c::$Tel)
+    @eval function Base.:-(p::$T, c::$Tel_inplace)
         res = copy(p)
-        res[0] -= c
+        res0 = ref(res, 0)
+        sub!(res0, res0, c)
         return res
     end
-    @eval function Base.:-(c::$Tel, p::$T)
+    @eval Base.:-(p::$T, c::$Tel) = p - convert(eltype(p), c)
+    @eval function Base.:-(c::$Tel_inplace, p::$T)
         res = -p
-        res[0] += c
+        res0 = ref(res, 0)
+        add!(res0, res0, c)
         return res
     end
+    @eval Base.:-(c::$Tel, p::$T) = convert(eltype(p), c) - p
 
     @eval Base.:*(p::$T, c::$Tel) = mul!(zero(p), p, convert(eltype(p), c))
 
     @eval Base.:/(p::$T, c::$Tel) = div!(zero(p), p, convert(eltype(p), c))
 end
 
+# Avoid conversion in these cases
+@eval Base.:*(p::Union{ArbPoly,ArbSeries}, c::ArbOrRef) = mul!(zero(p), p, c)
+@eval Base.:*(p::Union{AcbPoly,AcbSeries}, c::AcbOrRef) = mul!(zero(p), p, c)
+
+@eval Base.:/(p::Union{ArbPoly,ArbSeries}, c::ArbOrRef) = div!(zero(p), p, c)
+@eval Base.:/(p::Union{AcbPoly,AcbSeries}, c::AcbOrRef) = div!(zero(p), p, c)
+
 # Promotion to complex
 for (T, complexT) in [(ArbPoly, AcbPoly), (ArbSeries, AcbSeries)]
-    @eval function Base.:+(p::$T, c::Union{AcbOrRef,Complex})
+    @eval function Base.:+(p::$T, c::AcbOrRef)
         res = $complexT(p)
-        res[0] += c
+        res0 = ref(res, 0)
+        add!(res0, res0, c)
         return res
     end
 
-    @eval function Base.:-(p::$T, c::Union{AcbOrRef,Complex})
+    @eval function Base.:-(p::$T, c::AcbOrRef)
         res = $complexT(p)
-        res[0] -= c
+        res0 = ref(res, 0)
+        sub!(res0, res0, c)
         return res
     end
-    @eval function Base.:-(c::Union{AcbOrRef,Complex}, p::$T)
+    @eval function Base.:-(c::AcbOrRef, p::$T)
         res = $complexT(p)
         neg!(res, res)
-        res[0] += c
+        res0 = ref(res, 0)
+        add!(res0, res0, c)
         return res
     end
 
-    @eval function Base.:*(p::$T, c::Union{AcbOrRef,Complex})
+    @eval function Base.:*(p::$T, c::AcbOrRef)
         res = $complexT(p)
-        return mul!(res, res, convert(Acb, c))
+        return mul!(res, res, c)
     end
 
-    @eval function Base.:/(p::$T, c::Union{AcbOrRef,Complex})
+    @eval function Base.:/(p::$T, c::AcbOrRef)
         res = $complexT(p)
-        return div!(res, res, convert(Acb, c))
+        return div!(res, res, c)
     end
 end
+Base.:+(p::Union{ArbPoly,ArbSeries}, c::Complex) = p + convert(Acb, c)
+Base.:-(p::Union{ArbPoly,ArbSeries}, c::Complex) = p - convert(Acb, c)
+Base.:-(c::Complex, p::Union{ArbPoly,ArbSeries}) = convert(Acb, c) - p
+Base.:*(p::Union{ArbPoly,ArbSeries}, c::Complex) = p * convert(Acb, c)
+Base.:/(p::Union{ArbPoly,ArbSeries}, c::Complex) = p / convert(Acb, c)
 
 Base.:+(c::Number, p::Union{Poly,Series}) = p + c
 Base.:*(c::Number, p::Union{Poly,Series}) = p * c
@@ -384,7 +408,7 @@ taylor_shift(p::Union{Poly,Series}, c) = taylor_shift!(zero(p), p, convert(eltyp
 
 compose(p::T, q::T) where {T<:Poly} = compose!(T(prec = _precision((p, q))), p, q)
 function compose(p::T, q::T) where {T<:Series}
-    iszero(q[0]) ||
+    iszero(ref(q, 0)) ||
         throw(ArgumentError("constant term of q must be zero, got q[0] = $(q[0])"))
     deg = _degree(p, q)
     res = T(degree = deg, prec = _precision((p, q)))
@@ -393,9 +417,9 @@ end
 
 function revert(p::Series)
     degree(p) >= 1 || throw(ArgumentError("p must have degree at least 1"))
-    iszero(p[0]) ||
+    iszero(ref(p, 0)) ||
         throw(ArgumentError("constant term of p must be zero, got p[0] = $(p[0])"))
-    !iszero(p[1]) ||
+    !iszero(ref(p, 1)) ||
         throw(ArgumentError("linear term of p must be non-zero, got p[0] = $(p[0])"))
     return revert_series!(zero(p), p, degree(p) + 1)
 end

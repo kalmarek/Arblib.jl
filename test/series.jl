@@ -45,6 +45,15 @@
 
         @test_throws BoundsError p[-1]
         @test_throws BoundsError p[11]
+
+        p = TSeries(T[i for i = 0:10])
+        @test all(Arblib.ref(p, i) == p[i] for i = 0:10)
+
+        Arblib.set!(Arblib.ref(p, 0), 5)
+        @test p[0] == 5
+
+        @test_throws BoundsError Arblib.ref(p, -1)
+        @test_throws BoundsError Arblib.ref(p, 11)
     end
 
     @testset "Constructors" begin

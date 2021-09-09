@@ -41,6 +41,18 @@
         @test Arblib.rel_accuracy_bits(q[0]) > 500
 
         @test_throws BoundsError p[-1]
+
+        p = TPoly(T[i for i = 0:10])
+        @test all(Arblib.ref(p, i) == p[i] for i = 0:10)
+
+        Arblib.set!(Arblib.ref(p, 0), 5)
+        @test p[0] == 5
+
+        @test_throws BoundsError Arblib.ref(p, -1)
+        @test_throws BoundsError Arblib.ref(p, 11)
+        Arblib.zero!(Arblib.ref(p, 10))
+        Arblib.normalise!(p)
+        @test_throws BoundsError Arblib.ref(p, 10)
     end
 
     @testset "Constructors" begin
