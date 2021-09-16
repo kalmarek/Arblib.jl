@@ -9,7 +9,7 @@
     end
 
     @testset "Arf" begin
-        for T in [UInt, Int, Float64, Mag, Arf, BigFloat]
+        for T in [UInt, Int, Float64, Mag, Arf, BigFloat, BigInt]
             @test Arf(zero(T)) == zero(Arf)
             @test Arf(one(T)) == one(Arf)
             @test precision(Arf(zero(T), prec = 80)) == 80
@@ -26,7 +26,7 @@
     end
 
     @testset "Arb" begin
-        for T in [UInt, Int, Float64, Arf, Arb, BigFloat, Rational{Int}]
+        for T in [UInt, Int, Float64, Arf, Arb, BigFloat, Rational{Int}, BigInt]
             @test Arb(zero(T)) == zero(Arb)
             @test Arb(one(T)) == one(Arb)
             @test precision(Arb(zero(T), prec = 80)) == 80
@@ -62,7 +62,7 @@
     end
 
     @testset "Acb" begin
-        for T in [UInt, Int, Float64, Arf, Arb, BigFloat, Rational{Int}]
+        for T in [UInt, Int, Float64, Arf, Arb, BigFloat, Rational{Int}, BigInt]
             @test Acb(zero(T)) == zero(Acb)
             @test Acb(one(T)) == one(Acb)
             @test precision(Acb(zero(T), prec = 80)) == 80
