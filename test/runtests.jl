@@ -1,3 +1,5 @@
+ENV["NEMO_THREADED"] = 1
+
 using Arblib, Test, LinearAlgebra, SpecialFunctions
 
 @testset "Arblib" begin
@@ -23,4 +25,5 @@ using Arblib, Test, LinearAlgebra, SpecialFunctions
     include("poly.jl")
     include("series.jl")
     include("special-functions.jl")
+    include("threading.jl")
 end
