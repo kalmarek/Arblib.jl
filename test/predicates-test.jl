@@ -134,6 +134,20 @@
         @test y > x
         @test y >= x
 
+        # Comparison with rationals
+        @test -1 // 2 < x < 1 // 2
+        @test -1 // 2 <= x <= 1 // 2
+        @test cmp(x, 1 // 2) == -1
+        @test cmp(-1 // 2, x) == -1
+        @test 1 // 2 > x > -1 // 2
+        @test 1 // 2 >= x >= -1 // 2
+        @test cmp(1 // 2, x) == 1
+        @test cmp(x, -1 // 2) == 1
+
+        @test !(-1 // 2 > x)
+        @test !(-1 // 2 >= x)
+        @test cmp(-1 // 2, x) == -1
+
         x, y = Acb(0), Acb(1)
         @test x == x
         @test x == 0

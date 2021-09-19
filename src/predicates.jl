@@ -151,6 +151,16 @@ for (ArbT, args) in (
     end
 end
 
+# Julia Base defines special methods for comparison between Rational
+# and AbstractFloat which do not work well for Arb. We redefine these
+# methods to just convert the rational number to Arb.
+Base.:<(x::Arb, y::Rational) = x < convert(Arb, y)
+Base.:<(x::Rational, y::Arb) = convert(Arb, x) < y
+Base.:<=(x::Arb, y::Rational) = x <= convert(Arb, y)
+Base.:<=(x::Rational, y::Arb) = convert(Arb, x) <= y
+Base.cmp(x::Arb, y::Rational) = Base.cmp(x, convert(Arb, y))
+Base.cmp(x::Rational, y::Arb) = Base.cmp(convert(Arb, x), y)
+
 Base.isequal(x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}} = !iszero(equal(x, y))
 Base.isequal(x::T, y::T) where {T<:Union{ArbSeries,AcbSeries}} =
     degree(x) == degree(y) && !iszero(equal(x, y))
