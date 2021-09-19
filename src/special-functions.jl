@@ -165,7 +165,8 @@ SpecialFunctions.erfc(x::Series) = hypgeom_erfc_series!(zero(x), x, length(x))
 # Not implemented by Arb
 
 #SpecialFunctions.erfi(x)
-# Not implemented by Arb
+SpecialFunctions.erfi(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_erfi!(zero(x), x)
+SpecialFunctions.erfi(x::Series) = hypgeom_erfi_series!(zero(x), x, length(x))
 
 #SpecialFunctions.erfinv(x)
 # Not implemented by Arb
