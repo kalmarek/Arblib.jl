@@ -139,6 +139,18 @@
         @test p / T(2) == p / 2 == p / 2.0 == TSeries([0.5, 1, 1.5])
         @test T(2) / p == 2 / p == 2.0 / p == TSeries([2, -4, 2])
 
+        # Test with zero polynomial
+        @test zero(TSeries) + 1 == TSeries(1)
+        @test zero(TSeries) - 1 == TSeries(-1)
+        @test 1 - zero(TSeries) == TSeries(1)
+        @test 1 * zero(TSeries) == TSeries()
+        @test zero(TSeries) / 1 == TSeries()
+
+        # Test that the normalisation works
+        @test iszero(TSeries(-1) + 1)
+        @test iszero(TSeries(1) - 1)
+        @test iszero(1 - TSeries(1))
+
         let p = setprecision(p, 80)
             @test precision(p + T(2)) ==
                   precision(T(2) + p) ==
