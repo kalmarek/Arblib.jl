@@ -31,8 +31,7 @@ export Mag,
     ArbSeries,
     AcbPoly,
     AcbSeries,
-    ref,
-    flint_set_num_threads
+    ref
 
 macro libarb(function_name)
     return (:($function_name), libarb)
