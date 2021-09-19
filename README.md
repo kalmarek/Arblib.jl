@@ -262,3 +262,9 @@ and does are not extended, these are mostly scaled version of methods.
 Arb does however implement many special functions that are not in
 SpecialFunction and at the moment there is no user friendly interface
 for most of them.
+
+## Support for multi-threading
+Enabling a threaded version of flint can be done by setting the
+environment variable `NEMO_THREADED=1`. Note that this should be
+set before `Arblib.jl` is loaded. To set the actual number of threads,
+use `Arblib.flint_set_num_threads($numberofthreads)`.

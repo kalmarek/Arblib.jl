@@ -41,6 +41,20 @@ macro libflint(function_name)
     return (:($function_name), Arb_jll.libflint)
 end
 
+const __isthreaded = Ref(false)
+
+function __init__()
+    __isthreaded[] = Base.get(ENV, "NEMO_THREADED", "") == "1"
+end
+
+function flint_set_num_threads(a::Integer)
+    if !__isthreaded[]
+        error("To use threaded flint, julia has to be started with NEMO_THREADED=1")
+    else
+        ccall(@libflint(flint_set_num_threads), Nothing, (Cint,), a)
+    end
+end
+
 include("arb_types.jl")
 include("rounding.jl")
 include("types.jl")
