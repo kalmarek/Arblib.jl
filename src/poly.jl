@@ -310,26 +310,42 @@ for (T, Tel, Tel_inplace) in [
     (Union{ArbPoly,ArbSeries}, Real, Union{ArbOrRef,ArfLike,Unsigned,Integer}),
     (Union{AcbPoly,AcbSeries}, Number, Union{AcbOrRef,ArbOrRef,Unsigned,Integer}),
 ]
+    # Since we use inplace methods we need to manually normalise the
+    # polynomials after the operation. This is to make sure that it
+    # correctly recognizes the possibly new degree of the polynomial.
+    # For example for iszero(ArbPoly(1) - 1) to work.
+
     @eval function Base.:+(p::$T, c::$Tel_inplace)
         res = copy(p)
+        # Handle p being the zero polynomial
+        iszero(p) && return set_coeff!(res, 0, c)
         res0 = ref(res, 0)
         add!(res0, res0, c)
-        return res
+        return normalise!(res)
     end
     @eval Base.:+(p::$T, c::$Tel) = p + convert(eltype(p), c)
 
     @eval function Base.:-(p::$T, c::$Tel_inplace)
         res = copy(p)
+        # Handle p being the zero polynomial
+        if iszero(p)
+            set_coeff!(res, 0, c)
+            res0 = ref(res, 0)
+            neg!(res0, res0)
+            return res
+        end
         res0 = ref(res, 0)
         sub!(res0, res0, c)
-        return res
+        return normalise!(res)
     end
     @eval Base.:-(p::$T, c::$Tel) = p - convert(eltype(p), c)
     @eval function Base.:-(c::$Tel_inplace, p::$T)
         res = -p
+        # Handle p being the zero polynomial
+        iszero(p) && return set_coeff!(res, 0, c)
         res0 = ref(res, 0)
         add!(res0, res0, c)
-        return res
+        return normalise!(res)
     end
     @eval Base.:-(c::$Tel, p::$T) = convert(eltype(p), c) - p
 

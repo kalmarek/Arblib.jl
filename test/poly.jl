@@ -140,6 +140,18 @@
               TPoly([2, 4, 6])
         @test p / T(2) == p / 2 == p / 2.0 == TPoly([0.5, 1, 1.5])
 
+        # Test with zero polynomial
+        @test zero(TPoly) + 1 == TPoly(1)
+        @test zero(TPoly) - 1 == TPoly(-1)
+        @test 1 - zero(TPoly) == TPoly(1)
+        @test 1 * zero(TPoly) == TPoly()
+        @test zero(TPoly) / 1 == TPoly()
+
+        # Test that the normalisation works
+        @test iszero(TPoly(-1) + 1)
+        @test iszero(TPoly(1) - 1)
+        @test iszero(1 - TPoly(1))
+
         let p = setprecision(p, 80)
             @test precision(p + T(2)) ==
                   precision(T(2) + p) ==
