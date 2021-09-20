@@ -310,6 +310,11 @@ for (T, Tel, Tel_inplace) in [
     (Union{ArbPoly,ArbSeries}, Real, Union{ArbOrRef,ArfLike,Unsigned,Integer}),
     (Union{AcbPoly,AcbSeries}, Number, Union{AcbOrRef,ArbOrRef,Unsigned,Integer}),
 ]
+    # Since we use inplace methods we need to manually normalise the
+    # polynomials after the operation. This is to make sure that it
+    # correctly recognizes the possibly new degree of the polynomial.
+    # For example for iszero(ArbPoly(1) - 1) to work.
+
     @eval function Base.:+(p::$T, c::$Tel_inplace)
         res = copy(p)
         # Handle p being the zero polynomial
