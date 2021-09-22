@@ -31,6 +31,18 @@
         @test Arblib.set!(Arblib.realref(Acb()), 1 // 2) == one(Arb) / 2
         @test Arblib.equal(Arblib.set!(Arblib.arb_struct(), 1 // 2), one(Arb) / 2)
 
+        let m = typemax(Int)
+            @test isequal(Arblib.set!(Arb(), 1 // (m + big(1))), inv(Arb(m) + 1))
+            @test isequal(
+                Arblib.set!(Arblib.realref(Acb()), 1 // (m + big(1))),
+                inv(Arb(m) + 1),
+            )
+            @test Arblib.equal(
+                Arblib.set!(Arblib.arb_struct(), 1 // (m + big(1))),
+                inv(Arb(m) + 1),
+            )
+        end
+
         # Irrationals
         @test Arb(3) < Arblib.set!(Arb(), π) < Arb(4)
         @test Arblib.equal(Arblib.set!(Arb(), π), Arblib.set!(Arblib.realref(Acb()), π))
