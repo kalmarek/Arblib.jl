@@ -32,12 +32,6 @@ function set!(res::ArbLike, x::Union{UInt128,Int128,MagLike,BigInt,BigFloat})
     return res
 end
 
-#function set!(res::ArbLike, x::Union{MagLike,BigFloat})
-#    set!(midref(res), x)
-#    zero!(radref(res))
-#    return res
-#end
-
 function set!(res::ArbLike, x::Rational; prec::Integer = precision(res))
     set!(res, numerator(x))
     return div!(res, res, denominator(x), prec = prec)
