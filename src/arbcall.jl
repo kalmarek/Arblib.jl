@@ -147,7 +147,7 @@ end
 function jlfname(
     arbfname,
     prefixes = ("arf", "arb", "acb", "mag", "mat", "vec", "poly", "scalar"),
-    suffixes = ("si", "ui", "d", "mag", "arf", "arb", "acb", "mpfr", "str");
+    suffixes = ("si", "ui", "d", "mag", "arf", "arb", "acb", "mpz", "mpfr", "str");
     inplace = false,
 )
     strs = filter(!isempty, split(arbfname, "_"))
@@ -170,7 +170,7 @@ end
 function jlfname(
     af::Arbfunction,
     prefixes = ("arf", "arb", "acb", "mag", "mat", "vec", "poly", "scalar"),
-    suffixes = ("si", "ui", "d", "mag", "arf", "arb", "acb", "mpfr", "str");
+    suffixes = ("si", "ui", "d", "mag", "arf", "arb", "acb", "mpz", "mpfr", "str");
     inplace = inplace(af),
 )
     return jlfname(arbfname(af), prefixes, suffixes, inplace = inplace)

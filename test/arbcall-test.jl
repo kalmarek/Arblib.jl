@@ -98,6 +98,7 @@
             ("arf_set_si", :set),
             ("arf_set_d", :set),
             ("arb_set", :set),
+            ("arf_set_mpz", :set),
             ("arf_set_mpfr", :set),
             ("arb_set_arf", :set),
             ("arb_set_si", :set),
@@ -118,7 +119,6 @@
             ("arb_bin_uiui", :bin_uiui),
 
             # Deprecated types
-            ("arf_set_mpz", :set_mpz),
             ("arf_set_fmpr", :set_fmpr),
 
             # Underscore methods
