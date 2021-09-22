@@ -12,6 +12,9 @@
 
     @testset "Arb" begin
         # MagLike and BigFloat
+        @test Arblib.set!(Arb(), BigInt(1)) == one(Arb)
+        @test Arblib.set!(Arblib.realref(Acb()), BigInt(1)) == one(Arb)
+        @test Arblib.equal(Arblib.set!(Arblib.arb_struct(), BigInt(1)), one(Arb))
         @test Arblib.set!(Arb(), BigFloat(1.0)) == one(Arb)
         @test Arblib.set!(Arblib.realref(Acb()), BigFloat(1.0)) == one(Arb)
         @test Arblib.equal(Arblib.set!(Arblib.arb_struct(), BigFloat(1.0)), one(Arb))

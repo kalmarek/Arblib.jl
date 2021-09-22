@@ -26,7 +26,7 @@ function set!(res::ArfLike, x::Rational; prec::Integer = precision(res))
 end
 
 # Arb
-function set!(res::ArbLike, x::Union{UInt128,Int128,MagLike,BigFloat})
+function set!(res::ArbLike, x::Union{UInt128,Int128,MagLike,BigInt,BigFloat})
     set!(midref(res), x)
     zero!(radref(res))
     return res
