@@ -80,13 +80,14 @@ function set!(res::ArbLike, (a, b)::Tuple{<:Real,<:Real}; prec::Integer = precis
 end
 
 # Acb
-function set!(res::AcbLike, x::Union{UInt128,Int128})
+function set!(res::AcbLike, x::Union{Real,arf_struct,mag_struct,Tuple{<:Real,<:Real}})
     set!(realref(res), x)
     set!(imagref(res), 0)
     return res
 end
 
-function set!(res::AcbLike, x::Union{Real,arf_struct,mag_struct,Tuple{<:Real,<:Real}})
+# This needs to be a separate function for disambiguation with Integer
+function set!(res::AcbLike, x::Union{UInt128,Int128,BigInt})
     set!(realref(res), x)
     set!(imagref(res), 0)
     return res

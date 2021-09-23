@@ -130,6 +130,9 @@
     end
 
     @testset "Acb" begin
+        @test Arblib.set!(Acb(), BigInt(typemax(Int)) + 1) ==
+              Acb(BigFloat(typemax(Int)) + 1)
+
         @test Arblib.set!(Acb(), BigFloat(1.0)) == one(Acb)
         @test Arblib.equal(Arblib.set!(Arblib.acb_struct(), BigFloat(1.0)), one(Acb))
         x = Arblib.set!(Acb(), ℯ)
