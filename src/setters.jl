@@ -93,6 +93,7 @@ function set!(res::AcbLike, x::Union{UInt128,Int128,BigInt})
     return res
 end
 
+# Doesn't support aliasing between realref(res) and im
 function set!(
     res::AcbLike,
     re::Union{Real,arb_struct,arf_struct,mag_struct,Tuple{<:Real,<:Real}},
