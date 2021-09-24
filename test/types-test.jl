@@ -1,6 +1,7 @@
 @testset "types" begin
     @testset "Mag" begin
         @test Mag() isa Mag
+        @test Mag(Arblib.cstruct(Mag())) isa Mag
         @test Mag(Mag()) isa Mag
         @test Mag(Arf()) isa Mag
         x = Mag()
