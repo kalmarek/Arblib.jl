@@ -25,7 +25,11 @@ function set!(res::ArfLike, x::Rational; prec::Integer = precision(res))
     return res
 end
 
-function set!(res::ArfLike, x::Rational{BigInt}; prec::Integer = precision(res))
+function set!(
+    res::ArfLike,
+    x::Rational{<:Union{UInt128,Int128,BigInt}};
+    prec::Integer = precision(res),
+)
     set!(res, numerator(x))
     div!(res, res, Arf(denominator(x), prec = prec), prec = prec)
     return res
@@ -43,7 +47,11 @@ function set!(res::ArbLike, x::Rational; prec::Integer = precision(res))
     return div!(res, res, denominator(x), prec = prec)
 end
 
-function set!(res::ArbLike, x::Rational{BigInt}; prec::Integer = precision(res))
+function set!(
+    res::ArbLike,
+    x::Rational{<:Union{UInt128,Int128,BigInt}};
+    prec::Integer = precision(res),
+)
     set!(res, numerator(x))
     return div!(res, res, Arb(denominator(x), prec = prec), prec = prec)
 end

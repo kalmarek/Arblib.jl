@@ -20,12 +20,20 @@
 
         # Rational
         @test Arblib.set!(T(), 2 // 3) == Arf(2) / Arf(3)
-        @test Arblib.set!(T(), big(2) // 3) == Arf(2) / Arf(3)
+        @test Arblib.set!(T(), UInt128(2) // 3) == Arf(2) / Arf(3)
+        @test Arblib.set!(T(), Int128(2) // 3) == Arf(2) / Arf(3)
+        @test Arblib.set!(T(), BigInt(2) // 3) == Arf(2) / Arf(3)
         # Test that it works for big numerators and denominators
-        let x = BigInt(typemax(Int)) + 1
+        let x = UInt128(typemax(Int)) + 1
             @test Arblib.set!(T(), x // 2) == Arf(x) / 2
             @test Arblib.set!(T(), 1 // x) == inv(Arf(x))
             @test Arblib.set!(T(), x // (x + 1)) == Arf(x) / Arf(x + 1)
+            @test Arblib.set!(T(), Int128(x) // 2) == Arf(x) / 2
+            @test Arblib.set!(T(), 1 // Int128(x)) == inv(Arf(x))
+            @test Arblib.set!(T(), Int128(x) // (Int128(x) + 1)) == Arf(x) / Arf(x + 1)
+            @test Arblib.set!(T(), BigInt(x) // 2) == Arf(x) / 2
+            @test Arblib.set!(T(), 1 // BigInt(x)) == inv(Arf(x))
+            @test Arblib.set!(T(), BigInt(x) // (BigInt(x) + 1)) == Arf(x) / Arf(x + 1)
         end
     end
 
@@ -51,12 +59,26 @@
 
         # Rational
         @test Arblib.set!(T(), 1 // 2) == one(Arb) / 2
-        @test Arblib.set!(T(), big(1) // 2) == one(Arb) / 2
+        @test Arblib.set!(T(), UInt128(1) // 2) == one(Arb) / 2
+        @test Arblib.set!(T(), Int128(1) // 2) == one(Arb) / 2
+        @test Arblib.set!(T(), BigInt(1) // 2) == one(Arb) / 2
         # Test that it works for big numerators and denominators
-        let x = BigInt(typemax(Int)) + 1
+        let x = UInt128(typemax(Int)) + 1
             @test isequal(Arblib.set!(T(), x // 2), Arb(x) / 2)
             @test isequal(Arblib.set!(T(), 1 // x), inv(Arb(x)))
             @test isequal(Arblib.set!(T(), x // (x + 1)), Arb(x) / Arb(x + 1))
+            @test isequal(Arblib.set!(T(), Int128(x) // 2), Arb(x) / 2)
+            @test isequal(Arblib.set!(T(), 1 // Int128(x)), inv(Arb(x)))
+            @test isequal(
+                Arblib.set!(T(), Int128(x) // (Int128(x) + 1)),
+                Arb(x) / Arb(x + 1),
+            )
+            @test isequal(Arblib.set!(T(), BigInt(x) // 2), Arb(x) / 2)
+            @test isequal(Arblib.set!(T(), 1 // BigInt(x)), inv(Arb(x)))
+            @test isequal(
+                Arblib.set!(T(), BigInt(x) // (BigInt(x) + 1)),
+                Arb(x) / Arb(x + 1),
+            )
         end
 
         # Irrational
