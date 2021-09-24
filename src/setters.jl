@@ -82,14 +82,14 @@ end
 # Acb
 function set!(res::AcbLike, x::Union{Real,arf_struct,mag_struct,Tuple{<:Real,<:Real}})
     set!(realref(res), x)
-    set!(imagref(res), 0)
+    zero!(imagref(res))
     return res
 end
 
 # This needs to be a separate function for disambiguation with Integer
 function set!(res::AcbLike, x::Union{UInt128,Int128,BigInt})
     set!(realref(res), x)
-    set!(imagref(res), 0)
+    zero!(imagref(res))
     return res
 end
 
