@@ -26,7 +26,7 @@
     end
 
     @testset "Arb" begin
-        for T in [UInt, Int, Float64, Arf, Arb, BigFloat, Rational{Int}]
+        for T in [UInt, Int, Float64, Arf, Arb, BigInt, BigFloat, Rational{Int}]
             @test Arb(zero(T)) == zero(Arb)
             @test Arb(one(T)) == one(Arb)
             @test precision(Arb(zero(T), prec = 80)) == 80

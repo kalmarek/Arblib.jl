@@ -25,22 +25,35 @@ function set!(res::ArfLike, x::Rational; prec::Integer = precision(res))
     return res
 end
 
+function set!(
+    res::ArfLike,
+    x::Rational{<:Union{UInt128,Int128,BigInt}};
+    prec::Integer = precision(res),
+)
+    set!(res, numerator(x))
+    div!(res, res, Arf(denominator(x), prec = prec), prec = prec)
+    return res
+end
+
 # Arb
-function set!(res::ArbLike, x::Union{UInt128,Int128,MagLike,BigFloat})
+function set!(res::ArbLike, x::Union{UInt128,Int128,MagLike,BigInt,BigFloat})
     set!(midref(res), x)
     zero!(radref(res))
     return res
 end
 
-#function set!(res::ArbLike, x::Union{MagLike,BigFloat})
-#    set!(midref(res), x)
-#    zero!(radref(res))
-#    return res
-#end
-
 function set!(res::ArbLike, x::Rational; prec::Integer = precision(res))
     set!(res, numerator(x))
     return div!(res, res, denominator(x), prec = prec)
+end
+
+function set!(
+    res::ArbLike,
+    x::Rational{<:Union{UInt128,Int128,BigInt}};
+    prec::Integer = precision(res),
+)
+    set!(res, numerator(x))
+    return div!(res, res, Arb(denominator(x), prec = prec), prec = prec)
 end
 
 for (irr, suffix) in ((:π, "pi"), (:ℯ, "e"), (:γ, "euler"), (:catalan, "catalan"))
@@ -75,18 +88,20 @@ function set!(res::ArbLike, (a, b)::Tuple{<:Real,<:Real}; prec::Integer = precis
 end
 
 # Acb
-function set!(res::AcbLike, x::Union{UInt128,Int128})
-    set!(realref(res), x)
-    set!(imagref(res), 0)
-    return res
-end
-
 function set!(res::AcbLike, x::Union{Real,arf_struct,mag_struct,Tuple{<:Real,<:Real}})
     set!(realref(res), x)
-    set!(imagref(res), 0)
+    zero!(imagref(res))
     return res
 end
 
+# This needs to be a separate function for disambiguation with Integer
+function set!(res::AcbLike, x::Union{UInt128,Int128,BigInt})
+    set!(realref(res), x)
+    zero!(imagref(res))
+    return res
+end
+
+# Doesn't support aliasing between realref(res) and im
 function set!(
     res::AcbLike,
     re::Union{Real,arb_struct,arf_struct,mag_struct,Tuple{<:Real,<:Real}},
