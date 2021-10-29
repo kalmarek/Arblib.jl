@@ -95,6 +95,7 @@
             @test Arblib.contains(Arblib.set!(T(), (Arf(1), Arf(2))), x)
             @test Arblib.contains(Arblib.set!(T(), (BigFloat(1), BigFloat(2))), x)
 
+            @test Arblib.contains(Arblib.set!(T(), (Arb(1), Arb(2))), x)
             @test Arblib.contains(Arblib.set!(T(), (1, 2)), x)
             @test Arblib.contains(Arblib.set!(T(), (1.0, 2.0)), x)
             @test Arblib.contains(Arblib.set!(T(), (1, 2.0)), x)
@@ -104,9 +105,20 @@
         @test Arblib.set!(T(), (Mag(1), Mag(1))) == one(Arb)
         @test Arblib.set!(T(), (Arf(1), Arf(1))) == one(Arb)
         @test Arblib.set!(T(), (BigFloat(1), BigFloat(1))) == one(Arb)
+
+        @test Arblib.set!(T(), (Arb(1), Arb(1))) == one(Arb)
         @test Arblib.set!(T(), (1, 1)) == one(Arb)
         @test Arblib.set!(T(), (1.0, 1.0)) == one(Arb)
         @test Arblib.set!(T(), (1, 1.0)) == one(Arb)
+
+        # NaN endpoints
+        @test Arblib.isnan(Arblib.set!(T(), (Arf(NaN), Arf(0))))
+        @test Arblib.isnan(Arblib.set!(T(), (Arf(0), Arf(NaN))))
+        @test Arblib.isnan(Arblib.set!(T(), (Arf(NaN), Arf(NaN))))
+
+        @test Arblib.isnan(Arblib.set!(T(), (NaN, 0)))
+        @test Arblib.isnan(Arblib.set!(T(), (0, NaN)))
+        @test Arblib.isnan(Arblib.set!(T(), (NaN, NaN)))
 
         # Check handling of precision
         @test !iszero(radius(Arblib.set!(Arb(prec = 64), (BigFloat(π), BigFloat(π)))))

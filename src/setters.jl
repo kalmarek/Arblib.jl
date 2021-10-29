@@ -76,15 +76,23 @@ function set!(
     (a, b)::NTuple{2,Union{MagLike,ArfLike,BigFloat}};
     prec::Integer = precision(res),
 )
-    a <= b || throw(ArgumentError("must have a <= b, got a = $a and b = $b"))
+    # Checking a > b instead of a <= b also handles NaN correctly
+    a > b && throw(ArgumentError("must have a <= b, got a = $a and b = $b"))
     return set_interval!(res, a, b, prec = prec)
 end
 
 function set!(res::ArbLike, (a, b)::Tuple{<:Real,<:Real}; prec::Integer = precision(res))
-    # TODO: This is not strictly required to check.
+    # This is not strictly required to check since the union will give
+    # an enclosure anyway. But since thus method is designed for a <=
+    # b adding this check could catch some bugs.
     a > b && throw(ArgumentError("must have a <= b, got a = $a and b = $b"))
-    # TODO: If we really want to we could avoid one allocation by reusing res
-    return union!(res, Arb(a, prec = prec), Arb(b, prec = prec), prec = prec)
+    if !(a isa ArbLike)
+        a = Arb(a, prec = prec)
+    end
+    if !(b isa ArbLike)
+        b = Arb(b, prec = prec)
+    end
+    return union!(res, a, b, prec = prec)
 end
 
 # Acb
