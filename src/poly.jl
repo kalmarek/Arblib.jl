@@ -52,7 +52,7 @@ Base.getindex(p::Union{Poly,Series}, I::AbstractRange{<:Integer}) = [p[i] for i 
 
 Base.@propagate_inbounds function Base.setindex!(
     p::Union{ArbPoly,ArbSeries},
-    x::ArbLike,
+    x::Union{ArbLike,_BitSigned},
     i::Integer,
 )
     @boundscheck checkbounds(p, i)
