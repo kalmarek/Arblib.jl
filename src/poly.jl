@@ -102,7 +102,10 @@ for (TPoly, TSeries) in [(:ArbPoly, :ArbSeries), (:AcbPoly, :AcbSeries)]
         return p
     end
 
-    @eval function $TPoly(coeffs::AbstractVector; prec::Integer = _precision(first(coeffs)))
+    @eval function $TPoly(
+        coeffs::Union{Tuple,AbstractVector};
+        prec::Integer = _precision(first(coeffs)),
+    )
         p = fit_length!($TPoly(prec = prec), length(coeffs))
         @inbounds for i = 1:length(coeffs)
             p[i-1] = coeffs[i]
@@ -135,7 +138,7 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
     end
 
     @eval function $TSeries(
-        coeffs::AbstractVector;
+        coeffs::Union{Tuple,AbstractVector};
         degree::Integer = length(coeffs) - 1,
         prec::Integer = _precision(first(coeffs)),
     )
