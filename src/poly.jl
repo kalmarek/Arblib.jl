@@ -113,6 +113,17 @@ for (TPoly, TSeries) in [(:ArbPoly, :ArbSeries), (:AcbPoly, :AcbSeries)]
         return p
     end
 
+    # Add a specialised constructors for the common case of a tuple
+    # with two elements. This would for example be used when
+    # constructing a polynomial with a constant plus x, e.g
+    # ArbPoly((x, 1))
+    @eval function $TPoly(coeffs::Tuple{Any,Any}; prec::Integer = _precision(first(coeffs)))
+        p = fit_length!($TPoly(prec = prec), length(coeffs))
+        @inbounds p[0] = coeffs[1]
+        @inbounds p[1] = coeffs[2]
+        return p
+    end
+
     @eval $TPoly(p::Union{$TPoly,$TSeries}; prec::Integer = precision(p)) =
         set!($TPoly(prec = prec), p)
 end
@@ -146,6 +157,21 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
         @inbounds for i = 1:min(length(coeffs), degree + 1)
             p[i-1] = coeffs[i]
         end
+        return p
+    end
+
+    # Add a specialised constructors for the common case of a tuple
+    # with two elements. This would for example be used when
+    # constructing a series with a constant plus x, e.g ArbSeries((x,
+    # 1))
+    @eval function $TSeries(
+        coeffs::Tuple{Any,Any};
+        degree::Integer = length(coeffs) - 1,
+        prec::Integer = _precision(first(coeffs)),
+    )
+        p = fit_length!($TSeries(degree = degree, prec = prec), degree + 1)
+        @inbounds p[0] = coeffs[1]
+        @inbounds p[1] = coeffs[2]
         return p
     end
 
