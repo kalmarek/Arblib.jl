@@ -98,7 +98,7 @@ for (TPoly, TSeries) in [(:ArbPoly, :ArbSeries), (:AcbPoly, :AcbSeries)]
 
     @eval function $TPoly(coeff; prec::Integer = _precision(coeff))
         p = $TPoly(prec = prec)
-        p[0] = coeff
+        @inbounds p[0] = coeff
         return p
     end
 
@@ -133,7 +133,7 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
 
     @eval function $TSeries(coeff; degree::Integer = 0, prec::Integer = _precision(coeff))
         p = $TSeries(degree = degree, prec = prec)
-        p[0] = coeff
+        @inbounds p[0] = coeff
         return p
     end
 
