@@ -178,7 +178,7 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
         degree::Integer = length(coeffs) - 1,
         prec::Integer = _precision(first(coeffs)),
     )
-        p = fit_length!($TSeries(degree = degree, prec = prec), degree + 1)
+        p = $TSeries(degree = degree, prec = prec)
         @inbounds for i = 1:min(length(coeffs), degree + 1)
             p[i-1] = coeffs[i]
         end
@@ -194,7 +194,7 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
         degree::Integer = length(coeffs) - 1,
         prec::Integer = _precision(first(coeffs)),
     )
-        p = fit_length!($TSeries(degree = degree, prec = prec), degree + 1)
+        p = $TSeries(degree = degree, prec = prec)
         @inbounds p[0] = coeffs[1]
         @inbounds p[1] = coeffs[2]
         return p
