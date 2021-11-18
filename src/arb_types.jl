@@ -160,6 +160,7 @@ mutable struct acb_mat_struct
 end
 
 const ArbStructTypes = Union{
+    mag_struct,
     arf_struct,
     arb_struct,
     acb_struct,
@@ -170,6 +171,33 @@ const ArbStructTypes = Union{
     arb_mat_struct,
     acb_mat_struct,
 }
+
+function Base.deepcopy_internal(x::T, stackdict::IdDict) where {T<:ArbStructTypes}
+    haskey(stackdict, x) && return stackdict[x]
+    y = set!(T(), x)
+    stackdict[x] = y
+    return y
+end
+
+function Base.deepcopy_internal(
+    x::T,
+    stackdict::IdDict,
+) where {T<:Union{arb_vec_struct,acb_vec_struct}}
+    haskey(stackdict, x) && return stackdict[x]
+    y = set!(T(x.n), x, x.n)
+    stackdict[x] = y
+    return y
+end
+
+function Base.deepcopy_internal(
+    x::T,
+    stackdict::IdDict,
+) where {T<:Union{arb_mat_struct,acb_mat_struct}}
+    haskey(stackdict, x) && return stackdict[x]
+    y = set!(T(x.r, x.c), x)
+    stackdict[x] = y
+    return y
+end
 
 mutable struct calc_integrate_opt_struct
     deg_limit::Int
