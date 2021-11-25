@@ -52,7 +52,7 @@ Base.getindex(p::Union{Poly,Series}, I::AbstractRange{<:Integer}) = [p[i] for i 
 
 Base.@propagate_inbounds function Base.setindex!(
     p::Union{ArbPoly,ArbSeries},
-    x::ArbLike,
+    x::Union{ArbLike,_BitSigned},
     i::Integer,
 )
     @boundscheck checkbounds(p, i)
@@ -76,6 +76,31 @@ Base.@propagate_inbounds function Base.setindex!(p::Union{Poly,Series}, x, i::In
     return x
 end
 
+"""
+    ref(p::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}, i)
+
+Similar to `p[i]` but instead of an `Arb` or `Acb` returns an `ArbRef`
+or `AcbRef` which still shares the memory with the `i`-th entry of
+`p[i]`.
+
+For `ArbPoly` and `AcbPoly` it only allows accessing coefficients up
+to the degree of the polynomial since higher coefficients are not
+guaranteed to be allocated.
+
+For `ArbSeries` and `AcbSeries` it allows accessing coefficients up to
+the degree of the series. Note that this degree might not be the same
+as the degree of the underlying polynomial (in case higher order
+coefficients are zero) but the way they are constructed ensures that
+the coefficients will always be initialised.
+
+!!! Note: If you use this to change the coefficient in a way so that the degree
+    of the polynomial might change you need to normalise the polynomial
+    afterwards to make sure that Arb recognises the possibly new degree of
+    the polynomial. If the new degree is the same or lower this can be
+    done using [`Arblib.normalise!`](@ref). If the new degree is higher
+    you need to manually set the correct value of
+    `Arblib.cstruct(p).length` to be one higher than the new degree.
+"""
 Base.@propagate_inbounds function ref(p::Union{ArbPoly,ArbSeries}, i::Integer)
     @boundscheck 0 <= i <= degree(p) || throw(BoundsError(p, i))
     ptr = cstruct(p).coeffs + i * sizeof(arb_struct)
@@ -98,15 +123,29 @@ for (TPoly, TSeries) in [(:ArbPoly, :ArbSeries), (:AcbPoly, :AcbSeries)]
 
     @eval function $TPoly(coeff; prec::Integer = _precision(coeff))
         p = $TPoly(prec = prec)
-        p[0] = coeff
+        @inbounds p[0] = coeff
         return p
     end
 
-    @eval function $TPoly(coeffs::AbstractVector; prec::Integer = _precision(first(coeffs)))
+    @eval function $TPoly(
+        coeffs::Union{Tuple,AbstractVector};
+        prec::Integer = _precision(first(coeffs)),
+    )
         p = fit_length!($TPoly(prec = prec), length(coeffs))
         @inbounds for i = 1:length(coeffs)
             p[i-1] = coeffs[i]
         end
+        return p
+    end
+
+    # Add a specialised constructors for the common case of a tuple
+    # with two elements. This would for example be used when
+    # constructing a polynomial with a constant plus x, e.g
+    # ArbPoly((x, 1))
+    @eval function $TPoly(coeffs::Tuple{Any,Any}; prec::Integer = _precision(first(coeffs)))
+        p = fit_length!($TPoly(prec = prec), length(coeffs))
+        @inbounds p[0] = coeffs[1]
+        @inbounds p[1] = coeffs[2]
         return p
     end
 
@@ -130,19 +169,34 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
 
     @eval function $TSeries(coeff; degree::Integer = 0, prec::Integer = _precision(coeff))
         p = $TSeries(degree = degree, prec = prec)
-        p[0] = coeff
+        @inbounds p[0] = coeff
         return p
     end
 
     @eval function $TSeries(
-        coeffs::AbstractVector;
+        coeffs::Union{Tuple,AbstractVector};
         degree::Integer = length(coeffs) - 1,
         prec::Integer = _precision(first(coeffs)),
     )
-        p = fit_length!($TSeries(degree = degree, prec = prec), degree + 1)
+        p = $TSeries(degree = degree, prec = prec)
         @inbounds for i = 1:min(length(coeffs), degree + 1)
             p[i-1] = coeffs[i]
         end
+        return p
+    end
+
+    # Add a specialised constructors for the common case of a tuple
+    # with two elements. This would for example be used when
+    # constructing a series with a constant plus x, e.g ArbSeries((x,
+    # 1))
+    @eval function $TSeries(
+        coeffs::Tuple{Any,Any};
+        degree::Integer = length(coeffs) - 1,
+        prec::Integer = _precision(first(coeffs)),
+    )
+        p = $TSeries(degree = degree, prec = prec)
+        @inbounds p[0] = coeffs[1]
+        @inbounds p[1] = coeffs[2]
         return p
     end
 
