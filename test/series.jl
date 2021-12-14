@@ -84,7 +84,11 @@
               TSeries((5.0,)) ==
               TSeries(T[5]) ==
               TSeries(T(5))
-        @test TSeries(TSeries((1, 2))) == TSeries(ArbPoly((1, 2))) == TSeries((1, 2))
+        @test TSeries(TSeries((1, 2))) ==
+              TSeries(ArbPoly((1, 2))) ==
+              TSeries(TSeries((1, 2, 3)), degree = 1) ==
+              TSeries(ArbPoly((1, 2, 3)), degree = 1) ==
+              TSeries((1, 2))
 
         # A previous bug always set both coefficients
         @test Arblib.cstruct(TSeries((2, 1), degree = 0)).length == 1
