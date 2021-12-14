@@ -196,7 +196,9 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
     )
         p = $TSeries(degree = degree, prec = prec)
         @inbounds p[0] = coeffs[1]
-        @inbounds p[1] = coeffs[2]
+        if degree >= 1
+            @inbounds p[1] = coeffs[2]
+        end
         return p
     end
 

@@ -86,6 +86,9 @@
               TSeries(T(5))
         @test TSeries(TSeries((1, 2))) == TSeries(ArbPoly((1, 2))) == TSeries((1, 2))
 
+        # A previous bug always set both coefficients
+        @test Arblib.cstruct(TSeries((2, 1), degree = 0)).length == 1
+
         @test precision(TSeries(degree = 1, prec = 64)) == 64
         @test precision(TSeries(0, degree = 1, prec = 64)) == 64
         @test precision(TSeries((T(0),), prec = 64)) == 64
