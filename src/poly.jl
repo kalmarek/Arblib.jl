@@ -196,12 +196,17 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
     )
         p = $TSeries(degree = degree, prec = prec)
         @inbounds p[0] = coeffs[1]
-        @inbounds p[1] = coeffs[2]
+        if degree >= 1
+            @inbounds p[1] = coeffs[2]
+        end
         return p
     end
 
-    @eval $TSeries(p::Union{$TPoly,$TSeries}; prec::Integer = precision(p)) =
-        set!($TSeries(degree = degree(p), prec = prec), p)
+    @eval $TSeries(
+        p::Union{$TPoly,$TSeries};
+        degree::Integer = degree(p),
+        prec::Integer = precision(p),
+    ) = set_trunc!($TSeries(degree = degree, prec = prec), p, degree + 1)
 end
 function AcbSeries(p::Union{ArbPoly,ArbSeries}; degree = degree(p), prec = precision(p))
     res = AcbSeries(degree = degree, prec = prec)
