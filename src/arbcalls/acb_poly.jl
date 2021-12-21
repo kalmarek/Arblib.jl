@@ -183,6 +183,8 @@ arbcall"void _acb_poly_binomial_transform_convolution(acb_ptr b, acb_srcptr a, s
 arbcall"void acb_poly_binomial_transform_convolution(acb_poly_t b, const acb_poly_t a, slong len, slong prec)"
 arbcall"void _acb_poly_binomial_transform(acb_ptr b, acb_srcptr a, slong alen, slong len, slong prec)"
 arbcall"void acb_poly_binomial_transform(acb_poly_t b, const acb_poly_t a, slong len, slong prec)"
+arbcall"void _acb_poly_graeffe_transform(acb_ptr b, acb_srcptr a, slong len, slong prec)"
+arbcall"void acb_poly_graeffe_transform(acb_poly_t b, acb_poly_t a, slong prec)"
 
 ### Elementary functions
 arbcall"void _acb_poly_pow_ui_trunc_binexp(acb_ptr res, acb_srcptr f, slong flen, ulong exp, slong len, slong prec)"

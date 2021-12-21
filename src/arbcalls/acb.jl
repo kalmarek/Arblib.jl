@@ -32,7 +32,9 @@ arbcall"void acb_set_round(acb_t z, const acb_t x, slong prec)"
 #ni arbcall"void acb_set_round_fmpz(acb_t z, const fmpz_t x, slong prec)"
 arbcall"void acb_set_round_arb(acb_t z, const arb_t x, slong prec)"
 arbcall"void acb_swap(acb_t z, acb_t x)"
+arbcall"void acb_add_error_arf(acb_t x, const arf_t err)"
 arbcall"void acb_add_error_mag(acb_t x, const mag_t err)"
+arbcall"void acb_add_error_arb(acb_t x, const arb_t err)"
 arbcall"void acb_get_mid(acb_t m, const acb_t x)"
 
 ### Input and output
@@ -137,6 +139,11 @@ arbcall"void acb_dot_precise(acb_t res, const acb_t s, int subtract, acb_srcptr 
 arbcall"void acb_dot_simple(acb_t res, const acb_t s, int subtract, acb_srcptr x, slong xstep, acb_srcptr y, slong ystep, slong len, slong prec)"
 arbcall"void acb_dot(acb_t res, const acb_t s, int subtract, acb_srcptr x, slong xstep, acb_srcptr y, slong ystep, slong len, slong prec)"
 arbcall"void acb_approx_dot(acb_t res, const acb_t s, int subtract, acb_srcptr x, slong xstep, acb_srcptr y, slong ystep, slong len, slong prec)"
+arbcall"void acb_dot_ui(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep, const ulong * y, slong ystep, slong len, slong prec)"
+arbcall"void acb_dot_si(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep, const slong * y, slong ystep, slong len, slong prec)"
+arbcall"void acb_dot_uiui(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep, const ulong * y, slong ystep, slong len, slong prec)"
+arbcall"void acb_dot_siui(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep, const ulong * y, slong ystep, slong len, slong prec)"
+#ni arbcall"void acb_dot_fmpz(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep, const fmpz * y, slong ystep, slong len, slong prec)"
 
 ### Mathematical constants
 arbcall"void acb_const_pi(acb_t y, slong prec)"
@@ -208,9 +215,6 @@ arbcall"void acb_atanh(acb_t res, const acb_t z, slong prec)"
 #ni arbcall"void acb_lambertw(acb_t res, const acb_t z, const fmpz_t k, int flags, slong prec)"
 
 ### Rising factorials
-arbcall"void acb_rising_ui_bs(acb_t z, const acb_t x, ulong n, slong prec)"
-arbcall"void acb_rising_ui_rs(acb_t z, const acb_t x, ulong n, ulong step, slong prec)"
-arbcall"void acb_rising_ui_rec(acb_t z, const acb_t x, ulong n, slong prec)"
 arbcall"void acb_rising_ui(acb_t z, const acb_t x, ulong n, slong prec)"
 arbcall"void acb_rising(acb_t z, const acb_t x, const acb_t n, slong prec)"
 
@@ -260,6 +264,7 @@ arbcall"int _acb_vec_is_zero(acb_srcptr vec, slong len)"
 arbcall"int _acb_vec_is_real(acb_srcptr v, slong len)"
 arbcall"void _acb_vec_set(acb_ptr res, acb_srcptr vec, slong len)"
 arbcall"void _acb_vec_set_round(acb_ptr res, acb_srcptr vec, slong len, slong prec)"
+arbcall"void _acb_vec_swap(acb_ptr vec1, acb_ptr vec2, slong len)"
 arbcall"void _acb_vec_neg(acb_ptr res, acb_srcptr vec, slong len)"
 arbcall"void _acb_vec_add(acb_ptr res, acb_srcptr vec1, acb_srcptr vec2, slong len, slong prec)"
 arbcall"void _acb_vec_sub(acb_ptr res, acb_srcptr vec1, acb_srcptr vec2, slong len, slong prec)"

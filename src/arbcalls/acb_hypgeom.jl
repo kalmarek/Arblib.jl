@@ -2,6 +2,29 @@
 ### **acb_hypgeom.h** -- hypergeometric functions of complex variables
 ###
 
+### Rising factorials
+arbcall"void acb_hypgeom_rising_ui_forward(acb_t res, const acb_t x, ulong n, slong prec)"
+arbcall"void acb_hypgeom_rising_ui_bs(acb_t res, const acb_t x, ulong n, slong prec)"
+arbcall"void acb_hypgeom_rising_ui_rs(acb_t res, const acb_t x, ulong n, ulong m, slong prec)"
+arbcall"void acb_hypgeom_rising_ui_rec(acb_t res, const acb_t x, ulong n, slong prec)"
+arbcall"void acb_hypgeom_rising_ui(acb_t res, const acb_t x, ulong n, slong prec)"
+arbcall"void acb_hypgeom_rising(acb_t res, const acb_t x, const acb_t n, slong prec)"
+arbcall"void acb_hypgeom_rising_ui_jet_powsum(acb_ptr res, const acb_t x, ulong n, slong len, slong prec)"
+arbcall"void acb_hypgeom_rising_ui_jet_bs(acb_ptr res, const acb_t x, ulong n, slong len, slong prec)"
+arbcall"void acb_hypgeom_rising_ui_jet_rs(acb_ptr res, const acb_t x, ulong n, ulong m, slong len, slong prec)"
+arbcall"void acb_hypgeom_rising_ui_jet(acb_ptr res, const acb_t x, ulong n, slong len, slong prec)"
+arbcall"void acb_hypgeom_log_rising_ui(acb_ptr res, const acb_t x, ulong n, slong prec)"
+arbcall"void acb_hypgeom_log_rising_ui_jet(acb_ptr res, const acb_t x, ulong n, slong len, slong prec)"
+
+### Gamma function
+arbcall"void acb_hypgeom_gamma_stirling_sum_horner(acb_t s, const acb_t z, slong N, slong prec)"
+arbcall"void acb_hypgeom_gamma_stirling_sum_improved(acb_t s, const acb_t z, slong N, slong K, slong prec)"
+arbcall"void acb_hypgeom_gamma_stirling(acb_t res, const acb_t x, int reciprocal, slong prec)"
+arbcall"int acb_hypgeom_gamma_taylor(acb_t res, const acb_t x, int reciprocal, slong prec)"
+arbcall"void acb_hypgeom_gamma(acb_t res, const acb_t x, slong prec)"
+arbcall"void acb_hypgeom_rgamma(acb_t res, const acb_t x, slong prec)"
+arbcall"void acb_hypgeom_lgamma(acb_t res, const acb_t x, slong prec)"
+
 ### Convergent series
 arbcall"void acb_hypgeom_pfq_bound_factor(mag_t C, acb_srcptr a, slong p, acb_srcptr b, slong q, const acb_t z, ulong n)"
 arbcall"slong acb_hypgeom_pfq_choose_n(acb_srcptr a, slong p, acb_srcptr b, slong q, const acb_t z, slong prec)"
