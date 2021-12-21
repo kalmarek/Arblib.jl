@@ -5,6 +5,16 @@ using Arblib
 Parse a .rst file from the Arb documentation. Returns the title of the
 document together with a list of sections with their titles and the
 functions documented in them.
+
+The documentation stores the functions as
+```
+.. function:: void arb_rising_ui(arb_t z, const arb_t x, ulong n, slong prec)
+              void arb_rising(arb_t z, const arb_t x, const arb_t n, slong prec)
+
+```
+With one or more functions for each occurrence of `.. function::`. We
+therefore look for `.. function::` in the documentation files and read
+each line until we encounter an empty line.
 """
 function parse_arbdoc(filename)
     return open(filename) do file
@@ -24,9 +34,17 @@ function parse_arbdoc(filename)
             start = splits[n]
             stop = n == length(splits) ? length(lines) : splits[n+1] - 1
 
+            previous_was_function = false
             for line in lines[start:stop]
                 if startswith(line, ".. function::")
                     push!(sections[n][2], strip(line[length(".. function::")+1:end]))
+                    previous_was_function = true
+                elseif previous_was_function
+                    if !isempty(strip(line))
+                        push!(sections[n][2], strip(strip(line)))
+                    else
+                        previous_was_function = false
+                    end
                 end
             end
         end
