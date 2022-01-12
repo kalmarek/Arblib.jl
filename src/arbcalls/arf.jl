@@ -102,6 +102,7 @@ arbcall"void arf_init_neg_mag_shallow(arf_t z, const mag_t x)"
 #ns arbcall"void arf_randtest(arf_t res, flint_rand_t state, slong bits, slong mag_bits)"
 #ns arbcall"void arf_randtest_not_zero(arf_t res, flint_rand_t state, slong bits, slong mag_bits)"
 #ns arbcall"void arf_randtest_special(arf_t res, flint_rand_t state, slong bits, slong mag_bits)"
+#ns arbcall"void arf_urandom(arf_t res, flint_rand_t state, slong bits, arf_rnd_t rnd)"
 
 ### Input and output
 arbcall"void arf_debug(const arf_t x)"
@@ -144,6 +145,7 @@ arbcall"int arf_submul_ui(arf_t z, const arf_t x, ulong y, slong prec, arf_rnd_t
 arbcall"int arf_submul_si(arf_t z, const arf_t x, slong y, slong prec, arf_rnd_t rnd)"
 arbcall"int arf_submul_mpz(arf_t z, const arf_t x, const mpz_t y, slong prec, arf_rnd_t rnd)"
 #ni arbcall"int arf_submul_fmpz(arf_t z, const arf_t x, const fmpz_t y, slong prec, arf_rnd_t rnd)"
+arbcall"int arf_fma(arf_t res, const arf_t x, const arf_t y, const arf_t z, slong prec, arf_rnd_t rnd)"
 arbcall"int arf_sosq(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)"
 
 ### Summation

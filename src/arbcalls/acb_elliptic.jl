@@ -25,6 +25,7 @@ arbcall"void acb_elliptic_rc1(acb_t res, const acb_t x, slong prec)"
 
 ### Weierstrass elliptic functions
 arbcall"void acb_elliptic_p(acb_t res, const acb_t z, const acb_t tau, slong prec)"
+arbcall"void acb_elliptic_p_prime(acb_t res, const acb_t z, const acb_t tau, slong prec)"
 arbcall"void acb_elliptic_p_jet(acb_ptr res, const acb_t z, const acb_t tau, slong len, slong prec)"
 arbcall"void _acb_elliptic_p_series(acb_ptr res, acb_srcptr z, slong zlen, const acb_t tau, slong len, slong prec)"
 arbcall"void acb_elliptic_p_series(acb_poly_t res, const acb_poly_t z, const acb_t tau, slong len, slong prec)"

@@ -2,6 +2,36 @@
 ### **arb_hypgeom.h** -- hypergeometric functions of real variables
 ###
 
+### Rising factorials
+arbcall"void _arb_hypgeom_rising_coeffs_1(ulong * c, ulong k, slong n)"
+arbcall"void _arb_hypgeom_rising_coeffs_2(ulong * c, ulong k, slong n)"
+#ni arbcall"void _arb_hypgeom_rising_coeffs_fmpz(fmpz * c, ulong k, slong n)"
+arbcall"void arb_hypgeom_rising_ui_forward(arb_t res, const arb_t x, ulong n, slong prec)"
+arbcall"void arb_hypgeom_rising_ui_bs(arb_t res, const arb_t x, ulong n, slong prec)"
+arbcall"void arb_hypgeom_rising_ui_rs(arb_t res, const arb_t x, ulong n, ulong m, slong prec)"
+arbcall"void arb_hypgeom_rising_ui_rec(arb_t res, const arb_t x, ulong n, slong prec)"
+arbcall"void arb_hypgeom_rising_ui(arb_t res, const arb_t x, ulong n, slong prec)"
+arbcall"void arb_hypgeom_rising(arb_t res, const arb_t x, const arb_t n, slong prec)"
+arbcall"void arb_hypgeom_rising_ui_jet_powsum(arb_ptr res, const arb_t x, ulong n, slong len, slong prec)"
+arbcall"void arb_hypgeom_rising_ui_jet_bs(arb_ptr res, const arb_t x, ulong n, slong len, slong prec)"
+arbcall"void arb_hypgeom_rising_ui_jet_rs(arb_ptr res, const arb_t x, ulong n, ulong m, slong len, slong prec)"
+arbcall"void arb_hypgeom_rising_ui_jet(arb_ptr res, const arb_t x, ulong n, slong len, slong prec)"
+
+### Gamma function
+arbcall"void _arb_hypgeom_gamma_stirling_term_bounds(slong * bound, const mag_t zinv, slong N)"
+arbcall"void arb_hypgeom_gamma_stirling_sum_horner(arb_t res, const arb_t z, slong N, slong prec)"
+arbcall"void arb_hypgeom_gamma_stirling_sum_improved(arb_t res, const arb_t z, slong N, slong K, slong prec)"
+arbcall"void arb_hypgeom_gamma_stirling(arb_t res, const arb_t x, int reciprocal, slong prec)"
+arbcall"int arb_hypgeom_gamma_taylor(arb_t res, const arb_t x, int reciprocal, slong prec)"
+arbcall"void arb_hypgeom_gamma(arb_t res, const arb_t x, slong prec)"
+#ni arbcall"void arb_hypgeom_gamma_fmpq(arb_t res, const fmpq_t x, slong prec)"
+#ni arbcall"void arb_hypgeom_gamma_fmpz(arb_t res, const fmpz_t x, slong prec)"
+arbcall"void arb_hypgeom_rgamma(arb_t res, const arb_t x, slong prec)"
+arbcall"void arb_hypgeom_lgamma(arb_t res, const arb_t x, slong prec)"
+
+### Binomial coefficients
+arbcall"void arb_hypgeom_central_bin_ui(arb_t res, ulong n, slong prec)"
+
 ### Generalized hypergeometric function
 arbcall"void arb_hypgeom_pfq(arb_t res, arb_srcptr a, slong p, arb_srcptr b, slong q, const arb_t z, int regularized, slong prec)"
 
@@ -101,6 +131,3 @@ arbcall"void arb_hypgeom_legendre_p_ui_root(arb_t res, arb_t weight, ulong n, ul
 
 ### Dilogarithm
 arbcall"void arb_hypgeom_dilog(arb_t res, const arb_t z, slong prec)"
-
-### Hypergeometric sequences
-arbcall"void arb_hypgeom_central_bin_ui(arb_t res, ulong n, slong prec)"

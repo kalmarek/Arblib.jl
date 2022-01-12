@@ -189,6 +189,8 @@ arbcall"void _arb_poly_binomial_transform_convolution(arb_ptr b, arb_srcptr a, s
 arbcall"void arb_poly_binomial_transform_convolution(arb_poly_t b, const arb_poly_t a, slong len, slong prec)"
 arbcall"void _arb_poly_binomial_transform(arb_ptr b, arb_srcptr a, slong alen, slong len, slong prec)"
 arbcall"void arb_poly_binomial_transform(arb_poly_t b, const arb_poly_t a, slong len, slong prec)"
+arbcall"void _arb_poly_graeffe_transform(arb_ptr b, arb_srcptr a, slong len, slong prec)"
+arbcall"void arb_poly_graeffe_transform(arb_poly_t b, arb_poly_t a, slong prec)"
 
 ### Powers and elementary functions
 arbcall"void _arb_poly_pow_ui_trunc_binexp(arb_ptr res, arb_srcptr f, slong flen, ulong exp, slong len, slong prec)"
