@@ -540,9 +540,53 @@ derivative(p::Poly) = derivative!(zero(p), p)
 derivative(p::T) where {T<:Series} =
     derivative!(T(degree = degree(p) - 1, prec = precision(p)), p)
 
+function derivative(p::Poly, n::Integer)
+    n == 0 && return copy(p)
+    n >= 0 || throw(ArgumentError("n must be non-negative"))
+
+    res = derivative!(zero(p), p)
+    for _ = 2:n
+        derivative!(res, res)
+    end
+    return res
+end
+
+function derivative(p::T, n::Integer) where {T<:Series}
+    n == 0 && return copy(p)
+    n >= 0 || throw(ArgumentError("n must be non-negative"))
+    n <= Arblib.degree(p) ||
+        throw(ArgumentError("n must be less than or equal to the degree of p"))
+
+    res = T(degree = degree(p) - n, prec = precision(p))
+    # During the computations the actual degree of res will be higher
+    # than its given degree. But in the end it should have the correct
+    # degree.
+    derivative!(res, p)
+    for _ = 2:n
+        derivative!(res, res)
+    end
+    return res
+end
+
 integral(p::Poly) = integral!(zero(p), p)
 integral(p::T) where {T<:Series} =
     integral!(T(degree = degree(p) + 1, prec = precision(p)), p)
+
+function integral(p::T, n::Integer) where {T<:Union{Poly,Series}}
+    n == 0 && return copy(p)
+    n >= 0 || throw(ArgumentError("n must be non-negative"))
+
+    if T <: Poly
+        res = zero(p)
+    elseif T <: Series
+        res = T(degree = degree(p) + n, prec = precision(p))
+    end
+    integral!(res, p)
+    for _ = 2:n
+        integral!(res, res)
+    end
+    return res
+end
 
 ##
 ## Power methods
