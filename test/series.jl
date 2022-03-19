@@ -257,16 +257,33 @@
     @testset "Differentiation and integration" begin
         p = TSeries([1, 2, 3])
 
-        @test Arblib.derivative(p) == TSeries([2, 6])
-        @test Arblib.integral(p) == TSeries([0, 1, 1, 1])
+        @test Arblib.derivative(p) == Arblib.derivative(p, 1) == TSeries([2, 6])
+        @test Arblib.integral(p) == Arblib.integral(p, 1) == TSeries([0, 1, 1, 1])
 
-        @test precision(Arblib.derivative(p)) == precision(p)
-        @test precision(Arblib.integral(p)) == precision(p)
-        @test precision(Arblib.derivative(TSeries(prec = 80))) == 80
-        @test precision(Arblib.integral(TSeries(prec = 80))) == 80
+        @test Arblib.derivative(p, 0) == Arblib.integral(p, 0) == p
 
-        @test Arblib.degree(Arblib.derivative(p)) == 1
-        @test Arblib.degree(Arblib.integral(p)) == 3
+        @test Arblib.derivative(p, 2) == TSeries([6])
+        @test Arblib.integral(TSeries([2, 6, 12]), 2) == TSeries([0, 0, 1, 1, 1])
+
+        @test precision(Arblib.derivative(p)) ==
+              precision(Arblib.derivative(p, 0)) ==
+              precision(Arblib.derivative(p, 2)) ==
+              precision(p)
+        @test precision(Arblib.integral(p)) ==
+              precision(Arblib.integral(p, 0)) ==
+              precision(Arblib.integral(p, 2)) ==
+              precision(p)
+        @test precision(Arblib.derivative(TSeries(p, prec = 80))) ==
+              precision(Arblib.derivative(TSeries(p, prec = 80), 0)) ==
+              precision(Arblib.derivative(TSeries(p, prec = 80), 2)) ==
+              80
+        @test precision(Arblib.integral(TSeries(p, prec = 80))) ==
+              precision(Arblib.integral(TSeries(p, prec = 80), 0)) ==
+              precision(Arblib.integral(TSeries(p, prec = 80), 2)) ==
+              80
+
+        @test_throws ArgumentError Arblib.derivative(TSeries(degree = 0), 1)
+        @test_throws ArgumentError Arblib.derivative(TSeries(degree = 1), 2)
     end
 
     @testset "Power methods" begin

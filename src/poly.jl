@@ -505,12 +505,17 @@ end
 
 (p::Union{ArbPoly,ArbSeries})(x::ArbOrRef) = evaluate!(Arb(prec = precision(p)), p, x)
 
-(p::Union{ArbPoly,ArbSeries})(x::Real) =
-    evaluate!(Arb(prec = precision(p)), p, convert(Arb, x))
+function (p::Union{ArbPoly,ArbSeries})(x::Real)
+    x = Arb(x, prec = precision(p))
+    evaluate!(x, p, x)
+end
 
 (p::Union{Poly,Series})(x::AcbOrRef) = evaluate!(Acb(prec = precision(p)), p, x)
 
-(p::Union{Poly,Series})(x) = evaluate!(Acb(prec = precision(p)), p, convert(Acb, x))
+function (p::Union{Poly,Series})(x)
+    x = Acb(x, prec = precision(p))
+    evaluate!(x, p, x)
+end
 
 function evaluate2(p::Union{ArbPoly,ArbSeries}, x::ArbOrRef)
     res1, res2 = Arb(prec = precision(p)), Arb(prec = precision(p))
@@ -519,8 +524,9 @@ function evaluate2(p::Union{ArbPoly,ArbSeries}, x::ArbOrRef)
 end
 
 function evaluate2(p::Union{ArbPoly,ArbSeries}, x::Real)
-    res1, res2 = Arb(prec = precision(p)), Arb(prec = precision(p))
-    evaluate2!(res1, res2, p, convert(Arb, x))
+    # Use res1 for converting x
+    res1, res2 = Arb(x, prec = precision(p)), Arb(prec = precision(p))
+    evaluate2!(res1, res2, p, res1)
     return (res1, res2)
 end
 
@@ -530,7 +536,12 @@ function evaluate2(p::Union{Poly,Series}, x::AcbOrRef)
     return (res1, res2)
 end
 
-evaluate2(p::Union{Poly,Series}, x::T) where {T} = evaluate2(p, convert(Acb, x))
+function evaluate2(p::Union{Poly,Series}, x)
+    # Use res1 for converting x
+    res1, res2 = Acb(x, prec = precision(p)), Acb(prec = precision(p))
+    evaluate2!(res1, res2, p, res1)
+    return (res1, res2)
+end
 
 ##
 ## Differentiation and integration
@@ -540,9 +551,53 @@ derivative(p::Poly) = derivative!(zero(p), p)
 derivative(p::T) where {T<:Series} =
     derivative!(T(degree = degree(p) - 1, prec = precision(p)), p)
 
+function derivative(p::Poly, n::Integer)
+    n == 0 && return copy(p)
+    n >= 0 || throw(ArgumentError("n must be non-negative"))
+
+    res = derivative!(zero(p), p)
+    for _ = 2:n
+        derivative!(res, res)
+    end
+    return res
+end
+
+function derivative(p::T, n::Integer) where {T<:Series}
+    n == 0 && return copy(p)
+    n >= 0 || throw(ArgumentError("n must be non-negative"))
+    n <= Arblib.degree(p) ||
+        throw(ArgumentError("n must be less than or equal to the degree of p"))
+
+    res = T(degree = degree(p) - n, prec = precision(p))
+    # During the computations the actual degree of res will be higher
+    # than its given degree. But in the end it should have the correct
+    # degree.
+    derivative!(res, p)
+    for _ = 2:n
+        derivative!(res, res)
+    end
+    return res
+end
+
 integral(p::Poly) = integral!(zero(p), p)
 integral(p::T) where {T<:Series} =
     integral!(T(degree = degree(p) + 1, prec = precision(p)), p)
+
+function integral(p::T, n::Integer) where {T<:Union{Poly,Series}}
+    n == 0 && return copy(p)
+    n >= 0 || throw(ArgumentError("n must be non-negative"))
+
+    if T <: Poly
+        res = zero(p)
+    elseif T <: Series
+        res = T(degree = degree(p) + n, prec = precision(p))
+    end
+    integral!(res, p)
+    for _ = 2:n
+        integral!(res, res)
+    end
+    return res
+end
 
 ##
 ## Power methods
