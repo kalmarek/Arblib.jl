@@ -26,24 +26,49 @@ function parse_arbdoc(filename)
         # Quick and dirty way to find all the sections
         splits = findall(str -> startswith(str, "------"), lines)
 
-        sections = Vector{Tuple{String,Vector{String}}}()
-        for n = 1:length(splits)
-            section_title = lines[splits[n]-1]
-            push!(sections, (section_title, []))
+        if isempty(splits)
+            # Some documentation files (currently only partitions.rst)
+            # don't have any sections but only a title. Handle this
+            # case here
 
-            start = splits[n]
-            stop = n == length(splits) ? length(lines) : splits[n+1] - 1
+            # The title is on the form
+            # **filename.h** -- some title
+            # Take only the part after --
+            sections = [(strip(split(title, "--", limit = 2)[2]), Vector{String}())]
 
             previous_was_function = false
-            for line in lines[start:stop]
+            for line in lines[5:end]
                 if startswith(line, ".. function::")
-                    push!(sections[n][2], strip(line[length(".. function::")+1:end]))
+                    push!(sections[1][2], strip(line[length(".. function::")+1:end]))
                     previous_was_function = true
                 elseif previous_was_function
                     if !isempty(strip(line))
-                        push!(sections[n][2], strip(strip(line)))
+                        push!(sections[1][2], strip(strip(line)))
                     else
                         previous_was_function = false
+                    end
+                end
+            end
+        else
+            sections = Vector{Tuple{String,Vector{String}}}()
+            for n = 1:length(splits)
+                section_title = lines[splits[n]-1]
+                push!(sections, (section_title, []))
+
+                start = splits[n]
+                stop = n == length(splits) ? length(lines) : splits[n+1] - 1
+
+                previous_was_function = false
+                for line in lines[start:stop]
+                    if startswith(line, ".. function::")
+                        push!(sections[n][2], strip(line[length(".. function::")+1:end]))
+                        previous_was_function = true
+                    elseif previous_was_function
+                        if !isempty(strip(line))
+                            push!(sections[n][2], strip(strip(line)))
+                        else
+                            previous_was_function = false
+                        end
                     end
                 end
             end
@@ -166,29 +191,28 @@ function parse_and_generate_arbdoc(arb_doc_dir, out_dir = "src/arbcalls/")
         "arb",
         "acb",
         "arb_poly",
+        "arb_fmpz_poly",
         "acb_poly",
+        "acb_dft",
         "arb_mat",
         "acb_mat",
         "acb_hypgeom",
         "arb_hypgeom",
         "acb_elliptic",
-        "acb_dirichlet",
-    )
-
-    unused_filenames = (
-        "arb_fmpz_poly",
-        "acb_dft",
         "acb_modular",
         "dirichlet",
+        "acb_dirichlet",
         "bernoulli",
         "hypgeom",
         "partitions",
         "arb_calc",
         "acb_calc",
+        "arb_fpwrap",
+        "double_interval",
         "fmpz_extras",
         "bool_mat",
         "dlog",
-        "fmpr",
+        #"fmpr", # Deprecated
     )
 
     manual_overrides = Dict{String,String}(
