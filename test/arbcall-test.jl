@@ -36,8 +36,11 @@
             ("slong x", :x, false, Integer, Int),
             ("ulong x", :x, false, Unsigned, UInt),
             ("double x", :x, false, Base.GMP.CdoubleMax, Cdouble),
+            ("complex_double x", :x, false, Union{ComplexF16, ComplexF32, ComplexF64}, ComplexF64),
             ("slong * x", :x, false, Vector{<:Integer}, Ref{Int}),
             ("ulong * x", :x, false, Vector{<:Unsigned}, Ref{UInt}),
+            ("double * x", :x, false, Vector{<:Base.GMP.CdoubleMax}, Ref{Float64}),
+            ("complex_double * x", :x, false, Vector{<:Union{ComplexF16, ComplexF32, ComplexF64}}, Ref{ComplexF64}),
             ("const char * inp", :inp, true, AbstractString, Cstring),
             ("arb_ptr v", :v, false, Arblib.ArbVectorLike, Ptr{arb_struct}),
             ("arb_srcptr res", :res, true, Arblib.ArbVectorLike, Ptr{arb_struct}),
@@ -112,6 +115,9 @@
             ("acb_set_si_si", :set),
             ("acb_set_d_d", :set),
             ("acb_set_arb_arb", :set),
+
+            # fpwrap
+            ("arb_fpwrap_double_exp", :exp),
 
             # Unsupported types
             ("arf_set_fmpz", :set_fmpz),
@@ -242,7 +248,7 @@
                 "int _acb_vec_is_zero(acb_srcptr vec, slong len)",
                 [:(vec::$(Arblib.AcbVectorLike))],
                 [:($(Expr(:kw, :(len::Integer), :(length(vec)))))],
-            ),
+            )
         )
             (a, k) = Arblib.jlargs(Arblib.Arbfunction(str))
             @test a == args
@@ -262,6 +268,7 @@
             "void arb_sin(arb_t s, const arb_t x, slong prec)",
             "void arb_cos(arb_t c, const arb_t x, slong prec)",
             "void arb_sin_cos(arb_t s, arb_t c, const arb_t x, slong prec)",
+            "int arb_fpwrap_double_exp(double * res, double x, int flags)",
             # Pointer
             "char * arb_get_str(const arb_t x, slong n, ulong flags)",
         )
