@@ -216,6 +216,7 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
 
     prec_kwarg = false
     rnd_kwarg = false
+    flags_kwarg = false
     len_keywords = Set{Symbol}()
     for (i, carg) in enumerate(cargs)
         if !argument_detection
@@ -235,6 +236,11 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
             else
                 push!(kwargs, :(prec::Integer))
             end
+            # Automatic detection of flags as kwarg flag=0.
+        elseif carg == Carg{Cint}(:flags, false)
+            @assert !flags_kwarg
+            push!(kwargs, Expr(:kw, :(flags::Integer), 0))
+            flags_kwarg = true
 
             # Automatic detection of rounding mode argument
         elseif carg == Carg{arb_rnd}(:rnd, false)
