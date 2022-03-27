@@ -1,5 +1,3 @@
-using Arblib
-
 """
     parse_arbdoc(filename)
 Parse a .rst file from the Arb documentation. Returns the title of the
@@ -144,15 +142,15 @@ function generate_file(
             else
                 try
 
-                    f = Arblib.Arbfunction(s)
+                    f = Arbfunction(s)
 
-                    s == Arblib.arbsignature(f) || @warn(
-                        "Expected signature: $s\n Obtained signature: $(Arblib.arbsignature(f))"
+                    s == arbsignature(f) || @warn(
+                        "Expected signature: $s\n Obtained signature: $(arbsignature(f))"
                     )
 
                     str *= "arbcall\"" * s * "\"\n"
                 catch e
-                    if e isa Arblib.UnsupportedArgumentType
+                    if e isa UnsupportedArgumentType
                         push!(unsuppargs, e.key)
                         num_unsupparg += 1
                         str *= "#ns arbcall\"" * s * "\"\n"

@@ -36,22 +36,34 @@
             ("slong x", :x, false, Integer, Int),
             ("ulong x", :x, false, Unsigned, UInt),
             ("double x", :x, false, Base.GMP.CdoubleMax, Cdouble),
-            ("complex_double x", :x, false, Union{ComplexF16, ComplexF32, ComplexF64}, ComplexF64),
+            (
+                "complex_double x",
+                :x,
+                false,
+                Union{ComplexF16,ComplexF32,ComplexF64},
+                ComplexF64,
+            ),
             ("slong * x", :x, false, Vector{<:Integer}, Ref{Int}),
             ("ulong * x", :x, false, Vector{<:Unsigned}, Ref{UInt}),
             ("double * x", :x, false, Vector{<:Base.GMP.CdoubleMax}, Ref{Float64}),
-            ("complex_double * x", :x, false, Vector{<:Union{ComplexF16, ComplexF32, ComplexF64}}, Ref{ComplexF64}),
+            (
+                "complex_double * x",
+                :x,
+                false,
+                Vector{<:Union{ComplexF16,ComplexF32,ComplexF64}},
+                Ref{ComplexF64},
+            ),
             ("const char * inp", :inp, true, AbstractString, Cstring),
             ("arb_ptr v", :v, false, Arblib.ArbVectorLike, Ptr{arb_struct}),
             ("arb_srcptr res", :res, true, Arblib.ArbVectorLike, Ptr{arb_struct}),
             ("acb_ptr v", :v, false, Arblib.AcbVectorLike, Ptr{acb_struct}),
             ("acb_srcptr res", :res, true, Arblib.AcbVectorLike, Ptr{acb_struct}),
         )
-            arg = Arblib.Carg(str)
-            @test Arblib.name(arg) == name
-            @test Arblib.isconst(arg) == isconst
-            @test Arblib.jltype(arg) == jltype
-            @test Arblib.ctype(arg) == ctype
+            arg = Arblib.ArbCall.Carg(str)
+            @test Arblib.ArbCall.name(arg) == name
+            @test Arblib.ArbCall.isconst(arg) == isconst
+            @test Arblib.ArbCall.jltype(arg) == jltype
+            @test Arblib.ArbCall.ctype(arg) == ctype
         end
 
         # Unsupported types
@@ -62,7 +74,8 @@
             "flint_rand_t state",
             "bool_mat_t mat",
         )
-            @test_throws Arblib.UnsupportedArgumentType arg = Arblib.Carg(str)
+            @test_throws Arblib.ArbCall.UnsupportedArgumentType arg =
+                Arblib.ArbCall.Carg(str)
         end
 
         # Unimplemented types
@@ -82,12 +95,12 @@
             "mp_limb_t * error",
             "mp_bitcnt_t * Qexp",
         )
-            @test_throws KeyError arg = Arblib.Carg(str)
+            @test_throws KeyError arg = Arblib.ArbCall.Carg(str)
         end
 
         # Parse errors
         for str in ()
-            @test_throws ArgumentError arg = Arblib.Carg(str)
+            @test_throws ArgumentError arg = Arblib.ArbCall.Carg(str)
         end
     end
 
@@ -139,8 +152,8 @@
             ("arb_rising_ui_rec", :rising_ui_rec),
             ("arb_zeta_ui_vec", :zeta_ui_vec),
         )
-            @test Arblib.jlfname(arbfname) == name
-            @test Arblib.jlfname(arbfname, inplace = true) == Symbol(name, :!)
+            @test Arblib.ArbCall.jlfname(arbfname) == name
+            @test Arblib.ArbCall.jlfname(arbfname, inplace = true) == Symbol(name, :!)
         end
     end
 
@@ -153,43 +166,43 @@
             ("double arf_get_d(const arf_t x, arf_rnd_t rnd)", Float64),
             ("acb_ptr _acb_vec_init(slong n)", AcbVector),
         )
-            @test Arblib.returntype(Arblib.Arbfunction(str)) == T
+            @test Arblib.ArbCall.returntype(Arblib.ArbCall.Arbfunction(str)) == T
         end
 
         # Unsupported return types
         for str in ("mag_ptr _mag_vec_init(slong n)",)
-            @test_throws KeyError Arblib.Arbfunction(str)
+            @test_throws KeyError Arblib.ArbCall.Arbfunction(str)
         end
 
         # Return types with parse errors
         for str in ()
-            @test_throws ArgumentError Arblib.Arbfunction(str)
+            @test_throws ArgumentError Arblib.ArbCall.Arbfunction(str)
         end
     end
 
     @testset "Length argument detection" begin
         len_keywords = Set{Symbol}()
-        prev_carg = Arblib.Carg("acb_srcptr A")
-        prev_carg_bad = Arblib.Carg("acb_t x")
-        carg1 = Arblib.Carg("slong lenA")
-        carg2 = Arblib.Carg("slong len")
-        carg3 = Arblib.Carg("slong n")
-        carg4 = Arblib.Carg("slong m")
+        prev_carg = Arblib.ArbCall.Carg("acb_srcptr A")
+        prev_carg_bad = Arblib.ArbCall.Carg("acb_t x")
+        carg1 = Arblib.ArbCall.Carg("slong lenA")
+        carg2 = Arblib.ArbCall.Carg("slong len")
+        carg3 = Arblib.ArbCall.Carg("slong n")
+        carg4 = Arblib.ArbCall.Carg("slong m")
 
-        @test Arblib.is_length_argument(carg1, prev_carg, len_keywords)
-        @test Arblib.is_length_argument(carg2, prev_carg, len_keywords)
-        @test Arblib.is_length_argument(carg3, prev_carg, len_keywords)
-        @test !Arblib.is_length_argument(carg4, prev_carg, len_keywords)
-        @test !Arblib.is_length_argument(carg1, prev_carg_bad, len_keywords)
-        @test !Arblib.is_length_argument(carg2, prev_carg_bad, len_keywords)
-        @test !Arblib.is_length_argument(carg3, prev_carg_bad, len_keywords)
-        @test !Arblib.is_length_argument(carg4, prev_carg_bad, len_keywords)
+        @test Arblib.ArbCall.is_length_argument(carg1, prev_carg, len_keywords)
+        @test Arblib.ArbCall.is_length_argument(carg2, prev_carg, len_keywords)
+        @test Arblib.ArbCall.is_length_argument(carg3, prev_carg, len_keywords)
+        @test !Arblib.ArbCall.is_length_argument(carg4, prev_carg, len_keywords)
+        @test !Arblib.ArbCall.is_length_argument(carg1, prev_carg_bad, len_keywords)
+        @test !Arblib.ArbCall.is_length_argument(carg2, prev_carg_bad, len_keywords)
+        @test !Arblib.ArbCall.is_length_argument(carg3, prev_carg_bad, len_keywords)
+        @test !Arblib.ArbCall.is_length_argument(carg4, prev_carg_bad, len_keywords)
 
         kwargs = []
-        Arblib.extract_length_argument!(kwargs, len_keywords, carg1, prev_carg)
+        Arblib.ArbCall.extract_length_argument!(kwargs, len_keywords, carg1, prev_carg)
         @test kwargs[1] == :($(Expr(:kw, :(lenA::Integer), :(length(A)))))
         @test :lenA ∈ len_keywords
-        @test !Arblib.is_length_argument(carg1, prev_carg, len_keywords)
+        @test !Arblib.ArbCall.is_length_argument(carg1, prev_carg, len_keywords)
     end
 
     @testset "Predicate detection" begin
@@ -204,7 +217,7 @@
             "int _acb_vec_is_zero(acb_srcptr vec, slong len)",
             "int _arb_vec_is_finite(arb_srcptr x, slong len)",
         )
-            @test Arblib.ispredicate(Arblib.Arbfunction(sig))
+            @test Arblib.ArbCall.ispredicate(Arblib.ArbCall.Arbfunction(sig))
         end
 
         for sig in (
@@ -216,7 +229,7 @@
             "int arf_set_round(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)",
             "int arf_cmp(const arf_t x, const arf_t y)",
         )
-            @test !Arblib.ispredicate(Arblib.Arbfunction(sig))
+            @test !Arblib.ArbCall.ispredicate(Arblib.ArbCall.Arbfunction(sig))
         end
     end
 
@@ -248,9 +261,9 @@
                 "int _acb_vec_is_zero(acb_srcptr vec, slong len)",
                 [:(vec::$(Arblib.AcbVectorLike))],
                 [:($(Expr(:kw, :(len::Integer), :(length(vec)))))],
-            )
+            ),
         )
-            (a, k) = Arblib.jlargs(Arblib.Arbfunction(str))
+            (a, k) = Arblib.ArbCall.jlargs(Arblib.ArbCall.Arbfunction(str))
             @test a == args
             @test k == kwargs
         end
@@ -272,7 +285,7 @@
             # Pointer
             "char * arb_get_str(const arb_t x, slong n, ulong flags)",
         )
-            @test Arblib.arbsignature(Arblib.Arbfunction(str)) == str
+            @test Arblib.ArbCall.arbsignature(Arblib.ArbCall.Arbfunction(str)) == str
         end
     end
 end

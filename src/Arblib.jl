@@ -58,7 +58,9 @@ end
 include("arb_types.jl")
 include("rounding.jl")
 include("types.jl")
-include("arbcall.jl")
+
+include("ArbCall/ArbCall.jl")
+import .ArbCall: @arbcall_str
 include("manual_overrides.jl")
 
 include("precision.jl")
