@@ -2,6 +2,12 @@ struct UnsupportedArgumentType <: Exception
     key::String
 end
 
+"""
+    ArbArgTypes(supported, unsupported)
+
+Struct for conversion between C argument types in the Arb
+documentation and Julia types.
+"""
 struct ArbArgTypes
     supported::Dict{String,DataType}
     unsupported::Set{String}
@@ -19,6 +25,7 @@ function Base.getindex(arbargtypes::ArbArgTypes, key::AbstractString)
     throw(KeyError(key))
 end
 
+# Define the conversions we use for the rest of the code
 const arbargtypes = ArbArgTypes(
     Dict{String,DataType}(
         "void" => Cvoid,
