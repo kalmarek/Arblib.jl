@@ -45,7 +45,7 @@ for example for floating point numbers we only allow conversion from
 types with lower precision. In general the conversion is done using
 [`Base.cconvert`](@ref).
 """
-jltype(::Carg) = rawtype(ca)
+jltype(ca::Carg) = rawtype(ca)
 jltype(::Carg{Cint}) = Integer
 jltype(::Carg{Int}) = Integer
 jltype(::Carg{UInt}) = Unsigned
