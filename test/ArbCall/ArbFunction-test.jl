@@ -75,31 +75,6 @@
         end
     end
 
-    @testset "Length argument detection" begin
-        len_keywords = Set{Symbol}()
-        prev_carg = Arblib.ArbCall.Carg("acb_srcptr A")
-        prev_carg_bad = Arblib.ArbCall.Carg("acb_t x")
-        carg1 = Arblib.ArbCall.Carg("slong lenA")
-        carg2 = Arblib.ArbCall.Carg("slong len")
-        carg3 = Arblib.ArbCall.Carg("slong n")
-        carg4 = Arblib.ArbCall.Carg("slong m")
-
-        @test Arblib.ArbCall.is_length_argument(carg1, prev_carg, len_keywords)
-        @test Arblib.ArbCall.is_length_argument(carg2, prev_carg, len_keywords)
-        @test Arblib.ArbCall.is_length_argument(carg3, prev_carg, len_keywords)
-        @test !Arblib.ArbCall.is_length_argument(carg4, prev_carg, len_keywords)
-        @test !Arblib.ArbCall.is_length_argument(carg1, prev_carg_bad, len_keywords)
-        @test !Arblib.ArbCall.is_length_argument(carg2, prev_carg_bad, len_keywords)
-        @test !Arblib.ArbCall.is_length_argument(carg3, prev_carg_bad, len_keywords)
-        @test !Arblib.ArbCall.is_length_argument(carg4, prev_carg_bad, len_keywords)
-
-        kwargs = []
-        Arblib.ArbCall.extract_length_argument!(kwargs, len_keywords, carg1, prev_carg)
-        @test kwargs[1] == :($(Expr(:kw, :(lenA::Integer), :(length(A)))))
-        @test :lenA ∈ len_keywords
-        @test !Arblib.ArbCall.is_length_argument(carg1, prev_carg, len_keywords)
-    end
-
     @testset "Predicate detection" begin
         for sig in (
             "int acb_is_zero(const acb_t z)",
@@ -145,11 +120,7 @@
                 ],
                 [
                     Expr(:kw, :(prec::Integer), :(_precision(res))),
-                    Expr(
-                        :kw,
-                        :(rnd::Union{$(Arblib.arb_rnd),RoundingMode}),
-                        :(RoundNearest),
-                    ),
+                    Expr(:kw, :(rnd::Union{Arblib.arb_rnd,RoundingMode}), :(RoundNearest)),
                 ],
             ),
             (

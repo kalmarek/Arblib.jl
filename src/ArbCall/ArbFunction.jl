@@ -101,54 +101,29 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
     prec_kwarg = false
     rnd_kwarg = false
     flags_kwarg = false
-    len_keywords = Set{Symbol}()
     for (i, carg) in enumerate(cargs)
         if !argument_detection
             push!(jl_arg_names_types, (name(carg), jltype(carg)))
             continue
         end
 
-        # Automatic detection of precision argument
-        if carg == Carg{Int}(:prec, false)
+        if is_precision_argument(carg)
             @assert !prec_kwarg
             prec_kwarg = true
 
-            # If the first argument has a precision,
-            # then use this otherwise make it a mandatory kwarg
-            if rawtype(cargs[1]) <: ArbTypes && rawtype(cargs[1]) != Mag
-                push!(kwargs, Expr(:kw, :(prec::Integer), :(_precision($(name(cargs[1]))))))
-            else
-                push!(kwargs, :(prec::Integer))
-            end
-            # Automatic detection of flags as kwarg flag=0.
-        elseif carg == Carg{Cint}(:flags, false)
+            push!(kwargs, extract_precision_argument(carg, first(cargs)))
+        elseif is_flag_argument(carg)
             @assert !flags_kwarg
-            push!(kwargs, Expr(:kw, :(flags::Integer), 0))
             flags_kwarg = true
 
-            # Automatic detection of rounding mode argument
-        elseif carg == Carg{arb_rnd}(:rnd, false)
+            push!(kwargs, extract_flag_argument(carg))
+        elseif is_rounding_argument(carg)
             @assert !rnd_kwarg
             rnd_kwarg = true
 
-            push!(
-                kwargs,
-                Expr(:kw, :(rnd::Union{$(arb_rnd),RoundingMode}), :(RoundNearest)),
-            )
-        elseif carg == Carg{Base.MPFR.MPFRRoundingMode}(:rnd, false)
-            @assert !rnd_kwarg
-            rnd_kwarg = true
-            push!(
-                kwargs,
-                Expr(
-                    :kw,
-                    :(rnd::Union{Base.MPFR.MPFRRoundingMode,RoundingMode}),
-                    :(RoundNearest),
-                ),
-            )
-            # Automatic detection of length arguments for vectors
-        elseif i > 1 && is_length_argument(carg, cargs[i-1], len_keywords)
-            extract_length_argument!(kwargs, len_keywords, carg, cargs[i-1])
+            push!(kwargs, extract_rounding_argument(carg))
+        elseif i > 1 && is_length_argument(carg, cargs[i-1])
+            push!(kwargs, extract_length_argument(carg, cargs[i-1]))
         else
             push!(jl_arg_names_types, (name(carg), jltype(carg)))
         end

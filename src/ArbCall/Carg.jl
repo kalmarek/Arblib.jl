@@ -81,3 +81,53 @@ ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbPoly,AcbPoly,ArbMatrix,AcbMa
     Ref{cstructtype(T)}
 ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
 ctype(::Carg{Vector{T}}) where {T} = Ref{T}
+
+is_precision_argument(ca::Carg) = ca == Carg{Int}(:prec, false)
+
+is_flag_argument(ca::Carg) = ca == Carg{Cint}(:flags, false)
+
+is_rounding_argument(ca::Carg) =
+    ca == Carg{arb_rnd}(:rnd, false) || ca == Carg{Base.MPFR.MPFRRoundingMode}(:rnd, false)
+
+is_length_argument(ca::Carg, prev_ca::Carg) =
+    (startswith(string(name(ca)), "len") || name(ca) == :n) &&
+    rawtype(ca) == Int &&
+    rawtype(prev_ca) ∈ (ArbVector, AcbVector)
+
+function extract_precision_argument(ca::Carg, first_ca::Carg)
+    is_precision_argument(ca) ||
+        throw(ArgumentError("argument is not a valid precision argument, $ca"))
+    # If the first argument has a precision, then use this otherwise
+    # make it a mandatory kwarg
+    if rawtype(first_ca) <: ArbTypes && rawtype(first_ca) != Mag
+        return Expr(:kw, :(prec::Integer), :(_precision($(name(first_ca)))))
+    else
+        return :(prec::Integer)
+    end
+end
+
+function extract_flag_argument(ca::Carg)
+    is_flag_argument(ca) ||
+        throw(ArgumentError("argument is not a valid flag argument, $ca"))
+    return Expr(:kw, :(flags::Integer), 0)
+end
+
+function extract_rounding_argument(ca::Carg)
+    is_rounding_argument(ca) ||
+        throw(ArgumentError("argument is not a valid rounding argument, $ca"))
+    if rawtype(ca) == arb_rnd
+        return Expr(:kw, :(rnd::Union{Arblib.arb_rnd,RoundingMode}), :(RoundNearest))
+    elseif rawtype(ca) == Base.MPFR.MPFRRoundingMode
+        return Expr(
+            :kw,
+            :(rnd::Union{Base.MPFR.MPFRRoundingMode,RoundingMode}),
+            :(RoundNearest),
+        )
+    end
+end
+
+function extract_length_argument(ca::Carg, prev_ca::Carg)
+    is_length_argument(ca, prev_ca) ||
+        throw(ArgumentError("argument is not a valid length argument, $ca"))
+    return Expr(:kw, :($(name(ca))::Integer), :(length($(name(prev_ca)))))
+end
