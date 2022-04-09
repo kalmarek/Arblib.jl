@@ -69,16 +69,6 @@ function jlfname(
     return jlfname(arbfname(af), prefixes, suffixes, inplace = inplace)
 end
 
-function is_length_argument(carg, prev_carg, len_keywords)
-    (startswith(string(name(carg)), "len") || carg == Carg{Int}(:n, false)) &&
-        rawtype(prev_carg) ∈ (ArbVector, AcbVector) &&
-        name(carg) ∉ len_keywords
-end
-function extract_length_argument!(kwargs, len_keywords, carg, prev_carg)
-    vec_name = name(prev_carg)
-    push!(kwargs, Expr(:kw, :($(name(carg))::Integer), :(length($vec_name))))
-    push!(len_keywords, name(carg))
-end
 function ispredicate(af::ArbFunction)
     return isconst(first(arguments(af))) &&
            returntype(af) == Cint &&
@@ -136,23 +126,7 @@ end
 
 function arbsignature(af::ArbFunction)
     creturnT = arbargtypes.supported_reversed[returntype(af)]
-    args = arguments(af)
-
-    arg_consts = isconst.(args)
-    arg_ctypes = [arbargtypes.supported_reversed[rawtype(arg)] for arg in args]
-    arg_names = name.(args)
-
-
-    c_args = join(
-        [
-            ifelse(
-                isconst && (type == "arb_ptr" || type == "acb_ptr"),
-                "$(split(type, "_")[1])_srcptr $name",
-                ifelse(isconst, "const ", "") * "$type $name",
-            ) for (isconst, type, name) in zip(arg_consts, arg_ctypes, arg_names)
-        ],
-        ", ",
-    )
+    c_args = join(arbsignature.(arguments(af)), ", ")
 
     "$creturnT $(arbfname(af))($c_args)"
 end
