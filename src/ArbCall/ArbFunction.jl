@@ -1,4 +1,4 @@
-struct ArbFunction{ReturnT}
+struct ArbFunction{T}
     fname::String
     args::Vector{Carg}
 end
@@ -42,7 +42,7 @@ function jlfname(
 end
 
 arbfname(af::ArbFunction) = af.fname
-returntype(af::ArbFunction{ReturnT}) where {ReturnT} = ReturnT
+returntype(af::ArbFunction{T}) where {T} = T
 arguments(af::ArbFunction) = af.args
 
 function inplace(af::ArbFunction)
