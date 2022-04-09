@@ -142,7 +142,7 @@ function generate_file(
             else
                 try
 
-                    f = Arbfunction(s)
+                    f = ArbFunction(s)
 
                     s == arbsignature(f) || @warn(
                         "Expected signature: $s\n Obtained signature: $(arbsignature(f))"

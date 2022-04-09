@@ -61,17 +61,17 @@
             ("double arf_get_d(const arf_t x, arf_rnd_t rnd)", Float64),
             ("acb_ptr _acb_vec_init(slong n)", AcbVector),
         )
-            @test Arblib.ArbCall.returntype(Arblib.ArbCall.Arbfunction(str)) == T
+            @test Arblib.ArbCall.returntype(Arblib.ArbCall.ArbFunction(str)) == T
         end
 
         # Unsupported return types
         for str in ("mag_ptr _mag_vec_init(slong n)",)
-            @test_throws KeyError Arblib.ArbCall.Arbfunction(str)
+            @test_throws KeyError Arblib.ArbCall.ArbFunction(str)
         end
 
         # Return types with parse errors
         for str in ()
-            @test_throws ArgumentError Arblib.ArbCall.Arbfunction(str)
+            @test_throws ArgumentError Arblib.ArbCall.ArbFunction(str)
         end
     end
 
@@ -87,7 +87,7 @@
             "int _acb_vec_is_zero(acb_srcptr vec, slong len)",
             "int _arb_vec_is_finite(arb_srcptr x, slong len)",
         )
-            @test Arblib.ArbCall.ispredicate(Arblib.ArbCall.Arbfunction(sig))
+            @test Arblib.ArbCall.ispredicate(Arblib.ArbCall.ArbFunction(sig))
         end
 
         for sig in (
@@ -99,7 +99,7 @@
             "int arf_set_round(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)",
             "int arf_cmp(const arf_t x, const arf_t y)",
         )
-            @test !Arblib.ArbCall.ispredicate(Arblib.ArbCall.Arbfunction(sig))
+            @test !Arblib.ArbCall.ispredicate(Arblib.ArbCall.ArbFunction(sig))
         end
     end
 
@@ -129,7 +129,7 @@
                 [:($(Expr(:kw, :(len::Integer), :(length(vec)))))],
             ),
         )
-            (a, k) = Arblib.ArbCall.jlargs(Arblib.ArbCall.Arbfunction(str))
+            (a, k) = Arblib.ArbCall.jlargs(Arblib.ArbCall.ArbFunction(str))
             @test a == args
             @test k == kwargs
         end
@@ -151,7 +151,7 @@
             # Pointer
             "char * arb_get_str(const arb_t x, slong n, ulong flags)",
         )
-            @test Arblib.ArbCall.arbsignature(Arblib.ArbCall.Arbfunction(str)) == str
+            @test Arblib.ArbCall.arbsignature(Arblib.ArbCall.ArbFunction(str)) == str
         end
     end
 end

@@ -1,16 +1,16 @@
-struct Arbfunction{ReturnT}
+struct ArbFunction{ReturnT}
     fname::String
     args::Vector{Carg}
 end
 
-function Arbfunction(str)
+function ArbFunction(str)
     m = match(r"(?<returntype>\w+(\s\*)?)\s+(?<arbfunction>[\w_]+)\((?<args>.*)\)", str)
     isnothing(m) &&
         throw(ArgumentError("string doesn't match arblib function signature pattern"))
 
     args = Carg.(strip.(split(m[:args], ",")))
 
-    return Arbfunction{arbargtypes[m[:returntype]]}(m[:arbfunction], args)
+    return ArbFunction{arbargtypes[m[:returntype]]}(m[:arbfunction], args)
 end
 
 function jlfname(
@@ -38,18 +38,18 @@ function jlfname(
     return inplace ? Symbol(fname, "!") : Symbol(fname)
 end
 
-arbfname(af::Arbfunction) = af.fname
-returntype(af::Arbfunction{ReturnT}) where {ReturnT} = ReturnT
-arguments(af::Arbfunction) = af.args
+arbfname(af::ArbFunction) = af.fname
+returntype(af::ArbFunction{ReturnT}) where {ReturnT} = ReturnT
+arguments(af::ArbFunction) = af.args
 
-function inplace(af::Arbfunction)
+function inplace(af::ArbFunction)
     firstarg = first(arguments(af))
     return !isconst(firstarg) &&
            (ctype(firstarg) <: Ref || ctype(firstarg) <: AbstractArray)
 end
 
 function jlfname(
-    af::Arbfunction,
+    af::ArbFunction,
     prefixes = (
         "arf",
         "arb",
@@ -79,7 +79,7 @@ function extract_length_argument!(kwargs, len_keywords, carg, prev_carg)
     push!(kwargs, Expr(:kw, :($(name(carg))::Integer), :(length($vec_name))))
     push!(len_keywords, name(carg))
 end
-function ispredicate(af::Arbfunction)
+function ispredicate(af::ArbFunction)
     return isconst(first(arguments(af))) &&
            returntype(af) == Cint &&
            (
@@ -92,7 +92,7 @@ function ispredicate(af::Arbfunction)
            )
 end
 
-function jlargs(af::Arbfunction; argument_detection::Bool = true)
+function jlargs(af::ArbFunction; argument_detection::Bool = true)
     cargs = arguments(af)
 
     jl_arg_names_types = Tuple{Symbol,Any}[]
@@ -134,7 +134,7 @@ function jlargs(af::Arbfunction; argument_detection::Bool = true)
     return args, kwargs
 end
 
-function arbsignature(af::Arbfunction)
+function arbsignature(af::ArbFunction)
     creturnT = arbargtypes.supported_reversed[returntype(af)]
     args = arguments(af)
 
@@ -157,7 +157,7 @@ function arbsignature(af::Arbfunction)
     "$creturnT $(arbfname(af))($c_args)"
 end
 
-function jlcode(af::Arbfunction, jl_fname = jlfname(af))
+function jlcode(af::ArbFunction, jl_fname = jlfname(af))
     jl_args, jl_kwargs = jlargs(af; argument_detection = true)
     jl_full_args, _ = jlargs(af; argument_detection = false)
 
@@ -195,6 +195,6 @@ function jlcode(af::Arbfunction, jl_fname = jlfname(af))
 end
 
 macro arbcall_str(str)
-    af = Arbfunction(str)
+    af = ArbFunction(str)
     return esc(jlcode(af))
 end
