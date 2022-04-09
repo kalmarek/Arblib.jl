@@ -13,22 +13,25 @@ function ArbFunction(str)
     return ArbFunction{arbargtypes[m[:returntype]]}(m[:arbfunction], args)
 end
 
+const jlfname_prefixes = (
+    "arf",
+    "arb",
+    "acb",
+    "mag",
+    "mat",
+    "vec",
+    "poly",
+    "scalar",
+    "fpwrap",
+    "double",
+    "cdouble",
+)
+const jlfname_suffixes = ("si", "ui", "d", "mag", "arf", "arb", "acb", "mpz", "mpfr", "str")
+
 function jlfname(
     arbfname,
-    prefixes = (
-        "arf",
-        "arb",
-        "acb",
-        "mag",
-        "mat",
-        "vec",
-        "poly",
-        "scalar",
-        "fpwrap",
-        "double",
-        "cdouble",
-    ),
-    suffixes = ("si", "ui", "d", "mag", "arf", "arb", "acb", "mpz", "mpfr", "str");
+    prefixes = jlfname_prefixes,
+    suffixes = jlfname_suffixes;
     inplace = false,
 )
     strs = filter(!isempty, split(arbfname, "_"))
@@ -50,20 +53,8 @@ end
 
 function jlfname(
     af::ArbFunction,
-    prefixes = (
-        "arf",
-        "arb",
-        "acb",
-        "mag",
-        "mat",
-        "vec",
-        "poly",
-        "scalar",
-        "fpwrap",
-        "double",
-        "cdouble",
-    ),
-    suffixes = ("si", "ui", "d", "mag", "arf", "arb", "acb", "mpz", "mpfr", "str");
+    prefixes = jlfname_prefixes,
+    suffixes = jlfname_suffixes;
     inplace = inplace(af),
 )
     return jlfname(arbfname(af), prefixes, suffixes, inplace = inplace)
