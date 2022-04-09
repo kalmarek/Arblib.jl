@@ -34,6 +34,16 @@ rawtype(::Carg{T}) where {T} = T
 Base.:(==)(a::Carg{T}, b::Carg{S}) where {T,S} =
     T == S && name(a) == name(b) && isconst(a) == isconst(b)
 
+function arbsignature(ca::Carg)
+    arbtype = arbargtypes.supported_reversed[rawtype(ca)]
+
+    if isconst(ca) && (arbtype == "arb_ptr" || arbtype == "acb_ptr")
+        return "$(split(arbtype, "_")[1])_srcptr $(name(ca))"
+    else
+        return ifelse(isconst(ca), "const ", "") * "$arbtype $(name(ca))"
+    end
+end
+
 """
     jltype(ca::Carg{T})
 

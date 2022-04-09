@@ -103,6 +103,23 @@
         end
     end
 
+    @testset "arbsignature" begin
+        for str in (
+            "arf_t x",
+            "arb_t x",
+            "const arf_t y",
+            "const arb_t x",
+            "slong prec",
+            "ulong y",
+            "arb_ptr res",
+            "arb_srcptr poly",
+            "acb_ptr res",
+            "acb_srcptr poly",
+        )
+            @test Arblib.ArbCall.arbsignature(Arblib.ArbCall.Carg(str)) == str
+        end
+    end
+
     @testset "precision_argument" begin
         @test Arblib.ArbCall.is_precision_argument(Arblib.ArbCall.Carg("slong prec"))
         @test !Arblib.ArbCall.is_precision_argument(Arblib.ArbCall.Carg("int prec"))
