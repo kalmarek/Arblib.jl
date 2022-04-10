@@ -1,9 +1,18 @@
-struct ArbFPWrapfunction{ReturnT<:Union{Float64,ComplexF64}}
+"""
+    ArbFPWrapFunction{T}(fname, args)
+    ArbFPWrapFunction(str)
+
+Struct representing an Arb function from the `arb_fpwrap.h` module.
+
+It contains the name of the function in the Arb documentation, the
+return type and a list of arguments for the function.
+"""
+struct ArbFPWrapFunction{T<:Union{Float64,ComplexF64}}
     fname::String
     args::Vector{Carg}
 end
 
-function ArbFPWrapfunction(str)
+function ArbFPWrapFunction(str)
     m = match(r"(?<returnflag>\w+(\s\*)?)\s+(?<arbfunction>[\w_]+)\((?<args>.*)\)", str)
     isnothing(m) &&
         throw(ArgumentError("string doesn't match arblib function signature pattern"))
@@ -25,16 +34,39 @@ function ArbFPWrapfunction(str)
         throw(ArgumentError("return type is not double or cdouble, got $type_str"))
     end
 
-    return ArbFPWrapfunction{return_type}(m[:arbfunction], args)
+    return ArbFPWrapFunction{return_type}(m[:arbfunction], args)
 end
 
-arbfname(af::ArbFPWrapfunction) = af.fname
-jlfname(af::ArbFPWrapfunction) = Symbol("fpwrap_" * split(af.fname, "_", limit = 4)[4])
+arbfname(af::ArbFPWrapFunction) = af.fname
+returntype(::ArbFPWrapFunction{T}) where {T} = T
+arguments(af::ArbFPWrapFunction) = af.args
 
-returntype(af::ArbFPWrapfunction{ReturnT}) where {ReturnT} = ReturnT
-arguments(af::ArbFPWrapfunction) = af.args
+function arbsignature(af::ArbFPWrapFunction)
+    creturnT = arbargtypes.supported_reversed[returntype(af)]
+    args = arguments(af)
 
-function jlargs(af::ArbFPWrapfunction{ReturnT}) where {ReturnT}
+    arg_consts = isconst.(args)
+    arg_ctypes = [arbargtypes.supported_reversed[rawtype(arg)] for arg in args]
+    arg_names = name.(args)
+
+
+    c_args = join(
+        [
+            ifelse(isconst, "const ", "") * "$type $name" for
+            (isconst, type, name) in zip(arg_consts, arg_ctypes, arg_names)
+        ],
+        ", ",
+    )
+
+    "int $(arbfname(af))($c_args)"
+end
+
+jlfname(af::ArbFPWrapFunction) = Symbol(:fpwrap_, split(arbfname(af), "_", limit = 4)[4])
+
+inplace(::ArbFPWrapFunction) = false
+ispredicate(::ArbFPWrapFunction) = false
+
+function jlargs(af::ArbFPWrapFunction{ReturnT}) where {ReturnT}
     cargs = arguments(af)
 
     # First argument is return value and last argument is flag
@@ -51,7 +83,7 @@ function jlargs(af::ArbFPWrapfunction{ReturnT}) where {ReturnT}
     return args
 end
 
-function jlcode(af::ArbFPWrapfunction, jl_fname = jlfname(af))
+function jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af))
     jl_args = jlargs(af)
 
     returnT = returntype(af)
@@ -90,6 +122,6 @@ function jlcode(af::ArbFPWrapfunction, jl_fname = jlfname(af))
 end
 
 macro arbfpwrapcall_str(str)
-    af = ArbFPWrapfunction(str)
+    af = ArbFPWrapFunction(str)
     return esc(jlcode(af))
 end
