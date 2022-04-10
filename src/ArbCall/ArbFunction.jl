@@ -3,7 +3,7 @@ struct ArbFunction{T}
     args::Vector{Carg}
 end
 
-function ArbFunction(str)
+function ArbFunction(str::AbstractString)
     m = match(r"(?<returntype>\w+(\s\*)?)\s+(?<arbfunction>[\w_]+)\((?<args>.*)\)", str)
     isnothing(m) &&
         throw(ArgumentError("string doesn't match arblib function signature pattern"))
@@ -11,6 +11,36 @@ function ArbFunction(str)
     args = Carg.(strip.(split(m[:args], ",")))
 
     return ArbFunction{arbargtypes[m[:returntype]]}(m[:arbfunction], args)
+end
+
+returntype(af::ArbFunction{T}) where {T} = T
+arbfname(af::ArbFunction) = af.fname
+arguments(af::ArbFunction) = af.args
+
+function arbsignature(af::ArbFunction)
+    creturnT = arbargtypes.supported_reversed[returntype(af)]
+    c_args = join(arbsignature.(arguments(af)), ", ")
+
+    "$creturnT $(arbfname(af))($c_args)"
+end
+
+function inplace(af::ArbFunction)
+    firstarg = first(arguments(af))
+    return !isconst(firstarg) &&
+           (ctype(firstarg) <: Ref || ctype(firstarg) <: AbstractArray)
+end
+
+function ispredicate(af::ArbFunction)
+    return isconst(first(arguments(af))) &&
+           returntype(af) == Cint &&
+           (
+               any(s -> startswith(string(jlfname(af)), s), ("is_",)) ||
+               any(
+                   s -> occursin(s, string(jlfname(af))),
+                   ("_is_", "contains", "can_", "check_", "validate_"),
+               ) ||
+               any(==(jlfname(af)), (:eq, :ne, :lt, :le, :gt, :ge, :overlaps, :equal))
+           )
 end
 
 const jlfname_prefixes = (
@@ -29,7 +59,7 @@ const jlfname_prefixes = (
 const jlfname_suffixes = ("si", "ui", "d", "mag", "arf", "arb", "acb", "mpz", "mpfr", "str")
 
 function jlfname(
-    arbfname,
+    arbfname::AbstractString,
     prefixes = jlfname_prefixes,
     suffixes = jlfname_suffixes;
     inplace = false,
@@ -41,37 +71,12 @@ function jlfname(
     return inplace ? Symbol(fname, "!") : Symbol(fname)
 end
 
-arbfname(af::ArbFunction) = af.fname
-returntype(af::ArbFunction{T}) where {T} = T
-arguments(af::ArbFunction) = af.args
-
-function inplace(af::ArbFunction)
-    firstarg = first(arguments(af))
-    return !isconst(firstarg) &&
-           (ctype(firstarg) <: Ref || ctype(firstarg) <: AbstractArray)
-end
-
-function jlfname(
+jlfname(
     af::ArbFunction,
     prefixes = jlfname_prefixes,
     suffixes = jlfname_suffixes;
     inplace = inplace(af),
-)
-    return jlfname(arbfname(af), prefixes, suffixes, inplace = inplace)
-end
-
-function ispredicate(af::ArbFunction)
-    return isconst(first(arguments(af))) &&
-           returntype(af) == Cint &&
-           (
-               any(s -> startswith(string(jlfname(af)), s), ("is_",)) ||
-               any(
-                   s -> occursin(s, string(jlfname(af))),
-                   ("_is_", "contains", "can_", "check_", "validate_"),
-               ) ||
-               any(==(jlfname(af)), (:eq, :ne, :lt, :le, :gt, :ge, :overlaps, :equal))
-           )
-end
+) = jlfname(arbfname(af), prefixes, suffixes; inplace)
 
 function jlargs(af::ArbFunction; argument_detection::Bool = true)
     cargs = arguments(af)
@@ -115,16 +120,9 @@ function jlargs(af::ArbFunction; argument_detection::Bool = true)
     return args, kwargs
 end
 
-function arbsignature(af::ArbFunction)
-    creturnT = arbargtypes.supported_reversed[returntype(af)]
-    c_args = join(arbsignature.(arguments(af)), ", ")
-
-    "$creturnT $(arbfname(af))($c_args)"
-end
-
 function jlcode(af::ArbFunction, jl_fname = jlfname(af))
-    jl_args, jl_kwargs = jlargs(af; argument_detection = true)
-    jl_full_args, _ = jlargs(af; argument_detection = false)
+    jl_args, jl_kwargs = jlargs(af, argument_detection = true)
+    jl_full_args, _ = jlargs(af, argument_detection = false)
 
     returnT = returntype(af)
     cargs = arguments(af)
