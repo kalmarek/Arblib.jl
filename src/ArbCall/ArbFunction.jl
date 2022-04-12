@@ -21,7 +21,7 @@ function arbsignature(af::ArbFunction)
     creturnT = arbargtypes.supported_reversed[returntype(af)]
     c_args = join(arbsignature.(arguments(af)), ", ")
 
-    "$creturnT $(arbfname(af))($c_args)"
+    return "$creturnT $(arbfname(af))($c_args)"
 end
 
 function inplace(af::ArbFunction)
@@ -30,18 +30,17 @@ function inplace(af::ArbFunction)
            (ctype(firstarg) <: Ref || ctype(firstarg) <: AbstractArray)
 end
 
-function ispredicate(af::ArbFunction)
-    return isconst(first(arguments(af))) &&
-           returntype(af) == Cint &&
-           (
-               any(s -> startswith(string(jlfname(af)), s), ("is_",)) ||
-               any(
-                   s -> occursin(s, string(jlfname(af))),
-                   ("_is_", "contains", "can_", "check_", "validate_"),
-               ) ||
-               any(==(jlfname(af)), (:eq, :ne, :lt, :le, :gt, :ge, :overlaps, :equal))
-           )
-end
+ispredicate(af::ArbFunction) =
+    isconst(first(arguments(af))) &&
+    returntype(af) == Cint &&
+    (
+        any(s -> startswith(string(jlfname(af)), s), ("is_",)) ||
+        any(
+            s -> occursin(s, string(jlfname(af))),
+            ("_is_", "contains", "can_", "check_", "validate_"),
+        ) ||
+        any(==(jlfname(af)), (:eq, :ne, :lt, :le, :gt, :ge, :overlaps, :equal))
+    )
 
 const jlfname_prefixes = (
     "arf",
@@ -148,9 +147,9 @@ function jlcode(af::ArbFunction, jl_fname = jlfname(af))
     )
 
     if isempty(jl_kwargs)
-        func_full_args
+        return func_full_args
     else
-        quote
+        return quote
             $func_full_args
             $jl_fname($(jl_args...); $(jl_kwargs...)) = $jl_fname($(name.(cargs)...))
         end
