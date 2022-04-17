@@ -60,7 +60,7 @@ include("rounding.jl")
 include("types.jl")
 
 include("ArbCall/ArbCall.jl")
-import .ArbCall: @arbcall_str
+import .ArbCall: @arbcall_str, @arbfpwrapcall_str
 include("manual_overrides.jl")
 
 include("precision.jl")
