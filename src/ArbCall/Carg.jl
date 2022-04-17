@@ -141,3 +141,16 @@ function extract_length_argument(ca::Carg, prev_ca::Carg)
         throw(ArgumentError("argument is not a valid length argument, $ca"))
     return Expr(:kw, :($(name(ca))::Integer), :(length($(name(prev_ca)))))
 end
+
+"""
+    is_fpwrap_res_argument(ca::Carg, T::Union{Float64,ComplexF64})
+
+Return true if `ca` corresponds to a result argument in an
+[`ArbFPWrapFunction`](@ref) with base type `T`.
+
+The raw type of `ca` should be `Vector{T}` and it should not be a
+`const`. Moreover the name should be `:res` or `resd` for some digit
+`d`.
+"""
+is_fpwrap_res_argument(ca::Carg{S}, T::Union{Type{Float64},Type{ComplexF64}}) where {S} =
+    S == Vector{T} && !isconst(ca) && !isnothing(match(r"res\d?$", string(name(ca))))

@@ -204,4 +204,24 @@
         ) == :($(Expr(:kw, :(lenA::Integer), :(length(A)))))
     end
 
+    @testset "fpwrap_res_argument" begin
+        is_fpwrap_res_argument = Arblib.ArbCall.is_fpwrap_res_argument
+        Carg = Arblib.ArbCall.Carg
+        @test is_fpwrap_res_argument(Carg("double * res"), Float64)
+        @test is_fpwrap_res_argument(Carg("double * res1"), Float64)
+        @test is_fpwrap_res_argument(Carg("double * res2"), Float64)
+        @test is_fpwrap_res_argument(Carg("complex_double * res"), ComplexF64)
+        @test is_fpwrap_res_argument(Carg("complex_double * res1"), ComplexF64)
+        @test is_fpwrap_res_argument(Carg("complex_double * res2"), ComplexF64)
+        @test !is_fpwrap_res_argument(Carg("double res"), Float64)
+        @test !is_fpwrap_res_argument(Carg("complex_double res"), ComplexF64)
+        @test !is_fpwrap_res_argument(Carg("const double * res"), Float64)
+        @test !is_fpwrap_res_argument(Carg("const complex_double * res"), ComplexF64)
+        @test !is_fpwrap_res_argument(Carg("double * x"), Float64)
+        @test !is_fpwrap_res_argument(Carg("complex_double * x"), ComplexF64)
+        @test !is_fpwrap_res_argument(Carg("double * rest"), Float64)
+        @test !is_fpwrap_res_argument(Carg("complex_double * rest"), ComplexF64)
+        @test !is_fpwrap_res_argument(Carg("arb_t res"), Float64)
+        @test !is_fpwrap_res_argument(Carg("slong * res"), ComplexF64)
+    end
 end

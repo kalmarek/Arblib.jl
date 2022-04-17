@@ -165,7 +165,7 @@ arbfpwrapcall"int arb_fpwrap_double_legendre_p(double * res, double n, double m,
 arbfpwrapcall"int arb_fpwrap_cdouble_legendre_p(complex_double * res, complex_double n, complex_double m, complex_double x, int type, int flags)"
 arbfpwrapcall"int arb_fpwrap_double_legendre_q(double * res, double n, double m, double x, int type, int flags)"
 arbfpwrapcall"int arb_fpwrap_cdouble_legendre_q(complex_double * res, complex_double n, complex_double m, complex_double x, int type, int flags)"
-#arbfpwrapcall"int arb_fpwrap_double_legendre_root(double * res1, double * res2, ulong n, ulong k, int flags)"
+arbfpwrapcall"int arb_fpwrap_double_legendre_root(double * res1, double * res2, ulong n, ulong k, int flags)"
 arbfpwrapcall"int arb_fpwrap_cdouble_spherical_y(complex_double * res, slong n, slong m, complex_double x1, complex_double x2, int flags)"
 arbfpwrapcall"int arb_fpwrap_double_hypgeom_0f1(double * res, double a, double x, int regularized, int flags)"
 arbfpwrapcall"int arb_fpwrap_cdouble_hypgeom_0f1(complex_double * res, complex_double a, complex_double x, int regularized, int flags)"
