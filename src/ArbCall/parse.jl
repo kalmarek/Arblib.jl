@@ -1,8 +1,9 @@
 """
     parse_arbdoc(filename)
-Parse a .rst file from the Arb documentation. Returns the title of the
-document together with a list of sections with their titles and the
-functions documented in them.
+
+Parse a `.rst` file from the Arb documentation. Returns the title of
+the document together with a list of sections with their titles and
+the functions documented in them as strings.
 
 The documentation stores the functions as
 ```
@@ -15,70 +16,60 @@ therefore look for `.. function::` in the documentation files and read
 each line until we encounter an empty line.
 """
 function parse_arbdoc(filename)
-    return open(filename) do file
-        lines = readlines(file)
+    lines = open(readlines, filename)
 
-        title = lines[3]
-        @assert startswith(lines[4], "======")
+    title = lines[3]
+    @assert startswith(lines[4], "======")
 
-        # Quick and dirty way to find all the sections
-        splits = findall(str -> startswith(str, "------"), lines)
+    # Quick and dirty way to find all the sections
+    splits = findall(str -> startswith(str, "------"), lines)
 
-        if isempty(splits)
-            # Some documentation files (currently only partitions.rst)
-            # don't have any sections but only a title. Handle this
-            # case here
+    sections = Vector{Tuple{String,Vector{String}}}()
+    if isempty(splits)
+        # Some documentation files (currently only partitions.rst)
+        # don't have any sections but only a title. Handle this
+        # case here
 
-            # The title is on the form
-            # **filename.h** -- some title
-            # Take only the part after --
-            sections = [(strip(split(title, "--", limit = 2)[2]), Vector{String}())]
+        # The title is on the form
+        # **filename.h** -- some title
+        # Take only the part after --
+        push!(sections, (uppercasefirst(strip(split(title, "--", limit = 2)[2])), []))
 
-            previous_was_function = false
-            for line in lines[5:end]
-                if startswith(line, ".. function::")
-                    push!(sections[1][2], strip(line[length(".. function::")+1:end]))
-                    previous_was_function = true
-                elseif previous_was_function
-                    if !isempty(strip(line))
-                        push!(sections[1][2], strip(strip(line)))
-                    else
-                        previous_was_function = false
-                    end
-                end
-            end
-        else
-            sections = Vector{Tuple{String,Vector{String}}}()
-            for n = 1:length(splits)
-                section_title = lines[splits[n]-1]
-                push!(sections, (section_title, []))
+        # Take the splits to be so that we read the whole file
+        splits = [1]
+    else
+        for n = 1:length(splits)
+            section_title = lines[splits[n]-1]
+            push!(sections, (section_title, []))
+        end
+    end
 
-                start = splits[n]
-                stop = n == length(splits) ? length(lines) : splits[n+1] - 1
+    for n in eachindex(sections)
+        start = splits[n]
+        stop = n == length(splits) ? length(lines) : splits[n+1] - 1
 
-                previous_was_function = false
-                for line in lines[start:stop]
-                    if startswith(line, ".. function::")
-                        push!(sections[n][2], strip(line[length(".. function::")+1:end]))
-                        previous_was_function = true
-                    elseif previous_was_function
-                        if !isempty(strip(line))
-                            push!(sections[n][2], strip(strip(line)))
-                        else
-                            previous_was_function = false
-                        end
-                    end
+        previous_was_function = false
+        for line in lines[start:stop]
+            if startswith(line, ".. function::")
+                push!(sections[n][2], strip(line[length(".. function::")+1:end]))
+                previous_was_function = true
+            elseif previous_was_function
+                if !isempty(strip(line))
+                    push!(sections[n][2], strip(line))
+                else
+                    previous_was_function = false
                 end
             end
         end
-
-        return title, sections
     end
+
+    return title, sections
 end
 
 """
     generate_file(title, sections; verbose, manual_overrides)
     generate_file(filename, title, sections; verbose, manual_overrides)
+
 Given a title and a list of sections, as returned by
 [`parse_arbdoc`](@ref), return a string with the Julia code to load
 all of those functions. If a file name is given then also write the
@@ -93,22 +84,18 @@ implemented). If they do not parse for some other reason an error is
 thrown.
 
 If the argument `manual_overrides` is given then comment out functions
-which exists as keys in the dictionary. It adds the value of the key
-as an extra comment.
+which exists as keys in the dictionary with `mo` (manual override). It
+adds the value of the key as an extra comment.
 """
 function generate_file(
     filename,
     title,
     sections;
+    fpwrap = false,
+    manual_overrides::Dict{String,String} = Dict{String,String}(),
     verbose = false,
-    manual_overrides = Dict{String,String}(),
 )
-    str = generate_file(
-        title,
-        sections,
-        verbose = verbose,
-        manual_overrides = manual_overrides,
-    )
+    str = generate_file(title, sections; fpwrap, manual_overrides, verbose)
     open(filename, "w") do file
         write(file, str)
     end
@@ -118,19 +105,29 @@ end
 function generate_file(
     title,
     sections;
+    fpwrap = false,
+    manual_overrides::Dict{String,String} = Dict{String,String}(),
     verbose = false,
-    manual_overrides = Dict{String,String}(),
 )
     str = "###\n"
     str *= "### " * title * "\n"
     str *= "###\n"
 
     num_functions = 0
+    num_override = 0
     num_unsupparg = 0
     num_keyerror = 0
 
     unsuppargs = Set{String}()
     keyerrors = Set{String}()
+
+    if fpwrap
+        arbfunction = ArbFPWrapFunction
+        arbfunctionstr = "arbfpwrapcall"
+    else
+        arbfunction = ArbFunction
+        arbfunctionstr = "arbcall"
+    end
 
     for (section_title, functions) in sections
         str *= "\n### " * section_title * "\n"
@@ -138,26 +135,26 @@ function generate_file(
         for s in functions
             num_functions += 1
             if s in keys(manual_overrides)
-                str *= "#mo arbcall\"" * s * "\" # $(manual_overrides[s])\n"
+                num_override += 1
+                str *= "#mo $arbfunctionstr\"" * s * "\" # $(manual_overrides[s])\n"
             else
                 try
-
-                    f = ArbFunction(s)
+                    f = arbfunction(s)
 
                     s == arbsignature(f) || @warn(
                         "Expected signature: $s\n Obtained signature: $(arbsignature(f))"
                     )
 
-                    str *= "arbcall\"" * s * "\"\n"
+                    str *= "$arbfunctionstr\"" * s * "\"\n"
                 catch e
                     if e isa UnsupportedArgumentType
                         push!(unsuppargs, e.key)
                         num_unsupparg += 1
-                        str *= "#ns arbcall\"" * s * "\"\n"
+                        str *= "#ns $arbfunctionstr\"" * s * "\"\n"
                     elseif e isa KeyError
                         push!(keyerrors, e.key)
                         num_keyerror += 1
-                        str *= "#ni arbcall\"" * s * "\"\n"
+                        str *= "#ni $arbfunctionstr\"" * s * "\"\n"
                     else
                         rethrow(e)
                     end
@@ -169,6 +166,7 @@ function generate_file(
     if verbose
         correctly_parsed = num_functions - num_unsupparg - num_keyerror
         @info "Correctly parsed functions: $correctly_parsed/$num_functions"
+        @info "Manual overrides: $num_override"
         @info "Unsupported types: $(collect(unsuppargs))"
         @info "Not implemented types: $(collect(keyerrors))"
     end
@@ -178,11 +176,14 @@ end
 
 """
     parse_and_generate_arbdoc(arb_doc_dir, out_dir = "src/arbcalls/")
+
 Parses the Arb documentation and generates corresponding Julia files.
 The value of `arb_doc_dir` should be a path to the directory
 `doc/source/` in the Arb directory.
 """
-function parse_and_generate_arbdoc(arb_doc_dir, out_dir = "src/arbcalls/")
+function parse_and_generate_arbdoc(
+    arb_doc_dir,
+    out_dir = "src/arbcalls/";
     filenames = (
         "mag",
         "arf",
@@ -211,7 +212,9 @@ function parse_and_generate_arbdoc(arb_doc_dir, out_dir = "src/arbcalls/")
         "bool_mat",
         "dlog",
         #"fmpr", # Deprecated
-    )
+    ),
+    verbose = false,
+)
 
     manual_overrides = Dict{String,String}(
         "void mag_print(const mag_t x)" => "clashes with Base.print",
@@ -241,15 +244,16 @@ function parse_and_generate_arbdoc(arb_doc_dir, out_dir = "src/arbcalls/")
     )
 
     for filename in filenames
-        @info "Generating $filename.jl"
+        verbose && @info "Generating $filename.jl"
         title, sections = parse_arbdoc(joinpath(arb_doc_dir, "$filename.rst"))
         generate_file(
             joinpath(out_dir, "$filename.jl"),
             title,
             sections,
-            verbose = true,
-            manual_overrides = manual_overrides,
+            fpwrap = filename == "arb_fpwrap";
+            manual_overrides,
+            verbose,
         )
-        println("")
+        verbose && println("")
     end
 end
