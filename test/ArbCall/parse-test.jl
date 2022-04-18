@@ -1,8 +1,5 @@
 @testset "parse" begin
-    @testset "parse_doc $filename" for filename in (
-        "arb.rst",
-        "partitions.rst",
-    )
+    @testset "parse_doc $filename" for filename in ("arb.rst", "partitions.rst")
         path = joinpath(dirname(dirname(pathof(Arblib))), "test", "ArbCall", filename)
         title, sections = Arblib.ArbCall.parse_arbdoc(path)
 
