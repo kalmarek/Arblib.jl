@@ -30,17 +30,17 @@ function inplace(af::ArbFunction)
            (ctype(firstarg) <: Ref || ctype(firstarg) <: AbstractArray)
 end
 
-ispredicate(af::ArbFunction) =
-    isconst(first(arguments(af))) &&
-    returntype(af) == Cint &&
-    (
-        any(s -> startswith(string(jlfname(af)), s), ("is_",)) ||
-        any(
-            s -> occursin(s, string(jlfname(af))),
-            ("_is_", "contains", "can_", "check_", "validate_"),
-        ) ||
-        any(==(jlfname(af)), (:eq, :ne, :lt, :le, :gt, :ge, :overlaps, :equal))
+function ispredicate(af::ArbFunction)
+    isconst(first(arguments(af))) || return false
+    returntype(af) == Cint || return false
+    jlname_starts = any(s -> startswith(string(jlfname(af)), s), ("is_",))
+    jlname_contains = any(
+        s -> occursin(s, string(jlfname(af))),
+        ("_is_", "contains", "can_", "check_", "validate_"),
     )
+    jlname_eq = any(==(jlfname(af)), (:eq, :ne, :lt, :le, :gt, :ge, :overlaps, :equal))
+    return jlname_starts || jlname_contains || jlname_eq
+end
 
 const jlfname_prefixes = (
     "arf",
