@@ -64,9 +64,6 @@ function arbsignature(af::ArbFPWrapFunction)
     return "int $(arbfname(af))($c_args)"
 end
 
-inplace(::ArbFPWrapFunction) = false
-ispredicate(::ArbFPWrapFunction) = false
-
 jlfname(af::ArbFPWrapFunction) = Symbol(:fpwrap_, split(arbfname(af), "_", limit = 4)[4])
 
 # TODO: Improve support for vector arguments
