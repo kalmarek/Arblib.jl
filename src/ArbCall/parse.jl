@@ -33,7 +33,9 @@ function parse_arbdoc(filename)
         # The title is on the form
         # **filename.h** -- some title
         # Take only the part after --
-        push!(sections, (uppercasefirst(strip(split(title, "--", limit = 2)[2])), []))
+        m = match(r"(.*)-- (?<title>.*)", title)
+        @assert !isnothing(m[:title])
+        push!(sections, (uppercasefirst(m[:title]), []))
 
         # Take the splits to be so that we read the whole file
         splits = [1]
