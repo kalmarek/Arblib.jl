@@ -3,7 +3,7 @@ struct UnsupportedArgumentType <: Exception
 end
 
 """
-    ArbArgTypes(supported, unsupported)
+    ArbArgTypes(supported, unsupported, supported_reversed)
 
 Struct for conversion between C argument types in the Arb
 documentation and Julia types.
@@ -12,11 +12,14 @@ struct ArbArgTypes
     supported::Dict{String,DataType}
     unsupported::Set{String}
     supported_reversed::Dict{DataType,String}
-end
 
-function ArbArgTypes(supported, unsupported)
-    supported_reversed = Dict(value => key for (key, value) in supported)
-    return ArbArgTypes(supported, unsupported, supported_reversed)
+    function ArbArgTypes(
+        supported,
+        unsupported,
+        supported_reversed = Dict(value => key for (key, value) in supported),
+    )
+        return new(supported, unsupported, supported_reversed)
+    end
 end
 
 function Base.getindex(arbargtypes::ArbArgTypes, key::AbstractString)
