@@ -104,12 +104,23 @@
     end
 
     @testset "jlargs" begin
-        for (str, args, kwargs) in (
-            ("void arb_init(arb_t x)", [:(x::$(Arblib.ArbLike))], Expr[]),
+        for (str, args, kwargs, full_args) in (
+            (
+                "void arb_init(arb_t x)",
+                [:(x::$(Arblib.ArbLike))],
+                Expr[],
+                [:(x::$(Arblib.ArbLike))],
+            ),
             (
                 "void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)",
                 [:(z::$(Arblib.ArbLike)), :(x::$(Arblib.ArbLike)), :(y::$(Arblib.ArbLike))],
                 [Expr(:kw, :(prec::Integer), :(_precision(z)))],
+                [
+                    :(z::$(Arblib.ArbLike)),
+                    :(x::$(Arblib.ArbLike)),
+                    :(y::$(Arblib.ArbLike)),
+                    :(prec::$Integer),
+                ],
             ),
             (
                 "int arf_add(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)",
@@ -122,16 +133,40 @@
                     Expr(:kw, :(prec::Integer), :(_precision(res))),
                     Expr(:kw, :(rnd::Union{Arblib.arb_rnd,RoundingMode}), :(RoundNearest)),
                 ],
+                [
+                    :(res::$(Arblib.ArfLike)),
+                    :(x::$(Arblib.ArfLike)),
+                    :(y::$(Arblib.ArfLike)),
+                    :(prec::$Integer),
+                    :(rnd::$(Union{Arblib.arb_rnd,RoundingMode})),
+                ],
+            ),
+            (
+                "void arb_lambertw(arb_t res, const arb_t x, int flags, slong prec)",
+                [:(res::$(Arblib.ArbLike)), :(x::$(Arblib.ArbLike))],
+                [
+                    Expr(:kw, :(flags::Integer), 0),
+                    Expr(:kw, :(prec::Integer), :(_precision(res))),
+                ],
+                [
+                    :(res::$(Arblib.ArbLike)),
+                    :(x::$(Arblib.ArbLike)),
+                    :(flags::$Integer),
+                    :(prec::$Integer),
+                ],
             ),
             (
                 "int _acb_vec_is_zero(acb_srcptr vec, slong len)",
                 [:(vec::$(Arblib.AcbVectorLike))],
                 [:($(Expr(:kw, :(len::Integer), :(length(vec)))))],
+                [:(vec::$(Arblib.AcbVectorLike)), :(len::$Integer)],
             ),
         )
-            (a, k) = Arblib.ArbCall.jlargs(Arblib.ArbCall.ArbFunction(str))
-            @test a == args
-            @test k == kwargs
+            @test (args, kwargs) == Arblib.ArbCall.jlargs(Arblib.ArbCall.ArbFunction(str))
+            @test (full_args, Expr[]) == Arblib.ArbCall.jlargs(
+                Arblib.ArbCall.ArbFunction(str),
+                argument_detection = false,
+            )
         end
     end
 

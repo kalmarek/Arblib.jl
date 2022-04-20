@@ -57,6 +57,41 @@
             ("arb_srcptr res", :res, true, Arblib.ArbVectorLike, Ptr{arb_struct}),
             ("acb_ptr v", :v, false, Arblib.AcbVectorLike, Ptr{acb_struct}),
             ("acb_srcptr res", :res, true, Arblib.AcbVectorLike, Ptr{acb_struct}),
+            (
+                "mpfr_rnd_t rnd",
+                :rnd,
+                false,
+                Union{Base.MPFR.MPFRRoundingMode,RoundingMode},
+                Base.MPFR.MPFRRoundingMode,
+            ),
+            (
+                "arb_mat_t mat",
+                :mat,
+                false,
+                Arblib.ArbMatrixLike,
+                Ref{Arblib.arb_mat_struct},
+            ),
+            (
+                "acb_mat_t mat",
+                :mat,
+                false,
+                Arblib.AcbMatrixLike,
+                Ref{Arblib.acb_mat_struct},
+            ),
+            (
+                "arb_poly_t mat",
+                :mat,
+                false,
+                Arblib.ArbPolyLike,
+                Ref{Arblib.arb_poly_struct},
+            ),
+            (
+                "acb_poly_t mat",
+                :mat,
+                false,
+                Arblib.AcbPolyLike,
+                Ref{Arblib.acb_poly_struct},
+            ),
         )
             arg = Arblib.ArbCall.Carg(str)
             @test Arblib.ArbCall.name(arg) == name

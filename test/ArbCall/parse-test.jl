@@ -104,6 +104,22 @@
              arbfpwrapcall"int arb_fpwrap_double_exp(double * res, double x, int flags)"
              """
 
+        @test_logs (:info, "Correctly parsed functions: 1/3") (:info, "Manual overrides: 0") (
+            :info,
+            "Unsupported types: [\"FILE *\"]",
+        ) (:info, "Not implemented types: [\"fmpz_t\"]") Arblib.ArbCall.generate_file(
+            "title",
+            [(
+                "section",
+                [
+                    "void arb_init(arb_t x)",
+                    "void arb_set_fmpz(arb_t y, const fmpz_t x)",
+                    "void arb_fprint(FILE * file, const arb_t x)",
+                ],
+            )],
+            verbose = true,
+        )
+
         mktemp() do path, io
             Arblib.ArbCall.generate_file(path, "title!", [("section!", [])])
             @test read(io, String) == "###\n### title!\n###\n\n### section!\n"
