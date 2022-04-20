@@ -1,4 +1,17 @@
 @testset "ArbFPWrapFunction" begin
+    @testset "parse" begin
+        @test_throws ArgumentError Arblib.ArbCall.ArbFPWrapFunction("")
+        @test_throws ArgumentError Arblib.ArbCall.ArbFPWrapFunction(
+            "slong arb_fpwrap_double_exp(double * res, double x, int flags)",
+        )
+        @test_throws ArgumentError Arblib.ArbCall.ArbFPWrapFunction(
+            "int arb_fpwrap_slong_exp(double * res, double x, int flags)",
+        )
+        @test_throws ArgumentError Arblib.ArbCall.ArbFPWrapFunction(
+            "int arb_fpwrap_double_exp(double x, int flags)",
+        )
+    end
+
     @testset "jlfname" begin
         for (str, name) in (
             ("int arb_fpwrap_double_exp(double * res, double x, int flags)", :fpwrap_exp),
@@ -143,6 +156,46 @@
             "int arb_fpwrap_double_legendre_root(double * res1, double * res2, ulong n, ulong k, int flags)",
         )
             @test Arblib.ArbCall.arbsignature(Arblib.ArbCall.ArbFPWrapFunction(str)) == str
+        end
+    end
+
+    @testset "jlcode" begin
+        for str in (
+            "int arb_fpwrap_double_exp(double * res, double x, int flags)",
+            "int arb_fpwrap_cdouble_exp(complex_double * res, complex_double x, int flags)",
+            "int arb_fpwrap_double_lambertw(double * res, double x, slong branch, int flags)",
+            "int arb_fpwrap_cdouble_lambertw(complex_double * res, complex_double x, slong branch, int flags)",
+            "int arb_fpwrap_double_hypgeom_pfq(double * res, const double * a, slong p, const double * b, slong q, double z, int regularized, int flags)",
+            "int arb_fpwrap_cdouble_hypgeom_pfq(complex_double * res, const complex_double * a, slong p, const complex_double * b, slong q, complex_double z, int regularized, int flags)",
+            "int arb_fpwrap_double_legendre_root(double * res1, double * res2, ulong n, ulong k, int flags)",
+        )
+
+            # We only check that evaluation of the code works, we
+            # don't actually test the code
+            af = Arblib.ArbCall.ArbFPWrapFunction(str)
+            code = Arblib.ArbCall.jlcode(af)
+            @test code isa Expr
+            @test typeof(eval(code)) <: Function
+        end
+
+        for str in (
+            "int arb_fpwrap_double_exp(double * res, double x, int flags)",
+            "int arb_fpwrap_cdouble_exp(complex_double * res, complex_double x, int flags)",
+        )
+            af = Arblib.ArbCall.ArbFPWrapFunction(str)
+            eval(Arblib.ArbCall.jlcode(af))
+
+            f = eval(Arblib.ArbCall.jlfname(af))
+            T = Arblib.ArbCall.basetype(af)
+            args = zeros(T, length(Arblib.ArbCall.jlargs(af)[1]))
+            @test f(args...) isa T
+            @test f(args..., safe = true) isa T
+            if T == ComplexF64
+                @test f(args..., accurate_parts = true) isa T
+            else
+                @test_throws MethodError f(args..., accurate_parts = true)
+            end
+            @test f(args..., work_limit = 16) isa T
         end
     end
 end

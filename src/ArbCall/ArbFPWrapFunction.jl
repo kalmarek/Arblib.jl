@@ -16,7 +16,7 @@ function ArbFPWrapFunction(str::AbstractString)
 
     # Check that it has the correct return type
     m[:returnflag] == "int" ||
-        throw(ArgumentError("expected function to return int, got $returnflag"))
+        throw(ArgumentError("expected function to return int, got $(m[:returnflag])"))
 
     # Determine if it returns double or cdouble
     type_str = split(m[:arbfunction], "_", limit = 4)[3]
