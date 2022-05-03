@@ -66,6 +66,28 @@ end
 
 jlfname(af::ArbFPWrapFunction) = Symbol(:fpwrap_, split(arbfname(af), "_", limit = 4)[4])
 
+# See https://github.com/kalmarek/Arblib.jl/issues/138 for some
+# discussions related to this approach for default arguments
+"""
+    fpwrap_error_on_failure_default()
+
+Function giving the default value for the argument `error_on_failure`.
+See also [`fpwrap_error_on_failure_default_set`](@ref).
+"""
+fpwrap_error_on_failure_default() = false
+
+"""
+    fpwrap_error_on_failure_default_set(value::Bool)
+
+Set the default value for the argument `error_on_failure` for `fpwrap`
+methods. See also [`fpwrap_error_on_failure_default`](@ref).
+"""
+function fpwrap_error_on_failure_default_set(value::Bool)
+    if fpwrap_error_on_failure_default() != value
+        @eval fpwrap_error_on_failure_default() = $value
+    end
+end
+
 # TODO: Improve support for vector arguments
 function jlargs(af::ArbFPWrapFunction)
     cargs = arguments(af)
@@ -83,13 +105,21 @@ function jlargs(af::ArbFPWrapFunction)
 
     if basetype(af) == Float64
         kwargs = [
-            Expr(:kw, :(error_on_failure::Bool), :(false)),
+            Expr(
+                :kw,
+                :(error_on_failure::Bool),
+                :(Arblib.ArbCall.fpwrap_error_on_failure_default()),
+            ),
             Expr(:kw, :(correct_rounding::Bool), :(false)),
             Expr(:kw, :(work_limit::Integer), :(8)),
         ]
     else
         kwargs = [
-            Expr(:kw, :(error_on_failure::Bool), :(false)),
+            Expr(
+                :kw,
+                :(error_on_failure::Bool),
+                :(Arblib.ArbCall.fpwrap_error_on_failure_default()),
+            ),
             Expr(:kw, :(accurate_parts::Bool), :(false)),
             Expr(:kw, :(correct_rounding::Bool), :(false)),
             Expr(:kw, :(work_limit::Integer), :(8)),

@@ -71,13 +71,29 @@
         end
     end
 
+    @testset "fpwrap_error_on_failure" begin
+        @test !Arblib.ArbCall.fpwrap_error_on_failure_default()
+        Arblib.ArbCall.fpwrap_error_on_failure_default_set(true)
+        @test Arblib.ArbCall.fpwrap_error_on_failure_default()
+        Arblib.ArbCall.fpwrap_error_on_failure_default_set(true)
+        @test Arblib.ArbCall.fpwrap_error_on_failure_default()
+        Arblib.ArbCall.fpwrap_error_on_failure_default_set(false)
+        @test !Arblib.ArbCall.fpwrap_error_on_failure_default()
+        Arblib.ArbCall.fpwrap_error_on_failure_default_set(false)
+        @test !Arblib.ArbCall.fpwrap_error_on_failure_default()
+    end
+
     @testset "jlargs" begin
         for (str, args, kwargs) in (
             (
                 "int arb_fpwrap_double_exp(double * res, double x, int flags)",
                 [:(x::$(Union{Float16,Float32,Float64}))],
                 [
-                    Expr(:kw, :(error_on_failure::Bool), :(false)),
+                    Expr(
+                        :kw,
+                        :(error_on_failure::Bool),
+                        :(Arblib.ArbCall.fpwrap_error_on_failure_default()),
+                    ),
                     Expr(:kw, :(correct_rounding::Bool), :(false)),
                     Expr(:kw, :(work_limit::Integer), :(8)),
                 ],
@@ -86,7 +102,11 @@
                 "int arb_fpwrap_cdouble_exp(complex_double * res, complex_double x, int flags)",
                 [:(x::$(Union{ComplexF16,ComplexF32,ComplexF64}))],
                 [
-                    Expr(:kw, :(error_on_failure::Bool), :(false)),
+                    Expr(
+                        :kw,
+                        :(error_on_failure::Bool),
+                        :(Arblib.ArbCall.fpwrap_error_on_failure_default()),
+                    ),
                     Expr(:kw, :(accurate_parts::Bool), :(false)),
                     Expr(:kw, :(correct_rounding::Bool), :(false)),
                     Expr(:kw, :(work_limit::Integer), :(8)),
@@ -96,7 +116,11 @@
                 "int arb_fpwrap_double_lambertw(double * res, double x, slong branch, int flags)",
                 [:(x::$(Union{Float16,Float32,Float64})), :(branch::$Integer)],
                 [
-                    Expr(:kw, :(error_on_failure::Bool), :(false)),
+                    Expr(
+                        :kw,
+                        :(error_on_failure::Bool),
+                        :(Arblib.ArbCall.fpwrap_error_on_failure_default()),
+                    ),
                     Expr(:kw, :(correct_rounding::Bool), :(false)),
                     Expr(:kw, :(work_limit::Integer), :(8)),
                 ],
@@ -105,7 +129,11 @@
                 "int arb_fpwrap_cdouble_lambertw(complex_double * res, complex_double x, slong branch, int flags)",
                 [:(x::$(Union{ComplexF16,ComplexF32,ComplexF64})), :(branch::$Integer)],
                 [
-                    Expr(:kw, :(error_on_failure::Bool), :(false)),
+                    Expr(
+                        :kw,
+                        :(error_on_failure::Bool),
+                        :(Arblib.ArbCall.fpwrap_error_on_failure_default()),
+                    ),
                     Expr(:kw, :(accurate_parts::Bool), :(false)),
                     Expr(:kw, :(correct_rounding::Bool), :(false)),
                     Expr(:kw, :(work_limit::Integer), :(8)),
@@ -115,7 +143,11 @@
                 "int arb_fpwrap_double_legendre_root(double * res1, double * res2, ulong n, ulong k, int flags)",
                 [:(n::$Unsigned), :(k::$Unsigned)],
                 [
-                    Expr(:kw, :(error_on_failure::Bool), :(false)),
+                    Expr(
+                        :kw,
+                        :(error_on_failure::Bool),
+                        :(Arblib.ArbCall.fpwrap_error_on_failure_default()),
+                    ),
                     Expr(:kw, :(correct_rounding::Bool), :(false)),
                     Expr(:kw, :(work_limit::Integer), :(8)),
                 ],
@@ -131,7 +163,11 @@
                     :(regularized::$Integer),
                 ],
                 [
-                    Expr(:kw, :(error_on_failure::Bool), :(false)),
+                    Expr(
+                        :kw,
+                        :(error_on_failure::Bool),
+                        :(Arblib.ArbCall.fpwrap_error_on_failure_default()),
+                    ),
                     Expr(:kw, :(correct_rounding::Bool), :(false)),
                     Expr(:kw, :(work_limit::Integer), :(8)),
                 ],
