@@ -233,5 +233,26 @@
             end
             @test f(args..., work_limit = 16) isa T
         end
+
+        af = Arblib.ArbCall.ArbFPWrapFunction(
+            "int arb_fpwrap_double_bessel_j(double * res, double nu, double x, int flags)",
+        )
+        eval(Arblib.ArbCall.jlcode(af))
+
+        # Test that it errors on failure
+        @test !isnan(Arblib.fpwrap_bessel_j(1.0, 1e40))
+        @test isnan(Arblib.fpwrap_bessel_j(1.0, 1e40, work_limit = 1))
+        @test_throws ErrorException Arblib.fpwrap_bessel_j(
+            1.0,
+            1e40,
+            error_on_failure = true,
+            work_limit = 1,
+        )
+        Arblib.ArbCall.fpwrap_error_on_failure_default_set(true)
+        @test_throws ErrorException Arblib.fpwrap_bessel_j(1.0, 1e40, work_limit = 1)
+        @test isnan(
+            Arblib.fpwrap_bessel_j(1.0, 1e40, error_on_failure = false, work_limit = 1),
+        )
+        Arblib.ArbCall.fpwrap_error_on_failure_default_set(false)
     end
 end
