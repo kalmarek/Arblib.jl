@@ -83,13 +83,13 @@ function jlargs(af::ArbFPWrapFunction)
 
     if basetype(af) == Float64
         kwargs = [
-            Expr(:kw, :(safe::Bool), :(false)),
+            Expr(:kw, :(error_on_failure::Bool), :(false)),
             Expr(:kw, :(correct_rounding::Bool), :(false)),
             Expr(:kw, :(work_limit::Integer), :(8)),
         ]
     else
         kwargs = [
-            Expr(:kw, :(safe::Bool), :(false)),
+            Expr(:kw, :(error_on_failure::Bool), :(false)),
             Expr(:kw, :(accurate_parts::Bool), :(false)),
             Expr(:kw, :(correct_rounding::Bool), :(false)),
             Expr(:kw, :(work_limit::Integer), :(8)),
@@ -128,7 +128,7 @@ function jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af))
                 $(name.(cargs)...),
             )
 
-            if iszero(return_flag) || !safe
+            if iszero(return_flag) || !error_on_failure
                 return $return_expr
             elseif isone(return_flag)
                 error("unable to evaluate accurately")

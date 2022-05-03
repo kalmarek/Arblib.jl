@@ -77,7 +77,7 @@
                 "int arb_fpwrap_double_exp(double * res, double x, int flags)",
                 [:(x::$(Union{Float16,Float32,Float64}))],
                 [
-                    Expr(:kw, :(safe::Bool), :(false)),
+                    Expr(:kw, :(error_on_failure::Bool), :(false)),
                     Expr(:kw, :(correct_rounding::Bool), :(false)),
                     Expr(:kw, :(work_limit::Integer), :(8)),
                 ],
@@ -86,7 +86,7 @@
                 "int arb_fpwrap_cdouble_exp(complex_double * res, complex_double x, int flags)",
                 [:(x::$(Union{ComplexF16,ComplexF32,ComplexF64}))],
                 [
-                    Expr(:kw, :(safe::Bool), :(false)),
+                    Expr(:kw, :(error_on_failure::Bool), :(false)),
                     Expr(:kw, :(accurate_parts::Bool), :(false)),
                     Expr(:kw, :(correct_rounding::Bool), :(false)),
                     Expr(:kw, :(work_limit::Integer), :(8)),
@@ -96,7 +96,7 @@
                 "int arb_fpwrap_double_lambertw(double * res, double x, slong branch, int flags)",
                 [:(x::$(Union{Float16,Float32,Float64})), :(branch::$Integer)],
                 [
-                    Expr(:kw, :(safe::Bool), :(false)),
+                    Expr(:kw, :(error_on_failure::Bool), :(false)),
                     Expr(:kw, :(correct_rounding::Bool), :(false)),
                     Expr(:kw, :(work_limit::Integer), :(8)),
                 ],
@@ -105,7 +105,7 @@
                 "int arb_fpwrap_cdouble_lambertw(complex_double * res, complex_double x, slong branch, int flags)",
                 [:(x::$(Union{ComplexF16,ComplexF32,ComplexF64})), :(branch::$Integer)],
                 [
-                    Expr(:kw, :(safe::Bool), :(false)),
+                    Expr(:kw, :(error_on_failure::Bool), :(false)),
                     Expr(:kw, :(accurate_parts::Bool), :(false)),
                     Expr(:kw, :(correct_rounding::Bool), :(false)),
                     Expr(:kw, :(work_limit::Integer), :(8)),
@@ -115,7 +115,7 @@
                 "int arb_fpwrap_double_legendre_root(double * res1, double * res2, ulong n, ulong k, int flags)",
                 [:(n::$Unsigned), :(k::$Unsigned)],
                 [
-                    Expr(:kw, :(safe::Bool), :(false)),
+                    Expr(:kw, :(error_on_failure::Bool), :(false)),
                     Expr(:kw, :(correct_rounding::Bool), :(false)),
                     Expr(:kw, :(work_limit::Integer), :(8)),
                 ],
@@ -131,7 +131,7 @@
                     :(regularized::$Integer),
                 ],
                 [
-                    Expr(:kw, :(safe::Bool), :(false)),
+                    Expr(:kw, :(error_on_failure::Bool), :(false)),
                     Expr(:kw, :(correct_rounding::Bool), :(false)),
                     Expr(:kw, :(work_limit::Integer), :(8)),
                 ],
@@ -189,7 +189,7 @@
             T = Arblib.ArbCall.basetype(af)
             args = zeros(T, length(Arblib.ArbCall.jlargs(af)[1]))
             @test f(args...) isa T
-            @test f(args..., safe = true) isa T
+            @test f(args..., error_on_failure = true) isa T
             if T == ComplexF64
                 @test f(args..., accurate_parts = true) isa T
             else
