@@ -12,14 +12,6 @@ struct ArbArgTypes
     supported::Dict{String,DataType}
     unsupported::Set{String}
     supported_reversed::Dict{DataType,String}
-
-    function ArbArgTypes(
-        supported,
-        unsupported,
-        supported_reversed = Dict(value => key for (key, value) in supported),
-    )
-        return new(supported, unsupported, supported_reversed)
-    end
 end
 
 function Base.getindex(arbargtypes::ArbArgTypes, key::AbstractString)
