@@ -3,9 +3,10 @@ ENV["NEMO_THREADED"] = 1
 using Arblib, Test, LinearAlgebra, SpecialFunctions
 
 @testset "Arblib" begin
+    include("ArbCall/runtests.jl")
+
     include("arb_types-test.jl")
     include("types-test.jl")
-    include("arbcall-test.jl")
     include("precision-test.jl")
     include("setters-test.jl")
     include("constructors-test.jl")

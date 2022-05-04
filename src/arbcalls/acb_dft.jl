@@ -1,0 +1,45 @@
+###
+### **acb_dft.h** -- Discrete Fourier transform
+###
+
+### Main DFT functions
+arbcall"void acb_dft(acb_ptr w, acb_srcptr v, slong n, slong prec)"
+arbcall"void acb_dft_inverse(acb_ptr w, acb_srcptr v, slong n, slong prec)"
+#ni arbcall"void acb_dft_precomp_init(acb_dft_pre_t pre, slong len, slong prec)"
+#ni arbcall"void acb_dft_precomp_clear(acb_dft_pre_t pre)"
+#ni arbcall"void acb_dft_precomp(acb_ptr w, acb_srcptr v, const acb_dft_pre_t pre, slong prec)"
+#ni arbcall"void acb_dft_inverse_precomp(acb_ptr w, acb_srcptr v, const acb_dft_pre_t pre, slong prec)"
+
+### DFT on products
+arbcall"void acb_dirichlet_dft_prod(acb_ptr w, acb_srcptr v, slong * cyc, slong num, slong prec)"
+#ni arbcall"void acb_dft_prod_init(acb_dft_prod_t t, slong * cyc, slong num, slong prec)"
+#ni arbcall"void acb_dft_prod_clear(acb_dft_prod_t t)"
+#ni arbcall"void acb_dirichlet_dft_prod_precomp(acb_ptr w, acb_srcptr v, const acb_dft_prod_t prod, slong prec)"
+
+### Convolution
+arbcall"void acb_dft_convol_naive(acb_ptr w, acb_srcptr f, acb_srcptr g, slong len, slong prec)"
+arbcall"void acb_dft_convol_rad2(acb_ptr w, acb_srcptr f, acb_srcptr g, slong len, slong prec)"
+arbcall"void acb_dft_convol(acb_ptr w, acb_srcptr f, acb_srcptr g, slong len, slong prec)"
+
+### FFT algorithms
+arbcall"void acb_dft_naive(acb_ptr w, acb_srcptr v, slong n, slong prec)"
+#ni arbcall"void acb_dft_naive_init(acb_dft_naive_t t, slong len, slong prec)"
+#ni arbcall"void acb_dft_naive_clear(acb_dft_naive_t t)"
+#ni arbcall"void acb_dft_naive_precomp(acb_ptr w, acb_srcptr v, const acb_dft_naive_t t, slong prec)"
+arbcall"void acb_dft_crt(acb_ptr w, acb_srcptr v, slong n, slong prec)"
+#ni arbcall"void acb_dft_crt_init(acb_dft_crt_t t, slong len, slong prec)"
+#ni arbcall"void acb_dft_crt_clear(acb_dft_crt_t t)"
+#ni arbcall"void acb_dft_crt_precomp(acb_ptr w, acb_srcptr v, const acb_dft_crt_t t, slong prec)"
+arbcall"void acb_dft_cyc(acb_ptr w, acb_srcptr v, slong n, slong prec)"
+#ni arbcall"void acb_dft_cyc_init(acb_dft_cyc_t t, slong len, slong prec)"
+#ni arbcall"void acb_dft_cyc_clear(acb_dft_cyc_t t)"
+#ni arbcall"void acb_dft_cyc_precomp(acb_ptr w, acb_srcptr v, const acb_dft_cyc_t t, slong prec)"
+arbcall"void acb_dft_rad2(acb_ptr w, acb_srcptr v, int e, slong prec)"
+arbcall"void acb_dft_inverse_rad2(acb_ptr w, acb_srcptr v, int e, slong prec)"
+#ni arbcall"void acb_dft_rad2_init(acb_dft_rad2_t t, int e, slong prec)"
+#ni arbcall"void acb_dft_rad2_clear(acb_dft_rad2_t t)"
+#ni arbcall"void acb_dft_rad2_precomp(acb_ptr w, acb_srcptr v, const acb_dft_rad2_t t, slong prec)"
+arbcall"void acb_dft_bluestein(acb_ptr w, acb_srcptr v, slong n, slong prec)"
+#ni arbcall"void acb_dft_bluestein_init(acb_dft_bluestein_t t, slong len, slong prec)"
+#ni arbcall"void acb_dft_bluestein_clear(acb_dft_bluestein_t t)"
+#ni arbcall"void acb_dft_bluestein_precomp(acb_ptr w, acb_srcptr v, const acb_dft_bluestein_t t, slong prec)"
