@@ -21,7 +21,7 @@ end
 
 function set!(res::ArfLike, x::Rational; prec::Integer = precision(res))
     set!(res, numerator(x))
-    div!(res, res, denominator(x), prec = prec)
+    div!(res, res, denominator(x); prec)
     return res
 end
 
@@ -31,7 +31,7 @@ function set!(
     prec::Integer = precision(res),
 )
     set!(res, numerator(x))
-    div!(res, res, Arf(denominator(x), prec = prec), prec = prec)
+    div!(res, res, Arf(denominator(x); prec); prec)
     return res
 end
 
@@ -44,7 +44,7 @@ end
 
 function set!(res::ArbLike, x::Rational; prec::Integer = precision(res))
     set!(res, numerator(x))
-    return div!(res, res, denominator(x), prec = prec)
+    return div!(res, res, denominator(x); prec)
 end
 
 function set!(
@@ -53,14 +53,14 @@ function set!(
     prec::Integer = precision(res),
 )
     set!(res, numerator(x))
-    return div!(res, res, Arb(denominator(x), prec = prec), prec = prec)
+    return div!(res, res, Arb(denominator(x); prec); prec)
 end
 
 for (irr, suffix) in ((:π, "pi"), (:ℯ, "e"), (:γ, "euler"), (:catalan, "catalan"))
     jlf = Symbol("const_$suffix", "!")
     IrrT = Irrational{irr}
     @eval begin
-        set!(res::ArbLike, ::$IrrT; prec::Integer = precision(res)) = $jlf(res, prec = prec)
+        set!(res::ArbLike, ::$IrrT; prec::Integer = precision(res)) = $jlf(res; prec)
     end
 end
 
@@ -78,7 +78,7 @@ function set!(
 )
     # Checking a > b instead of a <= b also handles NaN correctly
     a > b && throw(ArgumentError("must have a <= b, got a = $a and b = $b"))
-    return set_interval!(res, a, b, prec = prec)
+    return set_interval!(res, a, b; prec)
 end
 
 function set!(res::ArbLike, (a, b)::Tuple{<:Real,<:Real}; prec::Integer = precision(res))
@@ -87,12 +87,12 @@ function set!(res::ArbLike, (a, b)::Tuple{<:Real,<:Real}; prec::Integer = precis
     # b adding this check could catch some bugs.
     a > b && throw(ArgumentError("must have a <= b, got a = $a and b = $b"))
     if !(a isa ArbLike)
-        a = Arb(a, prec = prec)
+        a = Arb(a; prec)
     end
     if !(b isa ArbLike)
-        b = Arb(b, prec = prec)
+        b = Arb(b; prec)
     end
-    return union!(res, a, b, prec = prec)
+    return union!(res, a, b; prec)
 end
 
 # Acb

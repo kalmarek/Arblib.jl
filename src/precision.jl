@@ -53,7 +53,7 @@ function Base.setprecision(::Type{<:ArbTypes}, precision::Integer)
 end
 
 Base.setprecision(x::T, prec::Integer) where {T<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}} =
-    T(x, prec = prec)
+    T(x; prec)
 Base.setprecision(v::T, prec::Integer) where {T<:Union{ArbVector,ArbRefVector}} =
     T(v.arb_vec, prec)
 Base.setprecision(v::T, prec::Integer) where {T<:Union{AcbVector,AcbRefVector}} =
@@ -63,9 +63,9 @@ Base.setprecision(A::T, prec::Integer) where {T<:Union{ArbMatrix,ArbRefMatrix}} 
 Base.setprecision(A::T, prec::Integer) where {T<:Union{AcbMatrix,AcbRefMatrix}} =
     T(A.acb_mat, prec)
 
-Base.setprecision(poly::ArbPoly, prec::Integer) = ArbPoly(poly.arb_poly, prec = prec)
+Base.setprecision(poly::ArbPoly, prec::Integer) = ArbPoly(poly.arb_poly; prec)
 Base.setprecision(series::ArbSeries, prec::Integer) =
-    ArbSeries(series.arb_poly, degree = degree(series), prec = prec)
-Base.setprecision(poly::AcbPoly, prec::Integer) = AcbPoly(poly.acb_poly, prec = prec)
+    ArbSeries(series.arb_poly, degree = degree(series); prec)
+Base.setprecision(poly::AcbPoly, prec::Integer) = AcbPoly(poly.acb_poly; prec)
 Base.setprecision(series::AcbSeries, prec::Integer) =
-    AcbSeries(series.acb_poly, degree = degree(series), prec = prec)
+    AcbSeries(series.acb_poly, degree = degree(series); prec)

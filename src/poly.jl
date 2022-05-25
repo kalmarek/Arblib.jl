@@ -119,10 +119,10 @@ end
 
 for (TPoly, TSeries) in [(:ArbPoly, :ArbSeries), (:AcbPoly, :AcbSeries)]
     @eval $TPoly(p::cstructtype($TPoly); prec::Integer = DEFAULT_PRECISION[]) =
-        set!($TPoly(prec = prec), p)
+        set!($TPoly(; prec), p)
 
     @eval function $TPoly(coeff; prec::Integer = _precision(coeff))
-        p = $TPoly(prec = prec)
+        p = $TPoly(; prec)
         @inbounds p[0] = coeff
         return p
     end
@@ -131,7 +131,7 @@ for (TPoly, TSeries) in [(:ArbPoly, :ArbSeries), (:AcbPoly, :AcbSeries)]
         coeffs::Union{Tuple,AbstractVector};
         prec::Integer = _precision(first(coeffs)),
     )
-        p = fit_length!($TPoly(prec = prec), length(coeffs))
+        p = fit_length!($TPoly(; prec), length(coeffs))
         @inbounds for i = 1:length(coeffs)
             p[i-1] = coeffs[i]
         end
@@ -143,17 +143,17 @@ for (TPoly, TSeries) in [(:ArbPoly, :ArbSeries), (:AcbPoly, :AcbSeries)]
     # constructing a polynomial with a constant plus x, e.g
     # ArbPoly((x, 1))
     @eval function $TPoly(coeffs::Tuple{Any,Any}; prec::Integer = _precision(first(coeffs)))
-        p = fit_length!($TPoly(prec = prec), length(coeffs))
+        p = fit_length!($TPoly(; prec), length(coeffs))
         @inbounds p[0] = coeffs[1]
         @inbounds p[1] = coeffs[2]
         return p
     end
 
     @eval $TPoly(p::Union{$TPoly,$TSeries}; prec::Integer = precision(p)) =
-        set!($TPoly(prec = prec), p)
+        set!($TPoly(; prec), p)
 end
 function AcbPoly(p::Union{ArbPoly,ArbSeries}; prec = precision(p))
-    res = fit_length!(AcbPoly(prec = prec), length(p))
+    res = fit_length!(AcbPoly(; prec), length(p))
     @inbounds for i = 0:degree(p)
         res[i] = p[i]
     end
@@ -165,10 +165,10 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
         p::cstructtype($TSeries);
         degree::Integer = degree(p),
         prec::Integer = DEFAULT_PRECISION[],
-    ) = set!($TSeries(degree = degree, prec = prec), p)
+    ) = set!($TSeries(; degree, prec), p)
 
     @eval function $TSeries(coeff; degree::Integer = 0, prec::Integer = _precision(coeff))
-        p = $TSeries(degree = degree, prec = prec)
+        p = $TSeries(; degree, prec)
         @inbounds p[0] = coeff
         return p
     end
@@ -178,7 +178,7 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
         degree::Integer = length(coeffs) - 1,
         prec::Integer = _precision(first(coeffs)),
     )
-        p = $TSeries(degree = degree, prec = prec)
+        p = $TSeries(; degree, prec)
         @inbounds for i = 1:min(length(coeffs), degree + 1)
             p[i-1] = coeffs[i]
         end
@@ -194,7 +194,7 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
         degree::Integer = length(coeffs) - 1,
         prec::Integer = _precision(first(coeffs)),
     )
-        p = $TSeries(degree = degree, prec = prec)
+        p = $TSeries(; degree, prec)
         @inbounds p[0] = coeffs[1]
         if degree >= 1
             @inbounds p[1] = coeffs[2]
@@ -206,10 +206,10 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
         p::Union{$TPoly,$TSeries};
         degree::Integer = degree(p),
         prec::Integer = precision(p),
-    ) = set_trunc!($TSeries(degree = degree, prec = prec), p, degree + 1)
+    ) = set_trunc!($TSeries(; degree, prec), p, degree + 1)
 end
 function AcbSeries(p::Union{ArbPoly,ArbSeries}; degree = degree(p), prec = precision(p))
-    res = AcbSeries(degree = degree, prec = prec)
+    res = AcbSeries(; degree, prec)
     @inbounds for i = 0:min(Arblib.degree(p), degree)
         res[i] = p[i]
     end
@@ -226,9 +226,9 @@ Base.zero(::Type{T}) where {T<:Union{Poly,Series}} = T()
 Base.one(::Type{T}) where {T<:Union{Poly,Series}} = one!(zero(T))
 
 fromroots(::Type{ArbPoly}, roots::ArbVector; prec::Integer = DEFAULT_PRECISION[]) =
-    product_roots!(ArbPoly(prec = prec), roots)
+    product_roots!(ArbPoly(; prec), roots)
 fromroots(::Type{ArbPoly}, roots::AbstractVector; prec::Integer = DEFAULT_PRECISION[]) =
-    fromroots(ArbPoly, ArbVector(roots, prec = prec), prec = prec)
+    fromroots(ArbPoly, ArbVector(roots; prec); prec)
 
 fromroots(
     ::Type{ArbPoly},
@@ -236,7 +236,7 @@ fromroots(
     complex_roots::AcbVector;
     prec::Integer = DEFAULT_PRECISION[],
 ) = product_roots_complex!(
-    ArbPoly(prec = prec),
+    ArbPoly(; prec),
     real_roots,
     length(real_roots),
     complex_roots,
@@ -247,17 +247,12 @@ fromroots(
     real_roots::AbstractVector,
     complex_roots::AbstractVector;
     prec::Integer = DEFAULT_PRECISION[],
-) = fromroots(
-    ArbPoly,
-    ArbVector(real_roots, prec = prec),
-    AcbVector(complex_roots, prec = prec),
-    prec = prec,
-)
+) = fromroots(ArbPoly, ArbVector(real_roots; prec), AcbVector(complex_roots; prec); prec)
 
 fromroots(::Type{AcbPoly}, roots::AcbVector; prec::Integer = DEFAULT_PRECISION[]) =
-    product_roots!(AcbPoly(prec = prec), roots)
+    product_roots!(AcbPoly(; prec), roots)
 fromroots(::Type{AcbPoly}, roots::AbstractVector; prec::Integer = DEFAULT_PRECISION[]) =
-    fromroots(AcbPoly, AcbVector(roots, prec = prec), prec = prec)
+    fromroots(AcbPoly, AcbVector(roots; prec); prec)
 
 Base.copy(p::Union{Poly,Series}) = set!(zero(p), p)
 

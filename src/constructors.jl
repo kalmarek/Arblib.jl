@@ -4,19 +4,19 @@ Mag(x::Union{MagRef,ArfRef}) = Mag(mag_struct(cstruct(x)))
 Mag(x, y) = set!(Mag(), x, y)
 
 # Arf
-Arf(x; prec::Integer = _precision(x)) = set!(Arf(prec = prec), x)
+Arf(x; prec::Integer = _precision(x)) = set!(Arf(; prec), x)
 # disambiguation
-Arf(x::Arf; prec::Integer = precision(x)) = set!(Arf(prec = prec), x)
-Arf(x::Rational; prec::Integer = _precision(x)) = set!(Arf(prec = prec), x)
+Arf(x::Arf; prec::Integer = precision(x)) = set!(Arf(; prec), x)
+Arf(x::Rational; prec::Integer = _precision(x)) = set!(Arf(; prec), x)
 
 #Arb
-Arb(x; prec::Integer = _precision(x)) = set!(Arb(prec = prec), x)
+Arb(x; prec::Integer = _precision(x)) = set!(Arb(; prec), x)
 # disambiguation
-Arb(x::Arb; prec::Integer = precision(x)) = set!(Arb(prec = prec), x)
-Arb(x::Rational; prec::Integer = _precision(x)) = set!(Arb(prec = prec), x)
+Arb(x::Arb; prec::Integer = precision(x)) = set!(Arb(; prec), x)
+Arb(x::Rational; prec::Integer = _precision(x)) = set!(Arb(; prec), x)
 
 function Arb(str::AbstractString; prec::Integer = DEFAULT_PRECISION[])
-    res = Arb(prec = prec)
+    res = Arb(; prec)
     flag = set!(res, str)
     iszero(flag) || throw(ArgumentError("could not parse $str as an Arb"))
     return res
@@ -26,26 +26,26 @@ end
 Acb(
     x::Union{Real,arb_struct,arf_struct,Tuple{<:Real,<:Real}};
     prec::Integer = _precision(x),
-) = set!(Acb(prec = prec), x)
+) = set!(Acb(; prec), x)
 Acb(
     re::Union{Real,arb_struct,arf_struct,Tuple{<:Real,<:Real}},
     im::Union{Real,arb_struct,arf_struct,Tuple{<:Real,<:Real}};
     prec::Integer = max(_precision(re), _precision(im)),
-) = set!(Acb(prec = prec), re, im)
+) = set!(Acb(; prec), re, im)
 
-Acb(z::Union{AcbLike,Complex}; prec::Integer = _precision(z)) = set!(Acb(prec = prec), z)
+Acb(z::Union{AcbLike,Complex}; prec::Integer = _precision(z)) = set!(Acb(; prec), z)
 # disambiguation
-Acb(x::Acb; prec::Integer = precision(x)) = set!(Acb(prec = prec), x)
+Acb(x::Acb; prec::Integer = precision(x)) = set!(Acb(; prec), x)
 
 function Acb(str::AbstractString; prec::Integer = DEFAULT_PRECISION[])
-    res = Acb(prec = prec)
+    res = Acb(; prec)
     flag = set!(realref(res), str)
     iszero(flag) || throw(ArgumentError("could not parse $str as an Arb"))
     return res
 end
 
 function Acb(re::AbstractString, im::AbstractString; prec::Integer = DEFAULT_PRECISION[])
-    res = Acb(prec = prec)
+    res = Acb(; prec)
     flag = set!(realref(res), re)
     iszero(flag) || throw(ArgumentError("could not parse $str as an Arb"))
     flag = set!(imagref(res), im)
@@ -65,7 +65,7 @@ Base.ComplexF64(z::AcbLike) = Complex(Float64(realref(z)), Float64(imagref(z)))
 function Base.BigFloat(x::Union{Arf,ArfRef})
     y = BigFloat(; precision = precision(x))
     get!(y, x)
-    y
+    return y
 end
 Base.BigFloat(x::Union{Arb,ArbRef}) = BigFloat(midref(x))
 

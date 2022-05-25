@@ -189,8 +189,8 @@ function Base.:(*)(x::AcbOrRef, y::Complex{Bool})
 end
 Base.:(*)(x::Complex{Bool}, y::AcbOrRef) = y * x
 
-Base.real(z::AcbLike; prec = _precision(z)) = get_real!(Arb(prec = prec), z)
-Base.imag(z::AcbLike; prec = _precision(z)) = get_imag!(Arb(prec = prec), z)
+Base.real(z::AcbLike; prec = _precision(z)) = get_real!(Arb(; prec), z)
+Base.imag(z::AcbLike; prec = _precision(z)) = get_imag!(Arb(; prec), z)
 Base.conj(z::AcbLike) = conj!(Acb(prec = _precision(z)), z)
 Base.abs(z::AcbLike) = abs!(Arb(prec = _precision(z)), z)
 
