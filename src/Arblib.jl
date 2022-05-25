@@ -4,13 +4,6 @@ using Arb_jll
 import LinearAlgebra
 import SpecialFunctions
 
-if VERSION >= v"1.5.0-DEV.639"
-    import Base: contains
-end
-if VERSION >= v"1.6"
-    import Base: sincospi
-end
-
 export Mag,
     MagRef,
     Arf,

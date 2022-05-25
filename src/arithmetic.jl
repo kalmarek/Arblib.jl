@@ -163,7 +163,7 @@ function Base.sincos(x::Union{ArbOrRef,AcbOrRef})
     sin_cos!(s, c, x)
     return (s, c)
 end
-function sincospi(x::Union{ArbOrRef,AcbOrRef})
+function Base.sincospi(x::Union{ArbOrRef,AcbOrRef})
     s, c = zero(x), zero(x)
     sin_cos_pi!(s, c, x)
     return (s, c)
