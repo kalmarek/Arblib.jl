@@ -110,7 +110,7 @@ for (jf, af) in [(:+, :add!), (:-, :sub!)]
         w::T,
     ) where {T<:Union{ArbVector,ArbRefVector,AcbVector,AcbRefVector}}
         @boundscheck (length(v) == length(w) || throw(DimensionMismatch()))
-        u = T(length(v); prec = max(precision(v), precision(w)))
+        u = T(length(v); prec = _precision((v, w)))
         $af(u, v, w)
         u
     end
