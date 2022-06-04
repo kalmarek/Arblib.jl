@@ -132,8 +132,8 @@ for (TPoly, TSeries) in [(:ArbPoly, :ArbSeries), (:AcbPoly, :AcbSeries)]
         prec::Integer = _precision(first(coeffs)),
     )
         p = fit_length!($TPoly(; prec), length(coeffs))
-        @inbounds for i = 1:length(coeffs)
-            p[i-1] = coeffs[i]
+        @inbounds for (i, c) in enumerate(coeffs)
+            p[i-1] = c
         end
         return p
     end
@@ -179,8 +179,9 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
         prec::Integer = _precision(first(coeffs)),
     )
         p = $TSeries(; degree, prec)
-        @inbounds for i = 1:min(length(coeffs), degree + 1)
-            p[i-1] = coeffs[i]
+        @inbounds for (i, c) in enumerate(coeffs)
+            p[i-1] = c
+            i == degree + 1 && break
         end
         return p
     end
