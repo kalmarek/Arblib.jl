@@ -70,6 +70,7 @@
 
     @testset "_precision" begin
         let _precision = Arblib._precision
+            # One argument
             @test _precision(Arf(prec = 64)) == 64
             @test _precision(Arb(prec = 64)) == 64
             @test _precision(Acb(prec = 64)) == 64
@@ -86,28 +87,34 @@
             @test _precision(1.0 + im) == precision(Arb)
             @test _precision(1 // 1 + im) == precision(Arb)
 
+            # Two arguments
+            @test _precision(Arf(prec = 64), Arb(prec = 80)) == 80
+            @test _precision(Arf(prec = 80), Arb(prec = 64)) == 80
+            @test _precision(BigFloat(precision = 80), Acb(prec = 64)) == 80
+            @test _precision(BigFloat(precision = 64), Acb(prec = 80)) == 80
+            @test _precision(im * Arb(prec = 80), Acb(prec = 64)) == 80
+            @test _precision(im * Arb(prec = 64), Acb(prec = 80)) == 80
+            @test _precision(
+                Complex(BigFloat(precision = 64), BigFloat(precision = 64)),
+                Arf(prec = 80),
+            ) == 80
+            @test _precision(
+                Arf(prec = 80),
+                Complex(BigFloat(precision = 64), BigFloat(precision = 64)),
+            ) == 80
+
+            @test _precision(Arf(prec = 64), 1) == 64
+            @test _precision(1, Arf(prec = 64)) == 64
+            @test _precision(BigFloat(precision = 64), 1) == 64
+            @test _precision(1, BigFloat(precision = 64)) == 64
+            @test _precision(im * Arf(prec = 64), 1) == 64
+            @test _precision(1, im * Arf(prec = 64)) == 64
+
+            @test _precision(1.0, 2) == precision(Arb)
+
+            # Tuple
             @test _precision((Arf(prec = 64), Arb(prec = 80))) == 80
-            @test _precision((Arf(prec = 80), Arb(prec = 64))) == 80
-            @test _precision((BigFloat(precision = 80), Acb(prec = 64))) == 80
-            @test _precision((BigFloat(precision = 64), Acb(prec = 80))) == 80
-            @test _precision((im * Arb(prec = 80), Acb(prec = 64))) == 80
-            @test _precision((im * Arb(prec = 64), Acb(prec = 80))) == 80
-            @test _precision((
-                Complex(BigFloat(precision = 64), BigFloat(precision = 64)),
-                Arf(prec = 80),
-            )) == 80
-            @test _precision((
-                Arf(prec = 80),
-                Complex(BigFloat(precision = 64), BigFloat(precision = 64)),
-            )) == 80
-
             @test _precision((Arf(prec = 64), 1)) == 64
-            @test _precision((1, Arf(prec = 64))) == 64
-            @test _precision((BigFloat(precision = 64), 1)) == 64
-            @test _precision((1, BigFloat(precision = 64))) == 64
-            @test _precision((im * Arf(prec = 64), 1)) == 64
-            @test _precision((1, im * Arf(prec = 64))) == 64
-
             @test _precision((1.0, 2)) == precision(Arb)
         end
     end
