@@ -32,7 +32,7 @@ Base.abs(x::ArfOrRef) = abs!(zero(x), x)
 Base.:(-)(x::ArfOrRef) = neg!(zero(x), x)
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
     @eval function Base.$jf(x::ArfOrRef, y::Union{ArfOrRef,_BitInteger})
-        z = Arf(prec = _precision((x, y)))
+        z = Arf(prec = _precision(x, y))
         $af(z, x, y)
         return z
     end
@@ -77,14 +77,14 @@ end
 ### Arb and Acb
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
     @eval Base.$jf(x::ArbOrRef, y::Union{ArbOrRef,ArfOrRef,_BitInteger}) =
-        $af(Arb(prec = _precision((x, y))), x, y)
+        $af(Arb(prec = _precision(x, y)), x, y)
     @eval Base.$jf(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,_BitInteger}) =
-        $af(Acb(prec = _precision((x, y))), x, y)
+        $af(Acb(prec = _precision(x, y)), x, y)
     if jf == :(+) || jf == :(*)
         @eval Base.$jf(x::Union{ArfOrRef,_BitInteger}, y::ArbOrRef) =
-            $af(Arb(prec = _precision((x, y))), y, x)
+            $af(Arb(prec = _precision(x, y)), y, x)
         @eval Base.$jf(x::Union{ArbOrRef,_BitInteger}, y::AcbOrRef) =
-            $af(Acb(prec = _precision((x, y))), y, x)
+            $af(Acb(prec = _precision(x, y)), y, x)
     end
 end
 
@@ -92,14 +92,14 @@ Base.:(-)(x::Union{ArbOrRef,AcbOrRef}) = neg!(zero(x), x)
 Base.abs(x::ArbOrRef) = abs!(zero(x), x)
 Base.:(/)(x::_BitUnsigned, y::ArbOrRef) = ui_div!(zero(y), x, y)
 
-Base.:(^)(x::ArbOrRef, y::ArbOrRef) = pow!(Arb(prec = _precision((x, y))), x, y)
+Base.:(^)(x::ArbOrRef, y::ArbOrRef) = pow!(Arb(prec = _precision(x, y)), x, y)
 function Base.:(^)(x::ArbOrRef, y::_BitInteger)
     z = zero(x)
     x, n = (y >= 0 ? (x, y) : (inv!(z, x), -y))
     return pow!(z, x, convert(UInt, n))
 end
 Base.:(^)(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,_BitInteger}) =
-    pow!(Acb(prec = _precision((x, y))), x, y)
+    pow!(Acb(prec = _precision(x, y)), x, y)
 
 # We define the same special cases as Arb does, this avoids some
 # overhead
@@ -110,7 +110,7 @@ Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{0}) = one(x)
 Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{1}) = copy(x)
 Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{2}) = sqr(x)
 
-Base.hypot(x::ArbOrRef, y::ArbOrRef) = hypot!(Arb(prec = _precision((x, y))), x, y)
+Base.hypot(x::ArbOrRef, y::ArbOrRef) = hypot!(Arb(prec = _precision(x, y)), x, y)
 
 root(x::Union{ArbOrRef,AcbOrRef}, k::Integer) = root!(zero(x), x, convert(UInt, k))
 
@@ -156,7 +156,7 @@ cotpi(x::Union{ArbOrRef,AcbOrRef}) = cot_pi!(zero(x), x)
 cscpi(x::Union{ArbOrRef,AcbOrRef}) = csc_pi!(zero(x), x)
 # Julias definition of sinc is equivalent to Arbs definition of sincpi
 Base.sinc(x::Union{ArbOrRef,AcbOrRef}) = sinc_pi!(zero(x), x)
-Base.atan(y::ArbOrRef, x::ArbOrRef) = atan2!(Arb(prec = _precision((y, x))), y, x)
+Base.atan(y::ArbOrRef, x::ArbOrRef) = atan2!(Arb(prec = _precision(y, x)), y, x)
 
 function Base.sincos(x::Union{ArbOrRef,AcbOrRef})
     s, c = zero(x), zero(x)

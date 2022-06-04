@@ -263,27 +263,27 @@ Base.copy(p::Union{Poly,Series}) = set!(zero(p), p)
 
 Base.:-(p::Union{Poly,Series}) = neg!(zero(p), p)
 
-Base.:+(p::T, q::T) where {T<:Poly} = add!(T(prec = _precision((p, q))), p, q)
-Base.:-(p::T, q::T) where {T<:Poly} = sub!(T(prec = _precision((p, q))), p, q)
-Base.:*(p::T, q::T) where {T<:Poly} = mul!(T(prec = _precision((p, q))), p, q)
+Base.:+(p::T, q::T) where {T<:Poly} = add!(T(prec = _precision(p, q)), p, q)
+Base.:-(p::T, q::T) where {T<:Poly} = sub!(T(prec = _precision(p, q)), p, q)
+Base.:*(p::T, q::T) where {T<:Poly} = mul!(T(prec = _precision(p, q)), p, q)
 
 function Base.:+(p::AcbPoly, q::ArbPoly)
-    res = AcbPoly(q, prec = _precision((p, q)))
+    res = AcbPoly(q, prec = _precision(p, q))
     return add!(res, p, res)
 end
 Base.:+(p::ArbPoly, q::AcbPoly) = q + p
 
 function Base.:-(p::AcbPoly, q::ArbPoly)
-    res = AcbPoly(q, prec = _precision((p, q)))
+    res = AcbPoly(q, prec = _precision(p, q))
     return sub!(res, p, res)
 end
 function Base.:-(p::ArbPoly, q::AcbPoly)
-    res = AcbPoly(p, prec = _precision((p, q)))
+    res = AcbPoly(p, prec = _precision(p, q))
     return sub!(res, res, q)
 end
 
 function Base.:*(p::AcbPoly, q::ArbPoly)
-    res = AcbPoly(q, prec = _precision((p, q)))
+    res = AcbPoly(q, prec = _precision(p, q))
     return mul!(res, p, res)
 end
 Base.:*(p::ArbPoly, q::AcbPoly) = q * p
@@ -293,55 +293,55 @@ Base.:*(p::ArbPoly, q::AcbPoly) = q * p
 for T in [ArbSeries, AcbSeries]
     @eval function Base.:+(p::$T, q::$T)
         deg = _degree(p, q)
-        return add_series!($T(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
+        return add_series!($T(degree = deg, prec = _precision(p, q)), p, q, deg + 1)
     end
     @eval function Base.:-(p::$T, q::$T)
         deg = _degree(p, q)
-        return sub_series!($T(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
+        return sub_series!($T(degree = deg, prec = _precision(p, q)), p, q, deg + 1)
     end
     @eval function Base.:*(p::$T, q::$T)
         deg = _degree(p, q)
-        return mullow!($T(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
+        return mullow!($T(degree = deg, prec = _precision(p, q)), p, q, deg + 1)
     end
     @eval function Base.:/(p::$T, q::$T)
         deg = _degree(p, q)
-        return div_series!($T(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
+        return div_series!($T(degree = deg, prec = _precision(p, q)), p, q, deg + 1)
     end
 end
 
 function Base.:+(p::AcbSeries, q::ArbSeries)
     deg = _degree(p, q)
-    res = AcbSeries(q, degree = deg, prec = _precision((p, q)))
+    res = AcbSeries(q, degree = deg, prec = _precision(p, q))
     return add_series!(res, p, res, deg + 1)
 end
 Base.:+(p::ArbSeries, q::AcbSeries) = q + p
 
 function Base.:-(p::AcbSeries, q::ArbSeries)
     deg = _degree(p, q)
-    res = AcbSeries(q, degree = deg, prec = _precision((p, q)))
+    res = AcbSeries(q, degree = deg, prec = _precision(p, q))
     return sub_series!(res, p, res, deg + 1)
 end
 function Base.:-(p::ArbSeries, q::AcbSeries)
     deg = _degree(p, q)
-    res = AcbSeries(p, degree = deg, prec = _precision((p, q)))
+    res = AcbSeries(p, degree = deg, prec = _precision(p, q))
     return sub_series!(res, res, q, deg + 1)
 end
 
 function Base.:*(p::AcbSeries, q::ArbSeries)
     deg = _degree(p, q)
-    res = AcbSeries(q, degree = deg, prec = _precision((p, q)))
+    res = AcbSeries(q, degree = deg, prec = _precision(p, q))
     return mullow!(res, p, res, deg + 1)
 end
 Base.:*(p::ArbSeries, q::AcbSeries) = q * p
 
 function Base.:/(p::AcbSeries, q::ArbSeries)
     deg = _degree(p, q)
-    res = AcbSeries(q, degree = deg, prec = _precision((p, q)))
+    res = AcbSeries(q, degree = deg, prec = _precision(p, q))
     return div_series!(res, p, res, deg + 1)
 end
 function Base.:/(p::ArbSeries, q::AcbSeries)
     deg = _degree(p, q)
-    res = AcbSeries(p, degree = deg, prec = _precision((p, q)))
+    res = AcbSeries(p, degree = deg, prec = _precision(p, q))
     return div_series!(res, res, q, deg + 1)
 end
 
@@ -351,8 +351,8 @@ Base.inv(p::Series) = inv_series!(zero(p), p, degree(p) + 1)
 # implemented for vectors in Arb so we would have to call those
 # functions manually.
 function Base.divrem(p::T, q::T) where {T<:Poly}
-    quotient = T(prec = _precision((p, q)))
-    remainder = T(prec = _precision((p, q)))
+    quotient = T(prec = _precision(p, q))
+    remainder = T(prec = _precision(p, q))
     divrem!(quotient, remainder, p, q)
     return quotient, remainder
 end
@@ -477,12 +477,12 @@ end
 
 taylor_shift(p::Union{Poly,Series}, c) = taylor_shift!(zero(p), p, convert(eltype(p), c))
 
-compose(p::T, q::T) where {T<:Poly} = compose!(T(prec = _precision((p, q))), p, q)
+compose(p::T, q::T) where {T<:Poly} = compose!(T(prec = _precision(p, q)), p, q)
 function compose(p::T, q::T) where {T<:Series}
     iszero(ref(q, 0)) ||
         throw(ArgumentError("constant term of q must be zero, got q[0] = $(q[0])"))
     deg = _degree(p, q)
-    res = T(degree = deg, prec = _precision((p, q)))
+    res = T(degree = deg, prec = _precision(p, q))
     return compose_series!(res, p, q, deg + 1)
 end
 
@@ -603,11 +603,11 @@ Base.:^(p::Poly, e::Integer) = pow!(zero(p), p, convert(UInt, e))
 
 function Base.:^(p::ArbSeries, q::ArbSeries)
     deg = _degree(p, q)
-    return pow_series!(ArbSeries(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
+    return pow_series!(ArbSeries(degree = deg, prec = _precision(p, q)), p, q, deg + 1)
 end
 function Base.:^(p::AcbSeries, q::AcbSeries)
     deg = _degree(p, q)
-    return pow_series!(AcbSeries(degree = deg, prec = _precision((p, q))), p, q, deg + 1)
+    return pow_series!(AcbSeries(degree = deg, prec = _precision(p, q)), p, q, deg + 1)
 end
 
 Base.:^(p::ArbSeries, e::Real) = pow_arb_series!(zero(p), p, convert(Arb, e), length(p))

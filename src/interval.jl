@@ -133,8 +133,8 @@ getball(::Type{Arb}, x::ArbOrRef) = (Arb(midref(x)), Arb(radref(x), prec = preci
 `union(x, y, z...)` returns a ball containing the union of all given
 balls.
 """
-Base.union(x::ArbOrRef, y::ArbOrRef) = union!(Arb(prec = _precision((x, y))), x, y)
-Base.union(x::AcbOrRef, y::AcbOrRef) = union!(Acb(prec = _precision((x, y))), x, y)
+Base.union(x::ArbOrRef, y::ArbOrRef) = union!(Arb(prec = _precision(x, y)), x, y)
+Base.union(x::AcbOrRef, y::AcbOrRef) = union!(Acb(prec = _precision(x, y)), x, y)
 # TODO: Could be optimized, both for performance and enclosure
 Base.union(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...) =
     foldl(union, xs, init = union(union(x, y), z))
@@ -157,7 +157,7 @@ all given balls. If all the balls do not overlap throws an
 function Base.intersect(x::ArbOrRef, y::ArbOrRef)
     overlaps(x, y) ||
         throw(ArgumentError("intersection of non-intersecting balls not allowed"))
-    res = Arb(prec = _precision((x, y)))
+    res = Arb(prec = _precision(x, y))
     intersection!(res, x, y)
     return res
 end

@@ -146,7 +146,7 @@ for (jf, af) in [(:+, :add!), (:-, :sub!)]
             size(A) == size(B) ||
             throw(DimensionMismatch("Matrix sizes are not compatible."))
         )
-        C = T(size(A, 1), size(B, 2); prec = _precision((A, B)))
+        C = T(size(A, 1), size(B, 2); prec = _precision(A, B))
         $af(C, A, B)
         C
     end
@@ -164,7 +164,7 @@ function LinearAlgebra.mul!(C::T, A::T, B::T) where {T<:Matrices}
 end
 
 function Base.:(*)(A::T, B::T) where {T<:Matrices}
-    C = T(size(A, 1), size(B, 2); prec = _precision((A, B)))
+    C = T(size(A, 1), size(B, 2); prec = _precision(A, B))
     LinearAlgebra.mul!(C, A, B)
 end
 
@@ -242,11 +242,11 @@ LinearAlgebra.ldiv!(A::LinearAlgebra.LU{<:Any,T}, B::T) where {T<:Matrices} =
     LinearAlgebra.ldiv!(B, A, B)
 
 function Base.:(\)(A::T, B::T) where {T<:Matrices}
-    Y = T(size(A, 2), size(B, 2); prec = _precision((A, B)))
+    Y = T(size(A, 2), size(B, 2); prec = _precision(A, B))
     LinearAlgebra.ldiv!(Y, A, B)
 end
 function Base.:(\)(A::LinearAlgebra.LU{<:Any,T}, B::T) where {T<:Matrices}
-    Y = T(size(A, 2), size(B, 2); prec = _precision((A.factors, B)))
+    Y = T(size(A, 2), size(B, 2); prec = _precision(A.factors, B))
     LinearAlgebra.ldiv!(Y, A, B)
 end
 
