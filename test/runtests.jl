@@ -8,6 +8,7 @@ using Arblib, Test, LinearAlgebra, Random, SpecialFunctions
     include("arb_types.jl")
     include("types.jl")
     include("precision.jl")
+    include("manual_overrides.jl")
     include("setters.jl")
     include("constructors.jl")
     include("predicates.jl")
