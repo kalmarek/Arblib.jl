@@ -1,6 +1,6 @@
 @testset "Arblib.ArbCall" begin
-    include("Carg-test.jl")
-    include("ArbFunction-test.jl")
-    include("ArbFPWrapFunction-test.jl")
-    include("parse-test.jl")
+    include("Carg.jl")
+    include("ArbFunction.jl")
+    include("ArbFPWrapFunction.jl")
+    include("parse.jl")
 end
