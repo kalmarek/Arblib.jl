@@ -111,11 +111,6 @@
             @test _precision(1, im * Arf(prec = 64)) == 64
 
             @test _precision(1.0, 2) == precision(Arb)
-
-            # Tuple
-            @test _precision((Arf(prec = 64), Arb(prec = 80))) == 80
-            @test _precision((Arf(prec = 64), 1)) == 64
-            @test _precision((1.0, 2)) == precision(Arb)
         end
     end
 end
