@@ -33,6 +33,6 @@
 
         @test B1 == B2 == A * A
 
-        Arblib.flint_set_num_threads(2)
+        Arblib.flint_set_num_threads(1)
     end
 end

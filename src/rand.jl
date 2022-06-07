@@ -1,13 +1,12 @@
 import Random
 
-# TODO: remove Random.CloseOpen01{BigFloat} parameters
-# TODO: remove setprecision
-# possibly fixed by https://github.com/JuliaLang/julia/pull/38169
+# TODO: Reduce allocations by not constructing an intermediate
+# BigFloat.
 
 function Random.Sampler(
-    RNG::Type{<:Random.AbstractRNG},
-    st::Random.SamplerType{Acb},
-    n::Random.Repetition,
+    ::Type{<:Random.AbstractRNG},
+    ::Random.SamplerType{Acb},
+    ::Random.Repetition,
 )
     return Random.SamplerSimple(
         Random.SamplerType{Acb}(),
@@ -27,9 +26,9 @@ function Random.Sampler(
 end
 
 function Random.Sampler(
-    RNG::Type{<:Random.AbstractRNG},
+    ::Type{<:Random.AbstractRNG},
     x::TOrRef,
-    n::Random.Repetition,
+    ::Random.Repetition,
 ) where {TOrRef<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}}
     T = _nonreftype(TOrRef)
     return Random.SamplerSimple(
@@ -39,16 +38,10 @@ function Random.Sampler(
 end
 
 Random.rand(rng::Random.AbstractRNG, sp::Random.SamplerSimple{Random.SamplerType{Arf}}) =
-    setprecision(BigFloat, sp.data.prec) do
-        Arf(rand(rng, sp.data), prec = sp.data.prec)
-    end
+    Arf(rand(rng, sp.data); sp.data.prec)
 
 Random.rand(rng::Random.AbstractRNG, sp::Random.SamplerSimple{Random.SamplerType{Arb}}) =
-    setprecision(BigFloat, sp.data.prec) do
-        Arb(rand(rng, sp.data), prec = sp.data.prec)
-    end
+    Arb(rand(rng, sp.data); sp.data.prec)
 
 Random.rand(rng::Random.AbstractRNG, sp::Random.SamplerSimple{Random.SamplerType{Acb}}) =
-    setprecision(BigFloat, sp.data.prec) do
-        Acb(rand(rng, sp.data), rand(rng, sp.data), prec = sp.data.prec)
-    end
+    Acb(rand(rng, sp.data), rand(rng, sp.data); sp.data.prec)

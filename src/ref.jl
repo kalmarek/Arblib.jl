@@ -1,6 +1,6 @@
-ArfRef(; prec::Integer = DEFAULT_PRECISION[]) = Arf(; prec = prec)
-ArbRef(; prec::Integer = DEFAULT_PRECISION[]) = Arb(; prec = prec)
-AcbRef(; prec::Integer = DEFAULT_PRECISION[]) = Acb(; prec = prec)
+ArfRef(; prec::Integer = DEFAULT_PRECISION[]) = Arf(; prec)
+ArbRef(; prec::Integer = DEFAULT_PRECISION[]) = Arb(; prec)
+AcbRef(; prec::Integer = DEFAULT_PRECISION[]) = Acb(; prec)
 MagRef() = Mag()
 
 function ArfRef(
@@ -26,9 +26,9 @@ function AcbRef(
 end
 
 Mag(x::MagRef) = set!(Mag(), x)
-Arf(x::ArfRef; prec::Integer = precision(x)) = set!(Arf(prec = prec), x)
-Arb(x::ArbRef; prec::Integer = precision(x)) = set!(Arb(prec = prec), x)
-Acb(x::AcbRef; prec::Integer = precision(x)) = set!(Acb(prec = prec), x)
+Arf(x::ArfRef; prec::Integer = precision(x)) = set!(Arf(; prec), x)
+Arb(x::ArbRef; prec::Integer = precision(x)) = set!(Arb(; prec), x)
+Acb(x::AcbRef; prec::Integer = precision(x)) = set!(Acb(; prec), x)
 
 Base.zero(::Union{Type{MagRef},MagRef}) = zero(Mag)
 Base.one(::Union{Type{MagRef},MagRef}) = one(Mag)

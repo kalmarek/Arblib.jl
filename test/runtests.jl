@@ -1,17 +1,18 @@
 ENV["NEMO_THREADED"] = 1
 
-using Arblib, Test, LinearAlgebra, SpecialFunctions
+using Arblib, Test, LinearAlgebra, Random, SpecialFunctions
 
 @testset "Arblib" begin
     include("ArbCall/runtests.jl")
 
-    include("arb_types-test.jl")
-    include("types-test.jl")
-    include("precision-test.jl")
-    include("setters-test.jl")
-    include("constructors-test.jl")
-    include("predicates-test.jl")
-    include("show-test.jl")
+    include("arb_types.jl")
+    include("types.jl")
+    include("precision.jl")
+    include("manual_overrides.jl")
+    include("setters.jl")
+    include("constructors.jl")
+    include("predicates.jl")
+    include("show.jl")
     include("promotion.jl")
     include("examples.jl")
     include("arithmetic.jl")
@@ -22,7 +23,7 @@ using Arblib, Test, LinearAlgebra, SpecialFunctions
     include("matrix.jl")
     include("eigen.jl")
     include("calc_integrate.jl")
-    include("ref-test.jl")
+    include("ref.jl")
     include("poly.jl")
     include("series.jl")
     include("special-functions.jl")

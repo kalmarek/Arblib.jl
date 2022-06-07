@@ -26,16 +26,16 @@ function approx_eig_qr!(
 
     if iszero(tol)
         if side == :right
-            approx_eig_qr!(eigvals, C_NULL, eigvecs, A, C_NULL, maxiter, prec = prec)
+            approx_eig_qr!(eigvals, C_NULL, eigvecs, A, C_NULL, maxiter; prec)
         else # side == :left
-            approx_eig_qr!(eigvals, eigvecs, C_NULL, A, C_NULL, maxiter, prec = prec)
+            approx_eig_qr!(eigvals, eigvecs, C_NULL, A, C_NULL, maxiter; prec)
         end
     else
         mag_tol = convert(Mag, tol)
         if side == :right
-            approx_eig_qr!(eigvals, C_NULL, eigvecs, A, mag_tol, maxiter, prec = prec)
+            approx_eig_qr!(eigvals, C_NULL, eigvecs, A, mag_tol, maxiter; prec)
         else # side == :left
-            approx_eig_qr!(eigvals, eigvecs, C_NULL, A, mag_tol, maxiter, prec = prec)
+            approx_eig_qr!(eigvals, eigvecs, C_NULL, A, mag_tol, maxiter; prec)
         end
     end
     return eigvals
@@ -52,10 +52,10 @@ function approx_eig_qr!(
         DimensionMismatch("eigvals, eigvecs and A sizes are not compatible."),
     )
     if iszero(tol)
-        approx_eig_qr!(eigvals, C_NULL, C_NULL, A, C_NULL, maxiter, prec = prec)
+        approx_eig_qr!(eigvals, C_NULL, C_NULL, A, C_NULL, maxiter; prec)
     else
         mag_tol = convert(Mag, tol)
-        approx_eig_qr!(eigvals, C_NULL, C_NULL, A, mag_tol, maxiter, prec = prec)
+        approx_eig_qr!(eigvals, C_NULL, C_NULL, A, mag_tol, maxiter; prec)
     end
     return eigvals
 end
@@ -69,15 +69,7 @@ function approx_eig_qr(
 )
     λ_approx = similar(A, size(A, 1))
     eigvecs_approx = similar(A)
-    approx_eig_qr!(
-        λ_approx,
-        eigvecs_approx,
-        A,
-        tol = tol,
-        maxiter = maxiter,
-        prec = prec,
-        side = side,
-    )
+    approx_eig_qr!(λ_approx, eigvecs_approx, A; tol, maxiter, prec, side)
     return λ_approx, eigvecs_approx
 end
 
@@ -107,9 +99,9 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
             )
 
             val = if side == :left
-                $jlf(eigvals, eigvecs, C_NULL, A, eigvals_approx, R_eigvecs_approx, prec = prec)
+                $jlf(eigvals, eigvecs, C_NULL, A, eigvals_approx, R_eigvecs_approx; prec)
             else
-                $jlf(eigvals, C_NULL, eigvecs, A, eigvals_approx, R_eigvecs_approx, prec = prec)
+                $jlf(eigvals, C_NULL, eigvecs, A, eigvals_approx, R_eigvecs_approx; prec)
             end
             isone(val) || throw(EigenvalueComputationError())
             return eigvals, eigvecs
@@ -129,15 +121,7 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
                 DimensionMismatch("Eigenvectors sizes are not compatible with matrix A"),
             )
 
-            val = $jlf(
-                eigvals,
-                C_NULL,
-                C_NULL,
-                A,
-                eigvals_approx,
-                R_eigvecs_approx,
-                prec = prec,
-            )
+            val = $jlf(eigvals, C_NULL, C_NULL, A, eigvals_approx, R_eigvecs_approx; prec)
             isone(val) || throw(EigenvalueComputationError())
             return eigvals
         end
@@ -150,15 +134,7 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
             side = :right,
         )
             eigvals_approx, R_eigvecs_approx = approx_eig_qr(A, prec = prec)
-            return $jlf(
-                eigvals,
-                eigvecs,
-                A,
-                eigvals_approx,
-                R_eigvecs_approx,
-                prec = prec,
-                side = side,
-            )
+            return $jlf(eigvals, eigvecs, A, eigvals_approx, R_eigvecs_approx; prec, side)
         end
 
         function $jlf(
@@ -167,7 +143,7 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
             prec = precision(A),
         )
             λ_approx, R_approx = approx_eig_qr(A, prec = prec)
-            return $jlf(eigvals, A, λ_approx, R_approx, prec = prec)
+            return $jlf(eigvals, A, λ_approx, R_approx; prec)
         end
 
         function $jlf_allocating(
@@ -177,7 +153,7 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
         )
             eigvals = similar(A, size(A, 1))
             eigvecs = similar(A)
-            $jlf(eigvals, eigvecs, A, prec = prec, side = side)
+            $jlf(eigvals, eigvecs, A; prec, side)
             return eigvals, eigvecs
         end
     end
@@ -189,7 +165,7 @@ function eig_global_enclosure(
     R_eigvecs_approx::AcbMatrixLike;
     prec = precision(A),
 )
-    return eig_global_enclosure!(Mag(), A, λ_approx, R_approx, prec = prec)
+    return eig_global_enclosure!(Mag(), A, eigvals_approx, R_eigvecs_approx, prec)
 end
 
 function eig_enclosure_rump!(
@@ -204,15 +180,7 @@ function eig_enclosure_rump!(
                  size(eigvecs, 1) == size(A, 1) ||
                  throw(DimensionMismatch("Eigenvalues sizes are not compatible"))
 
-    return eig_enclosure_rump!(
-        λ,
-        C_NULL,
-        eigvecs,
-        A,
-        λ_approx,
-        R_eigvecs_approx,
-        prec = prec,
-    )
+    return eig_enclosure_rump!(λ, C_NULL, eigvecs, A, λ_approx, R_eigvecs_approx; prec)
 end
 
 for f in (:eig_multiple_rump, :eig_multiple)
@@ -223,8 +191,8 @@ for f in (:eig_multiple_rump, :eig_multiple)
             A::Union{AcbMatrix,AcbRefMatrix};
             prec = precision(A),
         )
-            λ_approx, R_approx = approx_eig_qr(A, prec = prec)
-            return $f_inplace(eigvals, A, λ_approx, R_approx, prec = prec)
+            λ_approx, R_approx = approx_eig_qr(A; prec)
+            return $f_inplace(eigvals, A, λ_approx, R_approx; prec)
         end
 
         function $f(
@@ -234,13 +202,13 @@ for f in (:eig_multiple_rump, :eig_multiple)
             prec = precision(A),
         )
             λ = similar(A, size(A, 1))
-            $f_inplace(λ, A, eigvals_approx, R_eigvecs_approx, prec = prec)
+            $f_inplace(λ, A, eigvals_approx, R_eigvecs_approx; prec)
             return λ
         end
 
         function $f(A::Union{AcbMatrix,AcbRefMatrix}; prec = precision(A))
             λ = similar(A, size(A, 1))
-            $f_inplace(λ, A, prec = prec)
+            $f_inplace(λ, A; prec)
             return λ
         end
 

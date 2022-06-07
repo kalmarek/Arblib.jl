@@ -1,4 +1,4 @@
-digits_prec(prec::Integer) = floor(Int, prec * log(2) / log(10))
+digits_prec(prec::Integer) = floor(Int, prec * (log(2) / log(10)))
 
 function _string(x::MagOrRef)
     Libc.flush_cstdio()

@@ -6,11 +6,11 @@ function _acb_calc_func!(
     prec::Int,
 )
     @assert iszero(order) || isone(order)
-    x = AcbRef(inp, nothing, prec = prec)
-    res = AcbRef(out, nothing, prec = prec)
+    x = AcbRef(inp, nothing; prec)
+    res = AcbRef(out, nothing; prec)
     f! = unsafe_pointer_to_objref(param)
 
-    f!(res, x, analytic = isone(order), prec = prec)
+    f!(res, x, analytic = isone(order); prec)
 
     return zero(Cint)
 end
@@ -189,9 +189,9 @@ function integrate!(
     if !check_analytic && !take_prec
         g! = (res, x; analytic, prec) -> f!(res, x)
     elseif !check_analytic && take_prec
-        g! = (res, x; analytic, prec) -> f!(res, x, prec = prec)
+        g! = (res, x; analytic, prec) -> f!(res, x; prec)
     elseif check_analytic && !take_prec
-        g! = (res, x; analytic, prec) -> f!(res, x, analytic = analytic)
+        g! = (res, x; analytic, prec) -> f!(res, x; analytic)
     else
         g! = f!
     end
@@ -200,12 +200,12 @@ function integrate!(
         g!,
         res,
         a,
-        b,
-        prec = prec,
-        rel_goal = rel_goal,
+        b;
+        prec,
+        rel_goal,
         abs_tol = convert(Mag, atol),
-        warn_on_no_convergence = warn_on_no_convergence,
-        opts = opts,
+        warn_on_no_convergence,
+        opts,
     )
 end
 
@@ -225,15 +225,15 @@ function integrate!(
     return integrate!(
         f!,
         res,
-        Acb(a, prec = prec),
-        Acb(b, prec = prec),
-        check_analytic = check_analytic,
-        take_prec = take_prec,
-        prec = prec,
-        rtol = rtol,
-        atol = atol,
-        warn_on_no_convergence = warn_on_no_convergence,
-        opts = opts,
+        Acb(a; prec),
+        Acb(b; prec);
+        check_analytic,
+        take_prec,
+        prec,
+        rtol,
+        atol,
+        warn_on_no_convergence,
+        opts,
     )
 end
 
@@ -331,20 +331,20 @@ function integrate(
     opts::Union{Ptr{Cvoid},calc_integrate_opt_struct} = C_NULL,
 )
     f! = (res, x; kwargs...) -> set!(res, f(x; kwargs...))
-    res = Acb(prec = prec)
+    res = Acb(; prec)
 
     return integrate!(
         f!,
         res,
         a,
         b;
-        check_analytic = check_analytic,
-        take_prec = take_prec,
-        rtol = rtol,
-        atol = atol,
-        warn_on_no_convergence = warn_on_no_convergence,
-        opts = opts,
-        prec = prec,
+        check_analytic,
+        take_prec,
+        rtol,
+        atol,
+        warn_on_no_convergence,
+        opts,
+        prec,
     )
 end
 
@@ -362,14 +362,14 @@ function integrate(
 )
     return integrate(
         f,
-        Acb(a, prec = prec),
-        Acb(b, prec = prec),
-        check_analytic = check_analytic,
-        take_prec = take_prec,
-        prec = prec,
-        rtol = rtol,
-        atol = atol,
-        warn_on_no_convergence = warn_on_no_convergence,
-        opts = opts,
+        Acb(a; prec),
+        Acb(b; prec);
+        check_analytic,
+        take_prec,
+        prec,
+        rtol,
+        atol,
+        warn_on_no_convergence,
+        opts,
     )
 end
