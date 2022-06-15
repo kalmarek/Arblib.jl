@@ -4,6 +4,9 @@ using Arb_jll
 import LinearAlgebra
 import SpecialFunctions
 
+# So that the parsed contains method extends the base function
+import Base: contains
+
 export Mag,
     MagRef,
     Arf,
