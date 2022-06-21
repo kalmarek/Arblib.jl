@@ -1,7 +1,7 @@
 name = "Arblib"
 uuid = "fb37089c-8514-4489-9461-98f9c8763369"
 authors = ["Marek Kaluba <kalmar@amu.edu.pl>", "Sascha Timme <Sascha Timme <timme@math.tu-berlin.de>", "Joel Dahne <joel@dahne.eu>"]
-version = "0.7.1"
+version = "0.7.2"
 
 [deps]
 Arb_jll = "d9960996-1013-53c9-9ba4-74a4155039c3"
