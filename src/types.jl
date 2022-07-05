@@ -91,14 +91,16 @@ end
 
 """
     ArbSeries <: Number
+
+This type should be considered experimental, the interface for it
+might change in the future.
 """
 struct ArbSeries <: Number
-    arb_poly::arb_poly_struct
+    poly::ArbPoly
     degree::Int
-    prec::Int
 
     ArbSeries(; degree::Integer = 0, prec::Integer = DEFAULT_PRECISION[]) =
-        fit_length!(new(arb_poly_struct(), degree, prec), degree + 1)
+        fit_length!(new(ArbPoly(; prec), degree), degree + 1)
 end
 
 """
@@ -113,14 +115,16 @@ end
 
 """
     AcbSeries <: Number
+
+This type should be considered experimental, the interface for it
+might change in the future.
 """
 struct AcbSeries <: Number
-    acb_poly::acb_poly_struct
+    poly::AcbPoly
     degree::Int
-    prec::Int
 
     AcbSeries(; degree::Integer = 0, prec::Integer = DEFAULT_PRECISION[]) =
-        fit_length!(new(acb_poly_struct(), degree, prec), degree + 1)
+        fit_length!(new(AcbPoly(; prec), degree), degree + 1)
 end
 
 """
@@ -234,6 +238,10 @@ for (T, prefix) in (
         Base.convert(::Type{$arbstruct}, x::$T) = cstruct(x)
     end
 end
+
+# ArbSeries and AcbSeries requires a different cstruct implementation
+cstruct(x::ArbSeries) = cstruct(x.poly)
+cstruct(x::AcbSeries) = cstruct(x.poly)
 
 # handle Ref types
 for prefix in [:mag, :arf, :arb, :acb]
