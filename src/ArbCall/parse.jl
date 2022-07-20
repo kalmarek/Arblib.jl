@@ -211,6 +211,7 @@ function parse_and_generate_arbdoc(
         "double_interval",
         #"fmpr", # Deprecated
         "fmpz_extras",
+        "fmpzi",
         "hypgeom",
         "mag",
         "partitions",

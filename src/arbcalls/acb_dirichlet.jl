@@ -39,6 +39,11 @@ arbcall"void acb_dirichlet_hurwitz_precomp_choose_param(ulong * A, ulong * K, ul
 arbcall"void acb_dirichlet_hurwitz_precomp_bound(mag_t res, const acb_t s, ulong A, ulong K, ulong N)"
 #ni arbcall"void acb_dirichlet_hurwitz_precomp_eval(acb_t res, const acb_dirichlet_hurwitz_precomp_t pre, ulong p, ulong q, slong prec)"
 
+### Lerch transcendent
+arbcall"void acb_dirichlet_lerch_phi_integral(acb_t res, const acb_t z, const acb_t s, const acb_t a, slong prec)"
+arbcall"void acb_dirichlet_lerch_phi_direct(acb_t res, const acb_t z, const acb_t s, const acb_t a, slong prec)"
+arbcall"void acb_dirichlet_lerch_phi(acb_t res, const acb_t z, const acb_t s, const acb_t a, slong prec)"
+
 ### Stieltjes constants
 #ni arbcall"void acb_dirichlet_stieltjes(acb_t res, const fmpz_t n, const acb_t a, slong prec)"
 
@@ -117,10 +122,10 @@ arbcall"void acb_dirichlet_backlund_s_bound(mag_t res, const arb_t t)"
 ### Riemann zeta function zeros (Platt's method)
 arbcall"void acb_dirichlet_platt_scaled_lambda(arb_t res, const arb_t t, slong prec)"
 #ni arbcall"void acb_dirichlet_platt_scaled_lambda_vec(arb_ptr res, const fmpz_t T, slong A, slong B, slong prec)"
-#ni arbcall"void acb_dirichlet_platt_multieval(arb_ptr res, const fmpz_t T, slong A, slong B, const arb_t h, slong J, slong K, slong sigma, slong prec)"
-#ni arbcall"void acb_dirichlet_platt_multieval_threaded(arb_ptr res, const fmpz_t T, slong A, slong B, const arb_t h, slong J, slong K, slong sigma, slong prec)"
+#ni arbcall"void acb_dirichlet_platt_multieval(arb_ptr res, const fmpz_t T, slong A, slong B, const arb_t h, const fmpz_t J, slong K, slong sigma, slong prec)"
+#ni arbcall"void acb_dirichlet_platt_multieval_threaded(arb_ptr res, const fmpz_t T, slong A, slong B, const arb_t h, const fmpz_t J, slong K, slong sigma, slong prec)"
 #ni arbcall"void acb_dirichlet_platt_ws_interpolation(arb_t res, arf_t deriv, const arb_t t0, arb_srcptr p, const fmpz_t T, slong A, slong B, slong Ns_max, const arb_t H, slong sigma, slong prec)"
-#ni arbcall"slong _acb_dirichlet_platt_local_hardy_z_zeros(arb_ptr res, const fmpz_t n, slong len, const fmpz_t T, slong A, slong B, const arb_t h, slong J, slong K, slong sigma_grid, slong Ns_max, const arb_t H, slong sigma_interp, slong prec)"
+#ni arbcall"slong _acb_dirichlet_platt_local_hardy_z_zeros(arb_ptr res, const fmpz_t n, slong len, const fmpz_t T, slong A, slong B, const arb_t h, const fmpz_t J, slong K, slong sigma_grid, slong Ns_max, const arb_t H, slong sigma_interp, slong prec)"
 #ni arbcall"slong acb_dirichlet_platt_local_hardy_z_zeros(arb_ptr res, const fmpz_t n, slong len, slong prec)"
 #ni arbcall"slong acb_dirichlet_platt_hardy_z_zeros(arb_ptr res, const fmpz_t n, slong len, slong prec)"
 #ni arbcall"slong acb_dirichlet_platt_zeta_zeros(acb_ptr res, const fmpz_t n, slong len, slong prec)"
