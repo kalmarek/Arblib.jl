@@ -152,8 +152,7 @@ SpecialFunctions.erf(x::Series) = hypgeom_erf_series!(zero(x), x, length(x))
 SpecialFunctions.erfc(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_erfc!(zero(x), x)
 SpecialFunctions.erfc(x::Series) = hypgeom_erfc_series!(zero(x), x, length(x))
 
-#SpecialFunctions.erfcinv(x)
-# Not implemented by Arb
+SpecialFunctions.erfcinv(x::ArbOrRef) = hypgeom_erfcinv!(zero(x), x)
 
 #SpecialFunctions.erfcx(x)
 # Not implemented by Arb
@@ -168,8 +167,7 @@ SpecialFunctions.erfc(x::Series) = hypgeom_erfc_series!(zero(x), x, length(x))
 SpecialFunctions.erfi(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_erfi!(zero(x), x)
 SpecialFunctions.erfi(x::Series) = hypgeom_erfi_series!(zero(x), x, length(x))
 
-#SpecialFunctions.erfinv(x)
-# Not implemented by Arb
+SpecialFunctions.erfinv(x::ArbOrRef) = hypgeom_erfinv!(zero(x), x)
 
 #SpecialFunctions.dawson(x)
 # Not implemented by Arb

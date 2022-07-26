@@ -108,12 +108,18 @@
         @test erfc(ArbSeries([2, 1]))[0] ≈ erfc(2)
         @test erfc(AcbSeries([2 + 2im, 1]))[0] ≈ erfc(2 + 2im)
 
+        @test erfcinv(Arb(0.1)) ≈ erfcinv(0.1)
+        @test erfcinv(Arb(0.2)) ≈ erfcinv(0.2)
+
         @test erfi(Arb(2)) ≈ erfi(2)
         @test erfi(Arb(3)) ≈ erfi(3)
         @test erfi(Acb(2 + 2im)) ≈ erfi(2 + 2im)
         @test erfi(Acb(3 + 3im)) ≈ erfi(3 + 3im)
         @test erfi(ArbSeries([2, 1]))[0] ≈ erfi(2)
         @test erfi(AcbSeries([2 + 2im, 1]))[0] ≈ erfi(2 + 2im)
+
+        @test erfinv(Arb(0.1)) ≈ erfinv(0.1)
+        @test erfinv(Arb(0.2)) ≈ erfinv(0.2)
     end
 
     @testset "Airy Functions" begin
