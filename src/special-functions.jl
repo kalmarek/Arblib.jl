@@ -12,7 +12,7 @@ SpecialFunctions.loggamma(x::Series) = lgamma_series!(zero(x), x, length(x))
 # Not implemented by Arb
 
 #SpecialFunctions.logfactorial(x)
-# Only relevant for Arblib
+# Not relevant for Arblib, only implemented for x::Integer
 
 SpecialFunctions.digamma(x::Union{ArbOrRef,AcbOrRef}) = digamma!(zero(x), x)
 SpecialFunctions.digamma(x::Series) = digamma_series!(zero(x), x, length(x))
@@ -163,7 +163,6 @@ SpecialFunctions.erfcinv(x::ArbOrRef) = hypgeom_erfcinv!(zero(x), x)
 #SpecialFunctions.logerfcx(x)
 # Not implemented by Arb
 
-#SpecialFunctions.erfi(x)
 SpecialFunctions.erfi(x::Union{ArbOrRef,AcbOrRef}) = hypgeom_erfi!(zero(x), x)
 SpecialFunctions.erfi(x::Series) = hypgeom_erfi_series!(zero(x), x, length(x))
 
