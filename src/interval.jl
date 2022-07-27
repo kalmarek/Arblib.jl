@@ -95,6 +95,8 @@ the ball `x`, both of them are of type `Arf`. If `T` is given convert
 to this type, supports `Arf`, `BigFloat` and `Arb`.
 
 If `x` contains `NaN` both `l` and `u` will be `NaN`.
+
+See also [`getball`](@ref).
 """
 function getinterval(::Type{Arf}, x::ArbOrRef)
     l, u = Arf(prec = precision(x)), Arf(prec = precision(x))
@@ -120,7 +122,7 @@ Returns a tuple `(m::Arf, r::Mag)` where `m` is the midpoint of the
 ball and `r` is the radius. If `T` is given convert both `m` and `r`
 to this type, supports `Arb`.
 
-See also [`setball`](@ref).
+See also [`setball`](@ref) and [`getinterval`](@ref). #
 """
 getball(x::ArbOrRef) = (Arf(midref(x)), Mag(radref(x)))
 getball(::Type{Arb}, x::ArbOrRef) = (Arb(midref(x)), Arb(radref(x), prec = precision(x)))
