@@ -59,6 +59,20 @@
         @test precision(Arb(MathConstants.γ, prec = 80)) == 80
         @test precision(Arb(MathConstants.catalan, prec = 80)) == 80
         @test precision(Arb(MathConstants.φ, prec = 80)) == 80
+
+        # setball
+        @test isone(Arblib.setball(Arb, Arf(1), Mag(0)))
+        @test isone(Arblib.setball(Arb, 1, 0))
+        @test isone(Arblib.setball(Arb, 1.0, 0.0))
+        @test isone(Arblib.setball(Arb, big(1.0), 0))
+        @test isone(Arblib.setball(Arb, 1 // 1, 0))
+
+        @test getinterval(Arblib.setball(Arb, 2, 1)) == (1, 3)
+        @test contains(Arblib.setball(Arb, 0.5, 0.5), 0)
+        @test contains(Arblib.setball(Arb, 0.5, 0.5), 1)
+
+        @test precision(Arblib.setball(Arb, Arf(prec = 80), 0)) == 80
+        @test precision(Arblib.setball(Arb, Arf(prec = 90), 0, prec = 80)) == 80
     end
 
     @testset "Acb" begin
