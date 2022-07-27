@@ -1,4 +1,5 @@
-export radius, midpoint, lbound, ubound, abs_lbound, abs_ubound, getinterval, getball
+export radius,
+    midpoint, lbound, ubound, abs_lbound, abs_ubound, getinterval, getball, add_error #
 
 """
     radius([T, ] x::ArbOrRef)
@@ -168,3 +169,17 @@ end
 # TODO: Could be optimized, both for performance and enclosure
 Base.intersect(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...) =
     foldl(intersect, xs, init = intersect(intersect(x, y), z))
+
+"""
+    add_error(x, err)
+
+Returns a copy of `x` with the absolute value of `err` added to the radius.
+
+For complex `x` it adds the error to both the real and imaginary
+parts. For matrices it adds it elementwise.
+
+See also [`set_ball`](@ref).
+"""
+add_error(x::Union{ArbOrRef,AcbOrRef}, err::Union{MagOrRef,ArfOrRef,ArbOrRef}) =
+    add_error!(copy(x), err)
+add_error(x::Union{ArbMatrixLike,AcbMatrixLike}, err::MagOrRef) = add_error!(copy(x), err)

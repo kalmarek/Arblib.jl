@@ -196,4 +196,35 @@
         @test_throws ArgumentError intersect(Arb(1), Arb(2))
         @test_throws ArgumentError intersect([xs; Arb(2)]...)
     end
+
+    @testset "add_error" begin
+        x = Arblib.setball(Arb, 0, 1)
+
+        @test radius(Arblib.add_error(x, Mag(1))) == Mag(2)
+        @test radius(Arblib.add_error(x, Arf(2))) == Mag(1) + Mag(Arf(2))
+        @test radius(Arblib.add_error(x, Arb(3))) == Mag(1) + Mag(Arf(3))
+
+        y = Arblib.add_error(x, Mag(1))
+        Arblib.zero!(y)
+        @test !isequal(x, y)
+
+        x = Acb(Arblib.setball(Arb, 0, 1), Arblib.setball(Arb, 2, 3))
+
+        y = Arblib.add_error(x, Mag(1))
+        @test radius(real(y)) == Mag(2)
+        @test radius(imag(y)) == Mag(1) + Mag(3)
+        y = Arblib.add_error(x, Arf(2))
+        @test radius(real(y)) == Mag(1) + Mag(Arf(2))
+        @test radius(imag(y)) == Mag(3) + Mag(Arf(2))
+        y = Arblib.add_error(x, Arb(3))
+        @test radius(real(y)) == Mag(1) + Mag(Arf(3))
+        @test radius(imag(y)) == Mag(3) + Mag(Arf(3))
+
+        @test precision(Arblib.add_error(Arb(prec = 80), Arb(prec = 90))) == 80
+        @test precision(Arblib.add_error(Acb(prec = 80), Arb(prec = 90))) == 80
+
+        @test all(isone, radius.(Arblib.add_error(ArbMatrix(2, 2), Mag(1))))
+        @test all(isone, radius.(real.(Arblib.add_error(AcbMatrix(2, 2), Mag(1)))))
+        @test all(isone, radius.(imag.(Arblib.add_error(AcbMatrix(2, 2), Mag(1)))))
+    end
 end
