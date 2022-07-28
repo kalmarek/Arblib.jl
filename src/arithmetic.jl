@@ -22,6 +22,10 @@ for f in [:inv, :sqrt, :log, :log1p, :exp, :expm1, :atan, :cosh, :sinh]
     @eval Base.$f(x::MagOrRef) = $(Symbol(f, :!))(zero(x), x)
 end
 
+Base.min(x::MagOrRef, y::MagOrRef) = Arblib.min!(zero(x), x, y)
+Base.max(x::MagOrRef, y::MagOrRef) = Arblib.max!(zero(x), x, y)
+Base.minmax(x::MagOrRef, y::MagOrRef) = (min(x, y), max(x, y))
+
 ### Arf
 function Base.sign(x::ArfOrRef)
     isnan(x) && return Arf(NaN) # Follow Julia and return NaN
@@ -73,6 +77,10 @@ function root(x::ArfOrRef, k::Integer)
     root!(y, x, convert(UInt, k))
     return y
 end
+
+Base.min(x::ArfOrRef, y::ArfOrRef) = Arblib.min!(zero(x), x, y)
+Base.max(x::ArfOrRef, y::ArfOrRef) = Arblib.max!(zero(x), x, y)
+Base.minmax(x::ArfOrRef, y::ArfOrRef) = (min(x, y), max(x, y))
 
 ### Arb and Acb
 for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
@@ -174,6 +182,10 @@ function sinhcosh(x::Union{ArbOrRef,AcbOrRef})
     return (s, c)
 end
 
+Base.min(x::ArbOrRef, y::ArbOrRef) = Arblib.min!(zero(x), x, y)
+Base.max(x::ArbOrRef, y::ArbOrRef) = Arblib.max!(zero(x), x, y)
+Base.minmax(x::ArbOrRef, y::ArbOrRef) = (min(x, y), max(x, y))
+
 ### Acb
 function Base.:(*)(x::AcbOrRef, y::Complex{Bool})
     if real(y)
@@ -194,38 +206,49 @@ Base.imag(z::AcbLike; prec = _precision(z)) = get_imag!(Arb(; prec), z)
 Base.conj(z::AcbLike) = conj!(Acb(prec = _precision(z)), z)
 Base.abs(z::AcbLike) = abs!(Arb(prec = _precision(z)), z)
 
-### min and max
-for T in [MagOrRef, ArfOrRef, ArbOrRef]
-    for op in [:min, :max]
-        # min/max
-        @eval Base.$op(x::$T, y::$T) = $(Symbol(op, :!))(zero(x), x, y)
-        # minimum/maximum
-        # The default implementation of minimum/maximum in Julia is
-        # not correct for Arb, we implemented a correct version when
-        # no specific dimension is given. The default give correct
-        # results for Mag and Arf but wrong results for Arb in some
-        # cases, be careful!
-        @eval function Base.$(Symbol(op, :imum))(A::AbstractArray{<:$T})
-            isempty(A) &&
-                throw(ArgumentError("reducing over an empty collection is not allowed"))
-            res = copy(first(A))
-            for x in Iterators.drop(A, 1)
-                $(Symbol(op, :!))(res, res, x)
-            end
-            return res
-        end
-    end
-    @eval Base.minmax(x::$T, y::$T) = (min(x, y), max(x, y))
+### minimum and maximum
+# The default implemented in Julia have several issues for Arb types.
+# See https://github.com/JuliaLang/julia/issues/45932.
+# Note that it works fine for Mag and Arf.
 
-    @eval function Base.extrema(A::AbstractArray{<:$T})
+# Before 1.8.0 there is no way to fix the implementation in Base.
+# Instead we define a new method. Note that this doesn't fully fix the
+# problem, there is no way to dispatch on for example
+# minimum(x -> Arb(x), [1, 2, 3, 4]) or an array with only some Arb.
+if VERSION < v"1.8.0-rc3"
+    function Base.minimum(A::AbstractArray{<:ArbOrRef})
         isempty(A) &&
             throw(ArgumentError("reducing over an empty collection is not allowed"))
-        l = copy(first(A))
-        u = copy(first(A))
+        res = copy(first(A))
         for x in Iterators.drop(A, 1)
-            min!(l, l, x)
-            max!(u, u, x)
+            Arblib.min!(res, res, x)
         end
-        return (l, u)
+        return res
+    end
+
+    function Base.maximum(A::AbstractArray{<:ArbOrRef})
+        isempty(A) &&
+            throw(ArgumentError("reducing over an empty collection is not allowed"))
+        res = copy(first(A))
+        for x in Iterators.drop(A, 1)
+            Arblib.max!(res, res, x)
+        end
+        return res
     end
 end
+
+# Since 1.8.0 it is possible to fix the Base implementation by
+# overloading some internal methods. This also works before 1.8.0 but
+# doesn't solve the full problem.
+
+# The default implementation in Base is not correct for Arb
+Base._fast(::typeof(min), x::Arb, y::Arb) = min(x, y)
+Base._fast(::typeof(min), x::Arb, y) = min(x, y)
+Base._fast(::typeof(min), x, y::Arb) = min(x, y)
+Base._fast(::typeof(max), x::Arb, y::Arb) = max(x, y)
+Base._fast(::typeof(max), x::Arb, y) = max(x, y)
+Base._fast(::typeof(max), x, y::Arb) = max(x, y)
+
+# Mag, Arf and Arb don't have signed zeros
+Base.isbadzero(::typeof(min), x::Union{Mag,Arf,Arb}) = false
+Base.isbadzero(::typeof(max), x::Union{Mag,Arf,Arb}) = false

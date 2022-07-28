@@ -173,29 +173,15 @@ TODO: Come up with more examples
 ### Implementation details
 In some cases the implementation in Julia implicitly makes certain
 assumptions to improve performance and this can lead to issues. For
-example the `maximum` method in Julia checks for `NaN` results (on
-which is short fuses) using `x == x`, which works for most numerical
-types but not for `Arb` (`x == x` is only true if the radius is zero).
-See <https://github.com/JuliaLang/julia/issues/36287> for some more
-details. Arblib implements its own `maximum` method which gives
-rigorous results, but it only covers the case
-`maximum(AbstractFloat{Arb})`.
-
-``` julia
-julia> f = i -> Arb((i, i + 1));
-
-julia> A = f.(0:1000);
-
-julia> maximum(A)
-[1.00e+3 +/- 1.01]
-
-julia> maximum(A, dims = 1)
-1-element Array{Arb,1}:
- [+/- 1.01]
-
-julia> maximum(f, 0:1000)
-[+/- 1.01]
-```
+example, prior to Julia version 1.8 the `minimum` and `maximum`
+methods in Julia checked for `NaN` results (on which is short fuses)
+using `x == x`, which works for most numerical types but not for `Arb`
+(`x == x` is only true if the radius is zero). See
+<https://github.com/JuliaLang/julia/issues/36287> and in particular
+<https://github.com/JuliaLang/julia/issues/45932> for more details.
+Since Julia version 1.8 the `minimum` and `maximum` methods work
+correctly for `Arb`, for earlier versions of Julia it only works
+correctly in some cases.
 
 These types of problems are the hardest to find since they are not
 clear from the documentation but you have to read the implementation,
