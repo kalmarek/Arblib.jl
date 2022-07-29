@@ -1,4 +1,5 @@
-export radius, midpoint, lbound, ubound, abs_lbound, abs_ubound, getinterval, getball
+export radius,
+    midpoint, lbound, ubound, abs_lbound, abs_ubound, getinterval, getball, add_error #
 
 """
     radius([T, ] x::ArbOrRef)
@@ -95,6 +96,8 @@ the ball `x`, both of them are of type `Arf`. If `T` is given convert
 to this type, supports `Arf`, `BigFloat` and `Arb`.
 
 If `x` contains `NaN` both `l` and `u` will be `NaN`.
+
+See also [`getball`](@ref).
 """
 function getinterval(::Type{Arf}, x::ArbOrRef)
     l, u = Arf(prec = precision(x)), Arf(prec = precision(x))
@@ -119,6 +122,8 @@ getinterval(x::ArbOrRef) = getinterval(Arf, x)
 Returns a tuple `(m::Arf, r::Mag)` where `m` is the midpoint of the
 ball and `r` is the radius. If `T` is given convert both `m` and `r`
 to this type, supports `Arb`.
+
+See also [`setball`](@ref) and [`getinterval`](@ref). #
 """
 getball(x::ArbOrRef) = (Arf(midref(x)), Mag(radref(x)))
 getball(::Type{Arb}, x::ArbOrRef) = (Arb(midref(x)), Arb(radref(x), prec = precision(x)))
@@ -164,3 +169,17 @@ end
 # TODO: Could be optimized, both for performance and enclosure
 Base.intersect(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...) =
     foldl(intersect, xs, init = intersect(intersect(x, y), z))
+
+"""
+    add_error(x, err)
+
+Returns a copy of `x` with the absolute value of `err` added to the radius.
+
+For complex `x` it adds the error to both the real and imaginary
+parts. For matrices it adds it elementwise.
+
+See also [`set_ball`](@ref).
+"""
+add_error(x::Union{ArbOrRef,AcbOrRef}, err::Union{MagOrRef,ArfOrRef,ArbOrRef}) =
+    add_error!(copy(x), err)
+add_error(x::Union{ArbMatrixLike,AcbMatrixLike}, err::MagOrRef) = add_error!(copy(x), err)
