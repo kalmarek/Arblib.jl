@@ -52,8 +52,10 @@ function flint_set_num_threads(a::Integer)
 end
 
 include("arb_types.jl")
+include("fmpz.jl")
 include("rounding.jl")
 include("types.jl")
+include("hash.jl")
 
 include("ArbCall/ArbCall.jl")
 import .ArbCall: @arbcall_str, @arbfpwrapcall_str
