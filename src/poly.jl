@@ -129,7 +129,7 @@ for (TPoly, TSeries) in [(:ArbPoly, :ArbSeries), (:AcbPoly, :AcbSeries)]
 
     @eval function $TPoly(
         coeffs::Union{Tuple,AbstractVector};
-        prec::Integer = _precision(first(coeffs)),
+        prec::Integer = _precision(coeffs),
     )
         p = fit_length!($TPoly(; prec), length(coeffs))
         @inbounds for (i, c) in enumerate(coeffs)
@@ -142,7 +142,7 @@ for (TPoly, TSeries) in [(:ArbPoly, :ArbSeries), (:AcbPoly, :AcbSeries)]
     # with two elements. This would for example be used when
     # constructing a polynomial with a constant plus x, e.g
     # ArbPoly((x, 1))
-    @eval function $TPoly(coeffs::Tuple{Any,Any}; prec::Integer = _precision(first(coeffs)))
+    @eval function $TPoly(coeffs::Tuple{Any,Any}; prec::Integer = _precision(coeffs))
         p = fit_length!($TPoly(; prec), length(coeffs))
         @inbounds p[0] = coeffs[1]
         @inbounds p[1] = coeffs[2]
@@ -175,8 +175,8 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
 
     @eval function $TSeries(
         coeffs::Union{Tuple,AbstractVector};
-        degree::Integer = length(coeffs) - 1,
-        prec::Integer = _precision(first(coeffs)),
+        degree::Integer = max(length(coeffs) - 1, 0),
+        prec::Integer = _precision(coeffs),
     )
         p = $TSeries(; degree, prec)
         @inbounds for (i, c) in enumerate(coeffs)
@@ -193,7 +193,7 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
     @eval function $TSeries(
         coeffs::Tuple{Any,Any};
         degree::Integer = length(coeffs) - 1,
-        prec::Integer = _precision(first(coeffs)),
+        prec::Integer = _precision(coeffs),
     )
         p = $TSeries(; degree, prec)
         @inbounds p[0] = coeffs[1]

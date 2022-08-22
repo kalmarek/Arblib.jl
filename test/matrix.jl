@@ -5,6 +5,9 @@
     (AcbRefMatrix, Acb, AcbRef),
 ]
     @testset "Basic" begin
+        @test isempty(TMat([]))
+        @test isempty(TMat([]))
+
         M = TMat(4, 4, prec = 128)
         @test size(M) == (4, 4)
         @test precision(M) == 128

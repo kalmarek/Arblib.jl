@@ -58,6 +58,7 @@
 
     @testset "Constructors" begin
         @test TSeries() ==
+              TSeries([]) ==
               TSeries(T(0)) ==
               TSeries((0,)) ==
               TSeries(T[0]) ==
