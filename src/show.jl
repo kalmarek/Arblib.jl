@@ -106,21 +106,17 @@ for ArbT in (Mag, MagRef, Arf, ArfRef, Arb, ArbRef, Acb, AcbRef)
     end
 end
 
-for ArbT in (Mag, MagRef, Arf, ArfRef, Arb, ArbRef)
-    @eval begin
-        function load_string!(x::$ArbT, str::AbstractString)
-            res = load!(x, str)
-            iszero(res) || throw(ArgumentError("could not load $str as " * $(string(ArbT))))
-            return x
-        end
+function load_string!(x::Union{MagLike,ArfLike,ArbLike}, str::AbstractString)
+    res = load!(x, str)
+    iszero(res) || throw(ArgumentError("could not load $str as $(string(typeof(x)))"))
+    return x
+end
 
-        function dump_string(x::$ArbT)
-            char_ptr = dump(x)
-            str = unsafe_string(char_ptr)
-            ccall(@libflint(flint_free), Cvoid, (Cstring,), char_ptr)
-            return str
-        end
-    end
+function dump_string(x::Union{MagLike,ArfLike,ArbLike})
+    char_ptr = dump(x)
+    str = unsafe_string(char_ptr)
+    ccall(@libflint(flint_free), Cvoid, (Cstring,), char_ptr)
+    return str
 end
 
 for T in [
