@@ -59,3 +59,22 @@ function Base.hash(z::AcbLike, h::UInt)
     # Same as for Complex{T}
     hash(realref(z), h ⊻ hash(imagref(z), Base.h_imag) ⊻ Base.hash_0_imag)
 end
+
+# arb_poly_struct and acb_poly_struct use default hash implementation,
+# this is okay since they don't implement an isequal method.
+function Base.hash(p::Union{ArbPoly,AcbPoly}, h::UInt)
+    for i = 0:degree(p)
+        h = hash(ref(p, i), h)
+    end
+    return h
+end
+
+function Base.hash(p::Union{ArbSeries,AcbSeries}, h::UInt)
+    # Conversion of Number to series gives a degree 0 series, we want
+    # the hashes to match in this case
+    degree(p) == 0 && return hash(ref(p, 0), h)
+
+    hash(p.poly, hash(degree(p), h))
+end
+
+# Vectors and Matrices have an implementation in Base that works well
