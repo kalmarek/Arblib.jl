@@ -1,6 +1,6 @@
 ENV["NEMO_THREADED"] = 1
 
-using Arblib, Test, LinearAlgebra, Random, SpecialFunctions
+using Arblib, Test, LinearAlgebra, Random, Serialization, SpecialFunctions
 
 @testset "Arblib" begin
     include("ArbCall/runtests.jl")
@@ -8,6 +8,7 @@ using Arblib, Test, LinearAlgebra, Random, SpecialFunctions
     include("arb_types.jl")
     include("types.jl")
     include("hash.jl")
+    include("serialize.jl")
     include("precision.jl")
     include("manual_overrides.jl")
     include("setters.jl")
