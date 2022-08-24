@@ -37,6 +37,19 @@ function Serialization.serialize(
     end
 end
 
+function Serialization.serialize(
+    s::Serialization.AbstractSerializer,
+    p::Union{arb_poly_struct,acb_poly_struct},
+)
+    Serialization.serialize_type(s, typeof(p))
+    Serialization.serialize(s, length(p))
+    T = p isa arb_poly_struct ? arb_struct : acb_struct
+    for i = 0:length(p)-1
+        Serialization.serialize(s, unsafe_load(p.coeffs + i * sizeof(T)))
+    end
+end
+
+
 Serialization.deserialize(
     s::Serialization.AbstractSerializer,
     T::Type{<:Union{mag_struct,arf_struct,arb_struct}},
@@ -80,5 +93,33 @@ function Serialization.deserialize(
             res[i, j] = Serialization.deserialize(s)
         end
     end
+    return res
+end
+
+function Serialization.deserialize(
+    s::Serialization.AbstractSerializer,
+    T::Type{<:Union{arb_poly_struct,acb_poly_struct}},
+)
+    n = Serialization.deserialize(s)
+    res = T()
+    for i = 0:n-1
+        set_coeff!(res, i, Serialization.deserialize(s))
+    end
+    return res
+end
+
+# For series we want to make sure that we have allocated the right
+# number of coefficients
+function Serialization.deserialize(
+    s::Serialization.AbstractSerializer,
+    T::Type{<:Union{ArbSeries,AcbSeries}},
+)
+    # This uses the base implementation of serialize so if that
+    # changes this might need to be updated
+    poly = Serialization.deserialize(s)
+    degree = Serialization.deserialize(s)
+    # The series constructor assures us that the number of allocated
+    # coefficients is determined from the degree
+    res = T(poly; degree) # TODO: Here an inplace constructor could be used
     return res
 end

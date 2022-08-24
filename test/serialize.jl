@@ -231,4 +231,130 @@
             AcbMatrix((1 + 2im) * Acb[1//3 π; ℯ NaN]),
         )
     end
+
+    # ArbPoly
+    create_serialization_stream() do s
+        for v in (
+            ArbPoly([]),
+            ArbPoly(Arb[1]),
+            ArbPoly(Arb[1, 0, 0]),
+            ArbPoly(Arb[1, 2, 3, 4]),
+            ArbPoly(Arb[1//3, π, ℯ, NaN]),
+        )
+            Serialization.serialize(s, v)
+            Arblib.zero!(v) # To catch aliasing issues
+        end
+        seek(s, 0)
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbPoly([]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbPoly(Arb[1]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbPoly(Arb[1, 0, 0]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbPoly(Arb[1, 2, 3, 4]))
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            ArbPoly(Arb[1//3, π, ℯ, NaN]),
+        )
+    end
+
+    # AcbPoly
+    create_serialization_stream() do s
+        for v in (
+            AcbPoly([]),
+            AcbPoly(Acb[1]),
+            AcbPoly(Acb[1, 0, 0]),
+            AcbPoly(Acb[1, 2, 3, 4]),
+            AcbPoly(Acb[1//3, π, ℯ, NaN]),
+            AcbPoly(im * Acb[1//3, π, ℯ, NaN]),
+            AcbPoly((1 + 2im) * Acb[1//3, π, ℯ, NaN]),
+        )
+            Serialization.serialize(s, v)
+            Arblib.zero!(v) # To catch aliasing issues
+        end
+        seek(s, 0)
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbPoly([]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbPoly(Acb[1]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbPoly(Acb[1, 0, 0]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbPoly(Acb[1, 2, 3, 4]))
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbPoly(Acb[1//3, π, ℯ, NaN]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbPoly(im * Acb[1//3, π, ℯ, NaN]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbPoly((1 + 2im) * Acb[1//3, π, ℯ, NaN]),
+        )
+    end
+
+    # ArbSeries
+    create_serialization_stream() do s
+        for v in (
+            ArbSeries([]),
+            ArbSeries(Arb[1]),
+            ArbSeries(Arb[1, 0, 0]),
+            ArbSeries(Arb[1, 2, 3, 4]),
+            ArbSeries(Arb[1//3, π, ℯ, NaN]),
+            ArbSeries(Arb[1, 0, 0]),
+        )
+            Serialization.serialize(s, v)
+            Arblib.zero!(v) # To catch aliasing issues
+        end
+        seek(s, 0)
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbSeries([]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbSeries(Arb[1]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbSeries(Arb[1, 0, 0]))
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            ArbSeries(Arb[1, 2, 3, 4]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            ArbSeries(Arb[1//3, π, ℯ, NaN]),
+        )
+        # Check that it allocates space according to the degree
+        # This fails with the default implementation of deserialize
+        @test Arblib.cstruct(Serialization.deserialize(s)).alloc == 3
+    end
+
+    # AcbSeries
+    create_serialization_stream() do s
+        for v in (
+            AcbSeries([]),
+            AcbSeries(Acb[1]),
+            AcbSeries(Acb[1, 0, 0]),
+            AcbSeries(Acb[1, 2, 3, 4]),
+            AcbSeries(Acb[1//3, π, ℯ, NaN]),
+            AcbSeries(im * Acb[1//3, π, ℯ, NaN]),
+            AcbSeries((1 + 2im) * Acb[1//3, π, ℯ, NaN]),
+            AcbSeries(Acb[1, 0, 0]),
+        )
+            Serialization.serialize(s, v)
+            Arblib.zero!(v) # To catch aliasing issues
+        end
+        seek(s, 0)
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbSeries([]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbSeries(Acb[1]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbSeries(Acb[1, 0, 0]))
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbSeries(Acb[1, 2, 3, 4]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbSeries(Acb[1//3, π, ℯ, NaN]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbSeries(im * Acb[1//3, π, ℯ, NaN]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbSeries((1 + 2im) * Acb[1//3, π, ℯ, NaN]),
+        )
+        # Check that it allocates space according to the degree
+        # This fails with the default implementation of deserialize
+        @test Arblib.cstruct(Serialization.deserialize(s)).alloc == 3
+    end
 end
