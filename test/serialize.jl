@@ -107,4 +107,128 @@
         @test isequal_and_prec_equal(Serialization.deserialize(s), Acb(π, ℯ, prec = 256))
         @test isequal_and_prec_equal(Serialization.deserialize(s), Acb(π, ℯ, prec = 512))
     end
+
+    # ArbVector
+    create_serialization_stream() do s
+        for v in (
+            ArbVector([]),
+            ArbVector(Arb[1]),
+            ArbVector(Arb[1, 2, 3, 4]),
+            ArbVector(Arb[1//3, π, ℯ, NaN]),
+        )
+            Serialization.serialize(s, v)
+            Arblib.zero!(v) # To catch aliasing issues
+        end
+        seek(s, 0)
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbVector([]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbVector(Arb[1]))
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            ArbVector(Arb[1, 2, 3, 4]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            ArbVector(Arb[1//3, π, ℯ, NaN]),
+        )
+    end
+
+    # AcbVector
+    create_serialization_stream() do s
+        for v in (
+            AcbVector([]),
+            AcbVector(Acb[1]),
+            AcbVector(Acb[1, 2, 3, 4]),
+            AcbVector(Acb[1//3, π, ℯ, NaN]),
+            AcbVector(im * Acb[1//3, π, ℯ, NaN]),
+            AcbVector((1 + 2im) * Acb[1//3, π, ℯ, NaN]),
+        )
+            Serialization.serialize(s, v)
+            Arblib.zero!(v) # To catch aliasing issues
+        end
+        seek(s, 0)
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbVector([]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbVector(Acb[1]))
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbVector(Acb[1, 2, 3, 4]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbVector(Acb[1//3, π, ℯ, NaN]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbVector(im * Acb[1//3, π, ℯ, NaN]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbVector((1 + 2im) * Acb[1//3, π, ℯ, NaN]),
+        )
+    end
+
+    # ArbMatrix
+    create_serialization_stream() do s
+        for v in (
+            ArbMatrix([]),
+            ArbMatrix([]),
+            ArbMatrix(Arb[1;;]),
+            ArbMatrix(Arb[1 2; 3 4]),
+            ArbMatrix(Arb[1 2 3; 4 5 6]),
+            ArbMatrix(Arb[1//3 π; ℯ NaN]),
+        )
+            Serialization.serialize(s, v)
+            Arblib.zero!(v) # To catch aliasing issues
+        end
+        seek(s, 0)
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbMatrix([]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbMatrix([]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbMatrix(Arb[1;;]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), ArbMatrix(Arb[1 2; 3 4]))
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            ArbMatrix(Arb[1 2 3; 4 5 6]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            ArbMatrix(Arb[1//3 π; ℯ NaN]),
+        )
+    end
+
+    # AcbMatrix
+    create_serialization_stream() do s
+        for v in (
+            AcbMatrix([]),
+            AcbMatrix([]),
+            AcbMatrix(Acb[1;;]),
+            AcbMatrix(Acb[1 2; 3 4]),
+            AcbMatrix(Acb[1 2 3; 4 5 6]),
+            AcbMatrix(Acb[1//3 π; ℯ NaN]),
+            AcbMatrix(im * Acb[1//3 π; ℯ NaN]),
+            AcbMatrix((1 + 2im) * Acb[1//3 π; ℯ NaN]),
+        )
+            Serialization.serialize(s, v)
+            Arblib.zero!(v) # To catch aliasing issues
+        end
+        seek(s, 0)
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbMatrix([]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbMatrix([]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbMatrix(Acb[1;;]))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), AcbMatrix(Acb[1 2; 3 4]))
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbMatrix(Acb[1 2 3; 4 5 6]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbMatrix(Acb[1//3 π; ℯ NaN]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbMatrix(im * Acb[1//3 π; ℯ NaN]),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            AcbMatrix((1 + 2im) * Acb[1//3 π; ℯ NaN]),
+        )
+    end
 end

@@ -13,6 +13,30 @@ function Serialization.serialize(s::Serialization.AbstractSerializer, x::acb_str
     Serialization.serialize(s, str)
 end
 
+function Serialization.serialize(
+    s::Serialization.AbstractSerializer,
+    v::Union{arb_vec_struct,acb_vec_struct},
+)
+    Serialization.serialize_type(s, typeof(v))
+    Serialization.serialize(s, size(v)[1])
+    for i = 1:size(v)[1]
+        Serialization.serialize(s, unsafe_load(v[i]))
+    end
+end
+
+function Serialization.serialize(
+    s::Serialization.AbstractSerializer,
+    v::Union{arb_mat_struct,acb_mat_struct},
+)
+    Serialization.serialize_type(s, typeof(v))
+    Serialization.serialize(s, size(v))
+    for i = 1:size(v)[1]
+        for j = 1:size(v)[2]
+            Serialization.serialize(s, unsafe_load(v[i, j]))
+        end
+    end
+end
+
 Serialization.deserialize(
     s::Serialization.AbstractSerializer,
     T::Type{<:Union{mag_struct,arf_struct,arb_struct}},
@@ -30,5 +54,31 @@ function Serialization.deserialize(s::Serialization.AbstractSerializer, T::Type{
     res = acb_struct()
     Arblib.load_string!(Arblib.realref(res), real_str)
     Arblib.load_string!(Arblib.imagref(res), imag_str)
+    return res
+end
+
+function Serialization.deserialize(
+    s::Serialization.AbstractSerializer,
+    T::Type{<:Union{arb_vec_struct,acb_vec_struct}},
+)
+    n = Serialization.deserialize(s)
+    res = T(n)
+    for i = 1:n
+        res[i] = Serialization.deserialize(s)
+    end
+    return res
+end
+
+function Serialization.deserialize(
+    s::Serialization.AbstractSerializer,
+    T::Type{<:Union{arb_mat_struct,acb_mat_struct}},
+)
+    r, c = Serialization.deserialize(s)
+    res = T(r, c)
+    for i = 1:r
+        for j = 1:c
+            res[i, j] = Serialization.deserialize(s)
+        end
+    end
     return res
 end
