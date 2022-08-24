@@ -30,6 +30,15 @@
         @test hash(Acb(π)) != hash(Acb(0, π))
     end
 
+    @testset "mag_struct, arf_struct, arb_struct, acb_struct" begin
+        # Internally uses the hashing for Mag, Arf, Arb and Acb so we
+        # only test that it calls that correctly
+        @test hash(Arblib.mag_struct()) == hash(zero(Mag))
+        @test hash(Arblib.arf_struct()) == hash(zero(Arf))
+        @test hash(Arblib.arb_struct()) == hash(zero(Arb))
+        @test hash(Arblib.acb_struct()) == hash(zero(Acb))
+    end
+
     @testset "Poly, Series" begin
         # Poly
         for T in (ArbPoly, AcbPoly)
