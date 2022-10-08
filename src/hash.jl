@@ -71,9 +71,16 @@ function Base.hash(z::AcbLike, h::UInt)
     hash(realref(z), h ⊻ hash(imagref(z), Base.h_imag) ⊻ Base.hash_0_imag)
 end
 
+# Compare with Base.h_imag
+if UInt === UInt64
+    const h_poly = 0xfd6de1a6c0e66975
+else
+    const h_poly = 0xa0617887
+end
 # arb_poly_struct and acb_poly_struct use default hash implementation,
 # this is okay since they don't implement an isequal method.
 function Base.hash(p::Union{ArbPoly,AcbPoly}, h::UInt)
+    h = hash(h_poly, h)
     for i = 0:degree(p)
         h = hash(ref(p, i), h)
     end
