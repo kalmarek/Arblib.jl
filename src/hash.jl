@@ -1,6 +1,15 @@
-# The Base implementation of hash(::Real) is based on Base.decompose
-# to guarantee that all numbers that compare equal are given the same
-# hash. We implement Base.decompose for Mag and Arf.
+#=
+The Base implementation of hash(::Real) is based on Base.decompose
+to guarantee that all numbers that compare equal are given the same
+hash. We implement Base.decompose for Mag and Arf.
+
+It should return a, not necessarily canonical, decomposition of
+rational values as `num*2^pow/den`. For Mag and Arf we always have den
+= 1 and we hence only need to find num and pow, corresponding to the
+mantissa end exponent. For Arf this is straight forward using
+arf_get_fmpz_2exp. For Mag the mantissa is stored directly in the
+struct as a UInt and the exponent as a fmpz.
+=#
 function Base.decompose(x::Union{mag_struct,Ptr{mag_struct}})::Tuple{UInt,BigInt,Int}
     isinf(x) && return 1, 0, 0
 
@@ -10,6 +19,8 @@ function Base.decompose(x::Union{mag_struct,Ptr{mag_struct}})::Tuple{UInt,BigInt
 
     pow = BigInt()
     ccall(@libflint(fmpz_get_mpz), Nothing, (Ref{BigInt}, Ref{UInt}), pow, x.exponent)
+    # There is an implicit factor 2^30 for the exponent, coming from
+    # the number of bits of the mantissa
     pow -= 30
 
     return x.mantissa, pow, 1
