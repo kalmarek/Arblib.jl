@@ -22,6 +22,8 @@ Base.precision(x::Union{ArbSeries,AcbSeries}) = precision(x.poly)
 
 @inline _precision(x::Union{ArbTypes,BigFloat}) = precision(x)
 @inline _precision(z::Complex) = max(_precision(real(z)), _precision(imag(z)))
+@inline _precision(v::Union{Tuple,AbstractVector}) =
+    isempty(v) ? DEFAULT_PRECISION[] : _precision(first(v))
 @inline _precision(
     a::Union{ArbTypes,BigFloat,Complex{<:Union{ArbTypes,BigFloat}}},
     b::Union{ArbTypes,BigFloat,Complex{<:Union{ArbTypes,BigFloat}}},

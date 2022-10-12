@@ -2,6 +2,7 @@ module Arblib
 
 using Arb_jll
 import LinearAlgebra
+import Serialization
 import SpecialFunctions
 
 # So that the parsed contains method extends the base function
@@ -52,8 +53,11 @@ function flint_set_num_threads(a::Integer)
 end
 
 include("arb_types.jl")
+include("fmpz.jl")
 include("rounding.jl")
 include("types.jl")
+include("hash.jl")
+include("serialize.jl")
 
 include("ArbCall/ArbCall.jl")
 import .ArbCall: @arbcall_str, @arbfpwrapcall_str

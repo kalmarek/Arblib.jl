@@ -4,6 +4,9 @@
     (ArbRefVector, Arb, ArbRef),
     (AcbRefVector, Acb, AcbRef),
 ]
+    @test isempty(TVec([]))
+    @test isempty(TVec([], prec = 80))
+
     V = TVec(4, prec = 128)
     @test size(V) == (4,)
     @test precision(V) == 128

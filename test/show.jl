@@ -8,11 +8,9 @@
     end
 
     @testset "dump" begin
-        x = Mag(1.1)
-        for x in (Mag(1.1), Arf(1.1), Arb(1.1))
-            y = zero(x)
+        for x in (Mag(π), Arf(1 // 3), Arb(π))
             str = Arblib.dump_string(x)
-            Arblib.load_string!(y, str)
+            y = Arblib.load_string!(zero(x), str)
             @test isequal(x, y)
         end
     end

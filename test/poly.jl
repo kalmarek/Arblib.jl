@@ -57,6 +57,7 @@
 
     @testset "Constructors" begin
         @test TPoly() ==
+              TPoly([]) ==
               TPoly(T(0)) ==
               TPoly((0,)) ==
               TPoly(T[0]) ==
