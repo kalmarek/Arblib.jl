@@ -1,3 +1,6 @@
+"""
+    arf_struct
+"""
 mutable struct arf_struct
     exponent::UInt      # fmpz
     size::UInt          # mp_size_t
@@ -19,6 +22,9 @@ mutable struct arf_struct
     end
 end
 
+"""
+    mag_struct
+"""
 mutable struct mag_struct
     exponent::UInt       # fmpz
     mantissa::UInt       # mp_limb_t
@@ -38,6 +44,9 @@ mutable struct mag_struct
     end
 end
 
+"""
+    arb_struct
+"""
 mutable struct arb_struct
     # ┌ arf_struct (midpoint)
     exponent::UInt      # │ fmpz
@@ -58,6 +67,9 @@ mutable struct arb_struct
     end
 end
 
+"""
+    acb_struct
+"""
 mutable struct acb_struct
     # ┌ arb_struct (real)
     exponent_r::UInt      # │ fmpz
@@ -83,6 +95,9 @@ mutable struct acb_struct
     end
 end
 
+"""
+    arb_vec_struct
+"""
 mutable struct arb_vec_struct
     entries::Ptr{arb_struct}
     n::Int
@@ -94,6 +109,9 @@ mutable struct arb_vec_struct
     end
 end
 
+"""
+    acb_vec_struct
+"""
 mutable struct acb_vec_struct
     entries::Ptr{acb_struct}
     n::Int
@@ -105,6 +123,9 @@ mutable struct acb_vec_struct
     end
 end
 
+"""
+    arb_poly_struct
+"""
 mutable struct arb_poly_struct
     coeffs::Ptr{arb_struct}
     length::Int
@@ -118,6 +139,9 @@ mutable struct arb_poly_struct
     end
 end
 
+"""
+    acb_poly_struct
+"""
 mutable struct acb_poly_struct
     coeffs::Ptr{acb_struct}
     length::Int
@@ -131,6 +155,9 @@ mutable struct acb_poly_struct
     end
 end
 
+"""
+    arb_mat_struct
+"""
 mutable struct arb_mat_struct
     entries::Ptr{arb_struct}
     r::Int
@@ -145,6 +172,9 @@ mutable struct arb_mat_struct
     end
 end
 
+"""
+    acb_mat_struct
+"""
 mutable struct acb_mat_struct
     entries::Ptr{acb_struct}
     r::Int
@@ -199,6 +229,9 @@ function Base.deepcopy_internal(
     return y
 end
 
+"""
+    calc_integrate_opt_struct
+"""
 mutable struct calc_integrate_opt_struct
     deg_limit::Int
     eval_limit::Int
