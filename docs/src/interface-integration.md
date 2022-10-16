@@ -1,0 +1,3 @@
+``` @docs
+Arblib.integrate
+```
