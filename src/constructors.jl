@@ -73,7 +73,7 @@ function Acb(re::AbstractString, im::AbstractString; prec::Integer = DEFAULT_PRE
     return res
 end
 
-Base.Int(x::ArfLike; rnd::Union{arb_rnd,RoundingMode} = RoundNearest) =
+Base.Int(x::ArfOrRef; rnd::Union{arb_rnd,RoundingMode} = RoundNearest) =
     is_int(x) ? get_si(x, rnd) : throw(InexactError(:Int64, Int64, x))
 
 Base.Float64(x::MagLike) = get(x)
