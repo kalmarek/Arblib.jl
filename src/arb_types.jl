@@ -130,8 +130,8 @@ end
 """
 mutable struct arb_poly_struct
     coeffs::Ptr{arb_struct}
-    length::Int
     alloc::Int
+    length::Int
 
     function arb_poly_struct()
         poly = new()
@@ -146,8 +146,8 @@ end
 """
 mutable struct acb_poly_struct
     coeffs::Ptr{acb_struct}
-    length::Int
     alloc::Int
+    length::Int
 
     function acb_poly_struct()
         poly = new()
