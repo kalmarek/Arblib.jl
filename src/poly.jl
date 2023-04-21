@@ -5,9 +5,9 @@ const Series = Union{ArbSeries,AcbSeries}
 ## Length and degree
 ##
 Base.length(p::Union{arb_poly_struct,ArbPoly}) =
-    ccall(@libarb(arb_poly_length), Int, (Ref{arb_poly_struct},), p)
+    ccall(@libflint(arb_poly_length), Int, (Ref{arb_poly_struct},), p)
 Base.length(p::Union{acb_poly_struct,AcbPoly}) =
-    ccall(@libarb(acb_poly_length), Int, (Ref{acb_poly_struct},), p)
+    ccall(@libflint(acb_poly_length), Int, (Ref{acb_poly_struct},), p)
 Base.length(p::Series) = p.degree + 1
 
 # Only define size for Poly. Series inherits the size from being

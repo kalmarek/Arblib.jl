@@ -1,6 +1,6 @@
 module Arblib
 
-using Arb_jll
+using FLINT_jll
 import LinearAlgebra
 import Serialization
 import SpecialFunctions
@@ -27,12 +27,13 @@ export Mag,
     AcbSeries,
     ref
 
-macro libarb(function_name)
-    return (:($function_name), libarb)
+macro libflint(function_name)
+    return (:($function_name), libflint)
 end
 
-macro libflint(function_name)
-    return (:($function_name), Arb_jll.libflint)
+# For backwards compatibility with when Arb was a separate package
+macro libarb(function_name)
+    return (:($function_name), libflint)
 end
 
 const __isthreaded = Ref(false)

@@ -33,7 +33,7 @@ function Base.decompose(x::Union{arf_struct,Ptr{arf_struct}})::Tuple{BigInt,BigI
     num = fmpz_struct()
     pow = fmpz_struct()
     ccall(
-        @libarb(arf_get_fmpz_2exp),
+        @libflint(arf_get_fmpz_2exp),
         Cvoid,
         (Ref{fmpz_struct}, Ref{fmpz_struct}, Ref{arf_struct}),
         num,

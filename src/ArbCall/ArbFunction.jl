@@ -151,7 +151,7 @@ function jlcode(af::ArbFunction, jl_fname = jlfname(af))
     func_full_args = :(
         function $jl_fname($(jl_full_args...))
             __ret = ccall(
-                Arblib.@libarb($(arbfname(af))),
+                Arblib.@libflint($(arbfname(af))),
                 $returnT,
                 $(Expr(:tuple, ctype.(cargs)...)),
                 $(name.(cargs)...),

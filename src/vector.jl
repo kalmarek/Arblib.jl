@@ -1,8 +1,8 @@
 # arb_mat_struct and acb_mat_struct methods
 clear!(v::arb_vec_struct) =
-    ccall(@libarb(_arb_vec_clear), Cvoid, (Ptr{arb_struct}, Int), v.entries, v.n)
+    ccall(@libflint(_arb_vec_clear), Cvoid, (Ptr{arb_struct}, Int), v.entries, v.n)
 clear!(v::acb_vec_struct) =
-    ccall(@libarb(_acb_vec_clear), Cvoid, (Ptr{acb_struct}, Int), v.entries, v.n)
+    ccall(@libflint(_acb_vec_clear), Cvoid, (Ptr{acb_struct}, Int), v.entries, v.n)
 
 Base.unsafe_convert(::Type{Ptr{arb_struct}}, v::arb_vec_struct) = v.entries
 Base.unsafe_convert(::Type{Ptr{acb_struct}}, v::acb_vec_struct) = v.entries
