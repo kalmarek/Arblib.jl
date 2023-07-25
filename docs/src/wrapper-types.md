@@ -1,3 +1,5 @@
+# Types
+
 The package defines the following types which map directly to Arb
 types with the corresponding name. In most cases you should not use
 these types directly but use the types from the [High level

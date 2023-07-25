@@ -1,5 +1,9 @@
+# Types
+
 The package defines a number of types for the high level interface.
-The basic types, which directly map to corresponding Arb types, are
+
+## Basic
+These types directly map to corresponding Arb types.
 
 ``` @docs
 Mag
@@ -14,14 +18,16 @@ ArbMatrix
 AcbMatrix
 ```
 
-It also defines two series types, which are wrapper for the polynomial
-types with a specified degree.
+## Series
+The package defines two series types, which are wrapper for the
+polynomial types with a specified degree.
 
 ``` @docs
 ArbSeries
 AcbSeries
 ```
 
+## Ref
 In addition to these there are a number of `Ref` types, which allow
 for non-allocating access in a number of cases.
 
@@ -36,7 +42,10 @@ ArbRefMatrix
 AcbRefMatrix
 ```
 
-We have the following table for the types
+## Correspondence between types
+We have the following table for the correspondence with between the
+[Low level wrapper types](wrapper-types.md) and the high level
+interface types.
 
 | Arb      | Wrapper          | High level  | Ref            |
 |----------|------------------|-------------|----------------|
