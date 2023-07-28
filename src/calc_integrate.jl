@@ -298,6 +298,8 @@ paper
 > https://doi.org/10.1007/978-3-319-96418-8
 > https://arxiv.org/abs/1802.07942
 
+See also: [`integrate!`](@ref).
+
 # Examples
 ```jldoctest
 julia> Arblib.integrate(sin, 0, 10) # Integrate sin from 0 to 10

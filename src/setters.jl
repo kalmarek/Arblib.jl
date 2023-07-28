@@ -86,7 +86,7 @@ end
 
 function set!(res::ArbLike, (a, b)::Tuple{<:Real,<:Real}; prec::Integer = precision(res))
     # This is not strictly required to check since the union will give
-    # an enclosure anyway. But since thus method is designed for a <=
+    # an enclosure anyway. But since this method is designed for a <=
     # b adding this check could catch some bugs.
     a > b && throw(ArgumentError("must have a <= b, got a = $a and b = $b"))
     if !(a isa ArbLike)
