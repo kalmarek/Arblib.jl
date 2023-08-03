@@ -38,7 +38,6 @@ Base.@propagate_inbounds function Base.setindex!(
     x,
     i::Integer,
 )
-    @boundscheck checkbounds(v, i)
     ref(v, i)[] = x
     return x
 end
@@ -84,7 +83,6 @@ Base.@propagate_inbounds function Base.setindex!(
     x,
     i::Integer,
 )
-    @boundscheck checkbounds(v, i)
     ref(v, i)[] = x
     return x
 end
