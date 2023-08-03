@@ -305,10 +305,3 @@ const ArbTypes = Union{
     AcbPoly,
     AcbSeries,
 }
-
-Base.setindex!(x::Union{Mag,MagRef,Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}, z::Number) =
-    set!(x, z)
-Base.setindex!(x::MagOrRef, z::Ptr{mag_struct}) = set!(x, z)
-Base.setindex!(x::ArfOrRef, z::Ptr{arf_struct}) = set!(x, z)
-Base.setindex!(x::ArbOrRef, z::Ptr{arb_struct}) = set!(x, z)
-Base.setindex!(x::AcbOrRef, z::Ptr{acb_struct}) = set!(x, z)
