@@ -1,3 +1,6 @@
+# Use res[] = x as short hand for Arblib.set!(res, x)
+Base.setindex!(res::Union{MagLike,ArfLike,ArbLike,AcbLike}, x) = set!(res, x)
+
 # Mag
 set!(res::MagLike, x::Integer) = set!(res, convert(UInt, x))
 set!(res::MagLike, ::Irrational{:π}) = const_pi!(res)
