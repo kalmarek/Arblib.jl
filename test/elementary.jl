@@ -16,9 +16,9 @@
     end
 
     @testset "Arf" begin
-        @test sqrt(Arf(4)) == Arf(2)
-        @test Arblib.rsqrt(Arf(4)) == Arf(1 // 2)
-        @test Arblib.root(Arf(8), 3) == Arf(2)
+        @test sqrt(Arf(4)) == 2
+        @test Arblib.rsqrt(Arf(4)) == 1 // 2
+        @test Arblib.root(Arf(8), 3) == 2
     end
 
     @testset "$T" for T in [Arb, Acb]
@@ -52,30 +52,26 @@
         end
         @test acosh(T(2)) ≈ acosh(2)
 
-        @test Arblib.rsqrt(T(1 // 4)) == T(2)
+        @test Arblib.rsqrt(T(1 // 4)) == 2
 
-        @test sinpi(T(1)) == T(0)
-        @test cospi(T(1)) == T(-1)
-        @test Arblib.tanpi(T(1)) == T(0)
+        @test sinpi(T(1)) == 0
+        @test cospi(T(1)) == -1
+        @test Arblib.tanpi(T(1)) == 0
         @test Arblib.cotpi(T(0.5)) == 0
         @test Arblib.cscpi(T(0.5)) == 1
         @test sinc(T(0.5)) ≈ sinc(0.5)
 
         @test isequal(sincos(T(1)), (sin(T(1)), cos(T(1))))
-        if VERSION >= v"1.6"
-            @test isequal(sincospi(T(1)), (sinpi(T(1)), cospi(T(1))))
-        else
-            @test isequal(Arblib.sincospi(T(1)), (sinpi(T(1)), cospi(T(1))))
-        end
+        @test isequal(sincospi(T(1)), (sinpi(T(1)), cospi(T(1))))
         @test isequal(Arblib.sinhcosh(T(1)), (sinh(T(1)), cosh(T(1))))
     end
 
     @testset "Arb - specific" begin
-        @test hypot(Arb(3), Arb(4)) == Arb(5)
+        @test hypot(Arb(3), Arb(4)) == 5
 
-        @test Arblib.sqrtpos(Arb(4)) == Arb(2)
-        @test Arblib.sqrtpos(Arb(-4)) == Arb(0)
-        @test Arblib.sqrt1pm1(Arb(3)) == Arb(1)
+        @test Arblib.sqrtpos(Arb(4)) == 2
+        @test Arblib.sqrtpos(Arb(-4)) == 0
+        @test Arblib.sqrt1pm1(Arb(3)) == 1
 
         @test atan(Arb(2), Arb(3)) ≈ atan(2, 3)
     end

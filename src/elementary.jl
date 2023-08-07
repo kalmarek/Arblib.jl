@@ -1,4 +1,5 @@
 ### Mag
+
 rsqrt(x::MagOrRef) = rsqrt!(zero(x), x)
 Base.hypot(x::MagOrRef, y::MagOrRef) = hypot!(zero(x), x, y)
 root(x::MagOrRef, n::Integer) = root!(zero(x), x, convert(UInt, n))
@@ -9,6 +10,7 @@ for f in [:sqrt, :log, :log1p, :exp, :expm1, :atan, :cosh, :sinh]
 end
 
 ### Arf
+
 function Base.sqrt(x::ArfOrRef)
     y = zero(x)
     sqrt!(y, x)
@@ -26,6 +28,7 @@ function root(x::ArfOrRef, k::Integer)
 end
 
 ### Arb and Acb
+
 Base.hypot(x::ArbOrRef, y::ArbOrRef) = hypot!(Arb(prec = _precision(x, y)), x, y)
 
 root(x::Union{ArbOrRef,AcbOrRef}, k::Integer) = root!(zero(x), x, convert(UInt, k))
