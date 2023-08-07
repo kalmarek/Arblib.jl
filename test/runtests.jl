@@ -18,6 +18,8 @@ using Arblib, Test, LinearAlgebra, Random, Serialization, SpecialFunctions
     include("promotion.jl")
     include("examples.jl")
     include("arithmetic.jl")
+    include("elementary.jl")
+    include("minmax.jl")
     include("rand.jl")
     include("float.jl")
     include("interval.jl")
