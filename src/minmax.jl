@@ -1,21 +1,36 @@
-### Mag
 Base.min(x::MagOrRef, y::MagOrRef) = Arblib.min!(zero(x), x, y)
 Base.max(x::MagOrRef, y::MagOrRef) = Arblib.max!(zero(x), x, y)
 Base.minmax(x::MagOrRef, y::MagOrRef) = (min(x, y), max(x, y))
 
-### Arf
+for T in (ArfOrRef, ArbOrRef)
+    @eval Base.min(x::$T, y::$T) =
+        Arblib.min!($(_nonreftype(T))(prec = _precision(x, y)), x, y)
+    @eval Base.max(x::$T, y::$T) =
+        Arblib.max!($(_nonreftype(T))(prec = _precision(x, y)), x, y)
+    @eval Base.minmax(x::$T, y::$T) = (min(x, y), max(x, y))
 
-Base.min(x::ArfOrRef, y::ArfOrRef) = Arblib.min!(zero(x), x, y)
-Base.max(x::ArfOrRef, y::ArfOrRef) = Arblib.max!(zero(x), x, y)
-Base.minmax(x::ArfOrRef, y::ArfOrRef) = (min(x, y), max(x, y))
+    # Define more efficient multi argument versions, similar to + and *
+    # TODO: Now precision is determined by first two arguments
+    for (f, f!) in ((:min, :min!), (:max, :max!))
+        @eval function Base.$f(a::$T, b::$T, c::$T)
+            z = $f(a, b)
+            return $f!(z, z, c)
+        end
 
-### Arb and Acb
-Base.min(x::ArbOrRef, y::ArbOrRef) = Arblib.min!(zero(x), x, y)
-Base.max(x::ArbOrRef, y::ArbOrRef) = Arblib.max!(zero(x), x, y)
-Base.minmax(x::ArbOrRef, y::ArbOrRef) = (min(x, y), max(x, y))
+        @eval function Base.$f(a::$T, b::$T, c::$T, d::$T)
+            z = $f(a, b)
+            return $f!(z, $f!(z, z, c), d)
+        end
+
+        @eval function Base.$f(a::$T, b::$T, c::$T, d::$T, e::$T)
+            z = $f(a, b)
+            return $f!(z, $f!(z, $f!(z, z, c), d), e)
+        end
+    end
+end
 
 ### minimum and maximum
-# The default implemented in Julia have several issues for Arb types.
+# The default implemented in Julia have several issues for the Arb type.
 # See https://github.com/JuliaLang/julia/issues/45932.
 # Note that it works fine for Mag and Arf.
 

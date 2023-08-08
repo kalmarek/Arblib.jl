@@ -1,20 +1,37 @@
 @testset "MinMax" begin
-    @testset "Mag" begin
-        @test min(Mag(1), Mag(2)) == Mag(1)
-        @test max(Mag(1), Mag(2)) == Mag(2)
-        @test minmax(Mag(1), Mag(2)) == minmax(Mag(2), Mag(1)) == (Mag(1), Mag(2))
+    @testset "$T" for T in (Mag, Arf, Mag)
+        @test min(T(1), T(2)) == T(1)
+        @test max(T(1), T(2)) == T(2)
+        @test minmax(T(1), T(2)) == minmax(T(2), T(1)) == (T(1), T(2))
+
+        @test min(T.((1, 2, 2))...) == T(1)
+        @test min(T.((1, 1, 2))...) == T(1)
+        @test min(T.((2, 2, 1))...) == T(1)
+        @test min(T.((1, 2, 2, 2))...) == T(1)
+        @test min(T.((1, 1, 2, 2))...) == T(1)
+        @test min(T.((2, 2, 1, 2))...) == T(1)
+        @test min(T.((2, 2, 2, 1))...) == T(1)
+        @test min(T.((1, 2, 2, 2, 2))...) == T(1)
+        @test min(T.((1, 1, 2, 2, 2))...) == T(1)
+        @test min(T.((2, 2, 1, 2, 2))...) == T(1)
+        @test min(T.((2, 2, 2, 1, 2))...) == T(1)
+        @test min(T.((2, 2, 2, 2, 1))...) == T(1)
+
+        @test max(T.((2, 1, 1))...) == T(2)
+        @test max(T.((2, 2, 1))...) == T(2)
+        @test max(T.((1, 1, 2))...) == T(2)
+        @test max(T.((2, 1, 1, 1))...) == T(2)
+        @test max(T.((2, 2, 1, 1))...) == T(2)
+        @test max(T.((1, 1, 2, 1))...) == T(2)
+        @test max(T.((1, 1, 1, 2))...) == T(2)
+        @test max(T.((2, 1, 1, 1, 1))...) == T(2)
+        @test max(T.((2, 2, 1, 1, 1))...) == T(2)
+        @test max(T.((1, 1, 2, 1, 1))...) == T(2)
+        @test max(T.((1, 1, 1, 2, 1))...) == T(2)
+        @test max(T.((1, 1, 1, 1, 2))...) == T(2)
     end
 
-    @testset "Arf" begin
-        @test min(Arf(1), Arf(2)) == Arf(1)
-        @test max(Arf(1), Arf(2)) == Arf(2)
-        @test minmax(Arf(1), Arf(2)) == minmax(Arf(2), Arf(1)) == (Arf(1), Arf(2))
-    end
-
-    @testset "Arb" begin
-        @test min(Arb(1), Arb(2)) == Arb(1)
-        @test max(Arb(1), Arb(2)) == Arb(2)
-        @test minmax(Arb(1), Arb(2)) == minmax(Arb(2), Arb(1)) == (Arb(1), Arb(2))
+    @testset "Arb - specific" begin
         @test Arblib.contains(min(Arb((0, 2)), Arb((-1, 3))), -1)
         @test Arblib.contains(min(Arb((0, 2)), Arb((-1, 3))), 2)
         @test !Arblib.contains(min(Arb((0, 2)), Arb((-1, 3))), 3)
@@ -34,10 +51,12 @@
         # default implementation works well. But to help find future
         # issues we test it here as well.
 
-        A = Arb[10:20; 0:9]
-        @test minimum(A) == 0
-        @test maximum(A) == 20
-        @test extrema(A) == (0, 20)
+        @testset "$T" for T in (Mag, Arf, Mag)
+            A = T[10:20; 0:9]
+            @test minimum(A) == T(0)
+            @test maximum(A) == T(20)
+            @test extrema(A) == (T(0), T(20))
+        end
 
         A = [Arb((i, i + 1)) for i = 0:20]
         @test contains(minimum(A), Arb((0, 1)))
