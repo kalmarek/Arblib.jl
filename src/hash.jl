@@ -56,7 +56,7 @@ Base.hash(x::acb_struct, h::UInt) = hash(Acb(x), h)
 # Hashes of Mag and Arf are computed using the Base implementation
 # which used Base.decompose defined above.
 
-function Base.hash(x::ArbLike, h::UInt)
+function Base.hash(x::ArbOrRef, h::UInt)
     # If the radius is zero we compute the hash using only the
     # midpoint, so that we get identical hashes as for the
     # corresponding Arf
@@ -66,7 +66,7 @@ function Base.hash(x::ArbLike, h::UInt)
     return hash(Arblib.midref(x), h)
 end
 
-function Base.hash(z::AcbLike, h::UInt)
+function Base.hash(z::AcbOrRef, h::UInt)
     # Same as for Complex{T}
     hash(realref(z), h ⊻ hash(imagref(z), Base.h_imag) ⊻ Base.hash_0_imag)
 end
