@@ -8,25 +8,6 @@ for T in (ArfOrRef, ArbOrRef)
     @eval Base.max(x::$T, y::$T) =
         Arblib.max!($(_nonreftype(T))(prec = _precision(x, y)), x, y)
     @eval Base.minmax(x::$T, y::$T) = (min(x, y), max(x, y))
-
-    # Define more efficient multi argument versions, similar to + and *
-    # TODO: Now precision is determined by first two arguments
-    for (f, f!) in ((:min, :min!), (:max, :max!))
-        @eval function Base.$f(a::$T, b::$T, c::$T)
-            z = $f(a, b)
-            return $f!(z, z, c)
-        end
-
-        @eval function Base.$f(a::$T, b::$T, c::$T, d::$T)
-            z = $f(a, b)
-            return $f!(z, $f!(z, z, c), d)
-        end
-
-        @eval function Base.$f(a::$T, b::$T, c::$T, d::$T, e::$T)
-            z = $f(a, b)
-            return $f!(z, $f!(z, $f!(z, z, c), d), e)
-        end
-    end
 end
 
 ### minimum and maximum

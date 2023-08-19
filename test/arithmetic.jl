@@ -13,13 +13,6 @@
 
         @test Mag(1 / 4) <= inv(Mag(4)) <= Mag(1 / 3)
 
-        @test Mag(6) <= +(Mag.((1, 2, 3))...) <= Mag(7)
-        @test Mag(10) <= +(Mag.((1, 2, 3, 4))...) <= Mag(11)
-        @test Mag(15) <= +(Mag.((1, 2, 3, 4, 5))...) <= Mag(16)
-        @test Mag(6) <= *(Mag.((1, 2, 3))...) <= Mag(7)
-        @test Mag(24) <= *(Mag.((1, 2, 3, 4))...) <= Mag(25)
-        @test Mag(120) <= *(Mag.((1, 2, 3, 4, 5))...) <= Mag(121)
-
         # signbit, sign and abs
         @test !signbit(Mag(0))
         @test !signbit(Mag(2))
@@ -63,13 +56,6 @@
               UInt8(6) / Arf(2) ==
               3
 
-        @test +(Arf.((1, 2, 3))...) == 6
-        @test +(Arf.((1, 2, 3, 4))...) == 10
-        @test +(Arf.((1, 2, 3, 4, 5))...) == 15
-        @test *(Arf.((1, 2, 3))...) == 6
-        @test *(Arf.((1, 2, 3, 4))...) == 24
-        @test *(Arf.((1, 2, 3, 4, 5))...) == 120
-
         # fma and muladd
         @test fma(Arf(2), Arf(3), Arf(4)) == muladd(Arf(2), Arf(3), Arf(4)) == 10
 
@@ -99,13 +85,6 @@
         @test T(1) - T(2) == T(1) - 2 == T(1) - UInt(2) == T(-1)
         @test T(2) * T(3) == T(2) * 3 == 3 * T(2) == T(2) * UInt(3) == UInt(3) * T(2) == 6
         @test T(6) / T(2) == T(6) / 2 == T(6) / UInt(2) == 3
-
-        @test +(T.((1, 2, 3))...) == 6
-        @test +(T.((1, 2, 3, 4))...) == 10
-        @test +(T.((1, 2, 3, 4, 5))...) == 15
-        @test *(T.((1, 2, 3))...) == 6
-        @test *(T.((1, 2, 3, 4))...) == 24
-        @test *(T.((1, 2, 3, 4, 5))...) == 120
 
         # ^
         @test Base.literal_pow(^, T(2), Val(-2)) ==

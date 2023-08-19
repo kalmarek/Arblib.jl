@@ -23,6 +23,7 @@ using Arblib, Test, LinearAlgebra, Random, Serialization, SpecialFunctions
     include("rand.jl")
     include("float.jl")
     include("interval.jl")
+    include("multi-argument.jl")
     include("vector.jl")
     include("matrix.jl")
     include("eigen.jl")

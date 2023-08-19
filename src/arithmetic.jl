@@ -32,31 +32,6 @@ for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
         @eval Base.$jf(x::Union{ArfOrRef,_BitInteger,Irrational}, y::ArbOrRef) = $jf(y, x)
 
         @eval Base.$jf(x::Union{ArbOrRef,_BitInteger,Irrational}, y::AcbOrRef) = $jf(y, x)
-
-        # Define more efficient multi argument versions, similar to BigFloat
-        # TODO: Now precision is determined by first two arguments
-        for T in (MagOrRef, ArfOrRef, ArbOrRef, AcbOrRef)
-            @eval function Base.$jf(a::$T, b::$T, c::$T)
-                z = $jf(a, b)
-                $af(z, z, c)
-                return z
-            end
-
-            @eval function Base.$jf(a::$T, b::$T, c::$T, d::$T)
-                z = $jf(a, b)
-                $af(z, z, c)
-                $af(z, z, d)
-                return z
-            end
-
-            @eval function Base.$jf(a::$T, b::$T, c::$T, d::$T, e::$T)
-                z = $jf(a, b)
-                $af(z, z, c)
-                $af(z, z, d)
-                $af(z, z, e)
-                return z
-            end
-        end
     else
         @eval function Base.$jf(x::Irrational, y::Union{ArbOrRef,AcbOrRef})
             z = zero(y)
