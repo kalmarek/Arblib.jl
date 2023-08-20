@@ -74,6 +74,7 @@
     end
 
     @testset "$T" for T in [Arb, Acb]
+        # +, -, *, /
         @test T(1) + T(2) ==
               T(1) + 2 ==
               2 + T(1) ==
@@ -82,9 +83,22 @@
               T(1) + UInt8(2) ==
               UInt8(2) + T(1) ==
               3
-        @test T(1) - T(2) == T(1) - 2 == T(1) - UInt(2) == T(-1)
+        @test T(1) - T(2) == T(1) - 2 == T(1) - UInt(2) == 1 - T(2) == T(-1)
         @test T(2) * T(3) == T(2) * 3 == 3 * T(2) == T(2) * UInt(3) == UInt(3) * T(2) == 6
-        @test T(6) / T(2) == T(6) / 2 == T(6) / UInt(2) == 3
+        @test T(6) / T(2) == T(6) / 2 == T(6) / UInt(2) == 6 / T(2) == 3
+
+        @test isequal(T(1) + π, T(1) + T(π))
+        @test isequal(π + T(1), T(1) + T(π))
+        @test T(1) + 3 // 2 == 3 // 2 + T(1) == 5 // 2
+        @test isequal(T(1) - π, T(1) - T(π))
+        @test isequal(π - T(1), T(π) - T(1))
+        @test T(1) - 3 // 2 == -(3 // 2 - T(1)) == -1 // 2
+        @test isequal(T(2) * π, T(2) * T(π))
+        @test isequal(π * T(2), T(π) * T(2))
+        @test T(2) * 3 // 2 == 3 // 2 * T(2) == 3
+        @test isequal(T(2) / π, T(2) / T(π))
+        @test isequal(π / T(2), T(π) / T(2))
+        @test T(4) / 4 // 1 == 4 // 1 / T(4) == 1
 
         # ^
         @test Base.literal_pow(^, T(2), Val(-2)) ==

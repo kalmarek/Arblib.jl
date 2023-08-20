@@ -18,8 +18,12 @@ for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
     @eval Base.$jf(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,_BitInteger}) =
         $af(Acb(prec = _precision(x, y)), x, y)
 
-    # Avoid one allocation for operations on irrationals
-    @eval function Base.$jf(x::Union{ArbOrRef,AcbOrRef}, y::Irrational)
+    # Avoid one allocation for operations on irrationals or BitInteger
+    # rationals
+    @eval function Base.$jf(
+        x::Union{ArbOrRef,AcbOrRef},
+        y::Union{Irrational,Rational{<:_BitInteger}},
+    )
         z = zero(x)
         z[] = y
         return $af(z, x, z)
@@ -33,7 +37,12 @@ for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
 
         @eval Base.$jf(x::Union{ArbOrRef,_BitInteger,Irrational}, y::AcbOrRef) = $jf(y, x)
     else
-        @eval function Base.$jf(x::Irrational, y::Union{ArbOrRef,AcbOrRef})
+        # Subtraction and division also need optimizations for when
+        # left argument is an integer
+        @eval function Base.$jf(
+            x::Union{Irrational,Rational{<:_BitInteger},_BitInteger},
+            y::Union{ArbOrRef,AcbOrRef},
+        )
             z = zero(y)
             z[] = x
             return $af(z, z, y)
