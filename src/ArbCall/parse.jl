@@ -73,9 +73,9 @@ end
     generate_file(filename, title, sections; verbose, manual_overrides)
 
 Given a title and a list of sections, as returned by
-[`parse_arbdoc`](@ref), return a string with the Julia code to load
-all of those functions. If a file name is given then also write the
-string to that file.
+[`Arblib.ArbCall.parse_arbdoc`](@ref), return a string with the Julia
+code to load all of those functions. If a file name is given then also
+write the string to that file.
 
 For each function it checks that it is correctly parsed. Those that do
 not parse due to types which are not supported and likely never will
