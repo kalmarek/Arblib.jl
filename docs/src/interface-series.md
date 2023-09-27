@@ -16,9 +16,7 @@ the length of the expansion.
 ```@repl 1
 using Arblib
 
-setprecision(Arb, 64)
-
-x0 = Arb(1 // 3)
+x0 = Arb(1 // 3, prec = 64)
 x = ArbSeries((x0, 1), degree = 5)
 
 sin(x)
