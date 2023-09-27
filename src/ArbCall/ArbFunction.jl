@@ -16,6 +16,8 @@ declaration in C. Note that note all types of function declarations
 are supported, only those which are relevant for the Arb library.
 
 ```jldoctest
+julia> using Arblib
+
 julia> Arblib.ArbCall.ArbFunction("void arb_zero(arb_t x)")
 Arblib.ArbCall.ArbFunction{Nothing}("arb_zero", Arblib.ArbCall.Carg[Arblib.ArbCall.Carg{Arb}(:x, false)])
 ```
