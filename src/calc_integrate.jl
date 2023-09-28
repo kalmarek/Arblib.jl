@@ -158,8 +158,6 @@ particular, there are three differences from `integrate`:
 
 # Examples
 ```jldoctest
-julia> using Arblib
-
 julia> Arblib.integrate!(Arblib.sin!, Acb(0), Acb(0), Acb(10)) # Integrate sin from 0 to 10
 [1.83907152907645245225886394782406483451993016513316854683595373104879258687 +/- 5.15e-75]
 
@@ -306,8 +304,6 @@ See also: [`integrate!`](@ref).
 
 # Examples
 ```jldoctest
-julia> using Arblib
-
 julia> Arblib.integrate(sin, 0, 10) # Integrate sin from 0 to 10
 [1.83907152907645245225886394782406483451993016513316854683595373104879258687 +/- 5.15e-75]
 

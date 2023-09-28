@@ -3,6 +3,8 @@ ENV["NEMO_THREADED"] = 1
 using Arblib, Test, LinearAlgebra, Random, Serialization, SpecialFunctions
 using Documenter
 
+DocMeta.setdocmeta!(Arblib, :DocTestSetup, :(using Arblib); recursive = true)
+
 @testset "Arblib" begin
     doctest(Arblib)
 
