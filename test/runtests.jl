@@ -1,8 +1,11 @@
 ENV["NEMO_THREADED"] = 1
 
 using Arblib, Test, LinearAlgebra, Random, Serialization, SpecialFunctions
+using Documenter
 
 @testset "Arblib" begin
+    doctest(Arblib)
+
     include("ArbCall/runtests.jl")
 
     include("arb_types.jl")
