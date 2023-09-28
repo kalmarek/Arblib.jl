@@ -2,6 +2,7 @@ using Documenter, Arblib
 
 makedocs(
     sitename = "Arblib",
+    modules = [Arblib],
     pages = [
         "index.md",
         "Low level wrapper" => [
@@ -18,4 +19,5 @@ makedocs(
         ],
         "Rigorous numerics" => "rigorous.md",
     ],
+    warnonly = [:missing_docs, :cross_references],
 )
