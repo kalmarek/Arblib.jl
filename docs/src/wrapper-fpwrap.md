@@ -7,6 +7,8 @@ generated using
 
 ``` @docs
 Arblib.ArbCall.@arbfpwrapcall_str
+Arblib.ArbCall.ArbFPWrapFunction
+Arblib.ArbCall.jlcode(af::Arblib.ArbCall.ArbFPWrapFunction)
 ```
 
 The name for the generated method is given by removing the `arb`

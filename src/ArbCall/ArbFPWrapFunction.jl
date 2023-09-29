@@ -129,6 +129,12 @@ function jlargs(af::ArbFPWrapFunction)
     return args, kwargs
 end
 
+"""
+    jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af))
+
+Generate the Julia code for calling a function from the `fpwrap`
+module of Arb from Julia.
+"""
 function jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af))
     T = basetype(af)
     cargs = arguments(af)

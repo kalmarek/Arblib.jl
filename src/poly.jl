@@ -93,12 +93,12 @@ as the degree of the underlying polynomial (in case higher order
 coefficients are zero) but the way they are constructed ensures that
 the coefficients will always be initialised.
 
-!!! Note: If you use this to change the coefficient in a way so that the degree
-    of the polynomial might change you need to normalise the polynomial
-    afterwards to make sure that Arb recognises the possibly new degree of
-    the polynomial. If the new degree is the same or lower this can be
-    done using [`Arblib.normalise!`](@ref). If the new degree is higher
-    you need to manually set the correct value of
+!!! Note: If you use this to change the coefficient in a way so that
+    the degree of the polynomial might change you need to normalise
+    the polynomial afterwards to make sure that Arb recognises the
+    possibly new degree of the polynomial. If the new degree is the
+    same or lower this can be done using `Arblib.normalise!`. If the
+    new degree is higher you need to manually set the correct value of
     `Arblib.cstruct(p).length` to be one higher than the new degree.
 """
 Base.@propagate_inbounds function ref(p::Union{ArbPoly,ArbSeries}, i::Integer)

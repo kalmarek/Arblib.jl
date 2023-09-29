@@ -20,6 +20,8 @@ The automatic generation of the methods is handled by
 
 ``` @docs
 Arblib.ArbCall.@arbcall_str
+Arblib.ArbCall.ArbFunction
+Arblib.ArbCall.jlcode(af::Arblib.ArbCall.ArbFunction)
 ```
 
 The main things to understand is how the name of the generated
@@ -53,6 +55,7 @@ determined by
 
 ``` @docs
 Arblib.ArbCall.jltype
+Arblib.ArbCall.ctype
 ```
 
 Some arguments are automatically converted to keyword arguments.

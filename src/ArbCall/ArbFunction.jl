@@ -136,6 +136,11 @@ function jlargs(af::ArbFunction; argument_detection::Bool = true)
     return args, kwargs
 end
 
+"""
+    jlcode(af::ArbFunction, jl_fname = jlfname(af))
+
+Generate the Julia code for calling the Arb function from Julia.
+"""
 function jlcode(af::ArbFunction, jl_fname = jlfname(af))
     jl_args, jl_kwargs = jlargs(af, argument_detection = true)
     jl_full_args, _ = jlargs(af, argument_detection = false)
