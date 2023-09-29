@@ -53,7 +53,7 @@ the [`Arblib.ArbCall.ctype`](@ref) of `ca`.
 These conversations should be done without any loss of information,
 for example for floating point numbers we only allow conversion from
 types with lower precision. In general the conversion is done using
-[`Base.cconvert`](@ref).
+`Base.cconvert`.
 """
 jltype(ca::Carg) = rawtype(ca)
 jltype(::Carg{Cint}) = Integer
