@@ -23,3 +23,5 @@ makedocs(
     ],
     warnonly = [:missing_docs],
 )
+
+deploydocs(repo = "github.com/kalmarek/Arblib.jl")
