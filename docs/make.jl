@@ -21,5 +21,5 @@ makedocs(
         ],
         "Rigorous numerics" => "rigorous.md",
     ],
-    warnonly = [:missing_docs, :cross_references],
+    warnonly = [:missing_docs],
 )
