@@ -3,7 +3,7 @@ using Documenter, Arblib
 DocMeta.setdocmeta!(Arblib, :DocTestSetup, :(using Arblib); recursive = true)
 
 makedocs(
-    sitename = "Arblib",
+    sitename = "Arblib.jl",
     modules = [Arblib],
     pages = [
         "index.md",
