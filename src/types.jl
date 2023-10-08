@@ -273,6 +273,10 @@ const MagOrRef = Union{Mag,MagRef}
 const ArfOrRef = Union{Arf,ArfRef}
 const ArbOrRef = Union{Arb,ArbRef}
 const AcbOrRef = Union{Acb,AcbRef}
+const ArbVectorOrRef = Union{ArbVector,ArbRefVector}
+const AcbVectorOrRef = Union{AcbVector,AcbRefVector}
+const ArbMatrixOrRef = Union{ArbMatrix,ArbRefMatrix}
+const AcbMatrixOrRef = Union{AcbMatrix,AcbRefMatrix}
 
 """
     MagLike = Union{Mag,MagRef,mag_struct,Ptr{mag_struct}}
