@@ -87,6 +87,34 @@
             A[1, 1] = 5 // 8
             @test !iszero(A[1, 1])
         end
+
+        @testset "copy" begin
+            v = TVec(1:4)
+            w = copy(v)
+            @test v == w
+            w[1] = 2
+            @test v[1] == 1
+            @test w[1] == 2
+
+            w = similar(v)
+            copy!(w, v)
+            @test v == w
+            w[1] = 2
+            @test v[1] == 1
+            @test w[1] == 2
+
+            w = TVec(5)
+            copyto!(w, v)
+            @test w[1:4] == v
+            @test w[5] == 0
+            w[1] = 2
+            @test v[1] == 1
+            @test w[1] == 2
+
+            @test_throws DimensionMismatch copy!(TVec(3), v)
+            @test_throws DimensionMismatch copy!(TVec(5), v)
+            @test_throws DimensionMismatch copyto!(TVec(3), v)
+        end
     end
 
     @testset "VectorRef: $T" for (T, TRef) in

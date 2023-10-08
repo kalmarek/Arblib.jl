@@ -150,6 +150,27 @@
             A[1, 1] = 5 // 8
             @test !iszero(A[1, 1])
         end
+
+        @testset "copy" begin
+            A = TMat([1 2; 3 4])
+            B = copy(A)
+            @test A == B
+            B[1] = 2
+            @test A[1, 1] == 1
+            @test B[1, 1] == 2
+
+            B = similar(A)
+            copy!(B, A)
+            @test A == B
+            B[1] = 2
+            @test A[1] == 1
+            @test B[1] == 2
+
+            @test_throws DimensionMismatch copy!(TMat(1, 2), A)
+            @test_throws DimensionMismatch copy!(TMat(3, 2), A)
+            @test_throws DimensionMismatch copy!(TMat(2, 1), A)
+            @test_throws DimensionMismatch copy!(TMat(3, 3), A)
+        end
     end
 
     @testset "RefMatrix: $T" for (T, TRef) in
