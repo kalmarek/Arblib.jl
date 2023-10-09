@@ -108,10 +108,22 @@ end
 Base.isnan(x::ArbOrRef) = isnan(midref(x))
 Base.isnan(x::AcbOrRef) = isnan(midref(realref(x))) || isnan(midref(imagref(x)))
 
-Base.isnan(p::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}) =
-    any(isnan, @inbounds p[i] for i = 0:degree(p))
-Base.isfinite(p::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}) =
-    all(isfinite, @inbounds p[i] for i = 0:degree(p))
+function Base.isnan(p::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries})
+    # degree(cstruct(p)) instead of degree(p) avoids iterating over
+    # coefficients known to be zero for series.
+    @inbounds for i = 0:degree(cstruct(p))
+        isnan(Arblib.ref(p, i)) && return true
+    end
+    return false
+end
+function Base.isfinite(p::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries})
+    # degree(cstruct(p)) instead of degree(p) avoids iterating over
+    # coefficients known to be zero for series.
+    @inbounds for i = 0:degree(cstruct(p))
+        isfinite(Arblib.ref(p, i)) || return false
+    end
+    return true
+end
 
 for ArbT in (ArfLike, ArbLike, AcbLike)
     @eval begin
