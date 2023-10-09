@@ -11,7 +11,7 @@ arf_get_fmpz_2exp. For Mag the mantissa is stored directly in the
 struct as a UInt and the exponent as a fmpz.
 =#
 function Base.decompose(x::Union{mag_struct,Ptr{mag_struct}})::Tuple{UInt,BigInt,Int}
-    isinf(x) && return 1, 0, 0
+    Arblib.is_inf(x) && return 1, 0, 0
 
     if x isa Ptr{mag_struct}
         x = unsafe_load(x)
@@ -27,8 +27,8 @@ function Base.decompose(x::Union{mag_struct,Ptr{mag_struct}})::Tuple{UInt,BigInt
 end
 
 function Base.decompose(x::Union{arf_struct,Ptr{arf_struct}})::Tuple{BigInt,BigInt,Int}
-    isnan(x) && return 0, 0, 0
-    isinf(x) && return ifelse(x < 0, -1, 1), 0, 0
+    Arblib.is_nan(x) && return 0, 0, 0
+    Arblib.is_inf(x) && return ifelse(Arblib.cmp(x, 0) < 0, -1, 1), 0, 0
 
     num = fmpz_struct()
     pow = fmpz_struct()
