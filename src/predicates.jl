@@ -197,3 +197,11 @@ end
 # this for non-number types. Note that in this case we always compare
 # them using Arblib.equal.
 Base.:(==)(x::T, y::T) where {T<:ArbStructTypes} = equal(x, y)
+
+function Base.:(==)(x::T, y::T) where {T<:Union{arb_vec_struct,acb_vec_struct}}
+    x.n == y.n || return false
+    for i = 1:x.n
+        equal(x[i], y[i]) || return false
+    end
+    return true
+end

@@ -171,4 +171,34 @@
         @test isequal(P3, P3)
     end
 
+    @testset "isequal for structs" begin
+        let cstruct = Arblib.cstruct
+            @test isequal(cstruct(Mag(1)), cstruct(Mag(1)))
+            @test isequal(cstruct(Arf(1)), cstruct(Arf(1)))
+            @test isequal(cstruct(Arb(1)), cstruct(Arb(1)))
+            @test isequal(cstruct(Acb(1)), cstruct(Acb(1)))
+
+            @test isequal(cstruct(ArbVector([1, 2])), cstruct(ArbVector([1, 2])))
+            @test isequal(cstruct(AcbVector([1, 2])), cstruct(AcbVector([1, 2])))
+
+            @test isequal(cstruct(ArbPoly([1, 2])), cstruct(ArbPoly([1, 2])))
+            @test isequal(cstruct(AcbPoly([1, 2])), cstruct(AcbPoly([1, 2])))
+
+            @test isequal(cstruct(ArbMatrix([1, 2])), cstruct(ArbMatrix([1, 2])))
+            @test isequal(cstruct(AcbMatrix([1, 2])), cstruct(AcbMatrix([1, 2])))
+
+            # It should behave like Arblib.equal and not Arblib.eq
+            @test isequal(cstruct(Arb(π)), cstruct(Arb(π)))
+            @test isequal(cstruct(Acb(π)), cstruct(Acb(π)))
+            @test isequal(cstruct(ArbMatrix([π])), cstruct(ArbMatrix([π])))
+            @test isequal(cstruct(AcbMatrix([π])), cstruct(AcbMatrix([π])))
+
+            # Different types should not be equal even if they are
+            # numerically the same
+            @test !isequal(cstruct(Mag(1)), cstruct(Arf(1)))
+            @test !isequal(cstruct(Arb(1)), cstruct(Acb(1)))
+            @test !isequal(cstruct(ArbVector([1])), cstruct(AcbVector([1])))
+            @test !isequal(cstruct(ArbMatrix([1])), cstruct(AcbMatrix([1])))
+        end
+    end
 end
