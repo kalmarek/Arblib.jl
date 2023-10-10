@@ -190,7 +190,11 @@ arbfpwrapcall"int arb_fpwrap_double_exp(double * res, double x, int flags)"
 ```
 defines the method
 ```
-fpwrap_exp(x::Union{Float16, Float32, Float64}; error_on_failure::Bool = Arblib.ArbCall.fpwrap_error_on_failure_default(), correct_rounding::Bool = false, work_limit::Integer = 8)
+fpwrap_exp(
+    x::Union{Float16, Float32, Float64};
+    error_on_failure::Bool = Arblib.ArbCall.fpwrap_error_on_failure_default(),
+    correct_rounding::Bool = false, work_limit::Integer = 8,
+)
 ```
 """
 macro arbfpwrapcall_str(str)

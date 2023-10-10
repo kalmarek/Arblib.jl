@@ -59,7 +59,7 @@ p = ArbPoly(1:10)
 x = Arb(1 // 3)
 res = zero(x)
 
-eval(p, x) = begin
+function eval(p, x)
     res = zero(x)
     xi = one(x)
     for i in 0:Arblib.degree(p)
@@ -69,7 +69,7 @@ eval(p, x) = begin
     return res
 end
 
-eval!(res, p, x) = begin
+function eval!(res, p, x)
     Arblib.zero!(res)
     xi = one(x)
     for i in 0:Arblib.degree(p)
