@@ -91,9 +91,21 @@ end
 const Vectors = Union{ArbVector,ArbRefVector,AcbVector,AcbRefVector}
 
 # General constructor
-for T in [:ArbVector, :ArbRefVector, :AcbVector, :AcbRefVector]
+
+for (T, TOrRef) in [
+    (:ArbVector, :ArbVectorOrRef),
+    (:ArbRefVector, :ArbVectorOrRef),
+    (:AcbVector, :AcbVectorOrRef),
+    (:AcbRefVector, :AcbVectorOrRef),
+]
+    @eval $T(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+        $T(cstructtype($T)(n), shallow = true; prec)
+
+    @eval $T(v::$TOrRef; shallow::Bool = false, prec::Integer = precision(v)) =
+        $T(cstruct(v); shallow, prec)
+
     @eval function $T(v::AbstractVector; prec::Integer = _precision(v))
-        V = $T(length(v); prec = prec)
+        V = $T(length(v); prec)
         @inbounds for (i, vᵢ) in enumerate(v)
             V[i] = vᵢ
         end

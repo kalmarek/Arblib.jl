@@ -103,9 +103,21 @@ end
 ## Common methods
 
 # General constructor
-for T in [:ArbMatrix, :ArbRefMatrix, :AcbMatrix, :AcbRefMatrix]
+for (T, TOrRef) in [
+    (:ArbMatrix, :ArbMatrixOrRef),
+    (:ArbRefMatrix, :ArbMatrixOrRef),
+    (:AcbMatrix, :AcbMatrixOrRef),
+    (:AcbRefMatrix, :AcbMatrixOrRef),
+]
+    @eval $T(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+        $T(cstructtype($T)(r, c), shallow = true; prec)
+
+    @eval $T(v::$TOrRef; shallow::Bool = false, prec::Integer = precision(v)) =
+        $T(cstruct(v); shallow, prec)
+
+
     @eval function $T(A::AbstractMatrix; prec::Integer = _precision(A))
-        B = $T(size(A)...; prec = prec)
+        B = $T(size(A)...; prec)
         # ensure to handle all kind of indices
         ax1, ax2 = axes(A)
         for (i, i′) in enumerate(ax1), (j, j′) in enumerate(ax2)
@@ -115,7 +127,7 @@ for T in [:ArbMatrix, :ArbRefMatrix, :AcbMatrix, :AcbRefMatrix]
     end
 
     @eval function $T(v::AbstractVector; prec::Integer = _precision(v))
-        A = $T(length(v), 1; prec = prec)
+        A = $T(length(v), 1; prec)
         for (i, vᵢ) in enumerate(v)
             A[i, 1] = vᵢ
         end
