@@ -182,4 +182,4 @@ See also [`setball`](@ref).
 """
 add_error(x::Union{ArbOrRef,AcbOrRef}, err::Union{MagOrRef,ArfOrRef,ArbOrRef}) =
     add_error!(copy(x), err)
-add_error(x::Union{ArbMatrixLike,AcbMatrixLike}, err::MagOrRef) = add_error!(copy(x), err)
+add_error(x::Union{ArbMatrixOrRef,AcbMatrixOrRef}, err::MagOrRef) = add_error!(copy(x), err)
