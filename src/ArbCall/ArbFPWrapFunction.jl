@@ -129,6 +129,12 @@ function jlargs(af::ArbFPWrapFunction)
     return args, kwargs
 end
 
+"""
+    jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af))
+
+Generate the Julia code for calling a function from the `fpwrap`
+module of Arb from Julia.
+"""
 function jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af))
     T = basetype(af)
     cargs = arguments(af)
@@ -171,6 +177,26 @@ function jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af))
     return func
 end
 
+"""
+    @arbfpwrapcall_str str
+
+Parse a string as an [`Arblib.ArbCall.ArbFPWrapFunction`](@ref),
+generate the code for a corresponding method with
+[`Arblib.ArbCall.jlcode`](@ref) and evaluate the code.
+
+For example
+```
+arbfpwrapcall"int arb_fpwrap_double_exp(double * res, double x, int flags)"
+```
+defines the method
+```
+fpwrap_exp(
+    x::Union{Float16, Float32, Float64};
+    error_on_failure::Bool = Arblib.ArbCall.fpwrap_error_on_failure_default(),
+    correct_rounding::Bool = false, work_limit::Integer = 8,
+)
+```
+"""
 macro arbfpwrapcall_str(str)
     af = ArbFPWrapFunction(str)
     return esc(jlcode(af))

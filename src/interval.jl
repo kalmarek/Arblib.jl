@@ -178,7 +178,7 @@ Returns a copy of `x` with the absolute value of `err` added to the radius.
 For complex `x` it adds the error to both the real and imaginary
 parts. For matrices it adds it elementwise.
 
-See also [`set_ball`](@ref).
+See also [`setball`](@ref).
 """
 add_error(x::Union{ArbOrRef,AcbOrRef}, err::Union{MagOrRef,ArfOrRef,ArbOrRef}) =
     add_error!(copy(x), err)

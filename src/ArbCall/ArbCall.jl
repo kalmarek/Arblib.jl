@@ -1,3 +1,9 @@
+"""
+    ArbCall
+
+This module handles the automatic generation of methods from parsing
+the Arb documentation.
+"""
 module ArbCall
 
 using ..Arblib

@@ -165,7 +165,9 @@ julia> Arblib.integrate!(Arblib.inv!, Acb(0), Acb(1, -5), Acb(1, 5)) # Integrate
 [+/- 2.02e-75] + [2.74680153389003172172254385288992229730199919179940161793956671182574846633 +/- 2.83e-75]im
 
 julia> # Integrate √z from 1 - 5im to 1 + 5im, taking into account the branch cut at (-∞, 0]
+
 julia> f! = (res, z; analytic = false) -> Arblib.sqrt_analytic!(res, z, analytic);
+
 julia> Arblib.integrate!(f!, Acb(0), Acb(1, -5), Acb(1, 10), check_analytic = true, prec = 64)
 [-9.0064084416559764 +/- 6.53e-17] + [23.8636067095598007 +/- 6.98e-17]im
 ```
@@ -298,6 +300,8 @@ paper
 > https://doi.org/10.1007/978-3-319-96418-8
 > https://arxiv.org/abs/1802.07942
 
+See also: [`integrate!`](@ref).
+
 # Examples
 ```jldoctest
 julia> Arblib.integrate(sin, 0, 10) # Integrate sin from 0 to 10
@@ -307,6 +311,7 @@ julia> Arblib.integrate(z -> 1/z, Acb(1, -5), Acb(1, 5)) # Integrate 1/z from 1 
 [+/- 2.02e-75] + [2.74680153389003172172254385288992229730199919179940161793956671182574846633 +/- 2.83e-75]im
 
 julia> # Integrate √z from 1 - 5im to 1 + 5im, taking into account the branch cut at (-∞, 0]
+
 julia> f = (z; analytic = false) -> begin
            if analytic && Arblib.contains_nonpositive(real(z))
                return Acb(NaN, prec = precision(z))
@@ -314,6 +319,7 @@ julia> f = (z; analytic = false) -> begin
                return sqrt(z)
            end
        end;
+
 julia> Arblib.integrate(f, Acb(1, -5), Acb(1, 10), check_analytic = true, prec = 64)
 [-9.0064084416559764 +/- 7.40e-17] + [23.8636067095598007 +/- 9.03e-17]im
 ```

@@ -1,5 +1,8 @@
 # Arblib.jl
 
+[![][docs-stable-img]][docs-stable-url]
+[![][docs-dev-img]][docs-dev-url]
+
 This package is a thin, efficient wrapper around [Arb](http://arblib.org) - a C library for arbitrary-precision ball arithmetic.
 
 The package is currently in early development. More features and
@@ -254,3 +257,8 @@ Enabling a threaded version of flint can be done by setting the
 environment variable `NEMO_THREADED=1`. Note that this should be
 set before `Arblib.jl` is loaded. To set the actual number of threads,
 use `Arblib.flint_set_num_threads($numberofthreads)`.
+
+[docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
+[docs-dev-url]: https://Kalmarek.github.io/Arblib.jl/dev/
+[docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
+[docs-stable-url]: https://Kalmarek.github.io/Arblib.jl/stable

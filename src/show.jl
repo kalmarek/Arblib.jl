@@ -128,6 +128,8 @@ for T in [
     :AcbVectorLike,
     :ArbMatrixLike,
     :AcbMatrixLike,
+    :ArbPolyLike,
+    :AcbPolyLike,
 ]
     @eval Base.show(io::IO, ::Type{$T}) = print(io, $(QuoteNode(T)))
 end

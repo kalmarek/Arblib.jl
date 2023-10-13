@@ -273,16 +273,48 @@ const MagOrRef = Union{Mag,MagRef}
 const ArfOrRef = Union{Arf,ArfRef}
 const ArbOrRef = Union{Arb,ArbRef}
 const AcbOrRef = Union{Acb,AcbRef}
+
+"""
+    MagLike = Union{Mag,MagRef,mag_struct,Ptr{mag_struct}}
+"""
 const MagLike = Union{Mag,MagRef,cstructtype(Mag),Ptr{cstructtype(Mag)}}
+"""
+    ArfLike = Union{Arf,ArfRef,arf_struct,Ptr{arf_struct}}}
+"""
 const ArfLike = Union{Arf,ArfRef,cstructtype(Arf),Ptr{cstructtype(Arf)}}
+"""
+    ArbLike = Union{Arb,ArbRef,arb_struct,Ptr{arb_struct}}}
+"""
 const ArbLike = Union{Arb,ArbRef,cstructtype(Arb),Ptr{cstructtype(Arb)}}
+"""
+    AcbLike = Union{Acb,AcbRef,acb_struct,Ptr{acb_struct}}}
+"""
 const AcbLike = Union{Acb,AcbRef,cstructtype(Acb),Ptr{cstructtype(Acb)}}
+"""
+    ArbVectorLike = Union{ArbVector,ArbRefVector,arb_vec_struct}
+"""
 const ArbVectorLike = Union{ArbVector,ArbRefVector,cstructtype(ArbVector)}
+"""
+    AcbVectorLike = Union{AcbVector,AcbRefVector,acb_vec_struct}
+"""
 const AcbVectorLike = Union{AcbVector,AcbRefVector,cstructtype(AcbVector)}
-const ArbMatrixLike = Union{ArbMatrix,ArbRefMatrix,cstructtype(ArbMatrix)}
-const AcbMatrixLike = Union{AcbMatrix,AcbRefMatrix,cstructtype(AcbMatrix)}
+"""
+    ArbPolyLike = Union{ArbPoly,ArbSeries,arb_poly_struct}
+"""
 const ArbPolyLike = Union{ArbPoly,ArbSeries,cstructtype(ArbPoly)}
+"""
+    AcbPolyLike = Union{AcbPoly,AcbSeries,acb_poly_struct}
+"""
 const AcbPolyLike = Union{AcbPoly,AcbSeries,cstructtype(AcbPoly)}
+"""
+    ArbMatrixLike = Union{ArbMatrix,ArbRefMatrix,arb_mat_struct)}
+"""
+const ArbMatrixLike = Union{ArbMatrix,ArbRefMatrix,cstructtype(ArbMatrix)}
+"""
+    AcbMatrixLike = Union{AcbMatrix,AcbRefMatrix,acb_mat_struct}
+"""
+const AcbMatrixLike = Union{AcbMatrix,AcbRefMatrix,cstructtype(AcbMatrix)}
+
 const ArbTypes = Union{
     Mag,
     MagRef,

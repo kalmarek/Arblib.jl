@@ -1,8 +1,25 @@
+"""
+    ArbFunction{T}(fname::String, args::Vector{Carg})
+
+Struct representing a C-function in the Arb library.
+"""
 struct ArbFunction{T}
     fname::String
     args::Vector{Carg}
 end
 
+"""
+    ArbFunction(str::AbstractString)
+
+Parse a string as an ArbFunction. The string should be as a function
+declaration in C. Note that note all types of function declarations
+are supported, only those which are relevant for the Arb library.
+
+```jldoctest
+julia> Arblib.ArbCall.ArbFunction("void arb_zero(arb_t x)")
+Arblib.ArbCall.ArbFunction{Nothing}("arb_zero", Arblib.ArbCall.Carg[Arblib.ArbCall.Carg{Arb}(:x, false)])
+```
+"""
 function ArbFunction(str::AbstractString)
     m = match(r"(?<returntype>\w+(\s\*)?)\s+(?<arbfunction>[\w_]+)\((?<args>.*)\)", str)
     isnothing(m) &&
@@ -119,6 +136,11 @@ function jlargs(af::ArbFunction; argument_detection::Bool = true)
     return args, kwargs
 end
 
+"""
+    jlcode(af::ArbFunction, jl_fname = jlfname(af))
+
+Generate the Julia code for calling the Arb function from Julia.
+"""
 function jlcode(af::ArbFunction, jl_fname = jlfname(af))
     jl_args, jl_kwargs = jlargs(af, argument_detection = true)
     jl_full_args, _ = jlargs(af, argument_detection = false)
@@ -156,6 +178,19 @@ function jlcode(af::ArbFunction, jl_fname = jlfname(af))
     end
 end
 
+"""
+    @arbcall_str str
+
+Parse a string as an [`Arblib.ArbCall.ArbFunction`](@ref), generate
+the code for a corresponding method with
+[`Arblib.ArbCall.jlcode`](@ref) and evaluate the code.
+
+For example
+```
+arbcall"void arb_zero(arb_t x)"
+```
+defines the method `zero!(x::ArbLike)`.
+"""
 macro arbcall_str(str)
     af = ArbFunction(str)
     return esc(jlcode(af))
