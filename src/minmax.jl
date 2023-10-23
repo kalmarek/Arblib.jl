@@ -7,7 +7,14 @@ for T in (ArfOrRef, ArbOrRef)
         Arblib.min!($(_nonreftype(T))(prec = _precision(x, y)), x, y)
     @eval Base.max(x::$T, y::$T) =
         Arblib.max!($(_nonreftype(T))(prec = _precision(x, y)), x, y)
-    @eval Base.minmax(x::$T, y::$T) = (min(x, y), max(x, y))
+end
+
+Base.minmax(x::ArfOrRef, y::ArfOrRef) = (min(x, y), max(x, y))
+function Base.minmax(x::ArbOrRef, y::ArbOrRef)
+    z1 = Arb(prec = _precision(x, y))
+    z2 = Arb(prec = _precision(x, y))
+    minmax!(z1, z2, x, y)
+    return z1, z2
 end
 
 ### minimum and maximum
