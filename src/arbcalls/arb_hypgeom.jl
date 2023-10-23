@@ -41,11 +41,11 @@ arbcall"void arb_hypgeom_m(arb_t res, const arb_t a, const arb_t b, const arb_t 
 arbcall"void arb_hypgeom_1f1(arb_t res, const arb_t a, const arb_t b, const arb_t z, int regularized, slong prec)"
 arbcall"void arb_hypgeom_1f1_integration(arb_t res, const arb_t a, const arb_t b, const arb_t z, int regularized, slong prec)"
 arbcall"void arb_hypgeom_u(arb_t res, const arb_t a, const arb_t b, const arb_t z, slong prec)"
-arbcall"void arb_hypgeom_u_integration(arb_t res, const arb_t a, const arb_t b, const arb_t z, int regularized, slong prec)"
+arbcall"void arb_hypgeom_u_integration(arb_t res, const arb_t a, const arb_t b, const arb_t z, slong prec)"
 
 ### Gauss hypergeometric function
 arbcall"void arb_hypgeom_2f1(arb_t res, const arb_t a, const arb_t b, const arb_t c, const arb_t z, int regularized, slong prec)"
-arbcall"void arb_hypgeom_2f1_integration(arb_t res, const arb_t a, const arb_t b, const arb_t z, int regularized, slong prec)"
+arbcall"void arb_hypgeom_2f1_integration(arb_t res, const arb_t a, const arb_t b, const arb_t c, const arb_t z, int regularized, slong prec)"
 
 ### Error functions and Fresnel integrals
 arbcall"void arb_hypgeom_erf(arb_t res, const arb_t z, slong prec)"
@@ -146,7 +146,7 @@ arbcall"void arb_hypgeom_legendre_p_ui_deriv_bound(mag_t dp, mag_t dp2, ulong n,
 arbcall"void arb_hypgeom_legendre_p_ui_zero(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong K, slong prec)"
 arbcall"void arb_hypgeom_legendre_p_ui_one(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong K, slong prec)"
 arbcall"void arb_hypgeom_legendre_p_ui_asymp(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong K, slong prec)"
-arbcall"void arb_hypgeom_legendre_p_rec(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong prec)"
+arbcall"void arb_hypgeom_legendre_p_ui_rec(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong prec)"
 arbcall"void arb_hypgeom_legendre_p_ui(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong prec)"
 arbcall"void arb_hypgeom_legendre_p_ui_root(arb_t res, arb_t weight, ulong n, ulong k, slong prec)"
 

@@ -19,7 +19,7 @@
 #ni arbcall"void fmpz_add2_fmpz_si_inline(fmpz_t z, const fmpz_t x, const fmpz_t y, slong c)"
 #ni arbcall"mp_size_t _fmpz_size(const fmpz_t x)"
 #ni arbcall"slong _fmpz_sub_small(const fmpz_t x, const fmpz_t y)"
-#ni arbcall"slong _fmpz_set_si_small(fmpz_t x, slong v)"
+#ni arbcall"void _fmpz_set_si_small(fmpz_t x, slong v)"
 
 ### Low-level conversions
 #ni arbcall"void fmpz_set_mpn_large(fmpz_t z, mp_srcptr src, mp_size_t n, int negative)"

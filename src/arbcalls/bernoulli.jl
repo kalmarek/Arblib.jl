@@ -6,7 +6,7 @@
 #ni arbcall"void bernoulli_rev_init(bernoulli_rev_t iter, ulong n)"
 #ni arbcall"void bernoulli_rev_next(fmpz_t numer, fmpz_t denom, bernoulli_rev_t iter)"
 #ni arbcall"void bernoulli_rev_clear(bernoulli_rev_t iter)"
-#ni arbcall"void bernoulli_fmpq_vec_no_cache(fmpq_t * res, ulong a, slong num)"
+#ni arbcall"void bernoulli_fmpq_vec_no_cache(fmpq * res, ulong a, slong num)"
 
 ### Caching
 arbcall"void bernoulli_cache_compute(slong n)"
