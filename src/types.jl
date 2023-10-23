@@ -129,91 +129,223 @@ end
 
 """
     ArbVector <: DenseVector{Arb}
+    ArbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[])
+    ArbVector(v::ArbVectorLike; shallow::Bool = false, prec::Integer = precision(v))
+    ArbVector(v::AbstractVector; prec::Integer = _precision(v))
+
+The constructor with `n::Integer` returns a vector with `n` elements
+filled with zeros. The other two constructors returns a copy of the
+given vector. If `shallow = true` then the returned vector shares the
+underlying data with the input, mutating one of them mutates both.
+
+See also [`ArbRefVector`](@ref).
 """
 struct ArbVector <: DenseVector{Arb}
     arb_vec::arb_vec_struct
     prec::Int
+
+    function ArbVector(
+        v::arb_vec_struct;
+        shallow::Bool = false,
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        if shallow
+            return new(v, prec)
+        else
+            return set!(new(cstructtype(ArbVector)(v.n), prec), v, v.n)
+        end
+    end
 end
-ArbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-    ArbVector(arb_vec_struct(n), prec)
 
 """
     AcbVector <: DenseVector{Acb}
+    AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[])
+    AcbVector(v::AcbVectorLike; shallow::Bool = false, prec::Integer = precision(v))
+    AcbVector(v::AbstractVector; prec::Integer = _precision(v))
+
+The constructor with `n::Integer` returns a vector with `n` elements
+filled with zeros. The other two constructors returns a copy of the
+given vector. If `shallow = true` then the returned vector shares the
+underlying data with the input, mutating one of them mutates both.
+
+See also [`AcbRefVector`](@ref).
 """
 struct AcbVector <: DenseVector{Acb}
     acb_vec::acb_vec_struct
     prec::Int
+
+    function AcbVector(
+        v::acb_vec_struct;
+        shallow::Bool = false,
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        if shallow
+            return new(v, prec)
+        else
+            return set!(new(cstructtype(AcbVector)(v.n), prec), v, v.n)
+        end
+    end
 end
-AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-    AcbVector(acb_vec_struct(n), prec)
 
 """
     ArbMatrix <: DenseMatrix{Arb}
+    ArbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[])
+    ArbMatrix(A::ArbMatrixLike; shallow::Bool = false, prec::Integer = precision(v))
+    ArbMatrix(A::AbstractMatrix; prec::Integer = _precision(v))
+    ArbMatrix(v::AbstractVector; prec::Integer = _precision(v))
+
+The constructor with `r::Integer, c::Integer` returns a `r × c` filled
+with zeros. The other three constructors returns a copy of the given
+matrix or vector. If `shallow = true` then the returned matrix shares
+the underlying data with the input, mutating one of them mutates both.
+
+See also [`ArbRefMatrix`](@ref).
 """
 struct ArbMatrix <: DenseMatrix{Arb}
     arb_mat::arb_mat_struct
     prec::Int
+
+    function ArbMatrix(
+        A::arb_mat_struct;
+        shallow::Bool = false,
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        if shallow
+            return new(A, prec)
+        else
+            return set!(new(cstructtype(ArbMatrix)(A.r, A.c), prec), A)
+        end
+    end
 end
-ArbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-    ArbMatrix(arb_mat_struct(r, c), prec)
 
 """
     AcbMatrix <: DenseMatrix{Acb}
+    AcbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[])
+    AcbMatrix(A::AcbMatrixLike; shallow::Bool = false, prec::Integer = precision(v))
+    AcbMatrix(A::AbstractMatrix; prec::Integer = _precision(v))
+    AcbMatrix(v::AbstractVector; prec::Integer = _precision(v))
+
+The constructor with `r::Integer, c::Integer` returns a `r × c` filled
+with zeros. The other three constructors returns a copy of the given
+matrix or vector. If `shallow = true` then the returned matrix shares
+the underlying data with the input, mutating one of them mutates both.
+
+See also [`AcbRefMatrix`](@ref).
 """
 struct AcbMatrix <: DenseMatrix{Acb}
     acb_mat::acb_mat_struct
     prec::Int
+
+    function AcbMatrix(
+        A::acb_mat_struct;
+        shallow::Bool = false,
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        if shallow
+            return new(A, prec)
+        else
+            return set!(new(cstructtype(AcbMatrix)(A.r, A.c), prec), A)
+        end
+    end
 end
-AcbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-    AcbMatrix(acb_mat_struct(r, c), prec)
 
 """
     ArbRefVector <: DenseMatrix{ArbRef}
+
+Similar to [`ArbVector`](@ref) but indexing elements returns an
+`ArbRef` referencing the corresponding element instead of an `Arb`
+copy of the element. The constructors are the same as for
+`ArbVector`
 """
 struct ArbRefVector <: DenseVector{ArbRef}
     arb_vec::arb_vec_struct
     prec::Int
+
+    function ArbRefVector(
+        arb_vec::arb_vec_struct;
+        shallow::Bool = false,
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        if shallow
+            return new(arb_vec, prec)
+        else
+            return set!(new(arb_vec_struct(arb_vec.n), prec), arb_vec, arb_vec.n)
+        end
+    end
 end
-ArbRefVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-    ArbRefVector(arb_vec_struct(n), prec)
 
 """
     AcbRefVector <: DenseMatrix{AcbRef}
+
+Similar to [`AcbVector`](@ref) but indexing elements returns an
+`AcbRef` referencing the corresponding element instead of an `Acb`
+copy of the element. The constructors are the same as for
+`AcbVector`
 """
 struct AcbRefVector <: DenseVector{AcbRef}
     acb_vec::acb_vec_struct
     prec::Int
+
+    function AcbRefVector(
+        acb_vec::acb_vec_struct;
+        shallow::Bool = false,
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        if shallow
+            return new(acb_vec, prec)
+        else
+            return set!(new(acb_vec_struct(acb_vec.n), prec), acb_vec, acb_vec.n)
+        end
+    end
 end
-AcbRefVector(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-    AcbRefVector(acb_vec_struct(n), prec)
 
 """
     ArbRefMatrix <: DenseMatrix{ArbRef}
+
+Similar to [`ArbMatrix`](@ref) but indexing elements returns an
+`ArbRef` referencing the corresponding element instead of an `Arb`
+copy of the element. The constructors are the same as for
+`ArbMatrix`
 """
 struct ArbRefMatrix <: DenseMatrix{ArbRef}
     arb_mat::arb_mat_struct
     prec::Int
+
+    function ArbRefMatrix(
+        A::arb_mat_struct;
+        shallow::Bool = false,
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        if shallow
+            return new(A, prec)
+        else
+            return set!(new(cstructtype(ArbRefMatrix)(A.r, A.c), prec), A)
+        end
+    end
 end
-ArbRefMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-    ArbRefMatrix(arb_mat_struct(r, c), prec)
 
 """
     AcbRefMatrix <: DenseMatrix{AcbRef}
+
+Similar to [`AcbMatrix`](@ref) but indexing elements returns an
+`AcbRef` referencing the corresponding element instead of an `Acb`
+copy of the element. The constructors are the same as for
+`AcbMatrix
 """
 struct AcbRefMatrix <: DenseMatrix{AcbRef}
     acb_mat::acb_mat_struct
     prec::Int
-end
-AcbRefMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[]) =
-    AcbRefMatrix(acb_mat_struct(r, c), prec)
 
-# conversion between ref and non-ref arrays.
-for T in [:Arb, :Acb], A in [:Vector, :Matrix]
-    TA = Symbol(T, A)
-    TRefA = Symbol(T, :Ref, A)
-    @eval begin
-        $TRefA(M::$TA) = $TRefA(cstruct(M), precision(M))
-        $TA(M::$TRefA) = $TA(cstruct(M), precision(M))
+    function AcbRefMatrix(
+        A::acb_mat_struct;
+        shallow::Bool = false,
+        prec::Integer = DEFAULT_PRECISION[],
+    )
+        if shallow
+            return new(A, prec)
+        else
+            return set!(new(cstructtype(AcbRefMatrix)(A.r, A.c), prec), A)
+        end
     end
 end
 
@@ -273,6 +405,10 @@ const MagOrRef = Union{Mag,MagRef}
 const ArfOrRef = Union{Arf,ArfRef}
 const ArbOrRef = Union{Arb,ArbRef}
 const AcbOrRef = Union{Acb,AcbRef}
+const ArbVectorOrRef = Union{ArbVector,ArbRefVector}
+const AcbVectorOrRef = Union{AcbVector,AcbRefVector}
+const ArbMatrixOrRef = Union{ArbMatrix,ArbRefMatrix}
+const AcbMatrixOrRef = Union{AcbMatrix,AcbRefMatrix}
 
 """
     MagLike = Union{Mag,MagRef,mag_struct,Ptr{mag_struct}}

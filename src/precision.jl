@@ -54,13 +54,13 @@ end
 Base.setprecision(x::T, prec::Integer) where {T<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}} =
     T(x; prec)
 Base.setprecision(v::T, prec::Integer) where {T<:Union{ArbVector,ArbRefVector}} =
-    T(v.arb_vec, prec)
+    T(v.arb_vec; prec)
 Base.setprecision(v::T, prec::Integer) where {T<:Union{AcbVector,AcbRefVector}} =
-    T(v.acb_vec, prec)
+    T(v.acb_vec; prec)
 Base.setprecision(A::T, prec::Integer) where {T<:Union{ArbMatrix,ArbRefMatrix}} =
-    T(A.arb_mat, prec)
+    T(A.arb_mat; prec)
 Base.setprecision(A::T, prec::Integer) where {T<:Union{AcbMatrix,AcbRefMatrix}} =
-    T(A.acb_mat, prec)
+    T(A.acb_mat; prec)
 
 Base.setprecision(poly::ArbPoly, prec::Integer) = ArbPoly(poly.arb_poly; prec)
 Base.setprecision(series::ArbSeries, prec::Integer) =
