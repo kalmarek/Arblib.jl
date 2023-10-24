@@ -47,45 +47,21 @@ end
 Base.decompose(x::Union{MagOrRef,ArfOrRef}) = Base.decompose(cstruct(x))
 
 # Hashes of structs are computed using the method for the wrapping
-# type and then hashed together with a constant. Compare with
-# Base.h_imag
-if UInt === UInt64
-    const h_mag = 0x5d9b5fdb71940a8e
-    const h_arf = 0x9587d52d253e1dd1
-    const h_arb = 0x5209056683bc3f7a
-    const h_acb = 0x9ca782e3b04fab90
-    const h_arb_vec = 0x25e99ee61f9a8792
-    const h_acb_vec = 0x05f9e7ef121a65fe
-    const h_arb_poly = 0xd821aefd7c0bb7d4
-    const h_acb_poly = 0xed00c6f74947b740
-    const h_arb_mat = 0x1caddefdf435e388
-    const h_acb_mat = 0x68e0fd60c8bdd5d1
-else
-    const h_mag = 0x8fa1c5cc
-    const h_arf = 0x695f4554
-    const h_arb = 0x769d5541
-    const h_acb = 0x5eda1191
-    const h_arb_vec = 0x16f853e7
-    const h_acb_vec = 0x31dc4078
-    const h_arb_poly = 0x67d3910f
-    const h_acb_poly = 0x55bdb518
-    const h_arb_mat = 0xbe4a9fe3
-    const h_acb_mat = 0x04460a47
-end
-Base.hash(x::mag_struct, h::UInt) = hash(Mag(x), hash(h_mag, h))
-Base.hash(x::arf_struct, h::UInt) = hash(Arf(x), hash(h_arf, h))
-Base.hash(x::arb_struct, h::UInt) = hash(Arb(x), hash(h_arb, h))
-Base.hash(x::acb_struct, h::UInt) = hash(Acb(x), hash(h_acb, h))
+# type and then hashed together with their type
+Base.hash(x::mag_struct, h::UInt) = hash(Mag(x), hash(typeof(x), h))
+Base.hash(x::arf_struct, h::UInt) = hash(Arf(x), hash(typeof(x), h))
+Base.hash(x::arb_struct, h::UInt) = hash(Arb(x), hash(typeof(x), h))
+Base.hash(x::acb_struct, h::UInt) = hash(Acb(x), hash(typeof(x), h))
 Base.hash(x::arb_vec_struct, h::UInt) =
-    hash(ArbVector(x, shallow = true), hash(h_arb_vec, h))
+    hash(ArbVector(x, shallow = true), hash(typeof(x), h))
 Base.hash(x::acb_vec_struct, h::UInt) =
-    hash(AcbVector(x, shallow = true), hash(h_acb_vec, h))
-Base.hash(x::arb_poly_struct, h::UInt) = hash(ArbPoly(x), hash(h_arb_poly, h))
-Base.hash(x::acb_poly_struct, h::UInt) = hash(AcbPoly(x), hash(h_acb_poly, h))
+    hash(AcbVector(x, shallow = true), hash(typeof(x), h))
+Base.hash(x::arb_poly_struct, h::UInt) = hash(ArbPoly(x), hash(typeof(x), h))
+Base.hash(x::acb_poly_struct, h::UInt) = hash(AcbPoly(x), hash(typeof(x), h))
 Base.hash(x::arb_mat_struct, h::UInt) =
-    hash(ArbMatrix(x, shallow = true), hash(h_arb_mat, h))
+    hash(ArbMatrix(x, shallow = true), hash(typeof(x), h))
 Base.hash(x::acb_mat_struct, h::UInt) =
-    hash(AcbMatrix(x, shallow = true), hash(h_acb_mat, h))
+    hash(AcbMatrix(x, shallow = true), hash(typeof(x), h))
 
 # Hashes of Mag and Arf are computed using the Base implementation
 # which used Base.decompose defined above.
@@ -111,8 +87,6 @@ if UInt === UInt64
 else
     const h_poly = 0xa0617887
 end
-# arb_poly_struct and acb_poly_struct use default hash implementation,
-# this is okay since they don't implement an isequal method.
 function Base.hash(p::Union{ArbPoly,AcbPoly}, h::UInt)
     h = hash(h_poly, h)
     for i = 0:degree(p)
