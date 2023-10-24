@@ -15,8 +15,8 @@
             @test precision(Arf(zero(T), prec = 80)) == 80
         end
 
-        @test Arf(zero(Arf).arf) == zero(Arf)
-        @test precision(Arf(zero(Arf).arf, prec = 80)) == 80
+        @test Arf(0) == zero(Arf)
+        @test precision(Arf(zero(Arf), prec = 80)) == 80
 
         @test precision(Arf(Arf(prec = 80))) == 80
         @test precision(Arf(BigFloat(0, precision = 80))) == 80
@@ -36,11 +36,9 @@
         @test Arb((one(Arf), one(Arf))) == one(Arb)
         @test isequal(Arb((Arf(1), Arf(2))), Arb((1, 2)))
 
-        @test Arb(zero(Arb).arb) == Arb("0.0") == zero(Arb)
-        @test Arb(one(Arb).arb) == Arb("1.0") == one(Arb)
-        @test precision(Arb(zero(Arb).arb, prec = 80)) ==
-              precision(Arb("0.0", prec = 80)) ==
-              80
+        @test Arb(0) == Arb("0.0") == zero(Arb)
+        @test Arb(1) == Arb("1.0") == one(Arb)
+        @test precision(Arb(zero(Arb), prec = 80)) == precision(Arb("0.0", prec = 80)) == 80
 
         @test precision(Arb(Arf(prec = 80))) == 80
         @test precision(Arb(Arb(prec = 80))) == 80
@@ -88,14 +86,12 @@
             @test precision(Acb(Complex(zero(T), zero(T)), prec = 80)) == 80
         end
 
-        @test Acb(zero(Acb).acb) == Acb("0.0") == zero(Acb)
-        @test Acb(one(Acb).acb) == Acb("1.0") == one(Acb)
-        @test precision(Acb(zero(Acb).acb, prec = 80)) ==
-              precision(Acb("0.0", prec = 80)) ==
-              80
+        @test Acb(0) == Acb("0.0") == zero(Acb)
+        @test Acb(1) == Acb("1.0") == one(Acb)
+        @test precision(Acb("0.0", prec = 80)) == 80
 
-        @test imag(Acb(zero(Arb).arb, one(Arb).arb)) == imag(Acb("0.0", "1.0")) == one(Arb)
-        @test precision(Acb(zero(Arb).arb, zero(Arb).arb, prec = 80)) ==
+        @test imag(Acb(zero(Arb), one(Arb))) == imag(Acb("0.0", "1.0")) == one(Arb)
+        @test precision(Acb(zero(Arb), zero(Arb), prec = 80)) ==
               precision(Acb("0.0", "0.0", prec = 80)) ==
               80
 

@@ -18,9 +18,14 @@ struct Mag <: Real
 
     Mag() = new(mag_struct())
 
-    Mag(x::mag_struct) = new(mag_struct(x))
-
-    Mag(x::Union{Mag,Arf}) = new(mag_struct(cstruct(x)))
+    # Uses init_set! constructor. Argument type should be
+    # Union{MagLike,ArfLike} but those are only defined further down.
+    Mag(
+        x::Union{
+            Union{Mag,mag_struct,Ptr{mag_struct}},
+            Union{Arf,arf_struct,Ptr{arf_struct}},
+        },
+    ) = new(mag_struct(cstruct(x)))
 end
 
 """

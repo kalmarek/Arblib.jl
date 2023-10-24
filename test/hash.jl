@@ -30,15 +30,6 @@
         @test hash(Acb(π)) != hash(Acb(0, π))
     end
 
-    @testset "mag_struct, arf_struct, arb_struct, acb_struct" begin
-        # Internally uses the hashing for Mag, Arf, Arb and Acb so we
-        # only test that it calls that correctly
-        @test hash(Arblib.mag_struct()) == hash(zero(Mag))
-        @test hash(Arblib.arf_struct()) == hash(zero(Arf))
-        @test hash(Arblib.arb_struct()) == hash(zero(Arb))
-        @test hash(Arblib.acb_struct()) == hash(zero(Acb))
-    end
-
     @testset "Poly, Series" begin
         # Poly
         for T in (ArbPoly, AcbPoly)
@@ -89,6 +80,48 @@
 
             @test hash(T([1, 2, 3])) != hash(T([1, 2, 4]))
             @test hash(T([0])) != hash(T([1]))
+        end
+    end
+
+    @testset "struct" begin
+        let cstruct = Arblib.cstruct
+            # Test so that hashes for different types don't overlap and
+            # that hashes of same values are same
+            @test hash(cstruct(Mag(1))) == hash(cstruct(Mag(1))) != hash(Mag(1))
+            @test hash(cstruct(Arf(1 // 3))) ==
+                  hash(cstruct(Arf(1 // 3))) !=
+                  hash(Arf(1 // 3))
+            @test hash(cstruct(Arb(1 // 3))) ==
+                  hash(cstruct(Arb(1 // 3))) !=
+                  hash(Arb(1 // 3))
+            @test hash(cstruct(Acb(1 // 3))) ==
+                  hash(cstruct(Acb(1 // 3))) !=
+                  hash(Acb(1 // 3))
+            @test hash(cstruct(ArbVector([1]))) ==
+                  hash(cstruct(ArbVector([1]))) !=
+                  hash(ArbVector([1]))
+            @test hash(cstruct(AcbVector([1]))) ==
+                  hash(cstruct(AcbVector([1]))) !=
+                  hash(AcbVector([1]))
+            @test hash(cstruct(ArbPoly([1]))) ==
+                  hash(cstruct(ArbPoly([1]))) !=
+                  hash(ArbPoly([1]))
+            @test hash(cstruct(AcbPoly([1]))) ==
+                  hash(cstruct(AcbPoly([1]))) !=
+                  hash(AcbPoly([1]))
+            @test hash(cstruct(ArbMatrix([1]))) ==
+                  hash(cstruct(ArbMatrix([1]))) !=
+                  hash(ArbMatrix([1]))
+            @test hash(cstruct(AcbMatrix([1]))) ==
+                  hash(cstruct(AcbMatrix([1]))) !=
+                  hash(AcbMatrix([1]))
+
+            @test hash(cstruct(Mag())) != hash(cstruct(Arf()))
+            @test hash(cstruct(Arf())) != hash(cstruct(Arb()))
+            @test hash(cstruct(Arb())) != hash(cstruct(Acb()))
+            @test hash(cstruct(ArbVector([1]))) != hash(cstruct(AcbVector([1])))
+            @test hash(cstruct(ArbPoly([1]))) != hash(cstruct(AcbPoly([1])))
+            @test hash(cstruct(ArbMatrix([1]))) != hash(cstruct(AcbMatrix([1])))
         end
     end
 end

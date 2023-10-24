@@ -11,7 +11,7 @@ arf_get_fmpz_2exp. For Mag the mantissa is stored directly in the
 struct as a UInt and the exponent as a fmpz.
 =#
 function Base.decompose(x::Union{mag_struct,Ptr{mag_struct}})::Tuple{UInt,BigInt,Int}
-    isinf(x) && return 1, 0, 0
+    Arblib.is_inf(x) && return 1, 0, 0
 
     if x isa Ptr{mag_struct}
         x = unsafe_load(x)
@@ -27,8 +27,8 @@ function Base.decompose(x::Union{mag_struct,Ptr{mag_struct}})::Tuple{UInt,BigInt
 end
 
 function Base.decompose(x::Union{arf_struct,Ptr{arf_struct}})::Tuple{BigInt,BigInt,Int}
-    isnan(x) && return 0, 0, 0
-    isinf(x) && return ifelse(x < 0, -1, 1), 0, 0
+    Arblib.is_nan(x) && return 0, 0, 0
+    Arblib.is_inf(x) && return ifelse(Arblib.cmp(x, 0) < 0, -1, 1), 0, 0
 
     num = fmpz_struct()
     pow = fmpz_struct()
@@ -47,16 +47,26 @@ end
 Base.decompose(x::Union{MagOrRef,ArfOrRef}) = Base.decompose(cstruct(x))
 
 # Hashes of structs are computed using the method for the wrapping
-# type
-Base.hash(x::mag_struct, h::UInt) = hash(Mag(x), h)
-Base.hash(x::arf_struct, h::UInt) = hash(Arf(x), h)
-Base.hash(x::arb_struct, h::UInt) = hash(Arb(x), h)
-Base.hash(x::acb_struct, h::UInt) = hash(Acb(x), h)
+# type and then hashed together with their type
+Base.hash(x::mag_struct, h::UInt) = hash(Mag(x), hash(typeof(x), h))
+Base.hash(x::arf_struct, h::UInt) = hash(Arf(x), hash(typeof(x), h))
+Base.hash(x::arb_struct, h::UInt) = hash(Arb(x), hash(typeof(x), h))
+Base.hash(x::acb_struct, h::UInt) = hash(Acb(x), hash(typeof(x), h))
+Base.hash(x::arb_vec_struct, h::UInt) =
+    hash(ArbVector(x, shallow = true), hash(typeof(x), h))
+Base.hash(x::acb_vec_struct, h::UInt) =
+    hash(AcbVector(x, shallow = true), hash(typeof(x), h))
+Base.hash(x::arb_poly_struct, h::UInt) = hash(ArbPoly(x), hash(typeof(x), h))
+Base.hash(x::acb_poly_struct, h::UInt) = hash(AcbPoly(x), hash(typeof(x), h))
+Base.hash(x::arb_mat_struct, h::UInt) =
+    hash(ArbMatrix(x, shallow = true), hash(typeof(x), h))
+Base.hash(x::acb_mat_struct, h::UInt) =
+    hash(AcbMatrix(x, shallow = true), hash(typeof(x), h))
 
 # Hashes of Mag and Arf are computed using the Base implementation
 # which used Base.decompose defined above.
 
-function Base.hash(x::ArbLike, h::UInt)
+function Base.hash(x::ArbOrRef, h::UInt)
     # If the radius is zero we compute the hash using only the
     # midpoint, so that we get identical hashes as for the
     # corresponding Arf
@@ -66,7 +76,7 @@ function Base.hash(x::ArbLike, h::UInt)
     return hash(Arblib.midref(x), h)
 end
 
-function Base.hash(z::AcbLike, h::UInt)
+function Base.hash(z::AcbOrRef, h::UInt)
     # Same as for Complex{T}
     hash(realref(z), h ⊻ hash(imagref(z), Base.h_imag) ⊻ Base.hash_0_imag)
 end
@@ -77,8 +87,6 @@ if UInt === UInt64
 else
     const h_poly = 0xa0617887
 end
-# arb_poly_struct and acb_poly_struct use default hash implementation,
-# this is okay since they don't implement an isequal method.
 function Base.hash(p::Union{ArbPoly,AcbPoly}, h::UInt)
     h = hash(h_poly, h)
     for i = 0:degree(p)

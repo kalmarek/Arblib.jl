@@ -2,7 +2,9 @@ export setball
 
 # Mag
 Mag(x) = set!(Mag(), x)
-Mag(x::Union{MagRef,ArfRef}) = Mag(mag_struct(cstruct(x)))
+# Can't be defined inside Mag due to MagRef and ArfRef being defined
+# later.
+Mag(x::Union{MagRef,ArfRef}) = Mag(cstruct(x))
 Mag(x, y) = set!(Mag(), x, y)
 
 # Arf
@@ -43,17 +45,8 @@ function setball(::Type{Arb}, m, r; prec = _precision(m))
 end
 
 ## Acb
-Acb(
-    x::Union{Real,arb_struct,arf_struct,Tuple{<:Real,<:Real}};
-    prec::Integer = _precision(x),
-) = set!(Acb(; prec), x)
-Acb(
-    re::Union{Real,arb_struct,arf_struct,Tuple{<:Real,<:Real}},
-    im::Union{Real,arb_struct,arf_struct,Tuple{<:Real,<:Real}};
-    prec::Integer = max(_precision(re), _precision(im)),
-) = set!(Acb(; prec), re, im)
-
-Acb(z::Union{AcbLike,Complex}; prec::Integer = _precision(z)) = set!(Acb(; prec), z)
+Acb(z; prec::Integer = _precision(z)) = set!(Acb(; prec), z)
+Acb(re, im; prec::Integer = max(_precision(re), _precision(im))) = set!(Acb(; prec), re, im)
 # disambiguation
 Acb(x::Acb; prec::Integer = precision(x)) = set!(Acb(; prec), x)
 
@@ -76,18 +69,18 @@ end
 Base.Int(x::ArfOrRef; rnd::Union{arb_rnd,RoundingMode} = RoundNearest) =
     is_int(x) ? get_si(x, rnd) : throw(InexactError(:Int64, Int64, x))
 
-Base.Float64(x::MagLike) = get(x)
-Base.Float64(x::ArfLike; rnd::Union{arb_rnd,RoundingMode} = RoundNearest) = get_d(x, rnd)
-Base.Float64(x::ArbLike) = Float64(midref(x))
+Base.Float64(x::MagOrRef) = get(x)
+Base.Float64(x::ArfOrRef; rnd::Union{arb_rnd,RoundingMode} = RoundNearest) = get_d(x, rnd)
+Base.Float64(x::ArbOrRef) = Float64(midref(x))
 
-Base.ComplexF64(z::AcbLike) = Complex(Float64(realref(z)), Float64(imagref(z)))
+Base.ComplexF64(z::AcbOrRef) = Complex(Float64(realref(z)), Float64(imagref(z)))
 
-function Base.BigFloat(x::Union{Arf,ArfRef})
+function Base.BigFloat(x::ArfOrRef)
     y = BigFloat(; precision = precision(x))
     get!(y, x)
     return y
 end
-Base.BigFloat(x::Union{Arb,ArbRef}) = BigFloat(midref(x))
+Base.BigFloat(x::ArbOrRef) = BigFloat(midref(x))
 
 Base.zero(::Union{Mag,Type{Mag}}) = Mag(UInt64(0))
 Base.one(::Union{Mag,Type{Mag}}) = Mag(UInt64(1))

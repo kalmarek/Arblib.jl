@@ -52,7 +52,7 @@ Base.getindex(p::Union{Poly,Series}, I::AbstractRange{<:Integer}) = [p[i] for i 
 
 Base.@propagate_inbounds function Base.setindex!(
     p::Union{ArbPoly,ArbSeries},
-    x::Union{ArbLike,_BitSigned},
+    x::Union{ArbOrRef,_BitSigned},
     i::Integer,
 )
     @boundscheck checkbounds(p, i)
@@ -62,7 +62,7 @@ end
 
 Base.@propagate_inbounds function Base.setindex!(
     p::Union{AcbPoly,AcbSeries},
-    x::AcbLike,
+    x::AcbOrRef,
     i::Integer,
 )
     @boundscheck checkbounds(p, i)
@@ -362,7 +362,7 @@ end
 ##
 
 for (T, Tel, Tel_inplace) in [
-    (Union{ArbPoly,ArbSeries}, Real, Union{ArbOrRef,ArfLike,Unsigned,Integer}),
+    (Union{ArbPoly,ArbSeries}, Real, Union{ArbOrRef,ArfOrRef,Unsigned,Integer}),
     (Union{AcbPoly,AcbSeries}, Number, Union{AcbOrRef,ArbOrRef,Unsigned,Integer}),
 ]
     # Since we use inplace methods we need to manually normalise the

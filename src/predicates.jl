@@ -1,6 +1,6 @@
 for (T, funcpairs) in (
     (
-        MagLike,
+        MagOrRef,
         (
             (:(Base.isfinite), :is_finite),
             (:(Base.isinf), :is_inf),
@@ -9,7 +9,7 @@ for (T, funcpairs) in (
         ),
     ),
     (
-        ArfLike,
+        ArfOrRef,
         (
             (:(Base.isfinite), :is_finite),
             (:(Base.isinf), :is_inf),
@@ -24,7 +24,7 @@ for (T, funcpairs) in (
         ),
     ),
     (
-        ArbLike,
+        ArbOrRef,
         (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
@@ -39,7 +39,7 @@ for (T, funcpairs) in (
         ),
     ),
     (
-        AcbLike,
+        AcbOrRef,
         (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
@@ -51,9 +51,9 @@ for (T, funcpairs) in (
             (:containsint, :contains_int),
         ),
     ),
-    (ArbVectorLike, ((:(Base.isfinite), :is_finite), (:(Base.iszero), :is_zero))),
+    (ArbVectorOrRef, ((:(Base.isfinite), :is_finite), (:(Base.iszero), :is_zero))),
     (
-        AcbVectorLike,
+        AcbVectorOrRef,
         (
             (:(Base.isfinite), :is_finite),
             (:(Base.isreal), :is_real),
@@ -81,7 +81,7 @@ for (T, funcpairs) in (
         ),
     ),
     (
-        ArbMatrixLike,
+        ArbMatrixOrRef,
         (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
@@ -90,7 +90,7 @@ for (T, funcpairs) in (
         ),
     ),
     (
-        AcbMatrixLike,
+        AcbMatrixOrRef,
         (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
@@ -125,7 +125,7 @@ function Base.isfinite(p::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries})
     return true
 end
 
-for ArbT in (ArfLike, ArbLike, AcbLike)
+for ArbT in (ArfOrRef, ArbOrRef, AcbOrRef)
     @eval begin
         Base.isequal(y::$ArbT, x::$ArbT) = !iszero(equal(x, y))
         # Comparison of non-floating point values should use ==
@@ -133,28 +133,28 @@ for ArbT in (ArfLike, ArbLike, AcbLike)
         Base.:(==)(x::$ArbT, y::Integer) = !iszero(equal(x, y))
     end
 end
-Base.:(==)(x::MagLike, y::MagLike) = !iszero(equal(x, y))
-Base.isless(x::MagLike, y::MagLike) = cmp(x, y) < 0
-Base.:(<)(x::MagLike, y::MagLike) = cmp(x, y) < 0
-Base.:(<=)(x::MagLike, y::MagLike) = cmp(x, y) <= 0
+Base.:(==)(x::MagOrRef, y::MagOrRef) = !iszero(equal(x, y))
+Base.isless(x::MagOrRef, y::MagOrRef) = cmp(x, y) < 0
+Base.:(<)(x::MagOrRef, y::MagOrRef) = cmp(x, y) < 0
+Base.:(<=)(x::MagOrRef, y::MagOrRef) = cmp(x, y) <= 0
 
-for jltype in (ArfLike, Integer, Unsigned, Base.GMP.CdoubleMax)
+for jltype in (ArfOrRef, Integer, Unsigned, Base.GMP.CdoubleMax)
     @eval begin
-        Base.isless(x::ArfLike, y::$jltype) = (isnan(y) && !isnan(x)) || cmp(x, y) < 0
-        Base.:(<)(x::ArfLike, y::$jltype) = !isnan(x) && !isnan(y) && cmp(x, y) < 0
-        Base.:(<=)(x::ArfLike, y::$jltype) = (x < y) || isequal(x, y)
+        Base.isless(x::ArfOrRef, y::$jltype) = (isnan(y) && !isnan(x)) || cmp(x, y) < 0
+        Base.:(<)(x::ArfOrRef, y::$jltype) = !isnan(x) && !isnan(y) && cmp(x, y) < 0
+        Base.:(<=)(x::ArfOrRef, y::$jltype) = (x < y) || isequal(x, y)
     end
 end
 
 for (ArbT, args) in (
-    (ArfLike, ((:(==), :equal),)),
+    (ArfOrRef, ((:(==), :equal),)),
     (
-        ArbLike,
+        ArbOrRef,
         ((:(==), :eq), (:(!=), :ne), (:(<), :lt), (:(<=), :le), (:(>), :gt), (:(>=), :ge)),
     ),
-    (AcbLike, ((:(==), :eq), (:(!=), :ne))),
-    (ArbMatrixLike, ((:(==), :eq), (:(!=), :ne))),
-    (AcbMatrixLike, ((:(==), :eq), (:(!=), :ne))),
+    (AcbOrRef, ((:(==), :eq), (:(!=), :ne))),
+    (ArbMatrixOrRef, ((:(==), :eq), (:(!=), :ne))),
+    (AcbMatrixOrRef, ((:(==), :eq), (:(!=), :ne))),
 )
     for (jlf, arbf) in args
         @eval begin
@@ -166,12 +166,12 @@ end
 # Julia Base defines special methods for comparison between Rational
 # and AbstractFloat which do not work well for Arb. We redefine these
 # methods to just convert the rational number to Arb.
-Base.:<(x::Arb, y::Rational) = x < convert(Arb, y)
-Base.:<(x::Rational, y::Arb) = convert(Arb, x) < y
-Base.:<=(x::Arb, y::Rational) = x <= convert(Arb, y)
-Base.:<=(x::Rational, y::Arb) = convert(Arb, x) <= y
-Base.cmp(x::Arb, y::Rational) = Base.cmp(x, convert(Arb, y))
-Base.cmp(x::Rational, y::Arb) = Base.cmp(convert(Arb, x), y)
+Base.:<(x::ArbOrRef, y::Rational) = x < convert(Arb, y)
+Base.:<(x::Rational, y::ArbOrRef) = convert(Arb, x) < y
+Base.:<=(x::ArbOrRef, y::Rational) = x <= convert(Arb, y)
+Base.:<=(x::Rational, y::ArbOrRef) = convert(Arb, x) <= y
+Base.cmp(x::ArbOrRef, y::Rational) = Base.cmp(x, convert(Arb, y))
+Base.cmp(x::Rational, y::ArbOrRef) = Base.cmp(convert(Arb, x), y)
 
 Base.isequal(x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}} = !iszero(equal(x, y))
 Base.isequal(x::T, y::T) where {T<:Union{ArbSeries,AcbSeries}} =
@@ -191,4 +191,17 @@ end
 
 function Base.:(!=)(x::T, y::T) where {T<:Union{ArbSeries,AcbSeries}}
     return (degree(x) != degree(y)) || iszero(overlaps(x, y))
+end
+
+# For structs we only have to define == since isequals defaults to
+# this for non-number types. Note that in this case we always compare
+# them using Arblib.equal.
+Base.:(==)(x::T, y::T) where {T<:ArbStructTypes} = equal(x, y)
+
+function Base.:(==)(x::T, y::T) where {T<:Union{arb_vec_struct,acb_vec_struct}}
+    x.n == y.n || return false
+    for i = 1:x.n
+        equal(x[i], y[i]) || return false
+    end
+    return true
 end

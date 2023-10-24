@@ -99,7 +99,7 @@ function set!(res::ArbLike, (a, b)::Tuple{<:Real,<:Real}; prec::Integer = precis
 end
 
 # Acb
-function set!(res::AcbLike, x::Union{Real,arf_struct,mag_struct,Tuple{<:Real,<:Real}})
+function set!(res::AcbLike, x::Union{Real,MagLike,ArfLike,Tuple{<:Real,<:Real}})
     set!(realref(res), x)
     zero!(imagref(res))
     return res
@@ -115,8 +115,8 @@ end
 # Doesn't support aliasing between realref(res) and im
 function set!(
     res::AcbLike,
-    re::Union{Real,arb_struct,arf_struct,mag_struct,Tuple{<:Real,<:Real}},
-    im::Union{Real,arb_struct,arf_struct,mag_struct,Tuple{<:Real,<:Real}},
+    re::Union{Real,MagLike,ArfLike,ArbLike,Tuple{<:Real,<:Real}},
+    im::Union{Real,MagLike,ArfLike,ArbLike,Tuple{<:Real,<:Real}},
 )
     set!(realref(res), re)
     set!(imagref(res), im)
