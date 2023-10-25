@@ -140,11 +140,14 @@ balls.
 """
 union(x::ArbOrRef, y::ArbOrRef) = union!(Arb(prec = _precision(x, y)), x, y)
 union(x::AcbOrRef, y::AcbOrRef) = union!(Acb(prec = _precision(x, y)), x, y)
-# TODO: Could be optimized, both for performance and enclosure
-union(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...) =
-    foldl(union, xs, init = union(union(x, y), z))
-union(x::AcbOrRef, y::AcbOrRef, z::AcbOrRef, xs...) =
-    foldl(union, xs, init = union(union(x, y), z))
+function union(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...)
+    res = union(y, z, xs...)
+    return union!(res, res, x)
+end
+function union(x::AcbOrRef, y::AcbOrRef, z::AcbOrRef, xs...)
+    res = union(y, z, xs...)
+    return union!(res, res, x)
+end
 
 """
     intersection(x::ArbOrRef, y::ArbOrRef)
@@ -160,16 +163,19 @@ all given balls. If all the balls do not overlap throws an
 `ArgumentError`.
 """
 function intersection(x::ArbOrRef, y::ArbOrRef)
-    overlaps(x, y) ||
-        throw(ArgumentError("intersection of non-intersecting balls not allowed"))
     res = Arb(prec = _precision(x, y))
-    intersection!(res, x, y)
+    sucess = intersection!(res, x, y)
+    iszero(sucess) &&
+        throw(ArgumentError("intersection of non-intersecting balls not allowed"))
     return res
 end
-# TODO: Could be optimized, both for performance and enclosure
-intersection(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...) =
-    foldl(intersection, xs, init = intersection(intersection(x, y), z))
-
+function intersection(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...)
+    res = intersection(y, z, xs...)
+    sucess = intersection!(res, res, x)
+    iszero(sucess) &&
+        throw(ArgumentError("intersection of non-intersecting balls not allowed"))
+    return res
+end
 
 """
     add_error(x, err)
