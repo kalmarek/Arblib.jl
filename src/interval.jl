@@ -138,28 +138,28 @@ getball(::Type{Arb}, x::ArbOrRef) = (Arb(midref(x)), Arb(radref(x), prec = preci
 `union(x, y, z...)` returns a ball containing the union of all given
 balls.
 """
-Base.union(x::ArbOrRef, y::ArbOrRef) = union!(Arb(prec = _precision(x, y)), x, y)
-Base.union(x::AcbOrRef, y::AcbOrRef) = union!(Acb(prec = _precision(x, y)), x, y)
+union(x::ArbOrRef, y::ArbOrRef) = union!(Arb(prec = _precision(x, y)), x, y)
+union(x::AcbOrRef, y::AcbOrRef) = union!(Acb(prec = _precision(x, y)), x, y)
 # TODO: Could be optimized, both for performance and enclosure
-Base.union(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...) =
+union(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...) =
     foldl(union, xs, init = union(union(x, y), z))
-Base.union(x::AcbOrRef, y::AcbOrRef, z::AcbOrRef, xs...) =
+union(x::AcbOrRef, y::AcbOrRef, z::AcbOrRef, xs...) =
     foldl(union, xs, init = union(union(x, y), z))
 
 """
-    intersect(x::ArbOrRef, y::ArbOrRef)
-    intersect(x::AcbOrRef, y::AcbOrRef)
-    intersect(x, y, z...)
+    intersection(x::ArbOrRef, y::ArbOrRef)
+    intersection(x::AcbOrRef, y::AcbOrRef)
+    intersection(x, y, z...)
 
-`intersect(x, y)` returns a ball containing the intersection of `x`
+`intersection(x, y)` returns a ball containing the intersection of `x`
 and `y`. If `x` and `y` do not overlap (as given by `overlaps(a, b)`)
 throws an `ArgumentError`.
 
-`intersect(x, y, z...)` returns a ball containing the intersection of
+`intersection(x, y, z...)` returns a ball containing the intersection of
 all given balls. If all the balls do not overlap throws an
 `ArgumentError`.
 """
-function Base.intersect(x::ArbOrRef, y::ArbOrRef)
+function intersection(x::ArbOrRef, y::ArbOrRef)
     overlaps(x, y) ||
         throw(ArgumentError("intersection of non-intersecting balls not allowed"))
     res = Arb(prec = _precision(x, y))
@@ -167,8 +167,9 @@ function Base.intersect(x::ArbOrRef, y::ArbOrRef)
     return res
 end
 # TODO: Could be optimized, both for performance and enclosure
-Base.intersect(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...) =
-    foldl(intersect, xs, init = intersect(intersect(x, y), z))
+intersection(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...) =
+    foldl(intersection, xs, init = intersection(intersection(x, y), z))
+
 
 """
     add_error(x, err)

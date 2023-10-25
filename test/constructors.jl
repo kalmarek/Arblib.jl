@@ -66,8 +66,8 @@
         @test isone(Arblib.setball(Arb, 1 // 1, 0))
 
         @test getinterval(Arblib.setball(Arb, 2, 1)) == (1, 3)
-        @test contains(Arblib.setball(Arb, 0.5, 0.5), 0)
-        @test contains(Arblib.setball(Arb, 0.5, 0.5), 1)
+        @test Arblib.contains(Arblib.setball(Arb, 0.5, 0.5), 0)
+        @test Arblib.contains(Arblib.setball(Arb, 0.5, 0.5), 1)
 
         @test precision(Arblib.setball(Arb, Arf(prec = 80), 0)) == 80
         @test precision(Arblib.setball(Arb, Arf(prec = 90), 0, prec = 80)) == 80

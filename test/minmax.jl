@@ -33,12 +33,12 @@
         end
 
         A = [Arb((i, i + 1)) for i = 0:20]
-        @test contains(minimum(A), Arb((0, 1)))
-        @test contains(minimum(reverse(A)), Arb((0, 1)))
-        @test contains(maximum(A), Arb((20, 21)))
-        @test contains(maximum(reverse(A)), Arb((20, 21)))
-        @test all(contains.(extrema(A), (Arb((0, 1)), Arb((20, 21)))))
-        @test all(contains.(extrema(reverse(A)), (Arb((0, 1)), Arb((20, 21)))))
+        @test Arblib.contains(minimum(A), Arb((0, 1)))
+        @test Arblib.contains(minimum(reverse(A)), Arb((0, 1)))
+        @test Arblib.contains(maximum(A), Arb((20, 21)))
+        @test Arblib.contains(maximum(reverse(A)), Arb((20, 21)))
+        @test all(Arblib.contains.(extrema(A), (Arb((0, 1)), Arb((20, 21)))))
+        @test all(Arblib.contains.(extrema(reverse(A)), (Arb((0, 1)), Arb((20, 21)))))
 
         # Fails in Julia version < 1.8 with default implementation due
         # to short circuiting in Base.mapreduce_impl
@@ -63,31 +63,31 @@
         # Fails with default implementation due to Base._fast
         #A = [Arb(0); [setball(Arb, 0, i) for i in reverse(0:257)]]
         A = [setball(Arb, 0, i) for i = 0:257]
-        @test contains(minimum(A), -257)
-        @test contains(maximum(A), 257)
-        @test contains(extrema(A)[1], -257)
-        @test contains(extrema(A)[2], 257)
-        @test contains(minimum(identity, A), -257)
-        @test contains(maximum(identity, A), 257)
-        @test contains(extrema(identity, A)[1], -257)
-        @test contains(extrema(identity, A)[2], 257)
+        @test Arblib.contains(minimum(A), -257)
+        @test Arblib.contains(maximum(A), 257)
+        @test Arblib.contains(extrema(A)[1], -257)
+        @test Arblib.contains(extrema(A)[2], 257)
+        @test Arblib.contains(minimum(identity, A), -257)
+        @test Arblib.contains(maximum(identity, A), 257)
+        @test Arblib.contains(extrema(identity, A)[1], -257)
+        @test Arblib.contains(extrema(identity, A)[2], 257)
 
         # Fails with default implementation due to both short circuit
         # and Base._fast
         A = [setball(Arb, 0, i) for i = 0:1000]
-        @test contains(minimum(A), -1000)
-        @test contains(maximum(A), 1000)
-        @test contains(extrema(A)[1], -1000)
-        @test contains(extrema(A)[2], 1000)
+        @test Arblib.contains(minimum(A), -1000)
+        @test Arblib.contains(maximum(A), 1000)
+        @test Arblib.contains(extrema(A)[1], -1000)
+        @test Arblib.contains(extrema(A)[2], 1000)
         if VERSION < v"1.8.0-rc3"
-            @test_broken contains(minimum(identity, A), -1000)
-            @test_broken contains(maximum(identity, A), 1000)
+            @test_broken Arblib.contains(minimum(identity, A), -1000)
+            @test_broken Arblib.contains(maximum(identity, A), 1000)
         else
-            @test contains(minimum(identity, A), -1000)
-            @test contains(maximum(identity, A), 1000)
+            @test Arblib.contains(minimum(identity, A), -1000)
+            @test Arblib.contains(maximum(identity, A), 1000)
         end
-        @test contains(extrema(identity, A)[1], -1000)
-        @test contains(extrema(identity, A)[2], 1000)
+        @test Arblib.contains(extrema(identity, A)[1], -1000)
+        @test Arblib.contains(extrema(identity, A)[2], 1000)
 
         @test !Base.isbadzero(min, zero(Mag))
         @test !Base.isbadzero(min, zero(Arf))
