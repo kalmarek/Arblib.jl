@@ -28,10 +28,11 @@ getball
 ```
 
 ## Union and intersection
-The `Base.union` and `Base.intersect` methods are overloaded to
-compute the union and intersection of balls.
+The methods `Arblib.union` and `Arblib.intersection` compute the union
+and intersection of balls. Note that these methods are not exported
+and different from `Base.union` and `Base.intersect`.
 
 ``` @docs
-union(::Arb, ::Arb)
-intersect(::Arb, ::Arb)
+Arblib.union
+Arblib.intersection
 ```

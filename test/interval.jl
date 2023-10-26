@@ -172,29 +172,29 @@
         xs = [Arb(i) for i in vcat(1:10, 10:-1:1)]
         xsc = Acb.(xs)
 
-        @test Arblib.contains(union(zero(Arb), one(Arb)), Arb(0.5))
-        @test Arblib.contains(union(zero(Acb), Acb(1, 1)), Acb(0.5, 0.5))
-        @test all(i -> Arblib.contains(union(xs...), i), 1:10)
-        @test all(i -> Arblib.contains(union(xsc...), i), Acb.(1:10))
+        @test Arblib.contains(Arblib.union(zero(Arb), one(Arb)), Arb(0.5))
+        @test Arblib.contains(Arblib.union(zero(Acb), Acb(1, 1)), Acb(0.5, 0.5))
+        @test all(i -> Arblib.contains(Arblib.union(xs...), i), 1:10)
+        @test all(i -> Arblib.contains(Arblib.union(xsc...), i), Acb.(1:10))
 
-        @test precision(union(Arb(prec = 80), Arb(prec = 90))) == 90
-        @test precision(union(Acb(prec = 80), Acb(prec = 90))) == 90
-        @test precision(union([Arb(prec = p) for p = 70:10:100]...)) == 100
-        @test precision(union([Acb(prec = p) for p = 70:10:100]...)) == 100
+        @test precision(Arblib.union(Arb(prec = 80), Arb(prec = 90))) == 90
+        @test precision(Arblib.union(Acb(prec = 80), Acb(prec = 90))) == 90
+        @test precision(Arblib.union([Arb(prec = p) for p = 70:10:100]...)) == 100
+        @test precision(Arblib.union([Acb(prec = p) for p = 70:10:100]...)) == 100
     end
 
-    @testset "intersect" begin
+    @testset "Arblib.intersection" begin
         xs = [Arb((0, i)) for i in vcat(1:10, 10:-1:1)]
 
-        @test Arblib.contains(intersect(Arb((0, 2)), Arb((1, 3))), Arb((1, 2)))
-        @test Arblib.contains(intersect(xs...), Arb((0, 1)))
-        @test !Arblib.contains(intersect(xs...), Arb(2))
+        @test Arblib.contains(Arblib.intersection(Arb((0, 2)), Arb((1, 3))), Arb((1, 2)))
+        @test Arblib.contains(Arblib.intersection(xs...), Arb((0, 1)))
+        @test !Arblib.contains(Arblib.intersection(xs...), Arb(2))
 
-        @test precision(intersect(Arb(prec = 80), Arb(prec = 90))) == 90
-        @test precision(intersect([Arb(prec = p) for p = 70:10:100]...)) == 100
+        @test precision(Arblib.intersection(Arb(prec = 80), Arb(prec = 90))) == 90
+        @test precision(Arblib.intersection([Arb(prec = p) for p = 70:10:100]...)) == 100
 
-        @test_throws ArgumentError intersect(Arb(1), Arb(2))
-        @test_throws ArgumentError intersect([xs; Arb(2)]...)
+        @test_throws ArgumentError Arblib.intersection(Arb(1), Arb(2))
+        @test_throws ArgumentError Arblib.intersection([xs; Arb(2)]...)
     end
 
     @testset "add_error" begin
