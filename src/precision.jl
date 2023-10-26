@@ -1,25 +1,46 @@
 const DEFAULT_PRECISION = Ref{Int}(256)
 
-"""
-    precision(<:Union{Arf, Arb, Acb, arf_struct, arb_struct, acb_struct})
-    precision(<:Ptr{<:Union{arf_struct, arb_struct, acb_struct}})
-    precision(x::Union{arf_struct, arb_struct, acb_struct})
-    precision(x::Ptr{<:Union{arf_struct, arb_struct, acb_struct}})
-Get the default precision (in bits) currently used for `Arblib` arithmetic.
-"""
-Base.precision(::Type{<:Union{ArbTypes,ArbStructTypes}}) = DEFAULT_PRECISION[]
-Base.precision(::Type{<:Ptr{<:ArbStructTypes}}) = DEFAULT_PRECISION[]
+if VERSION < v"1.8.0"
+    # Types
+    Base.precision(::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}}) =
+        DEFAULT_PRECISION[]
+    # Types not storing their precision
+    Base.precision(x::Union{ArbStructTypes,Ptr{<:ArbStructTypes}}) = DEFAULT_PRECISION[]
+    # Types storing their precision
+    Base.precision(x::ArbTypes) = x.prec
+    # Mag doesn't store a precision
+    Base.precision(::MagOrRef) = DEFAULT_PRECISION[]
+    # ArbSeries and AcbSeries don't store their precision directly
+    Base.precision(x::Union{ArbSeries,AcbSeries}) = precision(x.poly)
+else
+    # Since Julia 1.8.0 Base.precision calls Base._precision and by
+    # overloading that we automatically support giving base argument.
 
-Base.precision(x::ArbStructTypes) = DEFAULT_PRECISION[]
-Base.precision(x::Ptr{<:ArbStructTypes}) = DEFAULT_PRECISION[]
-Base.precision(x::ArbTypes) = x.prec
-# MagLike <: ArbTypes
-Base.precision(x::MagLike) = DEFAULT_PRECISION[]
-# disambiguation
-Base.precision(::MagOrRef) = DEFAULT_PRECISION[]
-# ArbSeries and AcbSeries don't store their precision
-Base.precision(x::Union{ArbSeries,AcbSeries}) = precision(x.poly)
+    # Types
+    Base._precision(::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}}) =
+        DEFAULT_PRECISION[]
+    # Types not storing their precision
+    Base._precision(::Union{ArbStructTypes,Ptr{<:ArbStructTypes}}) = DEFAULT_PRECISION[]
+    # Types storing their precision
+    Base._precision(x::ArbTypes) = x.prec
+    # Mag doesn't store a precision
+    Base._precision(::MagOrRef) = DEFAULT_PRECISION[]
+    # ArbSeries and AcbSeries don't store their precision directly
+    Base._precision(x::Union{ArbSeries,AcbSeries}) = Base._precision(x.poly)
 
+    # Base.precision only allows AbstractFloat, we want to be able to use
+    # all ArbLib types.
+    Base.precision(
+        T::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}};
+        base::Integer = 2,
+    ) = Base._precision(T, base)
+    Base.precision(
+        x::Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}};
+        base::Integer = 2,
+    ) = Base._precision(x, base)
+end
+
+# Used internally for determining the precision
 @inline _precision(x::Union{ArbTypes,BigFloat}) = precision(x)
 @inline _precision(z::Complex) = max(_precision(real(z)), _precision(imag(z)))
 @inline _precision(v::Union{Tuple,AbstractVector}) =
@@ -36,35 +57,29 @@ Base.precision(x::Union{ArbSeries,AcbSeries}) = precision(x.poly)
 @inline _precision(@nospecialize _) = DEFAULT_PRECISION[]
 
 """
-    setprecision(::Type{<:Union{Arf, Arb, Acb}}, precision::Int)
-Set the precision (in bits) to be used for `Arblib` arithmetic.
+    setprecision(::Type{<:ArbTypes}, precision::Int; base::Integer = 2)
+
+Set the precision (in bits) to be used for `Arblib` arithmetic. Note
+that the precision is shared for all types, it doesn't matter which
+type you use to set the precision.
+
+If `base` is specified, then the precision is the minimum required to
+give at least `precision` digits in the given `base`.
+
 !!! warning
     This function is not thread-safe. It will affect code running on all threads, but
     its behavior is undefined if called concurrently with computations that use the
     setting.
 """
-function Base.setprecision(::Type{<:ArbTypes}, precision::Integer)
-    if precision < 2
-        throw(DomainError(precision, "`precision` cannot be less than 2."))
-    end
-    DEFAULT_PRECISION[] = precision
+function Base.setprecision(::Type{<:ArbTypes}, precision::Integer; base::Integer = 2)
+    base > 1 || throw(DomainError(base, "`base` cannot be less than 2."))
+    precision > 1 || throw(DomainError(precision, "`precision` cannot be less than 2."))
+    DEFAULT_PRECISION[] = base == 2 ? precision : ceil(Int, precision * log2(base))
     return precision
 end
 
-Base.setprecision(x::T, prec::Integer) where {T<:Union{Arf,ArfRef,Arb,ArbRef,Acb,AcbRef}} =
-    T(x; prec)
-Base.setprecision(v::T, prec::Integer) where {T<:Union{ArbVector,ArbRefVector}} =
-    T(v.arb_vec; prec)
-Base.setprecision(v::T, prec::Integer) where {T<:Union{AcbVector,AcbRefVector}} =
-    T(v.acb_vec; prec)
-Base.setprecision(A::T, prec::Integer) where {T<:Union{ArbMatrix,ArbRefMatrix}} =
-    T(A.arb_mat; prec)
-Base.setprecision(A::T, prec::Integer) where {T<:Union{AcbMatrix,AcbRefMatrix}} =
-    T(A.acb_mat; prec)
-
-Base.setprecision(poly::ArbPoly, prec::Integer) = ArbPoly(poly.arb_poly; prec)
-Base.setprecision(series::ArbSeries, prec::Integer) =
-    ArbSeries(series, degree = degree(series); prec)
-Base.setprecision(poly::AcbPoly, prec::Integer) = AcbPoly(poly.acb_poly; prec)
-Base.setprecision(series::AcbSeries, prec::Integer) =
-    AcbSeries(series, degree = degree(series); prec)
+function Base.setprecision(x::T, precision::Integer; base::Integer = 2) where {T<:ArbTypes}
+    base > 1 || throw(DomainError(base, "`base` cannot be less than 2."))
+    precision > 1 || throw(DomainError(precision, "`precision` cannot be less than 2."))
+    return T(x, prec = base == 2 ? precision : ceil(Int, precision * log2(base)))
+end

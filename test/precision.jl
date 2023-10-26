@@ -2,72 +2,107 @@
     precdefault = 256
     prec = 64
 
-    @testset "precision: $T" for T in
-                                 (Arf, Arb, Acb, ArbPoly, ArbSeries, AcbPoly, AcbSeries)
-        @test precision(T()) == precdefault
-        @test precision(T(prec = prec)) == prec
+    types = (
+        Arf,
+        Arb,
+        Acb,
+        ArbPoly,
+        ArbSeries,
+        AcbPoly,
+        AcbSeries,
+        ArbVector,
+        ArbRefVector,
+        AcbVector,
+        AcbRefVector,
+        ArbMatrix,
+        ArbRefMatrix,
+        AcbMatrix,
+        AcbRefMatrix,
+    )
 
-        @test precision(Arblib.cstruct(T())) == precdefault
-        @test precision(Arblib.cstruct(T(prec = prec))) == precdefault
+    @testset "precision: $T" for T in types
+        if T <: AbstractVector
+            x = T(1)
+            y = T(1; prec)
+        elseif T <: AbstractMatrix
+            x = T(1, 1)
+            y = T(1, 1; prec)
+        else
+            x = T()
+            y = T(; prec)
+        end
+
+        @test precision(x) == precdefault
+        @test precision(y) == prec
+
+        @test precision(Arblib.cstruct(x)) == precdefault
+        @test precision(Arblib.cstruct(y)) == precdefault
 
         @test precision(T) == precdefault
         @test precision(Arblib.cstructtype(T)) == precdefault
         @test precision(Ptr{Arblib.cstructtype(T)}) == precdefault
 
-        if T in [ArbPoly, ArbSeries, AcbPoly, AcbSeries]
-            @test precision(T()[0]) == precdefault
-            @test precision(T(prec = prec)[0]) == prec
-        end
-    end
-
-    @testset "setprecision: $T" for T in
-                                    (Arf, Arb, Acb, ArbPoly, ArbSeries, AcbPoly, AcbSeries)
-        x = T()
-        @test precision(x) == precdefault
-
-        y = setprecision(x, prec)
-        @test precision(y) == prec
-        @test isequal(x, y)
-
-        if T in [Arf, Arb, Acb]
-            Arblib.set!(y, 2)
-            @test !isequal(x, y)
-        elseif T in [ArbPoly, ArbSeries, AcbPoly, AcbSeries]
+        if T <: Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}
+            @test precision(x[0]) == precdefault
             @test precision(y[0]) == prec
-            y[0] = eltype(T)(2)
-            @test !isequal(x, y)
+        elseif T <: AbstractVector
+            @test precision(x[1, 1]) == precdefault
+            @test precision(y[1, 1]) == prec
+        elseif T <: AbstractMatrix
+            @test precision(x[1, 1]) == precdefault
+            @test precision(y[1, 1]) == prec
+        end
+
+        if VERSION >= v"1.8.0"
+            @test precision(x, base = 4) == precdefault ÷ 2
+            @test precision(y, base = 4) == prec ÷ 2
+
+            @test precision(Arblib.cstruct(x), base = 4) == precdefault ÷ 2
+            @test precision(Arblib.cstruct(y), base = 4) == precdefault ÷ 2
+
+            @test precision(T, base = 4) == precdefault ÷ 2
+            @test precision(Arblib.cstructtype(T), base = 4) == precdefault ÷ 2
+            @test precision(Ptr{Arblib.cstructtype(T)}, base = 4) == precdefault ÷ 2
+        end
+
+        x2 = setprecision(x, prec)
+        @test precision(x2) == prec
+        @test isequal(x, x2)
+
+        # Check aliasing
+        if T <: Union{Arf,Arb,Acb}
+            x2[] = 2
+            @test !isequal(x, x2)
+        elseif T <: Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}
+            x2[0] = 2
+            @test !isequal(x, x2)
+        elseif T <: AbstractVector
+            x2[1] = 2
+            @test !isequal(x, x2)
+        elseif T <: AbstractMatrix
+            x2[1, 1] = 2
+            @test !isequal(x, x2)
+        end
+
+        if VERSION >= v"1.8.0"
+            x3 = setprecision(x, prec ÷ 2, base = 4)
+            @test precision(x3) == prec
+            @test isequal(x3, x)
         end
     end
 
-    @testset "setprecision 2" begin
+    @testset "setprecision do" begin
         x = Arb("0.1")
         @test precision(x) == 256
-        @test precision(Arb) == 256
         @test string(x) ==
               "[0.1000000000000000000000000000000000000000000000000000000000000000000000000000 +/- 1.95e-78]"
 
-        setprecision(Arb, 64)
-        @test precision(x) == 256
-        @test precision(Arb) == 64
-        y = Arb("0.1")
-        @test precision(y) == 64
-        @test string(y) == "[0.100000000000000000 +/- 1.22e-20]"
-
-        setprecision(Arb, 256)
-    end
-
-    @testset "precision change: $T" for T in
-                                        [ArbMatrix, ArbRefMatrix, AcbMatrix, AcbRefMatrix]
-        A = T(3, 3; prec = 96)
-        @test precision(A) == 96
-        @test precision(A[1, 1]) == 96
-        B = setprecision(A, 128)
-        @test precision(B) == 128
-        @test precision(B[1, 1]) == 128
-
-        # Check that they are not aliased
-        A[1, 1] = 1
-        @test B[1, 1] == 0
+        setprecision(Arb, 64) do
+            @test precision(x) == 256
+            y = Arb("0.1")
+            @test precision(y) == 64
+            @test string(y) == "[0.100000000000000000 +/- 1.22e-20]"
+        end
     end
 
     @testset "_precision" begin
