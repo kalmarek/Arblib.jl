@@ -31,11 +31,6 @@ macro libflint(function_name)
     return (:($function_name), libflint)
 end
 
-# For backwards compatibility with when Arb was a separate package
-macro libarb(function_name)
-    return (:($function_name), libflint)
-end
-
 const __isthreaded = Ref(false)
 
 function __init__()
