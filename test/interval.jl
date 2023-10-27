@@ -20,8 +20,8 @@
         x = zero(Arb)
         y = one(Arb)
 
-        @test midpoint(x) == midpoint(Arf, x) == midpoint(Arb, x) == zero(Arf)
-        @test midpoint(y) == midpoint(Arf, y) == midpoint(Arb, y) == one(Arf)
+        @test midpoint(x) == midpoint(Arf, x) == midpoint(Arb, x) == 0
+        @test midpoint(y) == midpoint(Arf, y) == midpoint(Arb, y) == 1
         @test midpoint(x) isa Arf
         @test midpoint(Arf, x) isa Arf
         @test midpoint(Arb, x) isa Arb
@@ -29,6 +29,28 @@
         @test precision(midpoint(Arb(prec = 80))) == 80
         @test precision(midpoint(Arf, Arb(prec = 80))) == 80
         @test precision(midpoint(Arb, Arb(prec = 80))) == 80
+
+        x = zero(Acb)
+        y = Acb(1, 1)
+
+        @test midpoint(x) == midpoint(Arf, x) == midpoint(Arb, x) == midpoint(Acb, x) == 0
+        @test midpoint(y) ==
+              midpoint(Arf, y) ==
+              midpoint(Arb, y) ==
+              midpoint(Acb, y) ==
+              1 + im
+        @test midpoint(x) isa Complex{Arf}
+        @test midpoint(Arf, x) isa Complex{Arf}
+        @test midpoint(Arb, x) isa Complex{Arb}
+        @test midpoint(Acb, x) isa Acb
+
+        @test precision(real(midpoint(Acb(prec = 80)))) == 80
+        @test precision(imag(midpoint(Acb(prec = 80)))) == 80
+        @test precision(real(midpoint(Arf, Acb(prec = 80)))) == 80
+        @test precision(imag(midpoint(Arf, Acb(prec = 80)))) == 80
+        @test precision(real(midpoint(Arb, Acb(prec = 80)))) == 80
+        @test precision(imag(midpoint(Arb, Acb(prec = 80)))) == 80
+        @test precision(midpoint(Acb, Acb(prec = 80))) == 80
     end
 
     @testset "lbound/ubound" begin

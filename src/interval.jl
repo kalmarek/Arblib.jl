@@ -23,6 +23,18 @@ midpoint(::Type{Arb}, x::ArbOrRef) = Arb(midref(x))
 midpoint(x::ArbOrRef) = midpoint(Arf, x)
 
 """
+    midpoint([T, ] z::AcbOrRef)
+
+Returns the midpoint of `z` as a `Complex{Arf}`. If `T` is given and
+equal to `Arf` or `Arb`, convert to `Complex{T}`. If `T` is `Acb` then
+convert to that.
+"""
+midpoint(::Type{Acb}, z::AcbOrRef) = Acb(midref(realref(z)), midref(imagref(z)))
+midpoint(T::Type{<:Union{Arf,Arb}}, z::AcbOrRef) =
+    Complex(midpoint(T, realref(z)), midpoint(T, imagref(z)))
+midpoint(z::AcbOrRef) = midpoint(Arf, z)
+
+"""
     lbound([T, ] x::ArbOrRef)
 
 Returns a lower bound of `x` as an `Arf`. If `T` is given convert to
