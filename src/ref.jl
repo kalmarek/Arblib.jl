@@ -52,7 +52,7 @@ Base.getindex(x::AcbRef) = Acb(x)
 Return an `ArfRef` referencing the midpoint of `x`.
 """
 function midref(x::ArbLike, prec = precision(x))
-    mid_ptr = ccall(@libarb(arb_mid_ptr), Ptr{arf_struct}, (Ref{arb_struct},), x)
+    mid_ptr = ccall(@libflint(arb_mid_ptr), Ptr{arf_struct}, (Ref{arb_struct},), x)
     ArfRef(mid_ptr, prec, parentstruct(x))
 end
 
@@ -62,7 +62,7 @@ end
 Return a `MagRef` referencing the radius of `x`.
 """
 function radref(x::ArbLike)
-    rad_ptr = ccall(@libarb(arb_rad_ptr), Ptr{mag_struct}, (Ref{arb_struct},), x)
+    rad_ptr = ccall(@libflint(arb_rad_ptr), Ptr{mag_struct}, (Ref{arb_struct},), x)
     MagRef(rad_ptr, parentstruct(x))
 end
 
@@ -72,7 +72,7 @@ end
 Return an `ArbRef` referencing the real part of `x`.
 """
 function realref(z::AcbLike; prec = precision(z))
-    real_ptr = ccall(@libarb(acb_real_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
+    real_ptr = ccall(@libflint(acb_real_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
     ArbRef(real_ptr, prec, parentstruct(z))
 end
 
@@ -82,6 +82,6 @@ end
 Return an `ArbRef` referencing the imaginary part of `x`.
 """
 function imagref(z::AcbLike; prec = precision(z))
-    real_ptr = ccall(@libarb(acb_imag_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
+    real_ptr = ccall(@libflint(acb_imag_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
     ArbRef(real_ptr, prec, parentstruct(z))
 end

@@ -33,7 +33,7 @@ function calc_integrate!(
     prec::Int,
 )
     return ccall(
-        @libarb(acb_calc_integrate),
+        @libflint(acb_calc_integrate),
         Cint,
         (
             Ref{acb_struct},
@@ -70,7 +70,7 @@ function calc_integrate!(
     prec::Int,
 )
     return ccall(
-        @libarb(acb_calc_integrate),
+        @libflint(acb_calc_integrate),
         Cint,
         (
             Ref{acb_struct},

@@ -16,5 +16,5 @@ arbcall"slong hypgeom_bound(mag_t error, int r, slong C, slong D, slong K, const
 #ni arbcall"void hypgeom_precompute(hypgeom_t hyp)"
 
 ### Summation
-#ni arbcall"void arb_hypgeom_sum(arb_t P, arb_t Q, const hypgeom_t hyp, const slong n, slong prec)"
+#ni arbcall"void arb_hypgeom_sum(arb_t P, arb_t Q, const hypgeom_t hyp, slong n, slong prec)"
 #ni arbcall"void arb_hypgeom_infsum(arb_t P, arb_t Q, hypgeom_t hyp, slong tol, slong prec)"

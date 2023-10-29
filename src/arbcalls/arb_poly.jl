@@ -91,24 +91,10 @@ arbcall"int arb_poly_divrem(arb_poly_t Q, arb_poly_t R, const arb_poly_t A, cons
 arbcall"void _arb_poly_div_root(arb_ptr Q, arb_t R, arb_srcptr A, slong len, const arb_t c, slong prec)"
 
 ### Composition
-arbcall"void _arb_poly_taylor_shift_horner(arb_ptr g, const arb_t c, slong n, slong prec)"
-arbcall"void arb_poly_taylor_shift_horner(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec)"
-arbcall"void _arb_poly_taylor_shift_divconquer(arb_ptr g, const arb_t c, slong n, slong prec)"
-arbcall"void arb_poly_taylor_shift_divconquer(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec)"
-arbcall"void _arb_poly_taylor_shift_convolution(arb_ptr g, const arb_t c, slong n, slong prec)"
-arbcall"void arb_poly_taylor_shift_convolution(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec)"
 arbcall"void _arb_poly_taylor_shift(arb_ptr g, const arb_t c, slong n, slong prec)"
 arbcall"void arb_poly_taylor_shift(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec)"
-arbcall"void _arb_poly_compose_horner(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong prec)"
-arbcall"void arb_poly_compose_horner(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong prec)"
-arbcall"void _arb_poly_compose_divconquer(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong prec)"
-arbcall"void arb_poly_compose_divconquer(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong prec)"
 arbcall"void _arb_poly_compose(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong prec)"
 arbcall"void arb_poly_compose(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong prec)"
-arbcall"void _arb_poly_compose_series_horner(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong n, slong prec)"
-arbcall"void arb_poly_compose_series_horner(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong n, slong prec)"
-arbcall"void _arb_poly_compose_series_brent_kung(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong n, slong prec)"
-arbcall"void arb_poly_compose_series_brent_kung(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong n, slong prec)"
 arbcall"void _arb_poly_compose_series(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong n, slong prec)"
 arbcall"void arb_poly_compose_series(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong n, slong prec)"
 arbcall"void _arb_poly_revert_series_lagrange(arb_ptr h, arb_srcptr f, slong flen, slong n, slong prec)"
@@ -175,6 +161,8 @@ arbcall"void arb_poly_interpolate_fast(arb_poly_t poly, arb_srcptr xs, arb_srcpt
 ### Differentiation
 arbcall"void _arb_poly_derivative(arb_ptr res, arb_srcptr poly, slong len, slong prec)"
 arbcall"void arb_poly_derivative(arb_poly_t res, const arb_poly_t poly, slong prec)"
+arbcall"void _arb_poly_nth_derivative(arb_ptr res, arb_srcptr poly, ulong n, slong len, slong prec)"
+arbcall"void arb_poly_nth_derivative(arb_poly_t res, const arb_poly_t poly, ulong n, slong prec)"
 arbcall"void _arb_poly_integral(arb_ptr res, arb_srcptr poly, slong len, slong prec)"
 arbcall"void arb_poly_integral(arb_poly_t res, const arb_poly_t poly, slong prec)"
 
@@ -190,7 +178,7 @@ arbcall"void arb_poly_binomial_transform_convolution(arb_poly_t b, const arb_pol
 arbcall"void _arb_poly_binomial_transform(arb_ptr b, arb_srcptr a, slong alen, slong len, slong prec)"
 arbcall"void arb_poly_binomial_transform(arb_poly_t b, const arb_poly_t a, slong len, slong prec)"
 arbcall"void _arb_poly_graeffe_transform(arb_ptr b, arb_srcptr a, slong len, slong prec)"
-arbcall"void arb_poly_graeffe_transform(arb_poly_t b, arb_poly_t a, slong prec)"
+arbcall"void arb_poly_graeffe_transform(arb_poly_t b, const arb_poly_t a, slong prec)"
 
 ### Powers and elementary functions
 arbcall"void _arb_poly_pow_ui_trunc_binexp(arb_ptr res, arb_srcptr f, slong flen, ulong exp, slong len, slong prec)"
@@ -219,10 +207,6 @@ arbcall"void _arb_poly_exp_series_basecase(arb_ptr f, arb_srcptr h, slong hlen, 
 arbcall"void arb_poly_exp_series_basecase(arb_poly_t f, const arb_poly_t h, slong n, slong prec)"
 arbcall"void _arb_poly_exp_series(arb_ptr f, arb_srcptr h, slong hlen, slong n, slong prec)"
 arbcall"void arb_poly_exp_series(arb_poly_t f, const arb_poly_t h, slong n, slong prec)"
-arbcall"void _arb_poly_sin_cos_series_basecase(arb_ptr s, arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec, int times_pi)"
-arbcall"void arb_poly_sin_cos_series_basecase(arb_poly_t s, arb_poly_t c, const arb_poly_t h, slong n, slong prec, int times_pi)"
-arbcall"void _arb_poly_sin_cos_series_tangent(arb_ptr s, arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec, int times_pi)"
-arbcall"void arb_poly_sin_cos_series_tangent(arb_poly_t s, arb_poly_t c, const arb_poly_t h, slong n, slong prec, int times_pi)"
 arbcall"void _arb_poly_sin_cos_series(arb_ptr s, arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec)"
 arbcall"void arb_poly_sin_cos_series(arb_poly_t s, arb_poly_t c, const arb_poly_t h, slong n, slong prec)"
 arbcall"void _arb_poly_sin_series(arb_ptr s, arb_srcptr h, slong hlen, slong n, slong prec)"

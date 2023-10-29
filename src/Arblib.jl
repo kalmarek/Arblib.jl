@@ -1,6 +1,6 @@
 module Arblib
 
-using Arb_jll
+using FLINT_jll
 import LinearAlgebra
 import Serialization
 import SpecialFunctions
@@ -27,12 +27,8 @@ export Mag,
     AcbSeries,
     ref
 
-macro libarb(function_name)
-    return (:($function_name), libarb)
-end
-
 macro libflint(function_name)
-    return (:($function_name), Arb_jll.libflint)
+    return (:($function_name), libflint)
 end
 
 const __isthreaded = Ref(false)
@@ -86,11 +82,12 @@ include("special-functions.jl")
 
 include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")
+include("arbcalls/acf.jl")
 include("arbcalls/arb.jl")
 include("arbcalls/acb.jl")
 include("arbcalls/arb_poly.jl")
-include("arbcalls/arb_fmpz_poly.jl")
 include("arbcalls/acb_poly.jl")
+include("arbcalls/arb_fmpz_poly.jl")
 include("arbcalls/acb_dft.jl")
 include("arbcalls/arb_mat.jl")
 include("arbcalls/acb_mat.jl")
@@ -98,7 +95,6 @@ include("arbcalls/acb_hypgeom.jl")
 include("arbcalls/arb_hypgeom.jl")
 include("arbcalls/acb_elliptic.jl")
 include("arbcalls/acb_modular.jl")
-include("arbcalls/dirichlet.jl")
 include("arbcalls/acb_dirichlet.jl")
 include("arbcalls/bernoulli.jl")
 include("arbcalls/hypgeom.jl")
@@ -106,10 +102,7 @@ include("arbcalls/partitions.jl")
 include("arbcalls/arb_calc.jl")
 include("arbcalls/acb_calc.jl")
 include("arbcalls/arb_fpwrap.jl")
-include("arbcalls/double_interval.jl")
 include("arbcalls/fmpz_extras.jl")
-include("arbcalls/bool_mat.jl")
-include("arbcalls/dlog.jl")
 include("arbcalls/eigen.jl")
 
 end # module

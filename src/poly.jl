@@ -5,9 +5,9 @@ const Series = Union{ArbSeries,AcbSeries}
 ## Length and degree
 ##
 Base.length(p::Union{arb_poly_struct,ArbPoly}) =
-    ccall(@libarb(arb_poly_length), Int, (Ref{arb_poly_struct},), p)
+    ccall(@libflint(arb_poly_length), Int, (Ref{arb_poly_struct},), p)
 Base.length(p::Union{acb_poly_struct,AcbPoly}) =
-    ccall(@libarb(acb_poly_length), Int, (Ref{acb_poly_struct},), p)
+    ccall(@libflint(acb_poly_length), Int, (Ref{acb_poly_struct},), p)
 Base.length(p::Series) = p.degree + 1
 
 # Only define size for Poly. Series inherits the size from being
@@ -547,32 +547,17 @@ derivative(p::Poly) = derivative!(zero(p), p)
 derivative(p::T) where {T<:Series} =
     derivative!(T(degree = degree(p) - 1, prec = precision(p)), p)
 
-function derivative(p::Poly, n::Integer)
-    n == 0 && return copy(p)
-    n >= 0 || throw(ArgumentError("n must be non-negative"))
-
-    res = derivative!(zero(p), p)
-    for _ = 2:n
-        derivative!(res, res)
-    end
-    return res
-end
+derivative(p::Poly, n::Integer) = nth_derivative!(zero(p), p, convert(UInt, n))
 
 function derivative(p::T, n::Integer) where {T<:Series}
-    n == 0 && return copy(p)
-    n >= 0 || throw(ArgumentError("n must be non-negative"))
     n <= Arblib.degree(p) ||
         throw(ArgumentError("n must be less than or equal to the degree of p"))
 
-    res = T(degree = degree(p) - n, prec = precision(p))
-    # During the computations the actual degree of res will be higher
-    # than its given degree. But in the end it should have the correct
-    # degree.
-    derivative!(res, p)
-    for _ = 2:n
-        derivative!(res, res)
-    end
-    return res
+    return nth_derivative!(
+        T(degree = degree(p) - n, prec = precision(p)),
+        p,
+        convert(UInt, n),
+    )
 end
 
 integral(p::Poly) = integral!(zero(p), p)

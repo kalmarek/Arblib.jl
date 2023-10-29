@@ -105,7 +105,7 @@ mutable struct arb_vec_struct
     n::Int
 
     function arb_vec_struct(n::Integer)
-        v = new(ccall(@libarb(_arb_vec_init), Ptr{arb_struct}, (Int,), n), n)
+        v = new(ccall(@libflint(_arb_vec_init), Ptr{arb_struct}, (Int,), n), n)
         finalizer(clear!, v)
         return v
     end
@@ -119,7 +119,7 @@ mutable struct acb_vec_struct
     n::Int
 
     function acb_vec_struct(n::Integer)
-        v = new(ccall(@libarb(_acb_vec_init), Ptr{acb_struct}, (Int,), n), n)
+        v = new(ccall(@libflint(_acb_vec_init), Ptr{acb_struct}, (Int,), n), n)
         finalizer(clear!, v)
         return v
     end
@@ -130,8 +130,8 @@ end
 """
 mutable struct arb_poly_struct
     coeffs::Ptr{arb_struct}
-    length::Int
     alloc::Int
+    length::Int
 
     function arb_poly_struct()
         poly = new()
@@ -146,8 +146,8 @@ end
 """
 mutable struct acb_poly_struct
     coeffs::Ptr{acb_struct}
-    length::Int
     alloc::Int
+    length::Int
 
     function acb_poly_struct()
         poly = new()
@@ -254,7 +254,7 @@ mutable struct calc_integrate_opt_struct
     function calc_integrate_opt_struct()
         opts = new()
         ccall(
-            @libarb(acb_calc_integrate_opt_init),
+            @libflint(acb_calc_integrate_opt_init),
             Cvoid,
             (Ref{calc_integrate_opt_struct},),
             opts,

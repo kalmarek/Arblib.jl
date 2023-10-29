@@ -178,7 +178,7 @@ SpecialFunctions.erfinv(x::ArbOrRef) = hypgeom_erfinv!(zero(x), x)
 function SpecialFunctions.airyai(z::ArbOrRef)
     ai = zero(z)
     ccall(
-        @libarb(arb_hypgeom_airy),
+        @libflint(arb_hypgeom_airy),
         Cvoid,
         (Ref{arb_struct}, Ref{Cvoid}, Ref{Cvoid}, Ref{Cvoid}, Ref{arb_struct}, Int64),
         ai,
@@ -193,7 +193,7 @@ end
 function SpecialFunctions.airyai(z::AcbOrRef)
     ai = zero(z)
     ccall(
-        @libarb(acb_hypgeom_airy),
+        @libflint(acb_hypgeom_airy),
         Cvoid,
         (Ref{acb_struct}, Ref{Cvoid}, Ref{Cvoid}, Ref{Cvoid}, Ref{acb_struct}, Int64),
         ai,
@@ -208,7 +208,7 @@ end
 function SpecialFunctions.airyai(z::ArbSeries)
     ai = zero(z)
     ccall(
-        @libarb(arb_hypgeom_airy_series),
+        @libflint(arb_hypgeom_airy_series),
         Cvoid,
         (
             Ref{arb_poly_struct},
@@ -232,7 +232,7 @@ end
 function SpecialFunctions.airyai(z::AcbSeries)
     ai = zero(z)
     ccall(
-        @libarb(acb_hypgeom_airy_series),
+        @libflint(acb_hypgeom_airy_series),
         Cvoid,
         (
             Ref{acb_poly_struct},
@@ -257,7 +257,7 @@ end
 function SpecialFunctions.airyaiprime(z::ArbOrRef)
     ai_prime = zero(z)
     ccall(
-        @libarb(arb_hypgeom_airy),
+        @libflint(arb_hypgeom_airy),
         Cvoid,
         (Ref{Cvoid}, Ref{arb_struct}, Ref{Cvoid}, Ref{Cvoid}, Ref{arb_struct}, Int64),
         C_NULL,
@@ -272,7 +272,7 @@ end
 function SpecialFunctions.airyaiprime(z::AcbOrRef)
     ai_prime = zero(z)
     ccall(
-        @libarb(acb_hypgeom_airy),
+        @libflint(acb_hypgeom_airy),
         Cvoid,
         (Ref{Cvoid}, Ref{acb_struct}, Ref{Cvoid}, Ref{Cvoid}, Ref{acb_struct}, Int64),
         C_NULL,
@@ -287,7 +287,7 @@ end
 function SpecialFunctions.airyaiprime(z::ArbSeries)
     ai_prime = zero(z)
     ccall(
-        @libarb(arb_hypgeom_airy_series),
+        @libflint(arb_hypgeom_airy_series),
         Cvoid,
         (
             Ref{Cvoid},
@@ -311,7 +311,7 @@ end
 function SpecialFunctions.airyaiprime(z::AcbSeries)
     ai_prime = zero(z)
     ccall(
-        @libarb(acb_hypgeom_airy_series),
+        @libflint(acb_hypgeom_airy_series),
         Cvoid,
         (
             Ref{Cvoid},
@@ -336,7 +336,7 @@ end
 function SpecialFunctions.airybi(z::ArbOrRef)
     bi = zero(z)
     ccall(
-        @libarb(arb_hypgeom_airy),
+        @libflint(arb_hypgeom_airy),
         Cvoid,
         (Ref{Cvoid}, Ref{Cvoid}, Ref{arb_struct}, Ref{Cvoid}, Ref{arb_struct}, Int64),
         C_NULL,
@@ -351,7 +351,7 @@ end
 function SpecialFunctions.airybi(z::AcbOrRef)
     bi = zero(z)
     ccall(
-        @libarb(acb_hypgeom_airy),
+        @libflint(acb_hypgeom_airy),
         Cvoid,
         (Ref{Cvoid}, Ref{Cvoid}, Ref{acb_struct}, Ref{Cvoid}, Ref{acb_struct}, Int64),
         C_NULL,
@@ -366,7 +366,7 @@ end
 function SpecialFunctions.airybi(z::ArbSeries)
     bi = zero(z)
     ccall(
-        @libarb(arb_hypgeom_airy_series),
+        @libflint(arb_hypgeom_airy_series),
         Cvoid,
         (
             Ref{Cvoid},
@@ -390,7 +390,7 @@ end
 function SpecialFunctions.airybi(z::AcbSeries)
     bi = zero(z)
     ccall(
-        @libarb(acb_hypgeom_airy_series),
+        @libflint(acb_hypgeom_airy_series),
         Cvoid,
         (
             Ref{Cvoid},
@@ -415,7 +415,7 @@ end
 function SpecialFunctions.airybiprime(z::ArbOrRef)
     bi_prime = zero(z)
     ccall(
-        @libarb(arb_hypgeom_airy),
+        @libflint(arb_hypgeom_airy),
         Cvoid,
         (Ref{Cvoid}, Ref{Cvoid}, Ref{Cvoid}, Ref{arb_struct}, Ref{arb_struct}, Int64),
         C_NULL,
@@ -430,7 +430,7 @@ end
 function SpecialFunctions.airybiprime(z::AcbOrRef)
     bi_prime = zero(z)
     ccall(
-        @libarb(acb_hypgeom_airy),
+        @libflint(acb_hypgeom_airy),
         Cvoid,
         (Ref{Cvoid}, Ref{Cvoid}, Ref{Cvoid}, Ref{acb_struct}, Ref{acb_struct}, Int64),
         C_NULL,
@@ -445,7 +445,7 @@ end
 function SpecialFunctions.airybiprime(z::ArbSeries)
     bi_prime = zero(z)
     ccall(
-        @libarb(arb_hypgeom_airy_series),
+        @libflint(arb_hypgeom_airy_series),
         Cvoid,
         (
             Ref{Cvoid},
@@ -469,7 +469,7 @@ end
 function SpecialFunctions.airybiprime(z::AcbSeries)
     bi_prime = zero(z)
     ccall(
-        @libarb(acb_hypgeom_airy_series),
+        @libflint(acb_hypgeom_airy_series),
         Cvoid,
         (
             Ref{Cvoid},

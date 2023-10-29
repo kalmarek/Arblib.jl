@@ -59,7 +59,7 @@ arbcall"void acb_mat_conjugate(acb_mat_t dest, const acb_mat_t src)"
 
 ### Norms
 arbcall"void acb_mat_bound_inf_norm(mag_t b, const acb_mat_t A)"
-arbcall"void acb_mat_frobenius_norm(acb_t res, const acb_mat_t A, slong prec)"
+arbcall"void acb_mat_frobenius_norm(arb_t res, const acb_mat_t A, slong prec)"
 arbcall"void acb_mat_bound_frobenius_norm(mag_t res, const acb_mat_t A)"
 
 ### Arithmetic

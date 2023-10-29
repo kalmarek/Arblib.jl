@@ -32,7 +32,6 @@ arbcall"void arf_set_mpz(arf_t res, const mpz_t x)"
 arbcall"void arf_set_ui(arf_t res, ulong x)"
 arbcall"void arf_set_si(arf_t res, slong x)"
 arbcall"void arf_set_mpfr(arf_t res, const mpfr_t x)"
-#ns arbcall"void arf_set_fmpr(arf_t res, const fmpr_t x)"
 arbcall"void arf_set_d(arf_t res, double x)"
 arbcall"void arf_swap(arf_t x, arf_t y)"
 arbcall"void arf_init_set_ui(arf_t res, ulong x)"
@@ -49,7 +48,6 @@ arbcall"void arf_set_ui_2exp_si(arf_t res, ulong m, slong e)"
 #ni arbcall"void arf_get_fmpz_2exp(fmpz_t m, fmpz_t e, const arf_t x)"
 #ni arbcall"void arf_frexp(arf_t m, fmpz_t e, const arf_t x)"
 #mo arbcall"double arf_get_d(const arf_t x, arf_rnd_t rnd)" # clashes with arf_get_si
-#ns arbcall"void arf_get_fmpr(fmpr_t res, const arf_t x)"
 arbcall"int arf_get_mpfr(mpfr_t res, const arf_t x, mpfr_rnd_t rnd)"
 #ni arbcall"int arf_get_fmpz(fmpz_t res, const arf_t x, arf_rnd_t rnd)"
 #mo arbcall"slong arf_get_si(const arf_t x, arf_rnd_t rnd)" # clashes with arf_get_d
@@ -153,6 +151,9 @@ arbcall"int arf_sosq(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rn
 
 ### Summation
 #ni arbcall"int arf_sum(arf_t res, arf_srcptr terms, slong len, slong prec, arf_rnd_t rnd)"
+
+### Dot products
+#ni arbcall"void arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong xstep, arf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd)"
 
 ### Division
 arbcall"int arf_div(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)"

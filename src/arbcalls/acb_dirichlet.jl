@@ -26,17 +26,17 @@ arbcall"void acb_dirichlet_zeta_rs_d_coeffs(arb_ptr d, const arb_t sigma, slong 
 arbcall"void acb_dirichlet_zeta_rs_bound(mag_t err, const acb_t s, slong K)"
 arbcall"void acb_dirichlet_zeta_rs_r(acb_t res, const acb_t s, slong K, slong prec)"
 arbcall"void acb_dirichlet_zeta_rs(acb_t res, const acb_t s, slong K, slong prec)"
-arbcall"void acb_dirichlet_zeta_jet_rs(acb_t res, const acb_t s, slong len, slong prec)"
+arbcall"void acb_dirichlet_zeta_jet_rs(acb_ptr res, const acb_t s, slong len, slong prec)"
 
 ### Hurwitz zeta function
 arbcall"void acb_dirichlet_hurwitz(acb_t res, const acb_t s, const acb_t a, slong prec)"
 
 ### Hurwitz zeta function precomputation
-#ni arbcall"void acb_dirichlet_hurwitz_precomp_init(acb_dirichlet_hurwitz_precomp_t pre, const acb_t s, int deflate, ulong A, ulong K, ulong N, slong prec)"
+#ni arbcall"void acb_dirichlet_hurwitz_precomp_init(acb_dirichlet_hurwitz_precomp_t pre, const acb_t s, int deflate, slong A, slong K, slong N, slong prec)"
 #ni arbcall"void acb_dirichlet_hurwitz_precomp_init_num(acb_dirichlet_hurwitz_precomp_t pre, const acb_t s, int deflate, double num_eval, slong prec)"
 #ni arbcall"void acb_dirichlet_hurwitz_precomp_clear(acb_dirichlet_hurwitz_precomp_t pre)"
 arbcall"void acb_dirichlet_hurwitz_precomp_choose_param(ulong * A, ulong * K, ulong * N, const acb_t s, double num_eval, slong prec)"
-arbcall"void acb_dirichlet_hurwitz_precomp_bound(mag_t res, const acb_t s, ulong A, ulong K, ulong N)"
+arbcall"void acb_dirichlet_hurwitz_precomp_bound(mag_t res, const acb_t s, slong A, slong K, slong N)"
 #ni arbcall"void acb_dirichlet_hurwitz_precomp_eval(acb_t res, const acb_dirichlet_hurwitz_precomp_t pre, ulong p, ulong q, slong prec)"
 
 ### Lerch transcendent
@@ -56,10 +56,9 @@ arbcall"void acb_dirichlet_lerch_phi(acb_t res, const acb_t z, const acb_t s, co
 ### Dirichlet character Gauss, Jacobi and theta sums
 #ni arbcall"void acb_dirichlet_gauss_sum_naive(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)"
 #ni arbcall"void acb_dirichlet_gauss_sum_factor(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)"
-#ni arbcall"void acb_dirichlet_gauss_sum_order2(acb_t res, const dirichlet_char_t chi, slong prec)"
+#ni arbcall"void acb_dirichlet_gauss_sum_order2(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)"
 #ni arbcall"void acb_dirichlet_gauss_sum_theta(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)"
 #ni arbcall"void acb_dirichlet_gauss_sum(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)"
-#ni arbcall"void acb_dirichlet_gauss_sum_ui(acb_t res, const dirichlet_group_t G, ulong a, slong prec)"
 #ni arbcall"void acb_dirichlet_jacobi_sum_naive(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi1, const dirichlet_char_t chi2, slong prec)"
 #ni arbcall"void acb_dirichlet_jacobi_sum_factor(acb_t res,  const dirichlet_group_t G, const dirichlet_char_t chi1, const dirichlet_char_t chi2, slong prec)"
 #ni arbcall"void acb_dirichlet_jacobi_sum_gauss(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi1, const dirichlet_char_t chi2, slong prec)"
@@ -68,8 +67,8 @@ arbcall"void acb_dirichlet_lerch_phi(acb_t res, const acb_t z, const acb_t s, co
 #ni arbcall"void acb_dirichlet_chi_theta_arb(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const arb_t t, slong prec)"
 #ni arbcall"void acb_dirichlet_ui_theta_arb(acb_t res, const dirichlet_group_t G, ulong a, const arb_t t, slong prec)"
 arbcall"ulong acb_dirichlet_theta_length(ulong q, const arb_t t, slong prec)"
-#ni arbcall"void acb_dirichlet_qseries_powers_naive(acb_t res, const arb_t x, int p, const ulong * a, const acb_dirichlet_powers_t z, slong len, slong prec)"
-#ni arbcall"void acb_dirichlet_qseries_powers_smallorder(acb_t res, const arb_t x, int p, const ulong * a, const acb_dirichlet_powers_t z, slong len, slong prec)"
+#ni arbcall"void acb_dirichlet_qseries_arb_powers_naive(acb_t res, const arb_t x, int p, const ulong * a, const acb_dirichlet_roots_t z, slong len, slong prec)"
+#ni arbcall"void acb_dirichlet_qseries_arb_powers_smallorder(acb_t res, const arb_t x, int p, const ulong * a, const acb_dirichlet_roots_t z, slong len, slong prec)"
 
 ### Discrete Fourier transforms
 #ni arbcall"void acb_dirichlet_dft_conrey(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec)"
@@ -91,7 +90,7 @@ arbcall"ulong acb_dirichlet_theta_length(ulong q, const arb_t t, slong prec)"
 
 ### Hardy Z-functions
 #ni arbcall"void acb_dirichlet_hardy_theta(acb_ptr res, const acb_t t, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec)"
-#ni arbcall"void acb_dirichlet_hardy_z(acb_t res, const acb_t t, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec)"
+#ni arbcall"void acb_dirichlet_hardy_z(acb_ptr res, const acb_t t, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec)"
 #ni arbcall"void _acb_dirichlet_hardy_theta_series(acb_ptr res, acb_srcptr t, slong tlen, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec)"
 #ni arbcall"void acb_dirichlet_hardy_theta_series(acb_poly_t res, const acb_poly_t t, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec)"
 #ni arbcall"void _acb_dirichlet_hardy_z_series(acb_ptr res, acb_srcptr t, slong tlen, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec)"

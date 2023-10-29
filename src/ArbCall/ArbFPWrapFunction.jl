@@ -158,7 +158,7 @@ function jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af))
             flags::Cint = accurate_parts + correct_rounding * 2 + work_limit * 65536
 
             return_flag = ccall(
-                Arblib.@libarb($(arbfname(af))),
+                Arblib.@libflint($(arbfname(af))),
                 Cint,
                 $(Expr(:tuple, ctype.(cargs)...)),
                 $(name.(cargs)...),

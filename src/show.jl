@@ -7,7 +7,7 @@ function _string(x::MagOrRef)
     original_stdout = stdout
     out_rd, out_wr = redirect_stdout()
     try
-        ccall(@libarb(mag_print), Cvoid, (Ref{mag_struct},), x)
+        ccall(@libflint(mag_print), Cvoid, (Ref{mag_struct},), x)
         Libc.flush_cstdio()
     finally
         redirect_stdout(original_stdout)
@@ -28,7 +28,7 @@ Base.show(io::IO, x::ArfOrRef) = print(io, BigFloat(x))
 
 function Base.show(io::IO, x::ArbOrRef)
     cstr = ccall(
-        @libarb(arb_get_str),
+        @libflint(arb_get_str),
         Ptr{UInt8},
         (Ref{arb_struct}, Int, UInt),
         x,

@@ -1,7 +1,7 @@
 """
     parse_arbdoc(filename)
 
-Parse a `.rst` file from the Arb documentation. Returns the title of
+Parse a `.rst` file from the Flint documentation. Returns the title of
 the document together with a list of sections with their titles and
 the functions documented in them as strings.
 
@@ -177,45 +177,44 @@ function generate_file(
 end
 
 """
-    parse_and_generate_arbdoc(arb_doc_dir, out_dir = "src/arbcalls/")
+    parse_and_generate_arbdoc(doc_dir, out_dir = "src/arbcalls/"; filenames, verbose)
 
-Parses the Arb documentation and generates corresponding Julia files.
-The value of `arb_doc_dir` should be a path to the directory
-`doc/source/` in the Arb directory.
+Parses the Flint documentation and generates corresponding Julia
+files. The value of `doc_dir` should be a path to the directory
+`doc/source/` in the Flint directory.
+
+The `filenames` argument can be given to specify specific doc files to
+use. The `verbose` argument can be set to true to give more
+information about the result of the parsing.
 """
 function parse_and_generate_arbdoc(
-    arb_doc_dir,
+    doc_dir,
     out_dir = "src/arbcalls/";
-    filenames = (
-        "acb",
-        "acb_calc",
-        "acb_dft",
-        "acb_dirichlet",
-        "acb_elliptic",
-        "acb_hypgeom",
-        "acb_mat",
-        "acb_modular",
-        "acb_poly",
-        "arb",
-        "arb_calc",
-        "arb_fmpz_poly",
-        "arb_fpwrap",
-        "arb_hypgeom",
-        "arb_mat",
-        "arb_poly",
-        "arf",
-        "bernoulli",
-        "bool_mat",
-        "dirichlet",
-        "dlog",
-        "double_interval",
-        #"fmpr", # Deprecated
-        "fmpz_extras",
-        "fmpzi",
-        "hypgeom",
+    filenames = [
         "mag",
+        "arf",
+        "acf",
+        "arb",
+        "acb",
+        "arb_poly",
+        "acb_poly",
+        "arb_fmpz_poly",
+        "acb_dft",
+        "arb_mat",
+        "acb_mat",
+        "acb_hypgeom",
+        "arb_hypgeom",
+        "acb_elliptic",
+        "acb_modular",
+        "acb_dirichlet",
+        "bernoulli",
+        "hypgeom",
         "partitions",
-    ),
+        "arb_calc",
+        "acb_calc",
+        "arb_fpwrap",
+        "fmpz_extras",
+    ],
     verbose = false,
 )
 
@@ -248,7 +247,7 @@ function parse_and_generate_arbdoc(
 
     for filename in filenames
         verbose && @info "Generating $filename.jl"
-        title, sections = parse_arbdoc(joinpath(arb_doc_dir, "$filename.rst"))
+        title, sections = parse_arbdoc(joinpath(doc_dir, "$filename.rst"))
         generate_file(
             joinpath(out_dir, "$filename.jl"),
             title,

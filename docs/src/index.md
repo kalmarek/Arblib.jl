@@ -1,7 +1,8 @@
 # Arblib.jl Documentation
 
 This package is a wrapper around [Arb](http://arblib.org) - a C
-library for arbitrary-precision ball arithmetic. Other wrappers of Arb
+library for arbitrary-precision ball arithmetic. Since 2023 Arb is
+part of [Flint](https://flintlib.org/). Other wrappers of Arb/Flint
 for Julia include [Nemo](https://github.com/Nemocas/Nemo.jl) and
 [ArbNumerics.jl](https://github.com/JeffreySarnoff/ArbNumerics.jl).
 
