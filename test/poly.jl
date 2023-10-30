@@ -42,17 +42,30 @@
 
         @test_throws BoundsError p[-1]
 
-        p = TPoly(T[i for i = 0:10])
-        @test all(Arblib.ref(p, i) == p[i] for i = 0:10)
+        @testset "ref" begin
+            p = TPoly(T[i for i = 0:10])
+            @test all(Arblib.ref(p, i) == p[i] for i = 0:10)
 
-        Arblib.set!(Arblib.ref(p, 0), 5)
-        @test p[0] == 5
+            Arblib.set!(Arblib.ref(p, 0), 5)
+            @test p[0] == 5
 
-        @test_throws BoundsError Arblib.ref(p, -1)
-        @test_throws BoundsError Arblib.ref(p, 11)
-        Arblib.zero!(Arblib.ref(p, 10))
-        Arblib.normalise!(p)
-        @test_throws BoundsError Arblib.ref(p, 10)
+            @test_throws BoundsError Arblib.ref(p, -1)
+            @test_throws BoundsError Arblib.ref(p, 11)
+
+            # Change the degree and check that we can still access
+            Arblib.zero!(Arblib.ref(p, 10))
+            Arblib.normalise!(p)
+            @test iszero(Arblib.ref(p, 10))
+            Arblib.ref(p, 10)[] = 1
+            @test iszero(p[10]) # Length not updated
+            Arblib.set_length!(p, 11)
+            @test isone(p[10]) # Length updated
+
+            q = zero(TPoly)
+            Arblib.fit_length!(q, 5)
+            @test all(iszero(Arblib.ref(q, i)) for i = 0:4)
+            @test_throws BoundsError Arblib.ref(q, 5)
+        end
     end
 
     @testset "Constructors" begin

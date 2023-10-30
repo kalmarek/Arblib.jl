@@ -83,32 +83,30 @@ Similar to `p[i]` but instead of an `Arb` or `Acb` returns an `ArbRef`
 or `AcbRef` which still shares the memory with the `i`-th entry of
 `p[i]`.
 
-For `ArbPoly` and `AcbPoly` it only allows accessing coefficients up
-to the degree of the polynomial since higher coefficients are not
-guaranteed to be allocated.
-
-For `ArbSeries` and `AcbSeries` it allows accessing coefficients up to
-the degree of the series. Note that this degree might not be the same
-as the degree of the underlying polynomial (in case higher order
-coefficients are zero) but the way they are constructed ensures that
-the coefficients will always be initialised.
+It only allows accessing coefficients that are allocated. For
+`ArbPoly` and `AcbPoly` this is typically the degree of the
+polynomial, but can be higher if for example `Arblib.fit_length!` is
+used. For `ArbSeries` and `AcbSeries` all coefficients up to the
+degree of the series are guaranteed to be allocated, even if the
+underlying polynomial has a lower degree.
 
 !!! Note: If you use this to change the coefficient in a way so that
     the degree of the polynomial might change you need to normalise
     the polynomial afterwards to make sure that Arb recognises the
     possibly new degree of the polynomial. If the new degree is the
-    same or lower this can be done using `Arblib.normalise!`. If the
-    new degree is higher you need to manually set the correct value of
-    `Arblib.cstruct(p).length` to be one higher than the new degree.
+    same or lower this can be done using `Arblib.normalise!(p)`. If
+    the new degree is higher you need to manually set the length with
+    `Arblib.set_length!(p, len)`, where `len` is one higher than the
+    new degree.
 """
 Base.@propagate_inbounds function ref(p::Union{ArbPoly,ArbSeries}, i::Integer)
-    @boundscheck 0 <= i <= degree(p) || throw(BoundsError(p, i))
+    @boundscheck 0 <= i < cstruct(p).alloc || throw(BoundsError(p, i))
     ptr = cstruct(p).coeffs + i * sizeof(arb_struct)
     return ArbRef(ptr, precision(p), cstruct(p))
 end
 
 Base.@propagate_inbounds function ref(p::Union{AcbPoly,AcbSeries}, i::Integer)
-    @boundscheck 0 <= i <= degree(p) || throw(BoundsError(p, i))
+    @boundscheck 0 <= i < cstruct(p).alloc || throw(BoundsError(p, i))
     ptr = cstruct(p).coeffs + i * sizeof(acb_struct)
     return AcbRef(ptr, precision(p), cstruct(p))
 end
