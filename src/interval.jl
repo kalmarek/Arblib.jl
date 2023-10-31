@@ -143,15 +143,26 @@ getball(::Type{Arb}, x::ArbOrRef) = (Arb(midref(x)), Arb(radref(x), prec = preci
 """
     union(x::ArbOrRef, y::ArbOrRef)
     union(x::AcbOrRef, y::AcbOrRef)
+    union(x::T, y::T) where {T<:Union{ArbPoly,AcbPoly,ArbSeries,AcbSeries}}
     union(x, y, z...)
 
-`union(x, y)` returns a ball containing the union of `x` and `y`.
+Returns a ball containing the union of `x` and `y`. For polynomials
+and series the union is taken coefficient-wise.
 
 `union(x, y, z...)` returns a ball containing the union of all given
 balls.
 """
 union(x::ArbOrRef, y::ArbOrRef) = union!(Arb(prec = _precision(x, y)), x, y)
 union(x::AcbOrRef, y::AcbOrRef) = union!(Acb(prec = _precision(x, y)), x, y)
+union(x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}} =
+    _union!(T(prec = _precision(x, y)), x, y)
+function union(x::T, y::T) where {T<:Union{ArbSeries,AcbSeries}}
+    degree(x) == degree(y) || throw(ArgumentError("union of series requires same degree"))
+    res = T(degree = degree(x), prec = _precision(x, y))
+    _union!(res.poly, x.poly, y.poly)
+    return res
+end
+
 function union(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...)
     res = union(y, z, xs...)
     return union!(res, res, x)
@@ -159,6 +170,43 @@ end
 function union(x::AcbOrRef, y::AcbOrRef, z::AcbOrRef, xs...)
     res = union(y, z, xs...)
     return union!(res, res, x)
+end
+function union(x::T, y::T, z::T, xs...) where {T<:Union{ArbPoly,AcbPoly}}
+    res = union(y, z, xs...)
+    return _union!(res, res, x)
+end
+function union(x::T, y::T, z::T, xs...) where {T<:Union{ArbSeries,AcbSeries}}
+    res = union(y, z, xs...)
+    degree(res) == degree(x) || throw(ArgumentError("union of series requires same degree"))
+    _union!(res.poly, res.poly, x.poly)
+    return res
+end
+
+# User internally by union
+function _union!(res::T, x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}}
+    res_length = max(length(x), length(y))
+    common_degree = min(degree(x), degree(y))
+
+    fit_length!(res, res_length)
+
+    for i = 0:common_degree
+        union!(ref(res, i), ref(x, i), ref(y, i))
+    end
+
+    if common_degree + 1 < res_length
+        z = zero(eltype(T))
+        # At most one of the below loops will run
+        for i = common_degree+1:degree(x)
+            union!(ref(res, i), ref(x, i), z)
+        end
+        for i = common_degree+1:degree(y)
+            union!(ref(res, i), ref(y, i), z)
+        end
+    end
+
+    set_length!(res, res_length)
+
+    return res
 end
 
 """

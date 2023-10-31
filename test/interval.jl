@@ -203,6 +203,42 @@
         @test precision(Arblib.union(Acb(prec = 80), Acb(prec = 90))) == 90
         @test precision(Arblib.union([Arb(prec = p) for p = 70:10:100]...)) == 100
         @test precision(Arblib.union([Acb(prec = p) for p = 70:10:100]...)) == 100
+
+        # Alternative (very inefficient) implementation of
+        # Arblib.union
+        union_alt(p, q) =
+            let m = max(Arblib.degree(p), Arblib.degree(q))
+                typeof(p)(Arblib.union.([p[i] for i = 0:m], [q[i] for i = 0:m]))
+            end
+        union_alt(p, q, ps...) = foldr(union_alt, [p, q, ps...])
+
+        # Same degrees
+
+        for T in [ArbPoly, AcbPoly, ArbSeries, AcbSeries]
+            ps = [T([i, 10i]) for i in vcat(1:5, 5:-1:1)]
+            @test isequal(Arblib.union(ps[1], ps[2]), union_alt(ps[1], ps[2]))
+            @test isequal(Arblib.union(ps...), union_alt(ps...))
+        end
+
+        # Different degrees
+
+        for T in [ArbPoly, AcbPoly]
+            p, q = T([1, 2, 3]), T([2, 3])
+            @test isequal(Arblib.union(p, q), union_alt(p, q))
+            @test isequal(Arblib.union(q, p), union_alt(p, q))
+
+            ps = [T(i:2i) for i in vcat(1:5, 5:-1:1)]
+            @test isequal(Arblib.union(ps...), union_alt(ps...))
+        end
+
+        for T in [ArbSeries, AcbSeries]
+            p1, p2 = T(degree = 1), T(degree = 2)
+            @test_throws ArgumentError Arblib.union(p1, p2)
+            @test_throws ArgumentError Arblib.union(p2, p1)
+            @test_throws ArgumentError Arblib.union(p1, p2, p2)
+            @test_throws ArgumentError Arblib.union(p2, p1, p2)
+            @test_throws ArgumentError Arblib.union(p2, p2, p1)
+        end
     end
 
     @testset "Arblib.intersection" begin
