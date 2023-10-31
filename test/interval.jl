@@ -241,7 +241,7 @@
         end
     end
 
-    @testset "Arblib.intersection" begin
+    @testset "intersection" begin
         xs = [Arb((0, i)) for i in vcat(1:10, 10:-1:1)]
 
         @test Arblib.contains(Arblib.intersection(Arb((0, 2)), Arb((1, 3))), Arb((1, 2)))
@@ -253,6 +253,49 @@
 
         @test_throws ArgumentError Arblib.intersection(Arb(1), Arb(2))
         @test_throws ArgumentError Arblib.intersection([xs; Arb(2)]...)
+
+        # Alternative (very inefficient) implementation of
+        # Arblib.intersection
+        intersection_alt(p, q) =
+            let m = max(Arblib.degree(p), Arblib.degree(q))
+                typeof(p)(Arblib.intersection.([p[i] for i = 0:m], [q[i] for i = 0:m]))
+            end
+        intersection_alt(p, q, ps...) = foldr(intersection_alt, [p, q, ps...])
+
+        # Same degrees
+
+        for T in [ArbPoly, ArbSeries]
+            ps = [T([Arb((-i, i)), Arb((-10i, 10i))]) for i in vcat(1:5, 5:-1:1)]
+            @test isequal(Arblib.intersection(ps[1], ps[2]), intersection_alt(ps[1], ps[2]))
+            @test isequal(Arblib.intersection(ps...), intersection_alt(ps...))
+
+            p, q = T([1, 2]), T([1, 3])
+            @test_throws ArgumentError Arblib.intersection(p, q)
+        end
+
+        # Different degrees
+
+        let T = ArbPoly
+            p, q = T([1, 2, Arb((-1, 1))]), T([1, 2])
+            @test isequal(Arblib.intersection(p, q), intersection_alt(p, q))
+            @test isequal(Arblib.intersection(q, p), intersection_alt(p, q))
+
+            p, q = T([1, 2, NaN]), T([1, 2])
+            @test isequal(Arblib.intersection(p, q), intersection_alt(p, q))
+            @test isequal(Arblib.intersection(q, p), intersection_alt(p, q))
+
+            ps = [T([Arb((-j, j)) for j = 1:i]) for i in vcat(1:5, 5:-1:1)]
+            @test isequal(Arblib.intersection(ps...), intersection_alt(ps...))
+        end
+
+        let T = ArbSeries
+            p1, p2 = T(degree = 1), T(degree = 2)
+            @test_throws ArgumentError Arblib.intersection(p1, p2)
+            @test_throws ArgumentError Arblib.intersection(p2, p1)
+            @test_throws ArgumentError Arblib.intersection(p1, p2, p2)
+            @test_throws ArgumentError Arblib.intersection(p2, p1, p2)
+            @test_throws ArgumentError Arblib.intersection(p2, p2, p1)
+        end
     end
 
     @testset "add_error" begin
