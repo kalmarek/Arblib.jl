@@ -80,24 +80,53 @@ end
     ref(p::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}, i)
 
 Similar to `p[i]` but instead of an `Arb` or `Acb` returns an `ArbRef`
-or `AcbRef` which still shares the memory with the `i`-th entry of
-`p[i]`.
+or `AcbRef` which shares the memory with the `i`-th coefficient of
+`p`.
+
+!!! Note: For reading coefficients this is always safe, but if the
+    coefficient is mutated then care has to be taken. See the comment
+    further down for how to handle this.
 
 It only allows accessing coefficients that are allocated. For
-`ArbPoly` and `AcbPoly` this is typically the degree of the
-polynomial, but can be higher if for example `Arblib.fit_length!` is
-used. For `ArbSeries` and `AcbSeries` all coefficients up to the
-degree of the series are guaranteed to be allocated, even if the
-underlying polynomial has a lower degree.
+`ArbPoly` and `AcbPoly` this is typically all coefficients up to the
+degree of the polynomial, but can be higher if for example
+`Arblib.fit_length!` is used. For `ArbSeries` and `AcbSeries` all
+coefficients up to the degree of the series are guaranteed to be
+allocated, even if the underlying polynomial has a lower degree.
 
-!!! Note: If you use this to change the coefficient in a way so that
-    the degree of the polynomial might change you need to normalise
-    the polynomial afterwards to make sure that Arb recognises the
-    possibly new degree of the polynomial. If the new degree is the
-    same or lower this can be done using `Arblib.normalise!(p)`. If
-    the new degree is higher you need to manually set the length with
-    `Arblib.set_length!(p, len)`, where `len` is one higher than the
-    new degree.
+If the coefficient is mutated in a way that the degree of the
+polynomial changes then one needs to also update the internally stored
+length of the polynomial.
+
+- If the new degree is the same or lower this can be achieved with
+  ```
+  Arblib.normalise!(p)
+  ```
+- If the new degree is higher you need to manually set the length.
+  This can be achieved with
+  ```
+  Arblib.set_length!(p, len)
+  Arblib.normalise!(p)
+  ```
+  where `len` is one higher than (an upper bound of) the new degree.
+
+As an example consider an potential implementation (which currently
+doesn't exist) of
+`Arblib.indeterminate!(x::Union{ArbSeries,AcbSeries})` that sets all
+coefficients of `x` to `NaN`.
+```
+function Arblib.indeterminate!(x::Union{ArbSeries,AcbSeries})
+    for i = 0:Arblib.degree(x)
+        # i is less than or equal to the degree so Arblib.ref(x, i) is
+        # always allowed for series
+        Arblib.indeterminate!(Arblib.ref(x, i))
+    end
+    # Since we manually updated the coefficients of the polynomial we
+    # need to also manually update the degree. Note that we don't need
+    # to use Arblib.normalise! since we know the length exactly.
+    return Arblib.set_length!(x, length(x))
+end
+```
 """
 Base.@propagate_inbounds function ref(p::Union{ArbPoly,ArbSeries}, i::Integer)
     @boundscheck 0 <= i < cstruct(p).alloc || throw(BoundsError(p, i))
