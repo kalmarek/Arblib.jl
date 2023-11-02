@@ -182,7 +182,7 @@ function union(x::T, y::T, z::T, xs...) where {T<:Union{ArbSeries,AcbSeries}}
     return res
 end
 
-# User internally by union
+# Used internally by union
 function _union!(res::T, x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}}
     res_length = max(length(x), length(y))
     common_degree = min(degree(x), degree(y))
@@ -259,7 +259,7 @@ function intersection(x::ArbSeries, y::ArbSeries, z::ArbSeries, xs...)
     return res
 end
 
-# User internally by intersection
+# Used internally by intersection
 function _intersection!(res::ArbPoly, x::ArbPoly, y::ArbPoly)
     res_length = max(length(x), length(y))
     common_degree = min(degree(x), degree(y))
