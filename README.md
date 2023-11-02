@@ -7,10 +7,6 @@ This package is a thin, efficient wrapper around
 [Arb](http://arblib.org) - a C library for arbitrary-precision ball
 arithmetic. Since 2023 Arb is part of [Flint](https://flintlib.org/).
 
-The package is currently in early development. More features and
-documentation will be added. While we try to avoid it there might be
-breaking changes.
-
 ## Installation
 
 ```julia
