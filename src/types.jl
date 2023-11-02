@@ -96,9 +96,6 @@ end
 
 """
     ArbSeries <: Number
-
-This type should be considered experimental, the interface for it
-might change in the future.
 """
 struct ArbSeries <: Number
     poly::ArbPoly
@@ -120,9 +117,6 @@ end
 
 """
     AcbSeries <: Number
-
-This type should be considered experimental, the interface for it
-might change in the future.
 """
 struct AcbSeries <: Number
     poly::AcbPoly
