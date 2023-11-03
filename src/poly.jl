@@ -110,22 +110,52 @@ length of the polynomial.
   ```
   where `len` is one higher than (an upper bound of) the new degree.
 
-As an example consider an potential implementation (which currently
-doesn't exist) of
-`Arblib.indeterminate!(x::Union{ArbSeries,AcbSeries})` that sets all
-coefficients of `x` to `NaN`.
+See the extended help for more details.
+
+# Extended help
+Here is an example were the leading coefficient is mutated so that the
+degree is lowered.
+```jldoctest
+julia> p = ArbPoly([1, 2], prec = 64) # Polynomial of degree 1
+1.000000000000000000 + 2.000000000000000000⋅x
+
+julia> Arblib.zero!(Arblib.ref(p, 1)) # Set leading coefficient to 0
+0
+
+julia> Arblib.degree(p) # The degree is still reported as 1
+1
+
+julia> length(p) # And the length as 2
+2
+
+julia> p # Printing gives weird results
+1.000000000000000000 +
+
+julia> Arblib.normalise!(p) # Normalising the polynomial updates the degree
+1.000000000000000000
+
+julia> Arblib.degree(p) # This is now correct
+0
+
+julia> p # And so is printing
+1.000000000000000000
 ```
-function Arblib.indeterminate!(x::Union{ArbSeries,AcbSeries})
-    for i = 0:Arblib.degree(x)
-        # i is less than or equal to the degree so Arblib.ref(x, i) is
-        # always allowed for series
-        Arblib.indeterminate!(Arblib.ref(x, i))
-    end
-    # Since we manually updated the coefficients of the polynomial we
-    # need to also manually update the degree. Note that we don't need
-    # to use Arblib.normalise! since we know the length exactly.
-    return Arblib.set_length!(x, length(x))
-end
+Here is an example when a coefficient above the degree is mutated.
+```jldoctest
+julia> q = ArbSeries([1, 2, 0], prec = 64) # Series of degree 3 with leading coefficient zero
+1.000000000000000000 + 2.000000000000000000⋅x + 𝒪(x^3)
+
+julia> Arblib.one!(Arblib.ref(q, 2)) # Set the leading coefficient to 1
+1.000000000000000000
+
+julia> q # The leading coefficient is not picked up
+1.000000000000000000 + 2.000000000000000000⋅x + 𝒪(x^3)
+
+julia> Arblib.degree(q.poly) # The degree of the underlying polynomial is still 1
+1
+
+julia> Arblib.set_length!(q, 3) # After explicitly setting the length to 3 it is ok
+1.000000000000000000 + 2.000000000000000000⋅x + 1.000000000000000000⋅x^2 + 𝒪(x^3)
 ```
 """
 Base.@propagate_inbounds function ref(p::Union{ArbPoly,ArbSeries}, i::Integer)
