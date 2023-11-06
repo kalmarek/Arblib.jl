@@ -23,6 +23,18 @@ midpoint(::Type{Arb}, x::ArbOrRef) = Arb(midref(x))
 midpoint(x::ArbOrRef) = midpoint(Arf, x)
 
 """
+    midpoint([T, ] z::AcbOrRef)
+
+Returns the midpoint of `z` as a `Complex{Arf}`. If `T` is given and
+equal to `Arf` or `Arb`, convert to `Complex{T}`. If `T` is `Acb` then
+convert to that.
+"""
+midpoint(::Type{Acb}, z::AcbOrRef) = Acb(midref(realref(z)), midref(imagref(z)))
+midpoint(T::Type{<:Union{Arf,Arb}}, z::AcbOrRef) =
+    Complex(midpoint(T, realref(z)), midpoint(T, imagref(z)))
+midpoint(z::AcbOrRef) = midpoint(Arf, z)
+
+"""
     lbound([T, ] x::ArbOrRef)
 
 Returns a lower bound of `x` as an `Arf`. If `T` is given convert to
@@ -131,15 +143,26 @@ getball(::Type{Arb}, x::ArbOrRef) = (Arb(midref(x)), Arb(radref(x), prec = preci
 """
     union(x::ArbOrRef, y::ArbOrRef)
     union(x::AcbOrRef, y::AcbOrRef)
+    union(x::T, y::T) where {T<:Union{ArbPoly,AcbPoly,ArbSeries,AcbSeries}}
     union(x, y, z...)
 
-`union(x, y)` returns a ball containing the union of `x` and `y`.
+Returns a ball containing the union of `x` and `y`. For polynomials
+and series the union is taken coefficient-wise.
 
 `union(x, y, z...)` returns a ball containing the union of all given
 balls.
 """
 union(x::ArbOrRef, y::ArbOrRef) = union!(Arb(prec = _precision(x, y)), x, y)
 union(x::AcbOrRef, y::AcbOrRef) = union!(Acb(prec = _precision(x, y)), x, y)
+union(x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}} =
+    _union!(T(prec = _precision(x, y)), x, y)
+function union(x::T, y::T) where {T<:Union{ArbSeries,AcbSeries}}
+    degree(x) == degree(y) || throw(ArgumentError("union of series requires same degree"))
+    res = T(degree = degree(x), prec = _precision(x, y))
+    _union!(res.poly, x.poly, y.poly)
+    return res
+end
+
 function union(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...)
     res = union(y, z, xs...)
     return union!(res, res, x)
@@ -148,18 +171,56 @@ function union(x::AcbOrRef, y::AcbOrRef, z::AcbOrRef, xs...)
     res = union(y, z, xs...)
     return union!(res, res, x)
 end
+function union(x::T, y::T, z::T, xs...) where {T<:Union{ArbPoly,AcbPoly}}
+    res = union(y, z, xs...)
+    return _union!(res, res, x)
+end
+function union(x::T, y::T, z::T, xs...) where {T<:Union{ArbSeries,AcbSeries}}
+    res = union(y, z, xs...)
+    degree(res) == degree(x) || throw(ArgumentError("union of series requires same degree"))
+    _union!(res.poly, res.poly, x.poly)
+    return res
+end
+
+# Used internally by union
+function _union!(res::T, x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}}
+    res_length = max(length(x), length(y))
+    common_degree = min(degree(x), degree(y))
+
+    fit_length!(res, res_length)
+
+    for i = 0:common_degree
+        union!(ref(res, i), ref(x, i), ref(y, i))
+    end
+
+    if common_degree + 1 < res_length
+        z = zero(eltype(T))
+        # At most one of the below loops will run
+        for i = common_degree+1:degree(x)
+            union!(ref(res, i), ref(x, i), z)
+        end
+        for i = common_degree+1:degree(y)
+            union!(ref(res, i), ref(y, i), z)
+        end
+    end
+
+    set_length!(res, res_length)
+
+    return res
+end
 
 """
     intersection(x::ArbOrRef, y::ArbOrRef)
-    intersection(x::AcbOrRef, y::AcbOrRef)
+    intersection(x::T, y::T) where {T<:Union{ArbPoly,ArbSeries}}
     intersection(x, y, z...)
 
 `intersection(x, y)` returns a ball containing the intersection of `x`
 and `y`. If `x` and `y` do not overlap (as given by `overlaps(a, b)`)
-throws an `ArgumentError`.
+throws an `ArgumentError`. For polynomials and series the intersection
+is taken coefficient-wise.
 
-`intersection(x, y, z...)` returns a ball containing the intersection of
-all given balls. If all the balls do not overlap throws an
+`intersection(x, y, z...)` returns a ball containing the intersection
+of all given balls. If all the balls do not overlap throws an
 `ArgumentError`.
 """
 function intersection(x::ArbOrRef, y::ArbOrRef)
@@ -169,11 +230,70 @@ function intersection(x::ArbOrRef, y::ArbOrRef)
         throw(ArgumentError("intersection of non-intersecting balls not allowed"))
     return res
 end
+intersection(x::ArbPoly, y::ArbPoly) =
+    _intersection!(ArbPoly((prec = _precision(x, y))), x, y)
+function intersection(x::ArbSeries, y::ArbSeries)
+    degree(x) == degree(y) ||
+        throw(ArgumentError("intersection of series requires same degree"))
+    res = ArbSeries(degree = degree(x), prec = _precision(x, y))
+    _intersection!(res.poly, x.poly, y.poly)
+    return res
+end
+
 function intersection(x::ArbOrRef, y::ArbOrRef, z::ArbOrRef, xs...)
     res = intersection(y, z, xs...)
     sucess = intersection!(res, res, x)
     iszero(sucess) &&
         throw(ArgumentError("intersection of non-intersecting balls not allowed"))
+    return res
+end
+function intersection(x::ArbPoly, y::ArbPoly, z::ArbPoly, xs...)
+    res = intersection(y, z, xs...)
+    return _intersection!(res, res, x)
+end
+function intersection(x::ArbSeries, y::ArbSeries, z::ArbSeries, xs...)
+    res = intersection(y, z, xs...)
+    degree(res) == degree(x) ||
+        throw(ArgumentError("intersection of series requires same degree"))
+    _intersection!(res.poly, res.poly, x.poly)
+    return res
+end
+
+# Used internally by intersection
+function _intersection!(res::ArbPoly, x::ArbPoly, y::ArbPoly)
+    res_length = max(length(x), length(y))
+    common_degree = min(degree(x), degree(y))
+
+    fit_length!(res, res_length)
+
+    for i = 0:common_degree
+        sucess = intersection!(ref(res, i), ref(x, i), ref(y, i))
+        if iszero(sucess)
+            set_length!(res, res_length)
+            normalise!(res)
+            throw(ArgumentError("intersection of non-intersecting balls not allowed"))
+        end
+    end
+
+    if common_degree + 1 < res_length
+        # At most one of the below loops will run
+        for i = common_degree+1:degree(x)
+            xi = ref(x, i)
+            contains_zero(xi) ||
+                throw(ArgumentError("intersection of non-intersecting balls not allowed"))
+            isnan(midref(xi)) && indeterminate!(ref(res, i))
+        end
+        for i = common_degree+1:degree(y)
+            yi = ref(y, i)
+            contains_zero(yi) ||
+                throw(ArgumentError("intersection of non-intersecting balls not allowed"))
+            isnan(midref(yi)) && indeterminate!(ref(res, i))
+        end
+    end
+
+    set_length!(res, res_length)
+    normalise!(res)
+
     return res
 end
 

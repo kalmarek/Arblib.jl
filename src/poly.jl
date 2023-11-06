@@ -80,35 +80,92 @@ end
     ref(p::Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}, i)
 
 Similar to `p[i]` but instead of an `Arb` or `Acb` returns an `ArbRef`
-or `AcbRef` which still shares the memory with the `i`-th entry of
-`p[i]`.
+or `AcbRef` which shares the memory with the `i`-th coefficient of
+`p`.
 
-For `ArbPoly` and `AcbPoly` it only allows accessing coefficients up
-to the degree of the polynomial since higher coefficients are not
-guaranteed to be allocated.
+!!! Note: For reading coefficients this is always safe, but if the
+    coefficient is mutated then care has to be taken. See the comment
+    further down for how to handle this.
 
-For `ArbSeries` and `AcbSeries` it allows accessing coefficients up to
-the degree of the series. Note that this degree might not be the same
-as the degree of the underlying polynomial (in case higher order
-coefficients are zero) but the way they are constructed ensures that
-the coefficients will always be initialised.
+It only allows accessing coefficients that are allocated. For
+`ArbPoly` and `AcbPoly` this is typically all coefficients up to the
+degree of the polynomial, but can be higher if for example
+`Arblib.fit_length!` is used. For `ArbSeries` and `AcbSeries` all
+coefficients up to the degree of the series are guaranteed to be
+allocated, even if the underlying polynomial has a lower degree.
 
-!!! Note: If you use this to change the coefficient in a way so that
-    the degree of the polynomial might change you need to normalise
-    the polynomial afterwards to make sure that Arb recognises the
-    possibly new degree of the polynomial. If the new degree is the
-    same or lower this can be done using `Arblib.normalise!`. If the
-    new degree is higher you need to manually set the correct value of
-    `Arblib.cstruct(p).length` to be one higher than the new degree.
+If the coefficient is mutated in a way that the degree of the
+polynomial changes then one needs to also update the internally stored
+length of the polynomial.
+
+- If the new degree is the same or lower this can be achieved with
+  ```
+  Arblib.normalise!(p)
+  ```
+- If the new degree is higher you need to manually set the length.
+  This can be achieved with
+  ```
+  Arblib.set_length!(p, len)
+  Arblib.normalise!(p)
+  ```
+  where `len` is one higher than (an upper bound of) the new degree.
+
+See the extended help for more details.
+
+# Extended help
+Here is an example were the leading coefficient is mutated so that the
+degree is lowered.
+```jldoctest
+julia> p = ArbPoly([1, 2], prec = 64) # Polynomial of degree 1
+1.000000000000000000 + 2.000000000000000000⋅x
+
+julia> Arblib.zero!(Arblib.ref(p, 1)) # Set leading coefficient to 0
+0
+
+julia> Arblib.degree(p) # The degree is still reported as 1
+1
+
+julia> length(p) # And the length as 2
+2
+
+julia> p # Printing gives weird results
+1.000000000000000000 +
+
+julia> Arblib.normalise!(p) # Normalising the polynomial updates the degree
+1.000000000000000000
+
+julia> Arblib.degree(p) # This is now correct
+0
+
+julia> p # And so is printing
+1.000000000000000000
+```
+Here is an example when a coefficient above the degree is mutated.
+```jldoctest
+julia> q = ArbSeries([1, 2, 0], prec = 64) # Series of degree 3 with leading coefficient zero
+1.000000000000000000 + 2.000000000000000000⋅x + 𝒪(x^3)
+
+julia> Arblib.one!(Arblib.ref(q, 2)) # Set the leading coefficient to 1
+1.000000000000000000
+
+julia> q # The leading coefficient is not picked up
+1.000000000000000000 + 2.000000000000000000⋅x + 𝒪(x^3)
+
+julia> Arblib.degree(q.poly) # The degree of the underlying polynomial is still 1
+1
+
+julia> Arblib.set_length!(q, 3) # After explicitly setting the length to 3 it is ok
+1.000000000000000000 + 2.000000000000000000⋅x + 1.000000000000000000⋅x^2 + 𝒪(x^3)
+```
 """
 Base.@propagate_inbounds function ref(p::Union{ArbPoly,ArbSeries}, i::Integer)
-    @boundscheck 0 <= i <= degree(p) || throw(BoundsError(p, i))
+    @boundscheck 0 <= i < cstruct(p).alloc || throw(BoundsError(p, i))
     ptr = cstruct(p).coeffs + i * sizeof(arb_struct)
     return ArbRef(ptr, precision(p), cstruct(p))
 end
 
 Base.@propagate_inbounds function ref(p::Union{AcbPoly,AcbSeries}, i::Integer)
-    @boundscheck 0 <= i <= degree(p) || throw(BoundsError(p, i))
+    @boundscheck 0 <= i < cstruct(p).alloc || throw(BoundsError(p, i))
     ptr = cstruct(p).coeffs + i * sizeof(acb_struct)
     return AcbRef(ptr, precision(p), cstruct(p))
 end

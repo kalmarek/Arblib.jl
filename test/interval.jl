@@ -20,8 +20,8 @@
         x = zero(Arb)
         y = one(Arb)
 
-        @test midpoint(x) == midpoint(Arf, x) == midpoint(Arb, x) == zero(Arf)
-        @test midpoint(y) == midpoint(Arf, y) == midpoint(Arb, y) == one(Arf)
+        @test midpoint(x) == midpoint(Arf, x) == midpoint(Arb, x) == 0
+        @test midpoint(y) == midpoint(Arf, y) == midpoint(Arb, y) == 1
         @test midpoint(x) isa Arf
         @test midpoint(Arf, x) isa Arf
         @test midpoint(Arb, x) isa Arb
@@ -29,6 +29,28 @@
         @test precision(midpoint(Arb(prec = 80))) == 80
         @test precision(midpoint(Arf, Arb(prec = 80))) == 80
         @test precision(midpoint(Arb, Arb(prec = 80))) == 80
+
+        x = zero(Acb)
+        y = Acb(1, 1)
+
+        @test midpoint(x) == midpoint(Arf, x) == midpoint(Arb, x) == midpoint(Acb, x) == 0
+        @test midpoint(y) ==
+              midpoint(Arf, y) ==
+              midpoint(Arb, y) ==
+              midpoint(Acb, y) ==
+              1 + im
+        @test midpoint(x) isa Complex{Arf}
+        @test midpoint(Arf, x) isa Complex{Arf}
+        @test midpoint(Arb, x) isa Complex{Arb}
+        @test midpoint(Acb, x) isa Acb
+
+        @test precision(real(midpoint(Acb(prec = 80)))) == 80
+        @test precision(imag(midpoint(Acb(prec = 80)))) == 80
+        @test precision(real(midpoint(Arf, Acb(prec = 80)))) == 80
+        @test precision(imag(midpoint(Arf, Acb(prec = 80)))) == 80
+        @test precision(real(midpoint(Arb, Acb(prec = 80)))) == 80
+        @test precision(imag(midpoint(Arb, Acb(prec = 80)))) == 80
+        @test precision(midpoint(Acb, Acb(prec = 80))) == 80
     end
 
     @testset "lbound/ubound" begin
@@ -181,9 +203,45 @@
         @test precision(Arblib.union(Acb(prec = 80), Acb(prec = 90))) == 90
         @test precision(Arblib.union([Arb(prec = p) for p = 70:10:100]...)) == 100
         @test precision(Arblib.union([Acb(prec = p) for p = 70:10:100]...)) == 100
+
+        # Alternative (very inefficient) implementation of
+        # Arblib.union
+        union_alt(p, q) =
+            let m = max(Arblib.degree(p), Arblib.degree(q))
+                typeof(p)(Arblib.union.([p[i] for i = 0:m], [q[i] for i = 0:m]))
+            end
+        union_alt(p, q, ps...) = foldr(union_alt, [p, q, ps...])
+
+        # Same degrees
+
+        for T in [ArbPoly, AcbPoly, ArbSeries, AcbSeries]
+            ps = [T([i, 10i]) for i in vcat(1:5, 5:-1:1)]
+            @test isequal(Arblib.union(ps[1], ps[2]), union_alt(ps[1], ps[2]))
+            @test isequal(Arblib.union(ps...), union_alt(ps...))
+        end
+
+        # Different degrees
+
+        for T in [ArbPoly, AcbPoly]
+            p, q = T([1, 2, 3]), T([2, 3])
+            @test isequal(Arblib.union(p, q), union_alt(p, q))
+            @test isequal(Arblib.union(q, p), union_alt(p, q))
+
+            ps = [T(i:2i) for i in vcat(1:5, 5:-1:1)]
+            @test isequal(Arblib.union(ps...), union_alt(ps...))
+        end
+
+        for T in [ArbSeries, AcbSeries]
+            p1, p2 = T(degree = 1), T(degree = 2)
+            @test_throws ArgumentError Arblib.union(p1, p2)
+            @test_throws ArgumentError Arblib.union(p2, p1)
+            @test_throws ArgumentError Arblib.union(p1, p2, p2)
+            @test_throws ArgumentError Arblib.union(p2, p1, p2)
+            @test_throws ArgumentError Arblib.union(p2, p2, p1)
+        end
     end
 
-    @testset "Arblib.intersection" begin
+    @testset "intersection" begin
         xs = [Arb((0, i)) for i in vcat(1:10, 10:-1:1)]
 
         @test Arblib.contains(Arblib.intersection(Arb((0, 2)), Arb((1, 3))), Arb((1, 2)))
@@ -195,6 +253,49 @@
 
         @test_throws ArgumentError Arblib.intersection(Arb(1), Arb(2))
         @test_throws ArgumentError Arblib.intersection([xs; Arb(2)]...)
+
+        # Alternative (very inefficient) implementation of
+        # Arblib.intersection
+        intersection_alt(p, q) =
+            let m = max(Arblib.degree(p), Arblib.degree(q))
+                typeof(p)(Arblib.intersection.([p[i] for i = 0:m], [q[i] for i = 0:m]))
+            end
+        intersection_alt(p, q, ps...) = foldr(intersection_alt, [p, q, ps...])
+
+        # Same degrees
+
+        for T in [ArbPoly, ArbSeries]
+            ps = [T([Arb((-i, i)), Arb((-10i, 10i))]) for i in vcat(1:5, 5:-1:1)]
+            @test isequal(Arblib.intersection(ps[1], ps[2]), intersection_alt(ps[1], ps[2]))
+            @test isequal(Arblib.intersection(ps...), intersection_alt(ps...))
+
+            p, q = T([1, 2]), T([1, 3])
+            @test_throws ArgumentError Arblib.intersection(p, q)
+        end
+
+        # Different degrees
+
+        let T = ArbPoly
+            p, q = T([1, 2, Arb((-1, 1))]), T([1, 2])
+            @test isequal(Arblib.intersection(p, q), intersection_alt(p, q))
+            @test isequal(Arblib.intersection(q, p), intersection_alt(p, q))
+
+            p, q = T([1, 2, NaN]), T([1, 2])
+            @test isequal(Arblib.intersection(p, q), intersection_alt(p, q))
+            @test isequal(Arblib.intersection(q, p), intersection_alt(p, q))
+
+            ps = [T([Arb((-j, j)) for j = 1:i]) for i in vcat(1:5, 5:-1:1)]
+            @test isequal(Arblib.intersection(ps...), intersection_alt(ps...))
+        end
+
+        let T = ArbSeries
+            p1, p2 = T(degree = 1), T(degree = 2)
+            @test_throws ArgumentError Arblib.intersection(p1, p2)
+            @test_throws ArgumentError Arblib.intersection(p2, p1)
+            @test_throws ArgumentError Arblib.intersection(p1, p2, p2)
+            @test_throws ArgumentError Arblib.intersection(p2, p1, p2)
+            @test_throws ArgumentError Arblib.intersection(p2, p2, p1)
+        end
     end
 
     @testset "add_error" begin
