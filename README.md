@@ -18,10 +18,10 @@ pkg"add Arblib"
 ```
 
 ## What is Arb?
+
 From the Arb documentation:
 
->  Arb is a C library for rigorous real and complex arithmetic with arbitrary precision. Arb tracks numerical errors automatically using ball arithmetic, a form of interval arithmetic based on a midpoint-radius representation. On top of this, Arb provides a wide range of mathematical functionality, including polynomials, power series, matrices, integration, root-finding, and many transcendental functions. Arb is designed with efficiency as a primary goal, and is usually competitive with or faster than other arbitrary-precision packages.
-
+> Arb is a C library for rigorous real and complex arithmetic with arbitrary precision. Arb tracks numerical errors automatically using ball arithmetic, a form of interval arithmetic based on a midpoint-radius representation. On top of this, Arb provides a wide range of mathematical functionality, including polynomials, power series, matrices, integration, root-finding, and many transcendental functions. Arb is designed with efficiency as a primary goal, and is usually competitive with or faster than other arbitrary-precision packages.
 
 ## Types
 
@@ -40,7 +40,7 @@ garbage collection.
 | `arb_t`  | `Arb` or `ArbRef`  |
 | `acb_t`  | `Acb` or `AcbRef` |
 | `arb_t*`  | `ArbVector` or `ArbRefVector` |
-| `acb_t* ` | `AcbVector` or `AcbRefVector` |
+| `acb_t*` | `AcbVector` or `AcbRefVector` |
 | `arb_mat_t`  | `ArbMatrix` or `ArbRefMatrix` |
 | `acb_mat_t`  | `AcbMatrix` or `AcbRefMatrix`  |
 | `arb_poly_t`  | `ArbPoly` or `ArbSeries` |
@@ -61,6 +61,7 @@ suitable for use when Taylor series are computed using the `_series`
 functions in Arb. Similar for `AcbPoly` and `AcbSeries`.
 
 **Example**:
+
 ```julia
 julia> A = ArbMatrix([1 2; 3 4]; prec=64)
 2×2 ArbMatrix:
@@ -105,11 +106,13 @@ Arb functions are wrapped by parsing the Arb documentation and applying the foll
 
 **Example:**
 The function
+
 ```C
 arb_add_si(arb_t z, const arb_t x, slong y, slong prec)`
 ```
 
 becomes
+
 ```julia
 add!(z::ArbLike, x::ArbLike, y::Int; prec = precision(z))
 ```
@@ -133,6 +136,7 @@ exists. Both `Arb` and `Acb` are constructed in such a way that the
 result will always enclose the input.
 
 **Example:**
+
 ``` julia
 x = Arblib.set!(Arb(), π)
 y = Arb(π)
@@ -145,6 +149,7 @@ y = Arb((0, π))
 ```
 
 ## Pitfalls when interacting with the Julia ecosystem
+
 Arb is made for rigorous numerics and any functions which do not
 produce rigorous results are clearly marked as such. This is not the
 case with Julia in general and you therefore have to be careful when
@@ -153,6 +158,7 @@ completely rigorous. Below are three things which you have to be extra
 careful with.
 
 ### Implicit promotion
+
 Julia automatically promotes types in many cases and in particular you
 have to watch out for temporary non-rigorous values. For example
 `2(π*(Arb(ℯ)))` is okay, but not `2π*Arb(ℯ)`
@@ -169,12 +175,14 @@ false
 ```
 
 ### Non-rigorous approximations
+
 In many cases this is obvious, for example Julias built in methods for
 solving linear systems will not produce rigorous results.
 
 TODO: Come up with more examples
 
 ### Implementation details
+
 In some cases the implementation in Julia implicitly makes certain
 assumptions to improve performance and this can lead to issues. For
 example, prior to Julia version 1.8 the `minimum` and `maximum`
@@ -239,6 +247,7 @@ end
 ```
 
 ## Special functions
+
 Arblib extends the methods from
 [SpecialFunctions.jl](https://github.com/JuliaMath/SpecialFunctions.jl)
 with versions from Arb. In some cases the Arb version is more general
@@ -254,6 +263,7 @@ SpecialFunction and at the moment there is no user friendly interface
 for most of them.
 
 ## Support for multi-threading
+
 Enabling a threaded version of flint can be done by setting the
 environment variable `NEMO_THREADED=1`. Note that this should be
 set before `Arblib.jl` is loaded. To set the actual number of threads,
