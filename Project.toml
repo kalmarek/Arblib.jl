@@ -17,6 +17,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 [compat]
 Documenter = "1"
 FLINT_jll = "~300.0.0"
+LinearAlgebra = "1.6"
 Random = "1.6"
 Serialization = "1.6"
 SpecialFunctions = "1, 2"
