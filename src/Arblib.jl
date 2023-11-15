@@ -105,4 +105,6 @@ include("arbcalls/arb_fpwrap.jl")
 include("arbcalls/fmpz_extras.jl")
 include("arbcalls/eigen.jl")
 
+include("mutablearithmetics.jl")
+
 end # module
