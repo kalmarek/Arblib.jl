@@ -16,3 +16,11 @@ function Base.eps(T::Type{<:Union{ArfOrRef,ArbOrRef}})
     return eps!(res, res)
 end
 Base.eps(x::Union{ArfOrRef,ArbOrRef}) = eps!(zero(x), x)
+
+Base.typemin(::Type{<:MagOrRef}) = zero!(Mag())
+Base.typemin(x::Union{ArfOrRef,ArbOrRef}) = neg_inf!(zero(x))
+Base.typemin(T::Type{<:Union{ArfOrRef,ArbOrRef}}) = neg_inf!(zero(T))
+
+Base.typemax(::Type{<:MagOrRef}) = inf!(Mag())
+Base.typemax(x::Union{ArfOrRef,ArbOrRef}) = pos_inf!(zero(x))
+Base.typemax(T::Type{<:Union{ArfOrRef,ArbOrRef}}) = pos_inf!(zero(T))

@@ -42,4 +42,19 @@
         @test isnan(eps(Arf(NaN)))
         @test isnan(eps(Arb(NaN)))
     end
+
+    @testset "typemin/typemax" begin
+        @test typemin(Mag) == typemin(Mag(5)) == Mag(0)
+        @test typemax(Mag) == typemax(Mag(5)) == Mag(Inf)
+
+        @test typemin(Arf) == typemin(Arf(5)) == Arf(-Inf)
+        @test typemax(Arf) == typemax(Arf(5)) == Arf(Inf)
+        @test precision(typemin(Arf(prec = 80))) == 80
+        @test precision(typemax(Arf(prec = 80))) == 80
+
+        @test typemin(Arb) == typemin(Arb(5)) == Arb(-Inf)
+        @test typemax(Arb) == typemax(Arb(5)) == Arb(Inf)
+        @test precision(typemin(Arb(prec = 80))) == 80
+        @test precision(typemax(Arb(prec = 80))) == 80
+    end
 end
