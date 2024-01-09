@@ -57,4 +57,28 @@
         @test precision(typemin(Arb(prec = 80))) == 80
         @test precision(typemax(Arb(prec = 80))) == 80
     end
+
+    @testset "frexp/ldexp" begin
+        @test frexp(Arf(12.3)) == frexp(12.3)
+        @test frexp(Arf(-12.3)) == frexp(-12.3)
+        @test frexp(Arf(0)) == frexp(0.0)
+        @test frexp(Arf(Inf)) == frexp(Inf)
+        @test precision(frexp(Arf(1, prec = 80))[1]) == 80
+        @test frexp(Arf(1)) isa Tuple{Arf,BigInt}
+
+        @test frexp(Arb(12.3)) == frexp(12.3)
+        @test frexp(Arb(-12.3)) == frexp(-12.3)
+        @test frexp(Arb(0)) == frexp(0.0)
+        @test frexp(Arb(Inf)) == frexp(Inf)
+        @test isequal(frexp(Arb(π))[1], Arblib.mul_2exp!(Arb(), Arb(π), -2))
+        @test precision(frexp(Arb(1, prec = 80))[1]) == 80
+        @test frexp(Arb(1)) isa Tuple{Arb,BigInt}
+
+        @test ldexp(Arf(1.1), 2) == Arf(1.1) * 2^2
+        @test ldexp(Arf(1.1), -10) == Arf(1.1) / 2^10
+        @test ldexp(Arb(1.1), 2) == Arb(1.1) * 2^2
+        @test ldexp(Arb(1.1), -10) == Arb(1.1) / 2^10
+        @test precision(ldexp(Arf(1, prec = 80), 1)) == 80
+        @test precision(ldexp(Arb(1, prec = 80), 1)) == 80
+    end
 end
