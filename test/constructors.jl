@@ -129,25 +129,26 @@
     end
 
     @testset "Conversion" begin
-        @test Int(Arf(2.0)) isa Int
-        @test Int(Arf(2.0)) == 2
-        @test_throws InexactError Int(Arf(2.5))
+        @testset "Int" begin
+            @test Int(Arf(2.0)) isa Int
+            @test Int(Arf(2.0)) == 2
+            @test_throws InexactError Int(Arf(2.5))
 
-        @test Float64(Mag(2)) isa Float64
-        @test Float64(Mag(2)) == 2.0
-        @test Float64(Arf(2)) isa Float64
-        @test Float64(Arf(2)) == 2.0
-        @test Float64(Arb(2)) isa Float64
-        @test Float64(Arb(2)) == 2.0
+            @test Arblib.get_si(Arf(0.5)) == 0
+            @test Arblib.get_si(Arf(0.5); rnd = Arblib.ArbRoundFromZero) == 1
+        end
 
-        @test ComplexF64(Acb(2 + 3im)) isa ComplexF64
-        @test ComplexF64(Acb(2 + 3im)) == 2.0 + 3.0im
+        @testset "Complex" begin
+            @test Complex{Float32}(Acb(2 + 3im)) isa Complex{Float32}
+            @test Complex{Float64}(Acb(2 + 3im)) isa Complex{Float64}
+            @test Complex{Arb}(Acb(2 + 3im)) isa Complex{Arb}
+            @test Complex(Acb(2 + 3im)) isa Complex{Arb}
 
-        @test Arblib.get_si(Arf(0.5)) == 0
-        @test Arblib.get_si(Arf(0.5); rnd = Arblib.ArbRoundFromZero) == 1
-
-        @test BigFloat(Arf(2.5)) == 2.5
-        @test BigFloat(Arb(2.5)) == 2.5
+            @test Complex{Float32}(Acb(2 + 3im)) == 2.0 + 3.0im
+            @test Complex{Float64}(Acb(2 + 3im)) == 2.0 + 3.0im
+            @test Complex{Arb}(Acb(2 + 3im)) == 2.0 + 3.0im
+            @test Complex(Acb(2 + 3im)) == 2.0 + 3.0im
+        end
     end
 
     @testset "zeros/ones" begin
