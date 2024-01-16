@@ -66,14 +66,6 @@ function Acb(re::AbstractString, im::AbstractString; prec::Integer = DEFAULT_PRE
     return res
 end
 
-Base.Int(x::ArfOrRef; rnd::Union{arb_rnd,RoundingMode} = RoundNearest) =
-    is_int(x) ? get_si(x, rnd) : throw(InexactError(:Int64, Int64, x))
-
-# TODO: This currently allows construction of Complex{ArbRef}, which
-# we probably don't want.
-Base.Complex{T}(z::AcbOrRef) where {T} = Complex{T}(realref(z), imagref(z))
-Base.Complex(z::AcbOrRef) = Complex{Arb}(z)
-
 Base.zero(::Union{Mag,Type{Mag}}) = Mag(UInt64(0))
 Base.one(::Union{Mag,Type{Mag}}) = Mag(UInt64(1))
 Base.zero(x::T) where {T<:Union{Arf,Arb,Acb}} = T(0, prec = precision(x))

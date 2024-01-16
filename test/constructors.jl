@@ -128,29 +128,6 @@
         @test isequal(Acb((1, 2), (3, 4)), Acb(Arb((1, 2)), Arb((3, 4))))
     end
 
-    @testset "Conversion" begin
-        @testset "Int" begin
-            @test Int(Arf(2.0)) isa Int
-            @test Int(Arf(2.0)) == 2
-            @test_throws InexactError Int(Arf(2.5))
-
-            @test Arblib.get_si(Arf(0.5)) == 0
-            @test Arblib.get_si(Arf(0.5); rnd = Arblib.ArbRoundFromZero) == 1
-        end
-
-        @testset "Complex" begin
-            @test Complex{Float32}(Acb(2 + 3im)) isa Complex{Float32}
-            @test Complex{Float64}(Acb(2 + 3im)) isa Complex{Float64}
-            @test Complex{Arb}(Acb(2 + 3im)) isa Complex{Arb}
-            @test Complex(Acb(2 + 3im)) isa Complex{Arb}
-
-            @test Complex{Float32}(Acb(2 + 3im)) == 2.0 + 3.0im
-            @test Complex{Float64}(Acb(2 + 3im)) == 2.0 + 3.0im
-            @test Complex{Arb}(Acb(2 + 3im)) == 2.0 + 3.0im
-            @test Complex(Acb(2 + 3im)) == 2.0 + 3.0im
-        end
-    end
-
     @testset "zeros/ones" begin
         for T in [Arf, Arb, Acb]
             @test zeros(T, 2) == [zero(T), zero(T)]
