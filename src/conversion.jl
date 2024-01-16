@@ -54,8 +54,42 @@ Base.BigFloat(
 ) = BigFloat(midref(x), r; precision)
 
 ## Conversion to integers
-Base.Int(x::ArfOrRef; rnd::Union{arb_rnd,RoundingMode} = RoundNearest) =
-    is_int(x) ? get_si(x, rnd) : throw(InexactError(:Int64, Int64, x))
+
+# IMPROVE: We currently don't support any rounding to integers. This
+# would maybe be nice to do.
+# IMPROVE: Is there any point in supporting conversion to other
+# integers?
+
+function Base.Int(x::ArfOrRef)
+    is_int(x) || throw(InexactError(:Int, Int, x))
+    typemin(Int) <= x <= typemax(Int) || throw(InexactError(:Int, Int, x))
+    return get_si(x, ArbRoundNearest)
+end
+
+Base.Int(x::ArbOrRef) = is_int(x) ? Int(midref(x)) : throw(InexactError(:Int, Int, x))
+
+Base.Int(x::AcbOrRef) =
+    is_int(x) ? Int(midref(realref(x))) : throw(InexactError(:Int, Int, x))
+
+function Base.BigInt(x::ArfOrRef)
+    is_int(x) || throw(InexactError(:BigInt, BigInt, x))
+    n = fmpz_struct()
+    ccall(
+        @libflint(arf_get_fmpz),
+        Cint,
+        (Ref{fmpz_struct}, Ref{arf_struct}, Ref{arb_rnd}),
+        n,
+        x,
+        ArbRoundNearest,
+    )
+    return BigInt(n)
+end
+
+Base.BigInt(x::ArbOrRef) =
+    is_int(x) ? BigInt(midref(x)) : throw(InexactError(:BigInt, BigInt, x))
+
+Base.BigInt(x::AcbOrRef) =
+    is_int(x) ? BigInt(midref(realref(x))) : throw(InexactError(:BigInt, BigInt, x))
 
 ## Conversion to Complex
 

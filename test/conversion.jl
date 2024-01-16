@@ -161,12 +161,38 @@
     end
 
     @testset "Integers" begin
-        @test Int(Arf(2.0)) isa Int
-        @test Int(Arf(2.0)) == 2
-        @test_throws InexactError Int(Arf(2.5))
+        @testset "Int" begin
+            @test Int(Arf(2)) isa Int
 
-        @test Arblib.get_si(Arf(0.5)) == 0
-        @test Arblib.get_si(Arf(0.5); rnd = Arblib.ArbRoundFromZero) == 1
+            @test Int(Arf(2)) == 2
+            @test Int(Arf(typemin(Int))) == typemin(Int)
+            @test Int(Arf(typemax(Int))) == typemax(Int)
+
+            @test_throws InexactError Int(Arf(2.5))
+            @test_throws InexactError Int(Arf(typemin(Int)) - 1)
+            @test_throws InexactError Int(Arf(typemax(Int)) + 1)
+
+            @test Int(Arb(2)) isa Int
+            @test Int(Arb(2)) == 2
+            @test_throws InexactError Int(Arb(2.5))
+            @test_throws InexactError Int(setball(Arb, 1, 1))
+
+            @test Int(Acb(2)) isa Int
+            @test Int(Acb(2)) == 2
+            @test_throws InexactError Int(Acb(2.5))
+            @test_throws InexactError Int(Acb(setball(Arb, 1, 1)))
+            @test_throws InexactError Int(Acb(2, 1))
+        end
+
+        @testset "BigInt" begin
+            @test BigInt(Arf(2)) isa BigInt
+
+            @test BigInt(Arf(2)) == 2
+            @test BigInt(Arf(typemin(Int)) - 1) == big(typemin(Int)) - 1
+            @test BigInt(Arf(typemax(Int)) + 1) == big(typemax(Int)) + 1
+
+            @test_throws InexactError BigInt(Arf(2.5))
+        end
     end
 
     @testset "Complex" begin
