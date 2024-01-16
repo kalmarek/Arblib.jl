@@ -4,13 +4,14 @@
         y = Arb(2)
         Arblib.set!(Arblib.radref(y), one(Mag))
 
-        @test radius(x) == radius(Mag, x) == radius(Arf, x) == radius(Arb, x) == zero(Mag)
-        @test radius(y) == radius(Mag, y) == radius(Arf, y) == radius(Arb, y) == one(Mag)
+        @test radius(x) == radius(Mag, x) == radius(Arf, x) == radius(Arb, x) == 0
+        @test radius(y) == radius(Mag, y) == radius(Arf, y) == radius(Arb, y) == 1
 
         @test radius(x) isa Mag
         @test radius(Mag, x) isa Mag
         @test radius(Arf, x) isa Arf
         @test radius(Arb, x) isa Arb
+        @test radius(Float64, x) isa Float64
 
         @test precision(radius(Arf, Arb(prec = 80))) == 80
         @test precision(radius(Arb, Arb(prec = 80))) == 80

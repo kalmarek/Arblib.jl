@@ -5,11 +5,12 @@ export radius,
     radius([T, ] x::ArbOrRef)
 
 Returns the radius of `x` as a `Mag`. If `T` is given convert to this
-type, supports `Mag`, `Arf` and `Arb`.
+type, supports `Mag`, `Arf`, `Arb` and `Float64`.
 """
 radius(::Type{Mag}, x::ArbOrRef) = Mag(radref(x))
 radius(::Type{Arf}, x::ArbOrRef) = Arf(radref(x), prec = precision(x))
 radius(::Type{Arb}, x::ArbOrRef) = Arb(radref(x), prec = precision(x))
+radius(::Type{Float64}, x::ArbOrRef) = Float64(radref(x))
 radius(x::ArbOrRef) = radius(Mag, x)
 
 """
