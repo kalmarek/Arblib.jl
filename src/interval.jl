@@ -134,11 +134,12 @@ getinterval(x::ArbOrRef) = getinterval(Arf, x)
 
 Returns a tuple `(m::Arf, r::Mag)` where `m` is the midpoint of the
 ball and `r` is the radius. If `T` is given convert both `m` and `r`
-to this type, supports `Arb`.
+to this type, supports `Arf` and `Arb`.
 
 See also [`setball`](@ref) and [`getinterval`](@ref).
 """
 getball(x::ArbOrRef) = (Arf(midref(x)), Mag(radref(x)))
+getball(::Type{Arf}, x::ArbOrRef) = (Arf(midref(x)), Arf(radref(x), prec = precision(x)))
 getball(::Type{Arb}, x::ArbOrRef) = (Arb(midref(x)), Arb(radref(x), prec = precision(x)))
 
 """

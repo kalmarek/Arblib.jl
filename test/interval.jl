@@ -181,13 +181,15 @@
         y = one(Arb)
         Arblib.set!(Arblib.radref(y), 1)
 
-        @test getball(x) == getball(Arb, x) == (one(Arf), zero(Mag))
-        @test getball(y) == getball(Arb, y) == (one(Arf), one(Mag))
+        @test getball(x) == getball(Arf, x) == getball(Arb, x) == (one(Arf), zero(Mag))
+        @test getball(y) == getball(Arf, y) == getball(Arb, y) == (one(Arf), one(Mag))
 
         @test getball(x) isa Tuple{Arf,Mag}
+        @test getball(Arf, x) isa Tuple{Arf,Arf}
         @test getball(Arb, x) isa Tuple{Arb,Arb}
 
         @test precision(getball(Arb(prec = 80))[1]) == 80
+        @test precision.(getball(Arf, Arb(prec = 80))) == (80, 80)
         @test precision.(getball(Arb, Arb(prec = 80))) == (80, 80)
     end
 
