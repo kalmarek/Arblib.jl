@@ -69,9 +69,9 @@ end
 
 function set!(res::ArbLike, ::Irrational{:φ}; prec::Integer = precision(res))
     set!(res, 5)
-    sqrt!(res, res, prec)
-    add!(res, res, 1, prec)
-    return div!(res, res, 2, prec)
+    sqrt!(res, res; prec)
+    add!(res, res, 1; prec)
+    return mul_2exp!(res, res, -1)
 end
 
 function set!(
