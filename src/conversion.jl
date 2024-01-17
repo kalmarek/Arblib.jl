@@ -14,7 +14,6 @@ Base.Float64(x::ArfOrRef, r::arb_rnd) = get_d(x, r)
 Base.Float64(x::ArbOrRef, r::arb_rnd) = Float64(midref(x), r)
 
 # Deprecated
-# TODO: This signature clashes with the above one...
 Base.Float64(x::ArfOrRef; rnd::arb_rnd = ArbRoundNearest) = Float64(x, rnd)
 
 ## Float16 and Float32
