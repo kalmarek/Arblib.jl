@@ -18,11 +18,17 @@ Base.Float64(x::ArfOrRef; rnd::arb_rnd = ArbRoundNearest) = Float64(x, rnd)
 
 ## Float16 and Float32
 Base.Float16(x::MagOrRef, r::RoundingMode = RoundUp) = Float16(Float64(x, r), r)
+Base.Float16(x::MagOrRef, r::arb_rnd) = Float16(Float64(x, r), convert(RoundingMode, r))
 Base.Float32(x::MagOrRef, r::RoundingMode = RoundUp) = Float32(Float64(x, r), r)
+Base.Float32(x::MagOrRef, r::arb_rnd) = Float32(Float64(x, r), convert(RoundingMode, r))
 Base.Float16(x::Union{ArfOrRef,ArbOrRef}, r::RoundingMode = RoundNearest) =
     Float16(Float64(x, r), r)
+Base.Float16(x::Union{ArfOrRef,ArbOrRef}, r::arb_rnd) =
+    Float16(Float64(x, r), convert(RoundingMode, r))
 Base.Float32(x::Union{ArfOrRef,ArbOrRef}, r::RoundingMode = RoundNearest) =
     Float32(Float64(x, r), r)
+Base.Float32(x::Union{ArfOrRef,ArbOrRef}, r::arb_rnd) =
+    Float32(Float64(x, r), convert(RoundingMode, r))
 
 ## BigFloat
 

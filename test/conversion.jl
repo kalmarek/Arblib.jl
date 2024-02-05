@@ -1,7 +1,7 @@
 @testset "Conversion" begin
-    ArbRoundNearest = Arblib.RoundNearest
-    ArbRoundDown = Arblib.RoundDown
-    ArbRoundUp = Arblib.RoundUp
+    ArbRoundNearest = Arblib.ArbRoundNearest
+    ArbRoundDown = Arblib.ArbRoundDown
+    ArbRoundUp = Arblib.ArbRoundUp
 
     @testset "Floats" begin
         @testset "$T" for T in (Float16, Float32, Float64)
@@ -186,12 +186,28 @@
 
         @testset "BigInt" begin
             @test BigInt(Arf(2)) isa BigInt
-
             @test BigInt(Arf(2)) == 2
             @test BigInt(Arf(typemin(Int)) - 1) == big(typemin(Int)) - 1
             @test BigInt(Arf(typemax(Int)) + 1) == big(typemax(Int)) + 1
 
             @test_throws InexactError BigInt(Arf(2.5))
+
+            @test BigInt(Arb(2)) isa BigInt
+            @test BigInt(Arb(2)) == 2
+            @test BigInt(Arb(typemin(Int)) - 1) == big(typemin(Int)) - 1
+            @test BigInt(Arb(typemax(Int)) + 1) == big(typemax(Int)) + 1
+
+            @test_throws InexactError BigInt(Arb(2.5))
+            @test_throws InexactError BigInt(setball(Arb, 1, 1))
+
+            @test BigInt(Acb(2)) isa BigInt
+            @test BigInt(Acb(2)) == 2
+            @test BigInt(Acb(typemin(Int)) - 1) == big(typemin(Int)) - 1
+            @test BigInt(Acb(typemax(Int)) + 1) == big(typemax(Int)) + 1
+
+            @test_throws InexactError BigInt(Acb(2.5))
+            @test_throws InexactError BigInt(Acb(setball(Arb, 1, 1)))
+            @test_throws InexactError BigInt(Acb(2, 1))
         end
     end
 

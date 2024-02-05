@@ -28,3 +28,22 @@ Base.convert(::Type{arb_rnd}, ::RoundingMode{:Down}) = ArbRoundDown
 Base.convert(::Type{arb_rnd}, ::RoundingMode{:Up}) = ArbRoundUp
 Base.convert(::Type{arb_rnd}, ::RoundingMode{:Nearest}) = ArbRoundNearest
 Base.convert(::Type{arb_rnd}, ::RoundingMode{:Exact}) = ArbRoundExact
+
+function Base.convert(::Type{RoundingMode}, r::arb_rnd)
+    if r == ArbRoundToZero
+        return RoundToZero
+    elseif r == ArbRoundFromZero
+        return RoundFromZero
+    elseif r == ArbRoundDown
+        return RoundDown
+    elseif r == ArbRoundUp
+        return RoundUp
+    elseif r == ArbRoundNearest
+        return RoundNearest
+    elseif r == ArbRoundExact
+        # No RoundExact, we fall back to RoundNearest
+        return RoundNearest
+    else
+        throw(ArgumentError("invalid Arb rounding mode code: $r"))
+    end
+end
