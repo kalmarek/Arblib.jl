@@ -41,8 +41,7 @@ function Base.convert(::Type{RoundingMode}, r::arb_rnd)
     elseif r == ArbRoundNearest
         return RoundNearest
     elseif r == ArbRoundExact
-        # No RoundExact, we fall back to RoundNearest
-        return RoundNearest
+        return RoundingMode{:Exact}()
     else
         throw(ArgumentError("invalid Arb rounding mode code: $r"))
     end

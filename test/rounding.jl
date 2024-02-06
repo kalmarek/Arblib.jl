@@ -11,5 +11,5 @@
     @test convert(RoundingMode, Arblib.ArbRoundDown) == RoundDown
     @test convert(RoundingMode, Arblib.ArbRoundUp) == RoundUp
     @test convert(RoundingMode, Arblib.ArbRoundNearest) == RoundNearest
-    @test convert(RoundingMode, Arblib.ArbRoundExact) == RoundNearest
+    @test convert(RoundingMode, Arblib.ArbRoundExact) == RoundingMode{:Exact}()
 end
