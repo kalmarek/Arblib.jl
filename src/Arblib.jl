@@ -60,6 +60,7 @@ include("precision.jl")
 
 include("setters.jl")
 include("constructors.jl")
+include("conversion.jl")
 include("predicates.jl")
 include("show.jl")
 include("promotion.jl")

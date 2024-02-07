@@ -54,6 +54,9 @@
 
         @test Arblib.rsqrt(T(1 // 4)) == 2
 
+        @test Arblib.contains(2^log2(T(5)), T(5))
+        @test Arblib.contains(10^log10(T(5)), T(5))
+
         @test sinpi(T(1)) == 0
         @test cospi(T(1)) == -1
         @test Arblib.tanpi(T(1)) == 0

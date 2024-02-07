@@ -66,6 +66,17 @@ sqrtpos(x::ArbOrRef) = sqrtpos!(zero(x), x)
 sqrt1pm1(x::ArbOrRef) = sqrt1pm1!(zero(x), x)
 rsqrt(x::Union{ArbOrRef,AcbOrRef}) = rsqrt!(zero(x), x)
 
+function Base.log2(x::Union{ArbOrRef,AcbOrRef})
+    res = log(x)
+    log_2 = const_log2!(Arb(prec = precision(x)))
+    return div!(res, res, log_2)
+end
+function Base.log10(x::Union{ArbOrRef,AcbOrRef})
+    res = log(x)
+    log_10 = const_log10!(Arb(prec = precision(x)))
+    return div!(res, res, log_10)
+end
+
 Base.sinpi(x::Union{ArbOrRef,AcbOrRef}) = sin_pi!(zero(x), x)
 Base.cospi(x::Union{ArbOrRef,AcbOrRef}) = cos_pi!(zero(x), x)
 tanpi(x::Union{ArbOrRef,AcbOrRef}) = tan_pi!(zero(x), x)

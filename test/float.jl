@@ -42,4 +42,43 @@
         @test isnan(eps(Arf(NaN)))
         @test isnan(eps(Arb(NaN)))
     end
+
+    @testset "typemin/typemax" begin
+        @test typemin(Mag) == typemin(Mag(5)) == Mag(0)
+        @test typemax(Mag) == typemax(Mag(5)) == Mag(Inf)
+
+        @test typemin(Arf) == typemin(Arf(5)) == Arf(-Inf)
+        @test typemax(Arf) == typemax(Arf(5)) == Arf(Inf)
+        @test precision(typemin(Arf(prec = 80))) == 80
+        @test precision(typemax(Arf(prec = 80))) == 80
+
+        @test typemin(Arb) == typemin(Arb(5)) == Arb(-Inf)
+        @test typemax(Arb) == typemax(Arb(5)) == Arb(Inf)
+        @test precision(typemin(Arb(prec = 80))) == 80
+        @test precision(typemax(Arb(prec = 80))) == 80
+    end
+
+    @testset "frexp/ldexp" begin
+        @test frexp(Arf(12.3)) == frexp(12.3)
+        @test frexp(Arf(-12.3)) == frexp(-12.3)
+        @test frexp(Arf(0)) == frexp(0.0)
+        @test frexp(Arf(Inf)) == frexp(Inf)
+        @test precision(frexp(Arf(1, prec = 80))[1]) == 80
+        @test frexp(Arf(1)) isa Tuple{Arf,BigInt}
+
+        @test frexp(Arb(12.3)) == frexp(12.3)
+        @test frexp(Arb(-12.3)) == frexp(-12.3)
+        @test frexp(Arb(0)) == frexp(0.0)
+        @test frexp(Arb(Inf)) == frexp(Inf)
+        @test isequal(frexp(Arb(π))[1], Arblib.mul_2exp!(Arb(), Arb(π), -2))
+        @test precision(frexp(Arb(1, prec = 80))[1]) == 80
+        @test frexp(Arb(1)) isa Tuple{Arb,BigInt}
+
+        @test ldexp(Arf(1.1), 2) == Arf(1.1) * 2^2
+        @test ldexp(Arf(1.1), -10) == Arf(1.1) / 2^10
+        @test ldexp(Arb(1.1), 2) == Arb(1.1) * 2^2
+        @test ldexp(Arb(1.1), -10) == Arb(1.1) / 2^10
+        @test precision(ldexp(Arf(1, prec = 80), 1)) == 80
+        @test precision(ldexp(Arb(1, prec = 80), 1)) == 80
+    end
 end

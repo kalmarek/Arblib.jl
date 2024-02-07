@@ -11,7 +11,9 @@
         for x in (Mag(π), Arf(1 // 3), Arb(π))
             str = Arblib.dump_string(x)
             y = Arblib.load_string!(zero(x), str)
+            z = Arblib.load_string(typeof(x), str)
             @test isequal(x, y)
+            @test isequal(x, z)
         end
     end
 

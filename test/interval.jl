@@ -4,13 +4,14 @@
         y = Arb(2)
         Arblib.set!(Arblib.radref(y), one(Mag))
 
-        @test radius(x) == radius(Mag, x) == radius(Arf, x) == radius(Arb, x) == zero(Mag)
-        @test radius(y) == radius(Mag, y) == radius(Arf, y) == radius(Arb, y) == one(Mag)
+        @test radius(x) == radius(Mag, x) == radius(Arf, x) == radius(Arb, x) == 0
+        @test radius(y) == radius(Mag, y) == radius(Arf, y) == radius(Arb, y) == 1
 
         @test radius(x) isa Mag
         @test radius(Mag, x) isa Mag
         @test radius(Arf, x) isa Arf
         @test radius(Arb, x) isa Arb
+        @test radius(Float64, x) isa Float64
 
         @test precision(radius(Arf, Arb(prec = 80))) == 80
         @test precision(radius(Arb, Arb(prec = 80))) == 80
@@ -180,13 +181,15 @@
         y = one(Arb)
         Arblib.set!(Arblib.radref(y), 1)
 
-        @test getball(x) == getball(Arb, x) == (one(Arf), zero(Mag))
-        @test getball(y) == getball(Arb, y) == (one(Arf), one(Mag))
+        @test getball(x) == getball(Arf, x) == getball(Arb, x) == (one(Arf), zero(Mag))
+        @test getball(y) == getball(Arf, y) == getball(Arb, y) == (one(Arf), one(Mag))
 
         @test getball(x) isa Tuple{Arf,Mag}
+        @test getball(Arf, x) isa Tuple{Arf,Arf}
         @test getball(Arb, x) isa Tuple{Arb,Arb}
 
         @test precision(getball(Arb(prec = 80))[1]) == 80
+        @test precision.(getball(Arf, Arb(prec = 80))) == (80, 80)
         @test precision.(getball(Arb, Arb(prec = 80))) == (80, 80)
     end
 

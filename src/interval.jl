@@ -5,11 +5,12 @@ export radius,
     radius([T, ] x::ArbOrRef)
 
 Returns the radius of `x` as a `Mag`. If `T` is given convert to this
-type, supports `Mag`, `Arf` and `Arb`.
+type, supports `Mag`, `Arf`, `Arb` and `Float64`.
 """
 radius(::Type{Mag}, x::ArbOrRef) = Mag(radref(x))
 radius(::Type{Arf}, x::ArbOrRef) = Arf(radref(x), prec = precision(x))
 radius(::Type{Arb}, x::ArbOrRef) = Arb(radref(x), prec = precision(x))
+radius(::Type{Float64}, x::ArbOrRef) = Float64(radref(x))
 radius(x::ArbOrRef) = radius(Mag, x)
 
 """
@@ -133,11 +134,12 @@ getinterval(x::ArbOrRef) = getinterval(Arf, x)
 
 Returns a tuple `(m::Arf, r::Mag)` where `m` is the midpoint of the
 ball and `r` is the radius. If `T` is given convert both `m` and `r`
-to this type, supports `Arb`.
+to this type, supports `Arf` and `Arb`.
 
 See also [`setball`](@ref) and [`getinterval`](@ref).
 """
 getball(x::ArbOrRef) = (Arf(midref(x)), Mag(radref(x)))
+getball(::Type{Arf}, x::ArbOrRef) = (Arf(midref(x)), Arf(radref(x), prec = precision(x)))
 getball(::Type{Arb}, x::ArbOrRef) = (Arb(midref(x)), Arb(radref(x), prec = precision(x)))
 
 """

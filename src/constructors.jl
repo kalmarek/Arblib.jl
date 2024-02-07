@@ -66,22 +66,6 @@ function Acb(re::AbstractString, im::AbstractString; prec::Integer = DEFAULT_PRE
     return res
 end
 
-Base.Int(x::ArfOrRef; rnd::Union{arb_rnd,RoundingMode} = RoundNearest) =
-    is_int(x) ? get_si(x, rnd) : throw(InexactError(:Int64, Int64, x))
-
-Base.Float64(x::MagOrRef) = get(x)
-Base.Float64(x::ArfOrRef; rnd::Union{arb_rnd,RoundingMode} = RoundNearest) = get_d(x, rnd)
-Base.Float64(x::ArbOrRef) = Float64(midref(x))
-
-Base.ComplexF64(z::AcbOrRef) = Complex(Float64(realref(z)), Float64(imagref(z)))
-
-function Base.BigFloat(x::ArfOrRef)
-    y = BigFloat(; precision = precision(x))
-    get!(y, x)
-    return y
-end
-Base.BigFloat(x::ArbOrRef) = BigFloat(midref(x))
-
 Base.zero(::Union{Mag,Type{Mag}}) = Mag(UInt64(0))
 Base.one(::Union{Mag,Type{Mag}}) = Mag(UInt64(1))
 Base.zero(x::T) where {T<:Union{Arf,Arb,Acb}} = T(0, prec = precision(x))

@@ -17,16 +17,32 @@ else
     # overloading that we automatically support giving base argument.
 
     # Types
-    Base._precision(::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}}) =
-        DEFAULT_PRECISION[]
-    # Types not storing their precision
-    Base._precision(::Union{ArbStructTypes,Ptr{<:ArbStructTypes}}) = DEFAULT_PRECISION[]
-    # Types storing their precision
-    Base._precision(x::ArbTypes) = x.prec
-    # Mag doesn't store a precision
-    Base._precision(::MagOrRef) = DEFAULT_PRECISION[]
-    # ArbSeries and AcbSeries don't store their precision directly
-    Base._precision(x::Union{ArbSeries,AcbSeries}) = Base._precision(x.poly)
+    if VERSION < v"1.11.0-DEV"
+        Base._precision(::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}}) =
+            DEFAULT_PRECISION[]
+        # Types not storing their precision
+        Base._precision(::Union{ArbStructTypes,Ptr{<:ArbStructTypes}}) = DEFAULT_PRECISION[]
+        # Types storing their precision
+        Base._precision(x::ArbTypes) = x.prec
+        # Mag doesn't store a precision
+        Base._precision(::MagOrRef) = DEFAULT_PRECISION[]
+        # ArbSeries and AcbSeries don't store their precision directly
+        Base._precision(x::Union{ArbSeries,AcbSeries}) = Base._precision(x.poly)
+    else
+        Base._precision_with_base_2(
+            ::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}},
+        ) = DEFAULT_PRECISION[]
+        # Types not storing their precision
+        Base._precision_with_base_2(::Union{ArbStructTypes,Ptr{<:ArbStructTypes}}) =
+            DEFAULT_PRECISION[]
+        # Types storing their precision
+        Base._precision_with_base_2(x::ArbTypes) = x.prec
+        # Mag doesn't store a precision
+        Base._precision_with_base_2(::MagOrRef) = DEFAULT_PRECISION[]
+        # ArbSeries and AcbSeries don't store their precision directly
+        Base._precision_with_base_2(x::Union{ArbSeries,AcbSeries}) =
+            Base._precision_with_base_2(x.poly)
+    end
 
     # Base.precision only allows AbstractFloat, we want to be able to use
     # all ArbLib types.

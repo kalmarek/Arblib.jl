@@ -112,6 +112,8 @@ function load_string!(x::Union{MagLike,ArfLike,ArbLike}, str::AbstractString)
     return x
 end
 
+load_string(T::Type{<:Union{Mag,Arf,Arb}}, str::AbstractString) = load_string!(zero(T), str)
+
 function dump_string(x::Union{MagLike,ArfLike,ArbLike})
     char_ptr = dump(x)
     str = unsafe_string(char_ptr)
