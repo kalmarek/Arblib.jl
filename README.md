@@ -2,7 +2,7 @@
 
 [![][docs-stable-img]][docs-stable-url]
 [![][docs-dev-img]][docs-dev-url]
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10081695.svg)](https://doi.org/10.5281/zenodo.10081695)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10081694.svg)](https://doi.org/10.5281/zenodo.10081694)
 [![ci](https://github.com/kalmarek/Arblib.jl/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/kalmarek/Arblib.jl/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/kalmarek/Arblib.jl/graph/badge.svg?token=i1YYEc2Vht)](https://codecov.io/gh/kalmarek/Arblib.jl)
 
