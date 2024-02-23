@@ -19,7 +19,6 @@ ARF_RND_UP     (1)
     ArbRoundDown, # ARF_RND_FLOOR
     ArbRoundUp, # ARF_RND_CEIL
     ArbRoundNearest, # ARF_RND_NEAR
-    ArbRoundExact # ARF_PREC_EXACT
 )
 
 Base.convert(::Type{arb_rnd}, ::RoundingMode{:ToZero}) = ArbRoundToZero
@@ -27,7 +26,6 @@ Base.convert(::Type{arb_rnd}, ::RoundingMode{:FromZero}) = ArbRoundFromZero
 Base.convert(::Type{arb_rnd}, ::RoundingMode{:Down}) = ArbRoundDown
 Base.convert(::Type{arb_rnd}, ::RoundingMode{:Up}) = ArbRoundUp
 Base.convert(::Type{arb_rnd}, ::RoundingMode{:Nearest}) = ArbRoundNearest
-Base.convert(::Type{arb_rnd}, ::RoundingMode{:Exact}) = ArbRoundExact
 
 function Base.convert(::Type{RoundingMode}, r::arb_rnd)
     if r == ArbRoundToZero
@@ -40,8 +38,6 @@ function Base.convert(::Type{RoundingMode}, r::arb_rnd)
         return RoundUp
     elseif r == ArbRoundNearest
         return RoundNearest
-    elseif r == ArbRoundExact
-        return RoundingMode{:Exact}()
     else
         throw(ArgumentError("invalid Arb rounding mode code: $r"))
     end
