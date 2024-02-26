@@ -1,7 +1,12 @@
 @testset "show" begin
     @testset "string" begin
-        @test string(Mag()) == "(0)"
-        @test string(Mag(1)) == "(536870912 * 2^-29)"
+        @test Arblib._string(Mag()) == "(0)"
+        @test Arblib._string(Mag(1)) == "(536870912 * 2^-29)"
+
+        @test string(Mag()) == "0"
+        @test string(Mag(1)) == "1.00000000"
+        @test string(Mag(1), digits = 2) == "1.0"
+        @test string(Mag(1), digits = 12) == "1.00000000000"
 
         @test string(Arf()) == "0"
         @test string(Arf(1)) ==

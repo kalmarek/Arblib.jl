@@ -1,6 +1,6 @@
 digits_prec(prec::Integer) = floor(Int, prec * (log(2) / log(10)))
 
-function Base.string(x::MagOrRef)
+function _string(x::MagOrRef)
     Libc.flush_cstdio()
     Base.flush(stdout)
     io = IOStream("arb")
@@ -14,6 +14,14 @@ function Base.string(x::MagOrRef)
         close(out_wr)
     end
     return read(out_rd, String)
+end
+
+function Base.string(x::MagOrRef; digits::Integer = digits_prec(30))
+    cstr = ccall(@libflint(arf_get_str), Ptr{UInt8}, (Ref{arf_struct}, Int), Arf(x), digits)
+    str = unsafe_string(cstr)
+    ccall(@libflint(flint_free), Nothing, (Ptr{UInt8},), cstr)
+
+    return str
 end
 
 function Base.string(x::ArfOrRef; digits::Integer = digits_prec(precision(x)))
