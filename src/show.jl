@@ -1,6 +1,6 @@
 digits_prec(prec::Integer) = floor(Int, prec * (log(2) / log(10)))
 
-function _string(x::MagOrRef)
+function Base.string(x::MagOrRef)
     Libc.flush_cstdio()
     Base.flush(stdout)
     io = IOStream("arb")
@@ -16,37 +16,54 @@ function _string(x::MagOrRef)
     return read(out_rd, String)
 end
 
-function Base.show(io::IO, x::MagOrRef)
-    if isdefined(Main, :IJulia) && Main.IJulia.inited
-        print(io, Float64(x))
-    else
-        print(io, _string(x))
-    end
+function Base.string(x::ArfOrRef; digits::Integer = digits_prec(precision(x)))
+    cstr = ccall(@libflint(arf_get_str), Ptr{UInt8}, (Ref{arf_struct}, Int), x, digits)
+    str = unsafe_string(cstr)
+    ccall(@libflint(flint_free), Nothing, (Ptr{UInt8},), cstr)
+
+    return str
 end
 
-Base.show(io::IO, x::ArfOrRef) = print(io, BigFloat(x))
+function Base.string(
+    x::ArbOrRef;
+    digits::Integer = digits_prec(precision(x)),
+    more::Bool = false,
+    no_radius::Bool = false,
+    condense::Integer = 0,
+)
+    flag = convert(UInt, more + 2no_radius + 16condense)
 
-function Base.show(io::IO, x::ArbOrRef)
     cstr = ccall(
         @libflint(arb_get_str),
         Ptr{UInt8},
         (Ref{arb_struct}, Int, UInt),
         x,
-        digits_prec(precision(x)),
-        UInt(0),
+        digits,
+        flag,
     )
-    print(io, unsafe_string(cstr))
+    str = unsafe_string(cstr)
     ccall(@libflint(flint_free), Nothing, (Ptr{UInt8},), cstr)
+
+    return str
 end
 
-function Base.show(io::IO, x::AcbOrRef)
-    show(io, realref(x))
-    if !iszero(imagref(x))
-        print(io, " + ")
-        show(io, imagref(x))
-        print(io, "im")
+function Base.string(
+    z::AcbOrRef;
+    digits::Integer = digits_prec(precision(z)),
+    more::Bool = false,
+    no_radius::Bool = false,
+    condense::Integer = 0,
+)
+    str = string(realref(z); digits, more, no_radius, condense)
+
+    if !iszero(imagref(z))
+        str *= " + " * string(imagref(z); digits, more, no_radius, condense) * "im"
     end
+
+    return str
 end
+
+Base.show(io::IO, x::Union{MagOrRef,ArfOrRef,ArbOrRef,AcbOrRef}) = print(io, string(x))
 
 function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
     if (T == ArbPoly || T == AcbPoly) && iszero(poly)
@@ -79,30 +96,6 @@ function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,Ac
             ifelse(degree(poly) == 0, "", "^$(degree(poly) + 1)") *
             ")"
         print(io, str)
-    end
-end
-
-for ArbT in (Mag, MagRef, Arf, ArfRef, Arb, ArbRef, Acb, AcbRef)
-    arbf = Symbol(cprefix(ArbT), :_, :print)
-    @eval begin
-        function string_nice(
-            x::$ArbT,
-            digits::Integer = digits_prec(precision(x)),
-            flags::UInt = UInt(0),
-        )
-            Libc.flush_cstdio()
-            Base.flush(stdout)
-            original_stdout = stdout
-            out_rd, out_wr = redirect_stdout()
-            try
-                printn(x, digits, flags)
-                Libc.flush_cstdio()
-            finally
-                redirect_stdout(original_stdout)
-                close(out_wr)
-            end
-            return read(out_rd, String)
-        end
     end
 end
 
