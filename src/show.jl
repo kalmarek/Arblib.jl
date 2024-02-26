@@ -71,7 +71,16 @@ function Base.string(
     return str
 end
 
-Base.show(io::IO, x::Union{MagOrRef,ArfOrRef,ArbOrRef,AcbOrRef}) = print(io, string(x))
+function Base.show(io::IO, x::Union{MagOrRef,ArfOrRef})
+    if Base.get(io, :compact, false)
+        digits = min(6, digits_prec(precision(x)))
+        print(io, string(x; digits))
+    else
+        print(io, string(x))
+    end
+end
+
+Base.show(io::IO, x::Union{ArbOrRef,AcbOrRef}) = print(io, string(x))
 
 function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
     if (T == ArbPoly || T == AcbPoly) && iszero(poly)

@@ -69,6 +69,9 @@
     end
 
     @testset "show" begin
+        @test repr(Mag(1), context = IOContext(stdout, :compact => true)) == "1.00000"
+        @test repr(Arf(1), context = IOContext(stdout, :compact => true)) == "1.00000"
+
         prec = 32
 
         P = ArbPoly(Arb[1, 2, 0, π], prec = prec)
