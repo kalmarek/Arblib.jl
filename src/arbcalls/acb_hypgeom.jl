@@ -179,6 +179,7 @@ arbcall"void acb_hypgeom_legendre_p_uiui_rec(acb_t res, ulong n, ulong m, const 
 arbcall"void acb_hypgeom_spherical_y(acb_t res, slong n, slong m, const acb_t theta, const acb_t phi, slong prec)"
 
 ### Dilogarithm
+arbcall"void acb_hypgeom_dilog_bernoulli(acb_t res, const acb_t z, slong prec)"
 arbcall"void acb_hypgeom_dilog_zero_taylor(acb_t res, const acb_t z, slong prec)"
 arbcall"void acb_hypgeom_dilog_zero(acb_t res, const acb_t z, slong prec)"
 arbcall"void acb_hypgeom_dilog_transform(acb_t res, const acb_t z, int algorithm, slong prec)"
