@@ -206,6 +206,7 @@ function parse_and_generate_arbdoc(
         "arb_hypgeom",
         "acb_elliptic",
         "acb_modular",
+        "acb_theta",
         "acb_dirichlet",
         "bernoulli",
         "hypgeom",
