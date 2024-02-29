@@ -96,8 +96,8 @@ arbcall"void acb_mat_scalar_div_arb(acb_mat_t B, const acb_mat_t A, const arb_t 
 arbcall"void acb_mat_scalar_div_acb(acb_mat_t B, const acb_mat_t A, const acb_t c, slong prec)"
 
 ### Vector arithmetic
-arbcall"void _acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec)"
-arbcall"void _acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr v, slong prec)"
+#mo arbcall"void _acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec)" # same as acb_mat_vector_mul_row (except not allowing aliasing)
+#mo arbcall"void _acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr v, slong prec)" # same as acb_mat_vector_mul_col (except not allowing aliasing)
 arbcall"void acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec)"
 arbcall"void acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr v, slong prec)"
 

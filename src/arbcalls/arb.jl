@@ -392,7 +392,7 @@ arbcall"void _arb_vec_zero(arb_ptr vec, slong n)"
 arbcall"int _arb_vec_is_zero(arb_srcptr vec, slong len)"
 arbcall"int _arb_vec_is_finite(arb_srcptr x, slong len)"
 arbcall"int _arb_vec_equal(arb_srcptr vec1, arb_srcptr vec2, slong len)"
-arbcall"int _arb_vec_overlaps(arb_srcptr vec1, arb_srcptr vec2, slong len)"
+#mo arbcall"int _arb_vec_overlaps(arb_srcptr vec1, arb_srcptr vec2, slong len)" # clashes with _arb_poly_overlaps
 arbcall"int _arb_vec_contains(arb_srcptr vec1, arb_srcptr vec2, slong len)"
 arbcall"void _arb_vec_set(arb_ptr res, arb_srcptr vec, slong len)"
 arbcall"void _arb_vec_set_round(arb_ptr res, arb_srcptr vec, slong len, slong prec)"
