@@ -87,7 +87,13 @@ function Base.show(io::IO, x::Union{MagOrRef,ArfOrRef})
     end
 end
 
-Base.show(io::IO, x::Union{ArbOrRef,AcbOrRef}) = print(io, string(x))
+function Base.show(io::IO, x::Union{ArbOrRef,AcbOrRef})
+    if Base.get(io, :compact, false) && rel_accuracy_bits(x) > 48
+        print(io, string(x, condense = 2, unicode = true))
+    else
+        print(io, string(x))
+    end
+end
 
 function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,AcbSeries}}
     if (T == ArbPoly || T == AcbPoly) && iszero(poly)

@@ -79,6 +79,10 @@
     @testset "show" begin
         @test repr(Mag(1), context = IOContext(stdout, :compact => true)) == "1.00000"
         @test repr(Arf(1), context = IOContext(stdout, :compact => true)) == "1.00000"
+        @test repr(Arb(π), context = IOContext(stdout, :compact => true)) ==
+              "[3.14{…72 digits…}62 ± 1.93e-77]"
+        @test repr(Acb(π, ℯ), context = IOContext(stdout, :compact => true)) ==
+              "[3.14{…72 digits…}62 ± 1.93e-77] + [2.71{…72 digits…}35 ± 5.46e-77]im"
 
         prec = 32
 
