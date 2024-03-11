@@ -38,6 +38,7 @@ function Base.string(
     more::Bool = false,
     no_radius::Bool = false,
     condense::Integer = 0,
+    unicode::Bool = false,
 )
     flag = convert(UInt, more + 2no_radius + 16condense)
 
@@ -52,6 +53,11 @@ function Base.string(
     str = unsafe_string(cstr)
     ccall(@libflint(flint_free), Nothing, (Ptr{UInt8},), cstr)
 
+    if unicode
+        # Multiple patterns in same call requires Julia 1.7
+        str = replace(replace(str, "+/-" => "±"), "..." => "…")
+    end
+
     return str
 end
 
@@ -61,11 +67,12 @@ function Base.string(
     more::Bool = false,
     no_radius::Bool = false,
     condense::Integer = 0,
+    unicode::Bool = false,
 )
-    str = string(realref(z); digits, more, no_radius, condense)
+    str = string(realref(z); digits, more, no_radius, condense, unicode)
 
     if !iszero(imagref(z))
-        str *= " + " * string(imagref(z); digits, more, no_radius, condense) * "im"
+        str *= " + " * string(imagref(z); digits, more, no_radius, condense, unicode) * "im"
     end
 
     return str
