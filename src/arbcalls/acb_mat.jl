@@ -18,6 +18,9 @@ arbcall"void acb_mat_set(acb_mat_t dest, const acb_mat_t src)"
 #ni arbcall"void acb_mat_set_fmpq_mat(acb_mat_t dest, const fmpq_mat_t src, slong prec)"
 arbcall"void acb_mat_set_arb_mat(acb_mat_t dest, const arb_mat_t src)"
 arbcall"void acb_mat_set_round_arb_mat(acb_mat_t dest, const arb_mat_t src, slong prec)"
+arbcall"void acb_mat_get_real(arb_mat_t re, const arb_mat_t mat)"
+arbcall"void acb_mat_get_imag(arb_mat_t im, const arb_mat_t mat)"
+arbcall"void acb_mat_set_real_imag(acb_mat_t mat, const arb_mat_t re, const arb_mat_t im)"
 
 ### Random generation
 #ns arbcall"void acb_mat_randtest(acb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)"
@@ -49,6 +52,7 @@ arbcall"int acb_mat_is_diag(const acb_mat_t mat)"
 arbcall"void acb_mat_zero(acb_mat_t mat)"
 arbcall"void acb_mat_one(acb_mat_t mat)"
 arbcall"void acb_mat_ones(acb_mat_t mat)"
+arbcall"void acb_mat_onei(acb_mat_t mat)"
 arbcall"void acb_mat_indeterminate(acb_mat_t mat)"
 arbcall"void acb_mat_dft(acb_mat_t mat, int type, slong prec)"
 
@@ -90,6 +94,12 @@ arbcall"void acb_mat_scalar_div_si(acb_mat_t B, const acb_mat_t A, slong c, slon
 #ni arbcall"void acb_mat_scalar_div_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec)"
 arbcall"void acb_mat_scalar_div_arb(acb_mat_t B, const acb_mat_t A, const arb_t c, slong prec)"
 arbcall"void acb_mat_scalar_div_acb(acb_mat_t B, const acb_mat_t A, const acb_t c, slong prec)"
+
+### Vector arithmetic
+#mo arbcall"void _acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec)" # same as acb_mat_vector_mul_row (except not allowing aliasing)
+#mo arbcall"void _acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr v, slong prec)" # same as acb_mat_vector_mul_col (except not allowing aliasing)
+arbcall"void acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec)"
+arbcall"void acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr v, slong prec)"
 
 ### Gaussian elimination and solving
 arbcall"int acb_mat_lu_classical(slong * perm, acb_mat_t LU, const acb_mat_t A, slong prec)"

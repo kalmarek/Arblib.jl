@@ -1,7 +1,7 @@
 name = "Arblib"
 uuid = "fb37089c-8514-4489-9461-98f9c8763369"
 authors = ["Marek Kaluba <kalmar@amu.edu.pl>", "Sascha Timme <Sascha Timme <timme@math.tu-berlin.de>", "Joel Dahne <joel@dahne.eu>"]
-version = "1.1"
+version = "1.1.0"
 
 [deps]
 FLINT_jll = "e134572f-a0d5-539d-bddf-3cad8db41a82"
@@ -10,19 +10,19 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
-[extras]
-Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
 [compat]
 Documenter = "1"
-FLINT_jll = "~300.0.0"
+FLINT_jll = "~300.100.100"
 LinearAlgebra = "1.6"
 Random = "1.6"
 Serialization = "1.6"
 SpecialFunctions = "1, 2"
 Test = "1.6"
 julia = "1.6"
+
+[extras]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["Documenter", "Test"]

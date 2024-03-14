@@ -24,5 +24,4 @@
 #ni arbcall"void arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, slong prec)"
 
 ### Special polynomials
-#ni arbcall"void arb_fmpz_poly_cos_minpoly(fmpz_poly_t res, ulong n)"
 #ni arbcall"void arb_fmpz_poly_gauss_period_minpoly(fmpz_poly_t res, ulong q, ulong n)"

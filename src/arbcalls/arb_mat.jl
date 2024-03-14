@@ -19,6 +19,8 @@ arbcall"void arb_mat_set(arb_mat_t dest, const arb_mat_t src)"
 
 ### Random generation
 #ns arbcall"void arb_mat_randtest(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)"
+#ns arbcall"void arb_mat_randtest_cho(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)"
+#ns arbcall"void arb_mat_randtest_spd(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)"
 
 ### Input and output
 arbcall"void arb_mat_printd(const arb_mat_t mat, slong digits)"
@@ -86,6 +88,12 @@ arbcall"void arb_mat_scalar_div_si(arb_mat_t B, const arb_mat_t A, slong c, slon
 #ni arbcall"void arb_mat_scalar_div_fmpz(arb_mat_t B, const arb_mat_t A, const fmpz_t c, slong prec)"
 arbcall"void arb_mat_scalar_div_arb(arb_mat_t B, const arb_mat_t A, const arb_t c, slong prec)"
 
+### Vector arithmetic
+#mo arbcall"void _arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong prec)" # same as arb_mat_vector_mul_row (except not allowing aliasing)
+#mo arbcall"void _arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec)" # same as arb_mat_vector_mul_col (except not allowing aliasing)
+arbcall"void arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong prec)"
+arbcall"void arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec)"
+
 ### Gaussian elimination and solving
 arbcall"int arb_mat_lu_classical(slong * perm, arb_mat_t LU, const arb_mat_t A, slong prec)"
 arbcall"int arb_mat_lu_recursive(slong * perm, arb_mat_t LU, const arb_mat_t A, slong prec)"
@@ -149,3 +157,8 @@ arbcall"void arb_mat_get_mid(arb_mat_t B, const arb_mat_t A)"
 arbcall"void arb_mat_add_error_mag(arb_mat_t mat, const mag_t err)"
 
 ### Eigenvalues and eigenvectors
+
+### LLL reduction
+#ni arbcall"int arb_mat_spd_get_fmpz_mat(fmpz_mat_t B, const arb_mat_t A, slong prec)"
+#ni arbcall"void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)"
+arbcall"int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec)"

@@ -97,12 +97,6 @@ arbcall"void _arb_poly_compose(arb_ptr res, arb_srcptr poly1, slong len1, arb_sr
 arbcall"void arb_poly_compose(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong prec)"
 arbcall"void _arb_poly_compose_series(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong n, slong prec)"
 arbcall"void arb_poly_compose_series(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong n, slong prec)"
-arbcall"void _arb_poly_revert_series_lagrange(arb_ptr h, arb_srcptr f, slong flen, slong n, slong prec)"
-arbcall"void arb_poly_revert_series_lagrange(arb_poly_t h, const arb_poly_t f, slong n, slong prec)"
-arbcall"void _arb_poly_revert_series_newton(arb_ptr h, arb_srcptr f, slong flen, slong n, slong prec)"
-arbcall"void arb_poly_revert_series_newton(arb_poly_t h, const arb_poly_t f, slong n, slong prec)"
-arbcall"void _arb_poly_revert_series_lagrange_fast(arb_ptr h, arb_srcptr f, slong flen, slong n, slong prec)"
-arbcall"void arb_poly_revert_series_lagrange_fast(arb_poly_t h, const arb_poly_t f, slong n, slong prec)"
 arbcall"void _arb_poly_revert_series(arb_ptr h, arb_srcptr f, slong flen, slong n, slong prec)"
 arbcall"void arb_poly_revert_series(arb_poly_t h, const arb_poly_t f, slong n, slong prec)"
 
