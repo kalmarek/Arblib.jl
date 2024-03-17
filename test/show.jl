@@ -4,23 +4,35 @@
         @test Arblib._string(Mag(1)) == "(536870912 * 2^-29)"
 
         @test string(Mag()) == "0"
-        @test string(Mag(1)) == "1.00000000"
-        @test string(Mag(1), digits = 2) == "1.0"
-        @test string(Mag(1), digits = 12) == "1.00000000000"
+        @test string(Mag(1)) == "1.0"
+        @test string(Mag(1), digits = 3, remove_trailing_zeros = false) == "1.00"
+        @test string(Mag(1), digits = 12, remove_trailing_zeros = false) == "1.00000000000"
+        @test string(Mag(10^15)) == "1.0e+15"
+        @test string(Mag(10^15), remove_trailing_zeros = false) == "1.00000000e+15"
+        @test string(Mag(π) * 10^10) == "3.14159267e+10"
 
         @test string(Arf()) == "0"
-        @test string(Arf(1)) ==
-              "1.0000000000000000000000000000000000000000000000000000000000000000000000000000"
-        @test string(Arf(1, prec = 64)) == "1.000000000000000000"
-        @test string(Arf(1), digits = 2) == "1.0"
-        @test string(Arf(1), digits = 12) == "1.00000000000"
+        @test string(Arf(1)) == "1.0"
+        @test string(Arf(1), digits = 3, remove_trailing_zeros = false) == "1.00"
+        @test string(Arf(1), digits = 12, remove_trailing_zeros = false) == "1.00000000000"
+        @test string(Arf(1) / 3) ==
+              "0.33333333333333333333333333333333333333333333333333333333333333333333333333333"
+        @test string(Arf(1) / 3, digits = 12) == "0.333333333333"
+        @test string(Arf(10)^100) == "1.0e+100"
+        @test string(Arf(10)^100, remove_trailing_zeros = false) ==
+              "1.0000000000000000000000000000000000000000000000000000000000000000000000000000e+100"
+        @test string(Arf(1 // 3) * Arf(10)^81) ==
+              "3.3333333333333333333333333333333333333333333333333333333333333333333333333334e+80"
 
         @test string(Arb()) == "0"
-        @test string(Arb(1)) ==
-              "1.0000000000000000000000000000000000000000000000000000000000000000000000000000"
-        @test string(Arb(1, prec = 64)) == "1.000000000000000000"
-        @test string(Arb(1), digits = 2) == "1.0"
-        @test string(Arb(1), digits = 12) == "1.00000000000"
+        @test string(Arb(1)) == "1.0"
+        @test string(Arb(1, prec = 64), remove_trailing_zeros = false) ==
+              "1.000000000000000000"
+        @test string(Arb(1), digits = 2, remove_trailing_zeros = false) == "1.0"
+        @test string(Arb(1), digits = 12, remove_trailing_zeros = false) == "1.00000000000"
+        @test string(Arb(10)^100) == "1.0e+100"
+        @test string(Arb(10)^100, remove_trailing_zeros = false) ==
+              "1.0000000000000000000000000000000000000000000000000000000000000000000000000000e+100"
         @test string(Arb(π)) ==
               "[3.1415926535897932384626433832795028841971693993751058209749445923078164062862 +/- 1.93e-77]"
         @test string(Arb(π, prec = 64)) == "[3.141592653589793239 +/- 5.96e-19]"
@@ -39,11 +51,10 @@
               "[3.14159{…66 digits…}62862 ± 1.93e-77]"
 
         @test string(Acb()) == "0"
-        @test string(Acb(1)) ==
-              "1.0000000000000000000000000000000000000000000000000000000000000000000000000000"
-        @test string(Acb(0, 1)) ==
-              "0 + 1.0000000000000000000000000000000000000000000000000000000000000000000000000000im"
-        @test string(Acb(1, 1)) ==
+        @test string(Acb(1)) == "1.0"
+        @test string(Acb(0, 1)) == "0 + 1.0im"
+        @test string(Acb(1, 1)) == "1.0 + 1.0im"
+        @test string(Acb(1, 1), remove_trailing_zeros = false) ==
               "1.0000000000000000000000000000000000000000000000000000000000000000000000000000 + 1.0000000000000000000000000000000000000000000000000000000000000000000000000000im"
         @test string(Acb(π, ℯ)) ==
               "[3.1415926535897932384626433832795028841971693993751058209749445923078164062862 +/- 1.93e-77] + [2.7182818284590452353602874713526624977572470936999595749669676277240766303535 +/- 5.46e-77]im"
@@ -77,8 +88,8 @@
     end
 
     @testset "show" begin
-        @test repr(Mag(1), context = IOContext(stdout, :compact => true)) == "1.00000"
-        @test repr(Arf(1), context = IOContext(stdout, :compact => true)) == "1.00000"
+        @test repr(Mag(1), context = IOContext(stdout, :compact => true)) == "1.0"
+        @test repr(Arf(1), context = IOContext(stdout, :compact => true)) == "1.0"
         @test repr(Arb(π), context = IOContext(stdout, :compact => true)) ==
               "[3.14{…72 digits…}62 ± 1.93e-77]"
         @test repr(Acb(π, ℯ), context = IOContext(stdout, :compact => true)) ==
@@ -86,16 +97,15 @@
 
         prec = 32
 
-        P = ArbPoly(Arb[1, 2, 0, π], prec = prec)
-        @test "$P" == "1.00000000 + 2.00000000⋅x + [3.14159265 +/- 3.59e-9]⋅x^3"
-        P = AcbPoly([Acb[1, 2, 0, π]; Acb(1, 1)], prec = prec)
+        P = ArbPoly(Arb[1, 2, 0, π]; prec)
+        @test "$P" == "1.0 + 2.0⋅x + [3.14159265 +/- 3.59e-9]⋅x^3"
+        P = AcbPoly([Acb[1, 2, 0, π]; Acb(1, 1)]; prec)
+        @test "$P" == "1.0 + 2.0⋅x + [3.14159265 +/- 3.59e-9]⋅x^3 + (1.0 + 1.0im)⋅x^4"
+        P = ArbSeries(Arb[1, 2, 0, π], degree = 4; prec)
+        @test "$P" == "1.0 + 2.0⋅x + [3.14159265 +/- 3.59e-9]⋅x^3 + 𝒪(x^5)"
+        P = AcbSeries([Acb[1, 2, 0, π]; Acb(1, 1)], degree = 5; prec)
         @test "$P" ==
-              "1.00000000 + 2.00000000⋅x + [3.14159265 +/- 3.59e-9]⋅x^3 + (1.00000000 + 1.00000000im)⋅x^4"
-        P = ArbSeries(Arb[1, 2, 0, π], degree = 4, prec = prec)
-        @test "$P" == "1.00000000 + 2.00000000⋅x + [3.14159265 +/- 3.59e-9]⋅x^3 + 𝒪(x^5)"
-        P = AcbSeries([Acb[1, 2, 0, π]; Acb(1, 1)], degree = 5, prec = prec)
-        @test "$P" ==
-              "1.00000000 + 2.00000000⋅x + [3.14159265 +/- 3.59e-9]⋅x^3 + (1.00000000 + 1.00000000im)⋅x^4 + 𝒪(x^6)"
+              "1.0 + 2.0⋅x + [3.14159265 +/- 3.59e-9]⋅x^3 + (1.0 + 1.0im)⋅x^4 + 𝒪(x^6)"
 
         @test "$(ArbPoly())" == "$(AcbPoly())" == "0"
         @test "$(ArbSeries())" == "$(AcbSeries())" == "𝒪(x)"

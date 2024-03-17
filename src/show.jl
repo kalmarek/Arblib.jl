@@ -1,5 +1,27 @@
 digits_prec(prec::Integer) = floor(Int, prec * (log(2) / log(10)))
 
+function _remove_trailing_zeros(str::AbstractString)
+    if occursin('.', str)
+        if occursin('e', str)
+            # Numbers on the form xxx.yyy0ezzz
+            mantissa, exponent = split(str, 'e', limit = 2)
+            mantissa = rstrip(mantissa, '0')
+            if endswith(mantissa, '.')
+                mantissa *= '0'
+            end
+            str = mantissa * 'e' * exponent
+        else
+            # Numbers on the form xxx.yyy0
+            str = rstrip(str, '0')
+            if endswith(str, '.')
+                str *= '0'
+            end
+        end
+    end
+
+    return str
+end
+
 function _string(x::MagOrRef)
     Libc.flush_cstdio()
     Base.flush(stdout)
@@ -16,20 +38,28 @@ function _string(x::MagOrRef)
     return read(out_rd, String)
 end
 
-function Base.string(x::MagOrRef; digits::Integer = digits_prec(30))
+function Base.string(
+    x::MagOrRef;
+    digits::Integer = digits_prec(30),
+    remove_trailing_zeros::Bool = true,
+)
     cstr = ccall(@libflint(arf_get_str), Ptr{UInt8}, (Ref{arf_struct}, Int), Arf(x), digits)
     str = unsafe_string(cstr)
     ccall(@libflint(flint_free), Nothing, (Ptr{UInt8},), cstr)
 
-    return str
+    return remove_trailing_zeros ? _remove_trailing_zeros(str) : str
 end
 
-function Base.string(x::ArfOrRef; digits::Integer = digits_prec(precision(x)))
+function Base.string(
+    x::ArfOrRef;
+    digits::Integer = digits_prec(precision(x)),
+    remove_trailing_zeros::Bool = true,
+)
     cstr = ccall(@libflint(arf_get_str), Ptr{UInt8}, (Ref{arf_struct}, Int), x, digits)
     str = unsafe_string(cstr)
     ccall(@libflint(flint_free), Nothing, (Ptr{UInt8},), cstr)
 
-    return str
+    return remove_trailing_zeros ? _remove_trailing_zeros(str) : str
 end
 
 function Base.string(
@@ -39,6 +69,7 @@ function Base.string(
     no_radius::Bool = false,
     condense::Integer = 0,
     unicode::Bool = false,
+    remove_trailing_zeros::Bool = !no_radius,
 )
     flag = convert(UInt, more + 2no_radius + 16condense)
 
@@ -58,6 +89,10 @@ function Base.string(
         str = replace(replace(str, "+/-" => "±"), "..." => "…")
     end
 
+    if remove_trailing_zeros && !startswith(str, '[')
+        str = _remove_trailing_zeros(str)
+    end
+
     return str
 end
 
@@ -68,11 +103,31 @@ function Base.string(
     no_radius::Bool = false,
     condense::Integer = 0,
     unicode::Bool = false,
+    remove_trailing_zeros::Bool = true,
 )
-    str = string(realref(z); digits, more, no_radius, condense, unicode)
+    str = string(
+        realref(z);
+        digits,
+        more,
+        no_radius,
+        condense,
+        unicode,
+        remove_trailing_zeros,
+    )
 
     if !iszero(imagref(z))
-        str *= " + " * string(imagref(z); digits, more, no_radius, condense, unicode) * "im"
+        str *=
+            " + " *
+            string(
+                imagref(z);
+                digits,
+                more,
+                no_radius,
+                condense,
+                unicode,
+                remove_trailing_zeros,
+            ) *
+            "im"
     end
 
     return str
