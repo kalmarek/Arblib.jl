@@ -43,11 +43,7 @@ function Base.string(
     digits::Integer = digits_prec(30),
     remove_trailing_zeros::Bool = true,
 )
-    cstr = ccall(@libflint(arf_get_str), Ptr{UInt8}, (Ref{arf_struct}, Int), Arf(x), digits)
-    str = unsafe_string(cstr)
-    ccall(@libflint(flint_free), Nothing, (Ptr{UInt8},), cstr)
-
-    return remove_trailing_zeros ? _remove_trailing_zeros(str) : str
+    return string(Arf(x); digits, remove_trailing_zeros)
 end
 
 function Base.string(
@@ -105,29 +101,18 @@ function Base.string(
     unicode::Bool = false,
     remove_trailing_zeros::Bool = true,
 )
-    str = string(
-        realref(z);
-        digits,
-        more,
-        no_radius,
-        condense,
-        unicode,
-        remove_trailing_zeros,
+    kwargs = (
+        :digits => digits,
+        :more => more,
+        :no_radius => no_radius,
+        :condense => condense,
+        :unicode => unicode,
+        :remove_trailing_zeros => remove_trailing_zeros,
     )
 
+    str = string(realref(z); kwargs...)
     if !iszero(imagref(z))
-        str *=
-            " + " *
-            string(
-                imagref(z);
-                digits,
-                more,
-                no_radius,
-                condense,
-                unicode,
-                remove_trailing_zeros,
-            ) *
-            "im"
+        str *= " + " * string(imagref(z); kwargs...) * "im"
     end
 
     return str
