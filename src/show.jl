@@ -1,5 +1,27 @@
 digits_prec(prec::Integer) = floor(Int, prec * (log(2) / log(10)))
 
+function _remove_trailing_zeros(str::AbstractString)
+    if occursin('.', str)
+        if occursin('e', str)
+            # Numbers on the form xxx.yyy0ezzz
+            mantissa, exponent = split(str, 'e', limit = 2)
+            mantissa = rstrip(mantissa, '0')
+            if endswith(mantissa, '.')
+                mantissa *= '0'
+            end
+            str = mantissa * 'e' * exponent
+        else
+            # Numbers on the form xxx.yyy0
+            str = rstrip(str, '0')
+            if endswith(str, '.')
+                str *= '0'
+            end
+        end
+    end
+
+    return str
+end
+
 function _string(x::MagOrRef)
     Libc.flush_cstdio()
     Base.flush(stdout)
@@ -16,35 +38,100 @@ function _string(x::MagOrRef)
     return read(out_rd, String)
 end
 
-function Base.show(io::IO, x::MagOrRef)
-    if isdefined(Main, :IJulia) && Main.IJulia.inited
-        print(io, Float64(x))
-    else
-        print(io, _string(x))
-    end
+function Base.string(
+    x::MagOrRef;
+    digits::Integer = digits_prec(30),
+    remove_trailing_zeros::Bool = true,
+)
+    return string(Arf(x); digits, remove_trailing_zeros)
 end
 
-Base.show(io::IO, x::ArfOrRef) = print(io, BigFloat(x))
+function Base.string(
+    x::ArfOrRef;
+    digits::Integer = digits_prec(precision(x)),
+    remove_trailing_zeros::Bool = true,
+)
+    cstr = ccall(@libflint(arf_get_str), Ptr{UInt8}, (Ref{arf_struct}, Int), x, digits)
+    str = unsafe_string(cstr)
+    ccall(@libflint(flint_free), Nothing, (Ptr{UInt8},), cstr)
 
-function Base.show(io::IO, x::ArbOrRef)
+    return remove_trailing_zeros ? _remove_trailing_zeros(str) : str
+end
+
+function Base.string(
+    x::ArbOrRef;
+    digits::Integer = digits_prec(precision(x)),
+    more::Bool = false,
+    no_radius::Bool = false,
+    condense::Integer = 0,
+    unicode::Bool = false,
+    remove_trailing_zeros::Bool = !no_radius,
+)
+    flag = convert(UInt, more + 2no_radius + 16condense)
+
     cstr = ccall(
         @libflint(arb_get_str),
         Ptr{UInt8},
         (Ref{arb_struct}, Int, UInt),
         x,
-        digits_prec(precision(x)),
-        UInt(0),
+        digits,
+        flag,
     )
-    print(io, unsafe_string(cstr))
+    str = unsafe_string(cstr)
     ccall(@libflint(flint_free), Nothing, (Ptr{UInt8},), cstr)
+
+    if unicode
+        # Multiple patterns in same call requires Julia 1.7
+        str = replace(replace(str, "+/-" => "±"), "..." => "…")
+    end
+
+    if remove_trailing_zeros && !startswith(str, '[')
+        str = _remove_trailing_zeros(str)
+    end
+
+    return str
 end
 
-function Base.show(io::IO, x::AcbOrRef)
-    show(io, realref(x))
-    if !iszero(imagref(x))
-        print(io, " + ")
-        show(io, imagref(x))
-        print(io, "im")
+function Base.string(
+    z::AcbOrRef;
+    digits::Integer = digits_prec(precision(z)),
+    more::Bool = false,
+    no_radius::Bool = false,
+    condense::Integer = 0,
+    unicode::Bool = false,
+    remove_trailing_zeros::Bool = true,
+)
+    kwargs = (
+        :digits => digits,
+        :more => more,
+        :no_radius => no_radius,
+        :condense => condense,
+        :unicode => unicode,
+        :remove_trailing_zeros => remove_trailing_zeros,
+    )
+
+    str = string(realref(z); kwargs...)
+    if !iszero(imagref(z))
+        str *= " + " * string(imagref(z); kwargs...) * "im"
+    end
+
+    return str
+end
+
+function Base.show(io::IO, x::Union{MagOrRef,ArfOrRef})
+    if Base.get(io, :compact, false)
+        digits = min(6, digits_prec(precision(x)))
+        print(io, string(x; digits))
+    else
+        print(io, string(x))
+    end
+end
+
+function Base.show(io::IO, x::Union{ArbOrRef,AcbOrRef})
+    if Base.get(io, :compact, false) && rel_accuracy_bits(x) > 48
+        print(io, string(x, condense = 2, unicode = true))
+    else
+        print(io, string(x))
     end
 end
 
@@ -79,30 +166,6 @@ function Base.show(io::IO, poly::T) where {T<:Union{ArbPoly,ArbSeries,AcbPoly,Ac
             ifelse(degree(poly) == 0, "", "^$(degree(poly) + 1)") *
             ")"
         print(io, str)
-    end
-end
-
-for ArbT in (Mag, MagRef, Arf, ArfRef, Arb, ArbRef, Acb, AcbRef)
-    arbf = Symbol(cprefix(ArbT), :_, :print)
-    @eval begin
-        function string_nice(
-            x::$ArbT,
-            digits::Integer = digits_prec(precision(x)),
-            flags::UInt = UInt(0),
-        )
-            Libc.flush_cstdio()
-            Base.flush(stdout)
-            original_stdout = stdout
-            out_rd, out_wr = redirect_stdout()
-            try
-                printn(x, digits, flags)
-                Libc.flush_cstdio()
-            finally
-                redirect_stdout(original_stdout)
-                close(out_wr)
-            end
-            return read(out_rd, String)
-        end
     end
 end
 

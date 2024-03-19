@@ -36,7 +36,7 @@
                 y = zero(x)
                 y = sin_naive!(y, x)
                 str *= sprint(print, "Using $(lpad(prec, 5)) bits, sin(x) = ")
-                str *= sprint(println, Arblib.string_nice(y, 10))
+                str *= sprint(println, string(y, digits = 10))
                 y < zero(y) && break
                 prec *= 2
             end
