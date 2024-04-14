@@ -30,7 +30,7 @@ for (jf, af) in [(:+, :add!), (:*, :mul!), (:min, :min!), (:max, :max!)]
 end
 
 for T in (ArfOrRef, ArbOrRef, AcbOrRef, ArbPoly, AcbPoly)
-    @eval @inline _precision(x::$T, y::$T, z::$T, rest::Vararg{S}) where {S<:$T} =
+    @eval @inline _precision(x::$T, y::$T, z::$T, rest::Vararg{$T}) =
         max(precision(x), _precision(y, z, rest...))
 
     for (jf, af) in [(:+, :add!), (:*, :mul!), (:min, :min!), (:max, :max!)]
@@ -68,9 +68,9 @@ for T in (ArfOrRef, ArbOrRef, AcbOrRef, ArbPoly, AcbPoly)
 end
 
 for T in (ArbSeries, AcbSeries)
-    @eval @inline _precision(x::$T, y::$T, z::$T, rest::Vararg{S}) where {S<:$T} =
+    @eval @inline _precision(x::$T, y::$T, z::$T, rest::Vararg{$T}) =
         max(precision(x), _precision(y, z, rest...))
-    @eval @inline _degree(x::$T, y::$T, z::$T, rest::Vararg{S}) where {S<:$T} =
+    @eval @inline _degree(x::$T, y::$T, z::$T, rest::Vararg{$T}) =
         min(degree(x), _degree(y, z, rest...))
 
     for (jf, af) in [(:+, :add_series!), (:*, :mullow!)]
