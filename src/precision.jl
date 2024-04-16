@@ -1,51 +1,40 @@
 const DEFAULT_PRECISION = Ref{Int}(256)
 
-if VERSION < v"1.8.0"
-    # Types
-    Base.precision(::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}}) =
-        DEFAULT_PRECISION[]
-    # Types not storing their precision
-    Base.precision(x::Union{ArbStructTypes,Ptr{<:ArbStructTypes}}) = DEFAULT_PRECISION[]
-    # Types storing their precision
-    Base.precision(x::ArbTypes) = x.prec
-    # Mag doesn't store a precision
-    Base.precision(::MagOrRef) = DEFAULT_PRECISION[]
-    # ArbSeries and AcbSeries don't store their precision directly
-    Base.precision(x::Union{ArbSeries,AcbSeries}) = precision(x.poly)
-else
-    # Since Julia 1.8.0 Base.precision calls Base._precision and by
-    # overloading that we automatically support giving base argument.
-
-    # Types
-    if VERSION < v"1.11.0-DEV"
-        Base._precision(::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}}) =
-            DEFAULT_PRECISION[]
-        # Types not storing their precision
-        Base._precision(::Union{ArbStructTypes,Ptr{<:ArbStructTypes}}) = DEFAULT_PRECISION[]
-        # Types storing their precision
-        Base._precision(x::ArbTypes) = x.prec
-        # Mag doesn't store a precision
-        Base._precision(::MagOrRef) = DEFAULT_PRECISION[]
-        # ArbSeries and AcbSeries don't store their precision directly
-        Base._precision(x::Union{ArbSeries,AcbSeries}) = Base._precision(x.poly)
+let f
+    f = if VERSION < v"1.8.0-DEV.725"
+        :precision
+    elseif VERSION < v"1.11.0-DEV.1363"
+        # Since Julia 1.8.0 Base.precision calls Base._precision and by
+        # overloading that we automatically support giving base argument.
+        # Ref: https://github.com/JuliaLang/julia/pull/42428
+        :_precision
     else
-        Base._precision_with_base_2(
-            ::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}},
-        ) = DEFAULT_PRECISION[]
-        # Types not storing their precision
-        Base._precision_with_base_2(::Union{ArbStructTypes,Ptr{<:ArbStructTypes}}) =
-            DEFAULT_PRECISION[]
-        # Types storing their precision
-        Base._precision_with_base_2(x::ArbTypes) = x.prec
-        # Mag doesn't store a precision
-        Base._precision_with_base_2(::MagOrRef) = DEFAULT_PRECISION[]
-        # ArbSeries and AcbSeries don't store their precision directly
-        Base._precision_with_base_2(x::Union{ArbSeries,AcbSeries}) =
-            Base._precision_with_base_2(x.poly)
+        # Since Julia 1.11.0, the single-argument `Base._precision` is
+        # renamed to `Base._precision_with_base_2`
+        # Ref: https://github.com/JuliaLang/julia/pull/52910
+        :_precision_with_base_2
     end
 
+    @eval begin
+        # Types
+        Base.$f(::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}}) =
+            DEFAULT_PRECISION[]
+        # Types not storing their precision
+        Base.$f(x::Union{ArbStructTypes,Ptr{<:ArbStructTypes}}) = DEFAULT_PRECISION[]
+        # Types storing their precision
+        Base.$f(x::ArbTypes) = x.prec
+        # Mag doesn't store a precision
+        Base.$f(::MagOrRef) = DEFAULT_PRECISION[]
+        # ArbSeries and AcbSeries don't store their precision directly
+        Base.$f(x::Union{ArbSeries,AcbSeries}) = Base.$f(x.poly)
+    end
+end
+
+if VERSION >= v"1.8.0-DEV.725"
     # Base.precision only allows AbstractFloat, we want to be able to use
     # all ArbLib types.
+    # Hence we have to define `Base.precision` on Julia versions for which
+    # it is not defined above
     Base.precision(
         T::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}};
         base::Integer = 2,
@@ -98,4 +87,19 @@ function Base.setprecision(x::T, precision::Integer; base::Integer = 2) where {T
     base > 1 || throw(DomainError(base, "`base` cannot be less than 2."))
     precision > 1 || throw(DomainError(precision, "`precision` cannot be less than 2."))
     return T(x, prec = base == 2 ? precision : ceil(Int, precision * log2(base)))
+end
+
+# Since Julia 1.12, `Base.setprecision(::Function, ::Type, ::Integer; kwargs...)` is
+# defined only for `Type{BigFloat}`
+# Ref: https://github.com/JuliaLang/julia/pull/51362
+if VERSION >= v"1.12.0-DEV.78"
+    function Base.setprecision(f::Function, ::Type{T}, prec::Integer; kws...) where {T<:ArbTypes}
+        old_prec = Base.precision(T)
+        Base.setprecision(T, prec; kws...)
+        try
+            return f()
+        finally
+            Base.setprecision(T, old_prec)
+        end
+    end
 end
