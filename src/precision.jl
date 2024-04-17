@@ -93,7 +93,12 @@ end
 # defined only for `Type{BigFloat}`
 # Ref: https://github.com/JuliaLang/julia/pull/51362
 if VERSION >= v"1.12.0-DEV.78"
-    function Base.setprecision(f::Function, ::Type{T}, prec::Integer; kws...) where {T<:ArbTypes}
+    function Base.setprecision(
+        f::Function,
+        ::Type{T},
+        prec::Integer;
+        kws...,
+    ) where {T<:ArbTypes}
         old_prec = Base.precision(T)
         Base.setprecision(T, prec; kws...)
         try
