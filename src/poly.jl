@@ -83,9 +83,10 @@ Similar to `p[i]` but instead of an `Arb` or `Acb` returns an `ArbRef`
 or `AcbRef` which shares the memory with the `i`-th coefficient of
 `p`.
 
-!!! Note: For reading coefficients this is always safe, but if the
+!!! note
+    Using `ref` for reading coefficients is always safe, but if the
     coefficient is mutated then care has to be taken. See the comment
-    further down for how to handle this.
+    further down for how to handle mutation.
 
 It only allows accessing coefficients that are allocated. For
 `ArbPoly` and `AcbPoly` this is typically all coefficients up to the
