@@ -276,7 +276,8 @@ will be given a keyword argument `analytic::Bool`, if `analytic` is
 `true` then the output has to be non-finite (typically `Acb(NaN)`) if
 `f` is not holomorphic on the whole input ball.
 
-!!! Note: It's users responsibility to verify holomorphicity of `f`.
+!!! note
+    Users are responsible for verifying holomorphicity of `f`.
 
 Parameters:
  * `take_prec` if true then `f` will be given the keyword argument
@@ -289,9 +290,10 @@ Parameters:
  * `opts` a `C_NULL` (using the default options), or an instance of
    `acb_calc_integrate_opt_struct` controlling the algorithmic aspects of integration.
 
-!!! Note: `integrate` does not guarantee to satisfy provided
-    tolerances. But the result is guaranteed to be contained in the
-    resulting ball.
+!!! note
+    `integrate` does not guarantee to satisfy provided
+    tolerances. But the integration result is guaranteed to be contained
+    in the returned ball.
 
 For more information please consider arblib documentation and the
 paper
