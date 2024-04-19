@@ -322,6 +322,8 @@
         @test 2^TSeries([1, 0]) == TSeries([2, 0])
         @test (2 + im)^TSeries([1, 0]) == AcbSeries([2 + im, 0])
 
+        @test isequal(ℯ^p, exp(p))
+
         @test precision(setprecision(p, 80)^setprecision(q, 90)) == 90
         @test precision(setprecision(p, 80)^T(2)) == 80
     end
