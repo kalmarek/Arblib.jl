@@ -652,6 +652,16 @@ function Base.:^(p::AcbSeries, q::AcbSeries)
     deg = _degree(p, q)
     return pow_series!(AcbSeries(degree = deg, prec = _precision(p, q)), p, q, deg + 1)
 end
+function Base.:^(p::ArbSeries, q::AcbSeries)
+    deg = _degree(p, q)
+    res = AcbSeries(p, degree = deg, prec = _precision(p, q))
+    return pow_series!(res, res, q, deg + 1)
+end
+function Base.:^(p::AcbSeries, q::ArbSeries)
+    deg = _degree(p, q)
+    res = AcbSeries(q, degree = deg, prec = _precision(p, q))
+    return pow_series!(res, p, res, deg + 1)
+end
 
 Base.:^(p::ArbSeries, e::Real) = pow_arb_series!(zero(p), p, convert(Arb, e), length(p))
 function Base.:^(p::ArbSeries, e::Number)

@@ -306,7 +306,7 @@
         p = TSeries([1, 2, 3])
         q = TSeries([2, 3, 0])
 
-        @test p^q == TSeries([1, 4, 16])
+        @test p^q == ArbSeries([1, 2, 3])^q == p^ArbSeries([2, 3, 0]) == TSeries([1, 4, 16])
 
         @test p^T(2) ==
               p^Int(2) ==
