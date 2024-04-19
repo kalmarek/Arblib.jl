@@ -3,10 +3,13 @@ ENV["NEMO_THREADED"] = 1
 using Arblib, Test, LinearAlgebra, Random, Serialization, SpecialFunctions
 using Documenter
 
+import Aqua
+
 DocMeta.setdocmeta!(Arblib, :DocTestSetup, :(using Arblib); recursive = true)
 
 @testset "Arblib" begin
     doctest(Arblib)
+    Aqua.test_all(Arblib; ambiguities = (; broken = true))
 
     include("ArbCall/runtests.jl")
 
