@@ -6,6 +6,10 @@
         @test Mag(UInt64(1)) == Mag(1) == one(Mag) == one(Mag()) <= Mag(1.0)
         @test π < Float64(Mag(π)) < 3.15
         @test Mag(3, 4) == Mag(3 * 2^4)
+
+        # Check for ambiguities
+        @test Mag(1 + 0im) == Mag(1)
+        @test_throws InexactError Mag(1 + im)
     end
 
     @testset "Arf" begin
@@ -23,6 +27,10 @@
 
         @test precision(zero(Arf(prec = 80))) == 80
         @test precision(one(Arf(prec = 80))) == 80
+
+        # Check for ambiguities
+        @test Arf(1 + 0im) == 1
+        @test_throws InexactError Arf(1 + im)
     end
 
     @testset "Arb" begin
@@ -58,6 +66,10 @@
         @test precision(Arb(MathConstants.catalan, prec = 80)) == 80
         @test precision(Arb(MathConstants.φ, prec = 80)) == 80
 
+        @test Arb(Acb(1)) == 1
+        @test precision(Arb(Acb(1, prec = 80))) == 80
+        @test_throws InexactError Arb(Acb(1, 1))
+
         # setball
         @test isone(Arblib.setball(Arb, Arf(1), Mag(0)))
         @test isone(Arblib.setball(Arb, 1, 0))
@@ -71,6 +83,10 @@
 
         @test precision(Arblib.setball(Arb, Arf(prec = 80), 0)) == 80
         @test precision(Arblib.setball(Arb, Arf(prec = 90), 0, prec = 80)) == 80
+
+        # Check for ambiguities
+        @test Arb(1 + 0im) == 1
+        @test_throws InexactError Arb(1 + im)
     end
 
     @testset "Acb" begin

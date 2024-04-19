@@ -5,6 +5,8 @@ Base.setindex!(res::Union{MagLike,ArfLike,ArbLike,AcbLike}, x) = set!(res, x)
 set!(res::MagLike, x::Integer) = set!(res, convert(UInt, x))
 set!(res::MagLike, ::Irrational{:π}) = const_pi!(res)
 set!(res::MagLike, x::Integer, y::Integer) = set_ui_2exp!(res, convert(UInt, x), y)
+set!(res::MagLike, x::Complex) =
+    isreal(x) ? set!(res, real(x)) : throw(InexactError(:Mag, Mag, x))
 
 # Arf
 function set!(res::ArfLike, x::UInt128)
@@ -37,6 +39,9 @@ function set!(
     div!(res, res, Arf(denominator(x); prec); prec)
     return res
 end
+
+set!(res::ArfLike, x::Complex) =
+    isreal(x) ? set!(res, real(x)) : throw(InexactError(:Arf, Arf, x))
 
 # Arb
 function set!(res::ArbLike, x::Union{UInt128,Int128,MagLike,BigInt,BigFloat})
@@ -97,6 +102,11 @@ function set!(res::ArbLike, (a, b)::Tuple{<:Real,<:Real}; prec::Integer = precis
     end
     return union!(res, a, b; prec)
 end
+
+set!(res::ArbLike, x::AcbOrRef) =
+    is_real(x) ? set!(res, realref(x)) : throw(InexactError(:Arb, Arb, x))
+set!(res::ArbLike, x::Complex) =
+    isreal(x) ? set!(res, real(x)) : throw(InexactError(:Arb, Arb, x))
 
 # Acb
 function set!(res::AcbLike, x::Union{Real,MagLike,ArfLike,Tuple{<:Real,<:Real}})

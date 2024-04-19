@@ -6,18 +6,22 @@ Mag(x) = set!(Mag(), x)
 # later.
 Mag(x::Union{MagRef,ArfRef}) = Mag(cstruct(x))
 Mag(x, y) = set!(Mag(), x, y)
+# disambiguation
+Mag(x::Complex) = set!(Mag(), x)
 
 # Arf
 Arf(x; prec::Integer = _precision(x)) = set!(Arf(; prec), x)
 # disambiguation
 Arf(x::Arf; prec::Integer = precision(x)) = set!(Arf(; prec), x)
 Arf(x::Rational; prec::Integer = _precision(x)) = set!(Arf(; prec), x)
+Arf(x::Complex; prec::Integer = _precision(x)) = set!(Arf(; prec), x)
 
 #Arb
 Arb(x; prec::Integer = _precision(x)) = set!(Arb(; prec), x)
 # disambiguation
 Arb(x::Arb; prec::Integer = precision(x)) = set!(Arb(; prec), x)
 Arb(x::Rational; prec::Integer = _precision(x)) = set!(Arb(; prec), x)
+Arb(x::Complex; prec::Integer = _precision(x)) = set!(Arb(; prec), x)
 
 function Arb(str::AbstractString; prec::Integer = DEFAULT_PRECISION[])
     res = Arb(; prec)
