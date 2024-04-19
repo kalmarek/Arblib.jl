@@ -65,6 +65,6 @@ Base._fast(::typeof(min), x::AbstractFloat, y::ArbOrRef) = min(x, y)
 Base._fast(::typeof(max), x::ArbOrRef, y::AbstractFloat) = max(x, y)
 Base._fast(::typeof(max), x::AbstractFloat, y::ArbOrRef) = max(x, y)
 
-# Mag, Arf and Arb don't have signed zeros
-Base.isbadzero(::typeof(min), x::Union{Mag,Arf,Arb}) = false
-Base.isbadzero(::typeof(max), x::Union{Mag,Arf,Arb}) = false
+# Arf and Arb don't have signed zeros
+Base.isbadzero(::typeof(min), x::Union{ArfOrRef,ArbOrRef}) = false
+Base.isbadzero(::typeof(max), x::Union{ArfOrRef,ArbOrRef}) = false

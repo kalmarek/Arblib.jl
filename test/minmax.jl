@@ -110,17 +110,29 @@
         @test !Base.isbadzero(min, zero(Mag))
         @test !Base.isbadzero(min, zero(Arf))
         @test !Base.isbadzero(min, zero(Arb))
+        @test !Base.isbadzero(min, Arblib.radref(zero(Arb)))
+        @test !Base.isbadzero(min, Arblib.midref(zero(Arb)))
+        @test !Base.isbadzero(min, Arblib.realref(zero(Acb)))
 
         @test !Base.isbadzero(max, zero(Mag))
         @test !Base.isbadzero(max, zero(Arf))
         @test !Base.isbadzero(max, zero(Arb))
+        @test !Base.isbadzero(max, Arblib.radref(zero(Arb)))
+        @test !Base.isbadzero(max, Arblib.midref(zero(Arb)))
+        @test !Base.isbadzero(max, Arblib.realref(zero(Acb)))
 
         @test !Base.isgoodzero(min, zero(Mag))
         @test !Base.isgoodzero(min, zero(Arf))
         @test !Base.isgoodzero(min, zero(Arb))
+        @test !Base.isgoodzero(min, Arblib.radref(zero(Arb)))
+        @test !Base.isgoodzero(min, Arblib.midref(zero(Arb)))
+        @test !Base.isgoodzero(min, Arblib.realref(zero(Acb)))
 
         @test !Base.isgoodzero(max, zero(Mag))
         @test !Base.isgoodzero(max, zero(Arf))
         @test !Base.isgoodzero(max, zero(Arb))
+        @test !Base.isgoodzero(max, Arblib.radref(zero(Arb)))
+        @test !Base.isgoodzero(max, Arblib.midref(zero(Arb)))
+        @test !Base.isgoodzero(max, Arblib.realref(zero(Acb)))
     end
 end
