@@ -61,8 +61,7 @@
         @test iszero(extrema(identity, -A)[2])
 
         # Fails with default implementation due to Base._fast
-        #A = [Arb(0); [setball(Arb, 0, i) for i in reverse(0:257)]]
-        A = [setball(Arb, 0, i) for i = 0:257]
+        A = [Arb(0); [setball(Arb, 0, i) for i in reverse(0:257)]]
         @test Arblib.contains(minimum(A), -257)
         @test Arblib.contains(maximum(A), 257)
         @test Arblib.contains(extrema(A)[1], -257)
@@ -71,6 +70,25 @@
         @test Arblib.contains(maximum(identity, A), 257)
         @test Arblib.contains(extrema(identity, A)[1], -257)
         @test Arblib.contains(extrema(identity, A)[2], 257)
+        # In a previous version of Arblib, Base._fast was not correctly
+        # overloaded for ArbRef.
+        A = [
+            Arblib.realref(Acb(0))
+            [Arblib.realref(Acb(setball(Arb, 0, i))) for i in reverse(0:257)]
+        ]
+        @test Arblib.contains(minimum(A), -257)
+        @test Arblib.contains(maximum(A), 257)
+        @test Arblib.contains(extrema(A)[1], -257)
+        @test Arblib.contains(extrema(A)[2], 257)
+        @test Arblib.contains(minimum(identity, A), -257)
+        @test Arblib.contains(maximum(identity, A), 257)
+        @test Arblib.contains(extrema(identity, A)[1], -257)
+        @test Arblib.contains(extrema(identity, A)[2], 257)
+        # In a previous version of Arblib, Base._fast was not correctly
+        # handling mixture of Arb and AbstractFloat
+        @test minimum(AbstractFloat[Arb(0); fill(1.0, 257)]) == 0
+        @test maximum(AbstractFloat[Arb(0); fill(1.0, 257)]) == 1
+        @test extrema(AbstractFloat[Arb(0); fill(1.0, 257)]) == (0, 1)
 
         # Fails with default implementation due to both short circuit
         # and Base._fast
