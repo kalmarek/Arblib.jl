@@ -30,6 +30,7 @@
               "1.000000000000000000"
         @test string(Arb(1), digits = 2, remove_trailing_zeros = false) == "1.0"
         @test string(Arb(1), digits = 12, remove_trailing_zeros = false) == "1.00000000000"
+        @test string(Arb(1), condense = 2) == "1.00{...72 digits...}0"
         @test string(Arb(10)^100) == "1.0e+100"
         @test string(Arb(10)^100, remove_trailing_zeros = false) ==
               "1.0000000000000000000000000000000000000000000000000000000000000000000000000000e+100"
@@ -90,10 +91,20 @@
     @testset "show" begin
         @test repr(Mag(1), context = IOContext(stdout, :compact => true)) == "1.0"
         @test repr(Arf(1), context = IOContext(stdout, :compact => true)) == "1.0"
+        @test repr(Arb(1), context = IOContext(stdout, :compact => true)) == "1.0"
+        @test repr(Acb(1, 1), context = IOContext(stdout, :compact => true)) ==
+              "1.0 + 1.0im"
+
         @test repr(Arb(π), context = IOContext(stdout, :compact => true)) ==
               "[3.14{…72 digits…}62 ± 1.93e-77]"
         @test repr(Acb(π, ℯ), context = IOContext(stdout, :compact => true)) ==
               "[3.14{…72 digits…}62 ± 1.93e-77] + [2.71{…72 digits…}35 ± 5.46e-77]im"
+        @test repr(Arb(Float64(π)), context = IOContext(stdout, :compact => true)) ==
+              "3.14{…72 digits…}0"
+        @test repr(
+            Acb(Float64(π), Float64(ℯ)),
+            context = IOContext(stdout, :compact => true),
+        ) == "3.14{…72 digits…}0 + 2.71{…72 digits…}0im"
 
         prec = 32
 
