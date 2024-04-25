@@ -53,13 +53,18 @@ end
 # doesn't solve the full problem.
 
 # The default implementation in Base is not correct for Arb
-Base._fast(::typeof(min), x::Arb, y::Arb) = min(x, y)
-Base._fast(::typeof(min), x::Arb, y) = min(x, y)
-Base._fast(::typeof(min), x, y::Arb) = min(x, y)
-Base._fast(::typeof(max), x::Arb, y::Arb) = max(x, y)
-Base._fast(::typeof(max), x::Arb, y) = max(x, y)
-Base._fast(::typeof(max), x, y::Arb) = max(x, y)
+Base._fast(::typeof(min), x::ArbOrRef, y::ArbOrRef) = min(x, y)
+Base._fast(::typeof(min), x::ArbOrRef, y) = min(x, y)
+Base._fast(::typeof(min), x, y::ArbOrRef) = min(x, y)
+Base._fast(::typeof(max), x::ArbOrRef, y::ArbOrRef) = max(x, y)
+Base._fast(::typeof(max), x::ArbOrRef, y) = max(x, y)
+Base._fast(::typeof(max), x, y::ArbOrRef) = max(x, y)
+# Handle ambiguous methods
+Base._fast(::typeof(min), x::ArbOrRef, y::AbstractFloat) = min(x, y)
+Base._fast(::typeof(min), x::AbstractFloat, y::ArbOrRef) = min(x, y)
+Base._fast(::typeof(max), x::ArbOrRef, y::AbstractFloat) = max(x, y)
+Base._fast(::typeof(max), x::AbstractFloat, y::ArbOrRef) = max(x, y)
 
-# Mag, Arf and Arb don't have signed zeros
-Base.isbadzero(::typeof(min), x::Union{Mag,Arf,Arb}) = false
-Base.isbadzero(::typeof(max), x::Union{Mag,Arf,Arb}) = false
+# Arf and Arb don't have signed zeros
+Base.isbadzero(::typeof(min), x::Union{ArfOrRef,ArbOrRef}) = false
+Base.isbadzero(::typeof(max), x::Union{ArfOrRef,ArbOrRef}) = false

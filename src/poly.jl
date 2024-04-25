@@ -652,6 +652,16 @@ function Base.:^(p::AcbSeries, q::AcbSeries)
     deg = _degree(p, q)
     return pow_series!(AcbSeries(degree = deg, prec = _precision(p, q)), p, q, deg + 1)
 end
+function Base.:^(p::ArbSeries, q::AcbSeries)
+    deg = _degree(p, q)
+    res = AcbSeries(p, degree = deg, prec = _precision(p, q))
+    return pow_series!(res, res, q, deg + 1)
+end
+function Base.:^(p::AcbSeries, q::ArbSeries)
+    deg = _degree(p, q)
+    res = AcbSeries(q, degree = deg, prec = _precision(p, q))
+    return pow_series!(res, p, res, deg + 1)
+end
 
 Base.:^(p::ArbSeries, e::Real) = pow_arb_series!(zero(p), p, convert(Arb, e), length(p))
 function Base.:^(p::ArbSeries, e::Number)
@@ -678,6 +688,8 @@ Base.:^(p::ArbSeries, e::Integer) = pow_arb_series!(zero(p), p, convert(Arb, e),
 Base.:^(p::AcbSeries, e::Integer) = pow_acb_series!(zero(p), p, convert(Acb, e), length(p))
 Base.:^(p::ArbSeries, e::Rational) = pow_arb_series!(zero(p), p, convert(Arb, e), length(p))
 Base.:^(p::AcbSeries, e::Rational) = pow_acb_series!(zero(p), p, convert(Acb, e), length(p))
+Base.:^(::Irrational{:ℯ}, e::ArbSeries) = exp(e)
+Base.:^(::Irrational{:ℯ}, e::AcbSeries) = exp(e)
 
 ##
 ## Series methods
