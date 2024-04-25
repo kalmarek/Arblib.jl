@@ -8,6 +8,10 @@
 
         # Integer times power of 2
         @test Arblib.set!(T(), 3, 4) == Arblib.set!(T(), 3 * 2^4)
+
+        # Complex
+        @test Arblib.set!(T(), 1 + 0im) == Mag(1)
+        @test_throws InexactError Arblib.set!(T(), 1 + 1im)
     end
 
     @testset "$name" for (name, T) in [("Arf", Arf), ("ArfRef", () -> Arblib.midref(Arb()))]
@@ -35,6 +39,10 @@
             @test Arblib.set!(T(), 1 // BigInt(x)) == inv(Arf(x))
             @test Arblib.set!(T(), BigInt(x) // (BigInt(x) + 1)) == Arf(x) / Arf(x + 1)
         end
+
+        # Complex
+        @test Arblib.set!(T(), 1 + 0im) == 1
+        @test_throws InexactError Arblib.set!(T(), 1 + 1im)
     end
 
     @testset "$name" for (name, T) in
@@ -146,6 +154,12 @@
         @test_throws ArgumentError Arblib.set!(T(), (2, 1))
         @test_throws ArgumentError Arblib.set!(T(), (2.0, 1.0))
         @test_throws ArgumentError Arblib.set!(T(), (2, 1.0))
+
+        # Complex
+        @test Arblib.set!(T(), Acb(1, 0)) == 1
+        @test_throws InexactError Arblib.set!(T(), Acb(1, 1))
+        @test Arblib.set!(T(), 1 + 0im) == 1
+        @test_throws InexactError Arblib.set!(T(), 1 + 1im)
     end
 
     @testset "$name" for (name, T) in [

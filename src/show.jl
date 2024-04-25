@@ -6,14 +6,14 @@ function _remove_trailing_zeros(str::AbstractString)
             # Numbers on the form xxx.yyy0ezzz
             mantissa, exponent = split(str, 'e', limit = 2)
             mantissa = rstrip(mantissa, '0')
-            if endswith(mantissa, '.')
+            if endswith(mantissa, '.') || endswith(mantissa, '}')
                 mantissa *= '0'
             end
             str = mantissa * 'e' * exponent
         else
             # Numbers on the form xxx.yyy0
             str = rstrip(str, '0')
-            if endswith(str, '.')
+            if endswith(str, '.') || endswith(str, '}')
                 str *= '0'
             end
         end
@@ -129,7 +129,20 @@ end
 
 function Base.show(io::IO, x::Union{ArbOrRef,AcbOrRef})
     if Base.get(io, :compact, false) && rel_accuracy_bits(x) > 48
-        print(io, string(x, condense = 2, unicode = true))
+        str = string(x, condense = 2, unicode = true)
+        if isexact(x)
+            # For exact values the shortest output is in some cases
+            # not given by condensing the decimal digits, but by
+            # removing trailing zeros. We try both options and take
+            # the shortest.
+
+            str_alt = string(x)
+
+            if length(str_alt) < length(str)
+                str = str_alt
+            end
+        end
+        print(io, str)
     else
         print(io, string(x))
     end

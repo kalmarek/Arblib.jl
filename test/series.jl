@@ -306,7 +306,7 @@
         p = TSeries([1, 2, 3])
         q = TSeries([2, 3, 0])
 
-        @test p^q == TSeries([1, 4, 16])
+        @test p^q == ArbSeries([1, 2, 3])^q == p^ArbSeries([2, 3, 0]) == TSeries([1, 4, 16])
 
         @test p^T(2) ==
               p^Int(2) ==
@@ -321,6 +321,8 @@
 
         @test 2^TSeries([1, 0]) == TSeries([2, 0])
         @test (2 + im)^TSeries([1, 0]) == AcbSeries([2 + im, 0])
+
+        @test isequal(ℯ^p, exp(p))
 
         @test precision(setprecision(p, 80)^setprecision(q, 90)) == 90
         @test precision(setprecision(p, 80)^T(2)) == 80
