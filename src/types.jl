@@ -374,7 +374,16 @@ end
 cstruct(x::ArbSeries) = cstruct(x.poly)
 cstruct(x::AcbSeries) = cstruct(x.poly)
 
-# handle Ref types
+# Handle Ref types
+const MagOrRef = Union{Mag,MagRef}
+const ArfOrRef = Union{Arf,ArfRef}
+const ArbOrRef = Union{Arb,ArbRef}
+const AcbOrRef = Union{Acb,AcbRef}
+const ArbVectorOrRef = Union{ArbVector,ArbRefVector}
+const AcbVectorOrRef = Union{AcbVector,AcbRefVector}
+const ArbMatrixOrRef = Union{ArbMatrix,ArbRefMatrix}
+const AcbMatrixOrRef = Union{AcbMatrix,AcbRefMatrix}
+
 for prefix in [:mag, :arf, :arb, :acb]
     T = Symbol(uppercasefirst(string(prefix)))
     TRef = Symbol(T, :Ref)
@@ -392,7 +401,6 @@ for prefix in [:mag, :arf, :arb, :acb]
         parentstruct(x::$T) = cstruct(x)
         parentstruct(x::$TRef) = x
         parentstruct(x::$TStruct) = x
-        Base.copy(x::Union{$T,$TRef}) = $T(x)
     end
 end
 
@@ -400,14 +408,21 @@ end
 # similar code. It's convenient to have this method then.
 _nonreftype(::Type{T}) where {T<:Union{ArbPoly,AcbPoly,ArbSeries,AcbSeries}} = T
 
-const MagOrRef = Union{Mag,MagRef}
-const ArfOrRef = Union{Arf,ArfRef}
-const ArbOrRef = Union{Arb,ArbRef}
-const AcbOrRef = Union{Acb,AcbRef}
-const ArbVectorOrRef = Union{ArbVector,ArbRefVector}
-const AcbVectorOrRef = Union{AcbVector,AcbRefVector}
-const ArbMatrixOrRef = Union{ArbMatrix,ArbRefMatrix}
-const AcbMatrixOrRef = Union{AcbMatrix,AcbRefMatrix}
+# Copy of vectors and matrices is defined in their own files.
+Base.copy(
+    x::T,
+) where {
+    T<:Union{
+        MagOrRef,
+        ArfOrRef,
+        ArbOrRef,
+        AcbOrRef,
+        ArbPoly,
+        AcbPoly,
+        ArbSeries,
+        AcbSeries,
+    },
+} = _nonreftype(T)(x)
 
 """
     MagLike = Union{Mag,MagRef,mag_struct,Ptr{mag_struct}}
