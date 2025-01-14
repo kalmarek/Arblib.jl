@@ -25,6 +25,16 @@
         @test y == Arf(0)
     end
 
+    @testset "Acf" begin
+        @test Acf() isa Acf
+        @test precision(Acf(prec = 80)) == 80
+        x = Acf()
+        y = copy(x)
+        Arblib.set!(x, 1)
+        @test x == Acf(1)
+        @test y == Acf(0)
+    end
+
     @testset "Arb" begin
         @test Arb() isa Arb
         @test precision(Arb(prec = 80)) == 80

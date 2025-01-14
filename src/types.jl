@@ -29,6 +29,16 @@ struct Mag <: Real
 end
 
 """
+    Acf <: AbstractFloat
+"""
+struct Acf <: Number
+    acf::acf_struct
+    prec::Int
+
+    Acf(; prec::Integer = DEFAULT_PRECISION[]) = new(acf_struct(), prec)
+end
+
+"""
     Arb <: AbstractFloat
 """
 struct Arb <: AbstractFloat
@@ -67,13 +77,24 @@ struct ArbRef <: AbstractFloat
     parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_poly_struct,arb_mat_struct}
 end
 
+# FIXME: This can currently not be constructed. Should we still
+# define it?
+"""
+    AcfRef <: Number
+"""
+struct AcfRef <: Number
+    acf_ptr::Ptr{acf_struct}
+    prec::Int
+    parent::Union{Nothing} # FIXME
+end
+
 """
     ArfRef <: AbstractFloat
 """
 struct ArfRef <: AbstractFloat
     arf_ptr::Ptr{arf_struct}
     prec::Int
-    parent::Union{arb_struct,ArbRef}
+    parent::Union{acf_struct,AcfRef,arb_struct,ArbRef}
 end
 
 """
@@ -351,6 +372,7 @@ end
 for (T, prefix) in (
     (Mag, :mag),
     (Arf, :arf),
+    (Acf, :acf),
     (Arb, :arb),
     (Acb, :acb),
     (Union{ArbVector,ArbRefVector}, :arb_vec),
@@ -377,6 +399,7 @@ cstruct(x::AcbSeries) = cstruct(x.poly)
 # Handle Ref types
 const MagOrRef = Union{Mag,MagRef}
 const ArfOrRef = Union{Arf,ArfRef}
+const AcfOrRef = Union{Acf,AcfRef}
 const ArbOrRef = Union{Arb,ArbRef}
 const AcbOrRef = Union{Acb,AcbRef}
 const ArbVectorOrRef = Union{ArbVector,ArbRefVector}
@@ -384,7 +407,7 @@ const AcbVectorOrRef = Union{AcbVector,AcbRefVector}
 const ArbMatrixOrRef = Union{ArbMatrix,ArbRefMatrix}
 const AcbMatrixOrRef = Union{AcbMatrix,AcbRefMatrix}
 
-for prefix in [:mag, :arf, :arb, :acb]
+for prefix in [:mag, :arf, :acf, :arb, :acb]
     T = Symbol(uppercasefirst(string(prefix)))
     TRef = Symbol(T, :Ref)
     TStruct = Symbol(prefix, :_struct)
@@ -415,6 +438,7 @@ Base.copy(
     T<:Union{
         MagOrRef,
         ArfOrRef,
+        AcfOrRef,
         ArbOrRef,
         AcbOrRef,
         ArbPoly,
@@ -432,6 +456,10 @@ const MagLike = Union{Mag,MagRef,cstructtype(Mag),Ptr{cstructtype(Mag)}}
     ArfLike = Union{Arf,ArfRef,arf_struct,Ptr{arf_struct}}}
 """
 const ArfLike = Union{Arf,ArfRef,cstructtype(Arf),Ptr{cstructtype(Arf)}}
+"""
+    AcfLike = Union{Acf,AcfRef,acf_struct,Ptr{acf_struct}}}
+"""
+const AcfLike = Union{Acf,AcfRef,cstructtype(Acf),Ptr{cstructtype(Acf)}}
 """
     ArbLike = Union{Arb,ArbRef,arb_struct,Ptr{arb_struct}}}
 """
@@ -470,6 +498,8 @@ const ArbTypes = Union{
     MagRef,
     Arf,
     ArfRef,
+    Acf,
+    AcfRef,
     Arb,
     ArbRef,
     Acb,

@@ -12,6 +12,15 @@ for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
         return z
     end
 
+    if jf != :/ # Acf doesn't define div
+        # There are no integer versions defined for Acf
+        @eval function Base.$jf(x::AcfOrRef, y::AcfOrRef)
+            z = Acf(prec = _precision(x, y))
+            $af(z, x, y)
+            return z
+        end
+    end
+
     @eval Base.$jf(x::ArbOrRef, y::Union{ArbOrRef,ArfOrRef,_BitInteger}) =
         $af(Arb(prec = _precision(x, y)), x, y)
 
@@ -142,6 +151,8 @@ Base.literal_pow(::typeof(^), x::AcbOrRef, ::Val{3}) = cube(x)
 
 ### real, imag, conj
 
+Base.real(z::AcfOrRef) = Arf(realref(z))
+Base.imag(z::AcfOrRef) = Arf(imagref(z))
 Base.real(z::AcbOrRef) = get_real!(Arb(prec = _precision(z)), z)
 Base.imag(z::AcbOrRef) = get_imag!(Arb(prec = _precision(z)), z)
 Base.conj(z::AcbOrRef) = conj!(zero(z), z)

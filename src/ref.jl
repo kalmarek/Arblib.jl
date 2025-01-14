@@ -5,7 +5,7 @@ MagRef() = Mag()
 
 function ArfRef(
     ptr::Ptr{arf_struct},
-    parent::Union{arb_struct,ArbRef};
+    parent::Union{acf_struct,arb_struct,AcfRef,ArbRef};
     prec::Integer = DEFAULT_PRECISION[],
 )
     ArfRef(ptr, prec, parent)
@@ -47,6 +47,26 @@ Base.getindex(x::ArbRef) = Arb(x)
 Base.getindex(x::AcbRef) = Acb(x)
 
 """
+    realref(z::AcfLike, prec = precision(z))
+
+Return an `ArfRef` referencing the real part of `z`.
+"""
+function realref(z::AcfLike; prec = precision(z))
+    real_ptr = ccall(@libflint(acf_real_ptr), Ptr{arf_struct}, (Ref{acf_struct},), z)
+    ArfRef(real_ptr, prec, parentstruct(z))
+end
+
+"""
+    imagref(z::AcfLike, prec = precision(z))
+
+Return an `ArfRef` referencing the imaginary part of `z`.
+"""
+function imagref(z::AcfLike; prec = precision(z))
+    real_ptr = ccall(@libflint(acf_imag_ptr), Ptr{arf_struct}, (Ref{acf_struct},), z)
+    ArfRef(real_ptr, prec, parentstruct(z))
+end
+
+"""
     midref(x::ArbLike, prec = precision(x))
 
 Return an `ArfRef` referencing the midpoint of `x`.
@@ -69,7 +89,7 @@ end
 """
     realref(z::AcbLike, prec = precision(z))
 
-Return an `ArbRef` referencing the real part of `x`.
+Return an `ArbRef` referencing the real part of `z`.
 """
 function realref(z::AcbLike; prec = precision(z))
     real_ptr = ccall(@libflint(acb_real_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
@@ -79,7 +99,7 @@ end
 """
     imagref(z::AcbLike, prec = precision(z))
 
-Return an `ArbRef` referencing the imaginary part of `x`.
+Return an `ArbRef` referencing the imaginary part of `z`.
 """
 function imagref(z::AcbLike; prec = precision(z))
     real_ptr = ccall(@libflint(acb_imag_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)

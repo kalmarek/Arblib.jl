@@ -24,7 +24,7 @@ DocMeta.setdocmeta!(Arblib, :DocTestSetup, :(using Arblib); recursive = true)
     # ArbSeries and AcbSeries.
     Aqua.test_all(
         Arblib,
-        ambiguities = (exclude = [Mag, Arf, Arb, Acb, ArbSeries, AcbSeries, +, *],),
+        ambiguities = (exclude = [Mag, Arf, Acf, Arb, Acb, ArbSeries, AcbSeries, +, *],),
     )
 
     include("ArbCall/runtests.jl")

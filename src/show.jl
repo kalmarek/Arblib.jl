@@ -59,6 +59,19 @@ function Base.string(
 end
 
 function Base.string(
+    z::AcfOrRef;
+    digits::Integer = digits_prec(precision(z)),
+    remove_trailing_zeros::Bool = true,
+)
+    str = string(realref(z); digits, remove_trailing_zeros)
+    if !isreal(z)
+        str *= " + " * string(imagref(z); digits, remove_trailing_zeros) * "im"
+    end
+
+    return str
+end
+
+function Base.string(
     x::ArbOrRef;
     digits::Integer = digits_prec(precision(x)),
     more::Bool = false,
@@ -111,14 +124,14 @@ function Base.string(
     )
 
     str = string(realref(z); kwargs...)
-    if !iszero(imagref(z))
+    if !isreal(z)
         str *= " + " * string(imagref(z); kwargs...) * "im"
     end
 
     return str
 end
 
-function Base.show(io::IO, x::Union{MagOrRef,ArfOrRef})
+function Base.show(io::IO, x::Union{MagOrRef,ArfOrRef,AcfOrRef})
     if Base.get(io, :compact, false)
         digits = min(6, digits_prec(precision(x)))
         print(io, string(x; digits))
@@ -200,6 +213,7 @@ end
 for T in [
     :MagLike,
     :ArfLike,
+    :AcfLike,
     :ArbLike,
     :AcbLike,
     :ArbVectorLike,
