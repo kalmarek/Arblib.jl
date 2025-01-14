@@ -52,6 +52,19 @@
         end
     end
 
+    @testset "jlfname_series" begin
+        for (arbfname, name) in (
+            ("arb_poly_inv_series", :inv!),
+            ("arb_poly_compose_series", :compose!),
+            ("arb_poly_pow_arb_series", :pow!),
+            # These are special cases
+            ("arb_poly_mullow", :mul!),
+            ("acb_poly_mullow", :mul!),
+        )
+            @test Arblib.ArbCall.jlfname_series(arbfname) == name
+        end
+    end
+
     @testset "returntype" begin
         # Supported return types
         for (str, T) in (
@@ -113,6 +126,9 @@
             "void acb_poly_rising_ui_series(acb_poly_t res, const acb_poly_t f, ulong r, slong trunc, slong prec)",
             "void acb_hypgeom_erf_series(acb_poly_t res, const acb_poly_t z, slong len, slong prec)",
             "void acb_hypgeom_beta_lower_series(acb_poly_t res, const acb_t a, const acb_t b, const acb_poly_t z, int regularized, slong n, slong prec)",
+            # These are special cases
+            "void arb_poly_mullow(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong n, slong prec)",
+            "void acb_poly_mullow(acb_poly_t C, const acb_poly_t A, const acb_poly_t B, slong n, slong prec)",
         )
             @test Arblib.ArbCall.is_series_method(Arblib.ArbCall.ArbFunction(sig))
         end
@@ -230,6 +246,16 @@
                     Expr(:kw, :(len::$(Integer)), :(length(res))),
                 ],
                 [Expr(:kw, :(prec::Integer), :(_precision(res)))],
+            ),
+            (
+                "void arb_poly_mullow(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong n, slong prec)",
+                [
+                    :(C::$(Arblib.ArbSeries)),
+                    :(A::$(Arblib.ArbSeries)),
+                    :(B::$(Arblib.ArbSeries)),
+                    Expr(:kw, :(n::$(Integer)), :(length(C))),
+                ],
+                [Expr(:kw, :(prec::Integer), :(_precision(C)))],
             ),
         )
             @test (args, kwargs) ==

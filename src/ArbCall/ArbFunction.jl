@@ -60,7 +60,7 @@ function ispredicate(af::ArbFunction)
 end
 
 is_series_method(af::ArbFunction) =
-    endswith(arbfname(af), "_series") &&
+    (endswith(arbfname(af), "_series") || endswith(arbfname(af), "mullow")) &&
     (jltype(first(arguments(af))) <: Union{Arblib.ArbPolyLike,Arblib.AcbPolyLike})
 
 const jlfname_prefixes = (
@@ -97,6 +97,20 @@ jlfname(
     suffixes = jlfname_suffixes,
     inplace = inplace(af),
 ) = jlfname(arbfname(af); prefixes, suffixes, inplace)
+
+function jlfname_series(arbfname::AbstractString)
+    name = jlfname(arbfname, suffixes = (jlfname_suffixes..., "series"), inplace = true)
+    if name == :mullow!
+        # Handle this as a special case. There is no
+        # arb_poly_mul_series method, it is instead called
+        # arb_poly_mullow (same for acb_poly).
+        return :mul!
+    else
+        return name
+    end
+end
+
+jlfname_series(af::ArbFunction) = jlfname_series(arbfname(af))
 
 function jlargs(af::ArbFunction; argument_detection::Bool = true)
     cargs = arguments(af)
@@ -207,7 +221,7 @@ function jlcode(af::ArbFunction, jl_fname = jlfname(af))
     if is_series_method(af)
         # Note that this currently doesn't respect any custom function
         # name given as an argument.
-        jl_fname_series = jlfname(af, suffixes = (jlfname_suffixes..., "series"))
+        jl_fname_series = jlfname_series(af)
         jl_args_series, jl_kwargs_series = jlargs_series(af)
 
         func_series = quote
