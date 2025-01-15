@@ -127,8 +127,8 @@
             Acb(Complex(BigFloat(0, precision = 80), BigFloat(0, precision = 100))),
         ) == 100
 
-        @test precision(zero(Arb(prec = 80))) == 80
-        @test precision(one(Arb(prec = 80))) == 80
+        @test precision(zero(Acb(prec = 80))) == 80
+        @test precision(one(Acb(prec = 80))) == 80
 
         @test isequal(real(Acb(π)), Arb(π))
         @test isequal(real(Acb(ℯ)), Arb(ℯ))
