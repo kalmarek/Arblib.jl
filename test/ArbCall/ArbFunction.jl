@@ -52,6 +52,19 @@
         end
     end
 
+    @testset "jlfname_series" begin
+        for (arbfname, name) in (
+            ("arb_poly_inv_series", :inv!),
+            ("arb_poly_compose_series", :compose!),
+            ("arb_poly_pow_arb_series", :pow!),
+            # These are special cases
+            ("arb_poly_mullow", :mul!),
+            ("acb_poly_mullow", :mul!),
+        )
+            @test Arblib.ArbCall.jlfname_series(arbfname) == name
+        end
+    end
+
     @testset "returntype" begin
         # Supported return types
         for (str, T) in (
@@ -100,6 +113,38 @@
             "int arf_cmp(const arf_t x, const arf_t y)",
         )
             @test !Arblib.ArbCall.ispredicate(Arblib.ArbCall.ArbFunction(sig))
+        end
+    end
+
+    @testset "is_series_method" begin
+        for sig in (
+            "void arb_poly_pow_series(arb_poly_t h, const arb_poly_t f, const arb_poly_t g, slong len, slong prec)",
+            "void arb_poly_inv_series(arb_poly_t Q, const arb_poly_t A, slong n, slong prec)",
+            "void arb_poly_add_series(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong len, slong prec)",
+            "void acb_poly_atan_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)",
+            "void acb_poly_sin_pi_series(acb_poly_t s, const acb_poly_t h, slong n, slong prec)",
+            "void acb_poly_rising_ui_series(acb_poly_t res, const acb_poly_t f, ulong r, slong trunc, slong prec)",
+            "void acb_hypgeom_erf_series(acb_poly_t res, const acb_poly_t z, slong len, slong prec)",
+            "void acb_hypgeom_beta_lower_series(acb_poly_t res, const acb_t a, const acb_t b, const acb_poly_t z, int regularized, slong n, slong prec)",
+            # These are special cases
+            "void arb_poly_mullow(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong n, slong prec)",
+            "void acb_poly_mullow(acb_poly_t C, const acb_poly_t A, const acb_poly_t B, slong n, slong prec)",
+        )
+            @test Arblib.ArbCall.is_series_method(Arblib.ArbCall.ArbFunction(sig))
+        end
+
+        for sig in (
+            "void _arb_poly_inv_series(arb_ptr Q, arb_srcptr A, slong Alen, slong len, slong prec)",
+            "void _arb_poly_compose_series(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong n, slong prec)",
+            "void acb_set_ui(acb_t z, ulong x)",
+            "int acb_mat_lu_recursive(slong * perm, acb_mat_t LU, const acb_mat_t A, slong prec)",
+            "int acb_mat_lu(slong * perm, acb_mat_t LU, const acb_mat_t A, slong prec)",
+            "int acb_mat_inv(acb_mat_t X, const acb_mat_t A, slong prec)",
+            "int arb_sgn_nonzero(const arb_t x)",
+            "int arf_set_round(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)",
+            "int arf_cmp(const arf_t x, const arf_t y)",
+        )
+            @test !Arblib.ArbCall.is_series_method(Arblib.ArbCall.ArbFunction(sig))
         end
     end
 
@@ -167,6 +212,54 @@
                 Arblib.ArbCall.ArbFunction(str),
                 argument_detection = false,
             )
+        end
+    end
+
+    @testset "jlargs_series" begin
+        for (str, args, kwargs) in (
+            (
+                "void arb_poly_atan_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec)",
+                [
+                    :(res::$(Arblib.ArbSeries)),
+                    :(f::$(Arblib.ArbSeries)),
+                    Expr(:kw, :(n::$(Integer)), :(length(res))),
+                ],
+                [Expr(:kw, :(prec::Integer), :(_precision(res)))],
+            ),
+            (
+                "void acb_poly_div_series(acb_poly_t Q, const acb_poly_t A, const acb_poly_t B, slong n, slong prec)",
+                [
+                    :(Q::$(Arblib.AcbSeries)),
+                    :(A::$(Arblib.AcbSeries)),
+                    :(B::$(Arblib.AcbSeries)),
+                    Expr(:kw, :(n::$(Integer)), :(length(Q))),
+                ],
+                [Expr(:kw, :(prec::Integer), :(_precision(Q)))],
+            ),
+            (
+                "void acb_hypgeom_u_1f1_series(acb_poly_t res, const acb_poly_t a, const acb_poly_t b, const acb_poly_t z, slong len, slong prec)",
+                [
+                    :(res::$(Arblib.AcbSeries)),
+                    :(a::$(Arblib.AcbSeries)),
+                    :(b::$(Arblib.AcbSeries)),
+                    :(z::$(Arblib.AcbSeries)),
+                    Expr(:kw, :(len::$(Integer)), :(length(res))),
+                ],
+                [Expr(:kw, :(prec::Integer), :(_precision(res)))],
+            ),
+            (
+                "void arb_poly_mullow(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong n, slong prec)",
+                [
+                    :(C::$(Arblib.ArbSeries)),
+                    :(A::$(Arblib.ArbSeries)),
+                    :(B::$(Arblib.ArbSeries)),
+                    Expr(:kw, :(n::$(Integer)), :(length(C))),
+                ],
+                [Expr(:kw, :(prec::Integer), :(_precision(C)))],
+            ),
+        )
+            @test (args, kwargs) ==
+                  Arblib.ArbCall.jlargs_series(Arblib.ArbCall.ArbFunction(str))
         end
     end
 
