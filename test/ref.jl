@@ -41,10 +41,30 @@ end
     Arblib.set!(z, 4)
     @test Arblib.midref(x) == Arf(2)
 
+    w = Acf()
+    Arblib.set!(Arblib.realref(w), 2)
+    @test w == Acf(2, 0)
+    @test Arblib.realref(w) == Arf(2)
+    Arblib.set!(Arblib.imagref(w), 3)
+    @test w == Acf(2, 3)
+    @test Arblib.imagref(w) == Arf(3)
+
     @test isequal(zero(ArfRef), zero(Arf))
     @test isequal(zero(Arblib.midref(x)), zero(Arf))
     @test isequal(one(ArfRef), one(Arf))
     @test isequal(one(Arblib.midref(x)), one(Arf))
+end
+
+@testset "AcfRef" begin
+    @test AcfRef() isa Acf
+    @test isequal(AcfRef(), Acf())
+    @test precision(AcfRef()) == Arblib.DEFAULT_PRECISION[]
+    @test precision(AcfRef(prec = 80)) == 80
+
+    # FIXME: Add more tests when it is possible to construct AcfRef
+
+    @test isequal(zero(AcfRef), zero(Acf))
+    @test isequal(one(AcfRef), one(Acf))
 end
 
 @testset "ArbRef" begin

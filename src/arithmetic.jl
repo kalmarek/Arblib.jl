@@ -60,6 +60,12 @@ for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
 end
 
 Base.:-(x::Union{ArfOrRef,ArbOrRef,AcbOrRef}) = neg!(zero(x), x)
+function Base.:-(x::AcfOrRef)
+    y = Acf(x)
+    neg!(realref(y), realref(y))
+    neg!(imagref(y), imagref(y))
+    return y
+end
 Base.inv(x::Union{MagOrRef,ArbOrRef,AcbOrRef}) = inv!(zero(x), x)
 
 Base.:+(x::MagOrRef, y::Integer) = add!(zero(x), x, convert(UInt, y))

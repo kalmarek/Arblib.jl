@@ -35,6 +35,7 @@ Base.promote_rule(::Type{<:ArbSeries}, ::Type{T}) where {T<:Union{AcbSeries}} =
 
 # Make complex
 Base.promote_rule(::Type{<:AcfOrRef}, ::Type{<:ArbOrRef}) = Acb
+Base.promote_rule(::Type{<:AcfOrRef}, ::Type{Complex{T}}) where {T} = promote_type(Acf, T)
 Base.promote_rule(::Type{ArbSeries}, ::Type{<:Union{AcfOrRef,AcbOrRef}}) = AcbSeries
 
 ### External ###

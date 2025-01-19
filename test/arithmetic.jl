@@ -73,6 +73,35 @@
         @test abs(Arf(-2)) == abs(Arf(2)) == 2
     end
 
+    @testset "Acf" begin
+        # +, -, *, /
+        @test -Acf(2) == -2
+        @test -Acf(2, 3) == -2 - 3im
+
+        @test Acf(1) + Acf(2) ==
+              Acf(1) + 2 ==
+              2 + Acf(1) ==
+              Acf(1) + UInt(2) ==
+              UInt(2) + Acf(1) ==
+              Acf(1) + UInt8(2) ==
+              Acf(1) + UInt8(2) ==
+              UInt8(2) + Acf(1) ==
+              3
+        @test Acf(1) - Acf(2) == Acf(1) - 2 == Acf(1) - UInt(2) == -1
+        @test Acf(2) * Acf(3) ==
+              Acf(2) * 3 ==
+              3 * Acf(2) ==
+              Acf(2) * UInt(3) ==
+              UInt(3) * Acf(2) ==
+              6
+
+        # real, imag
+        @test real(Acf(1, 2)) isa Arf
+        @test real(Acf(1, 2)) == 1
+        @test imag(Acf(1, 2)) isa Arf
+        @test imag(Acf(1, 2)) == 2
+    end
+
     @testset "$T" for T in [Arb, Acb]
         # +, -, *, /
         @test T(1) + T(2) ==

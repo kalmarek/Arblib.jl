@@ -58,10 +58,22 @@ Serialization.deserialize(
     T::Type{<:Union{mag_struct,arf_struct,arb_struct}},
 ) = Arblib.load_string!(T(), Serialization.deserialize(s))
 
-function Serialization.deserialize(
-    s::Serialization.AbstractSerializer,
-    T::Union{Type{acf_struct},Type{acb_struct}},
-)
+function Serialization.deserialize(s::Serialization.AbstractSerializer, T::Type{acf_struct})
+    str = Serialization.deserialize(s)
+    # One spaces in the real part, so we are looking for
+    spaces = findall(" ", str)
+    @assert length(spaces) == 3
+
+    real_str = str[1:spaces[2].start-1]
+    imag_str = str[spaces[2].stop+1:end]
+
+    res = acf_struct()
+    Arblib.load_string!(Arblib.realref(res), real_str)
+    Arblib.load_string!(Arblib.imagref(res), imag_str)
+    return res
+end
+
+function Serialization.deserialize(s::Serialization.AbstractSerializer, T::Type{acb_struct})
     str = Serialization.deserialize(s)
     # Three spaces in the real part, so we are looking for
     spaces = findall(" ", str)
@@ -70,7 +82,7 @@ function Serialization.deserialize(
     real_str = str[1:spaces[4].start-1]
     imag_str = str[spaces[4].stop+1:end]
 
-    res = T isa Type{acf_struct} ? acf_struct() : acb_struct()
+    res = acb_struct()
     Arblib.load_string!(Arblib.realref(res), real_str)
     Arblib.load_string!(Arblib.imagref(res), imag_str)
     return res

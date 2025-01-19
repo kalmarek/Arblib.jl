@@ -172,6 +172,11 @@
             @test_throws InexactError Int(Arf(typemin(Int)) - 1)
             @test_throws InexactError Int(Arf(typemax(Int)) + 1)
 
+            @test Int(Acf(2)) isa Int
+            @test Int(Acf(2)) == 2
+            @test_throws InexactError Int(Acf(2.5))
+            @test_throws InexactError Int(Acf(2, 1))
+
             @test Int(Arb(2)) isa Int
             @test Int(Arb(2)) == 2
             @test_throws InexactError Int(Arb(2.5))
@@ -191,6 +196,14 @@
             @test BigInt(Arf(typemax(Int)) + 1) == big(typemax(Int)) + 1
 
             @test_throws InexactError BigInt(Arf(2.5))
+
+            @test BigInt(Acf(2)) isa BigInt
+            @test BigInt(Acf(2)) == 2
+            @test BigInt(Acf(typemin(Int)) - 1) == big(typemin(Int)) - 1
+            @test BigInt(Acf(typemax(Int)) + 1) == big(typemax(Int)) + 1
+
+            @test_throws InexactError BigInt(Acf(2.5))
+            @test_throws InexactError BigInt(Acf(2, 1))
 
             @test BigInt(Arb(2)) isa BigInt
             @test BigInt(Arb(2)) == 2
@@ -212,6 +225,16 @@
     end
 
     @testset "Complex" begin
+        @test Complex{Float32}(Acf(2 + 3im)) isa Complex{Float32}
+        @test Complex{Float64}(Acf(2 + 3im)) isa Complex{Float64}
+        @test Complex{Arf}(Acf(2 + 3im)) isa Complex{Arf}
+        @test Complex(Acf(2 + 3im)) isa Complex{Arf}
+
+        @test Complex{Float32}(Acf(2 + 3im)) == 2.0 + 3.0im
+        @test Complex{Float64}(Acf(2 + 3im)) == 2.0 + 3.0im
+        @test Complex{Arf}(Acf(2 + 3im)) == 2.0 + 3.0im
+        @test Complex(Acf(2 + 3im)) == 2.0 + 3.0im
+
         @test Complex{Float32}(Acb(2 + 3im)) isa Complex{Float32}
         @test Complex{Float64}(Acb(2 + 3im)) isa Complex{Float64}
         @test Complex{Arb}(Acb(2 + 3im)) isa Complex{Arb}

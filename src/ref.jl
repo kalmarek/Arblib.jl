@@ -1,4 +1,5 @@
 ArfRef(; prec::Integer = DEFAULT_PRECISION[]) = Arf(; prec)
+AcfRef(; prec::Integer = DEFAULT_PRECISION[]) = Acf(; prec)
 ArbRef(; prec::Integer = DEFAULT_PRECISION[]) = Arb(; prec)
 AcbRef(; prec::Integer = DEFAULT_PRECISION[]) = Acb(; prec)
 MagRef() = Mag()
@@ -9,6 +10,13 @@ function ArfRef(
     prec::Integer = DEFAULT_PRECISION[],
 )
     ArfRef(ptr, prec, parent)
+end
+function AcfRef(
+    ptr::Ptr{acf_struct},
+    parent::Union{Nothing}; # FIXME
+    prec::Integer = DEFAULT_PRECISION[],
+)
+    AcfRef(ptr, prec, parent)
 end
 function ArbRef(
     ptr::Ptr{arb_struct},
@@ -27,12 +35,13 @@ end
 
 Mag(x::MagRef) = set!(Mag(), x)
 Arf(x::ArfRef; prec::Integer = precision(x)) = set!(Arf(; prec), x)
+Acf(x::AcfRef; prec::Integer = precision(x)) = set!(Acf(; prec), x)
 Arb(x::ArbRef; prec::Integer = precision(x)) = set!(Arb(; prec), x)
 Acb(x::AcbRef; prec::Integer = precision(x)) = set!(Acb(; prec), x)
 
 Base.zero(::Union{Type{MagRef},MagRef}) = zero(Mag)
 Base.one(::Union{Type{MagRef},MagRef}) = one(Mag)
-for (TRef, T) in [(ArfRef, Arf), (ArbRef, Arb), (AcbRef, Acb)]
+for (TRef, T) in [(ArfRef, Arf), (AcfRef, Acf), (ArbRef, Arb), (AcbRef, Acb)]
     @eval begin
         Base.zero(x::$TRef) = $T(0, prec = precision(x))
         Base.zero(::Type{$TRef}) = zero($T)
@@ -43,6 +52,7 @@ end
 
 Base.getindex(x::MagRef) = Mag(x)
 Base.getindex(x::ArfRef) = Arf(x)
+Base.getindex(x::AcfRef) = Arf(x)
 Base.getindex(x::ArbRef) = Arb(x)
 Base.getindex(x::AcbRef) = Acb(x)
 
