@@ -63,7 +63,7 @@
         for T in (ArbVector, AcbVector)
             @test hash(T([], prec = 256)) ==
                   hash(T([], prec = 256)) ==
-                  hash(T([], prec = 80)) # FIXME
+                  hash(T([], prec = 80))
             @test hash(T([1])) == hash(T([1])) == hash(T([1], prec = 80))
             @test hash(T([1, 2, 3])) == hash(T([1, 2, 3])) == hash(T([1, 2, 3], prec = 80))
 
@@ -75,7 +75,7 @@
         for T in (ArbMatrix, AcbMatrix)
             @test hash(T([], prec = 256)) ==
                   hash(T([], prec = 256)) ==
-                  hash(T([], prec = 80)) # FIXME
+                  hash(T([], prec = 80))
             @test hash(T([1])) == hash(T([1])) == hash(T([1], prec = 80))
             @test hash(T([1, 2, 3])) == hash(T([1, 2, 3])) == hash(T([1, 2, 3], prec = 80))
 
