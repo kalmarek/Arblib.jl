@@ -92,6 +92,9 @@
             @test hash(cstruct(Arf(1 // 3))) ==
                   hash(cstruct(Arf(1 // 3))) !=
                   hash(Arf(1 // 3))
+            @test hash(cstruct(Acf(1 // 3))) ==
+                  hash(cstruct(Acf(1 // 3))) !=
+                  hash(Acf(1 // 3))
             @test hash(cstruct(Arb(1 // 3))) ==
                   hash(cstruct(Arb(1 // 3))) !=
                   hash(Arb(1 // 3))

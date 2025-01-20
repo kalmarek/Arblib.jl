@@ -182,8 +182,8 @@
 
     @testset "zeros/ones" begin
         for T in [Mag, Arf, Acf, Arb, Acb]
-            @test zeros(T, 2) == [zero(T), zero(T)]
-            @test ones(T, 2) == [one(T), one(T)]
+            @test zeros(T, 2) == zeros(one(T), 2) == [zero(T), zero(T)]
+            @test ones(T, 2) == ones(zero(T), 2) == [one(T), one(T)]
         end
 
         v = zeros(Arb, 2)
