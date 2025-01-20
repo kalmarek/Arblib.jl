@@ -13,7 +13,7 @@ function ArfRef(
 end
 function AcfRef(
     ptr::Ptr{acf_struct},
-    parent::Union{Nothing}; # FIXME
+    parent::Union{Nothing};
     prec::Integer = DEFAULT_PRECISION[],
 )
     AcfRef(ptr, prec, parent)

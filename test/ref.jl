@@ -61,7 +61,9 @@ end
     @test precision(AcfRef()) == Arblib.DEFAULT_PRECISION[]
     @test precision(AcfRef(prec = 80)) == 80
 
-    # FIXME: Add more tests when it is possible to construct AcfRef
+    # TODO: There is currently no way to construct an AcfRef which is
+    # referencing anything. Once that is added there should also be
+    # tests for it here.
 
     @test isequal(zero(AcfRef), zero(Acf))
     @test isequal(one(AcfRef), one(Acf))

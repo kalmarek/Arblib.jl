@@ -8,6 +8,7 @@ These types directly map to corresponding Arb types.
 ``` @docs
 Mag
 Arf
+Acf
 Arb
 Acb
 ArbVector
@@ -34,6 +35,7 @@ for non-allocating access in a number of cases.
 ``` @docs
 MagRef
 ArfRef
+AcfRef
 ArbRef
 AcbRef
 ArbRefVector
@@ -51,6 +53,7 @@ interface types.
 |----------|------------------|-------------|----------------|
 | `mag_t`  | `mag_struct`     | `Mag`       | `MagRef`       |
 | `arf_t`  | `arf_struct`     | `Arf`       | `ArfRef`       |
+| `acf_t`  | `acf_struct`     | `Acf`       | `AcfRef`       |
 | `arb_t`  | `arb_struct`     | `Arb`       | `ArbRef`       |
 | `acb_t`  | `acb_struct`     | `Acb`       | `AcbRef`       |
 | `arb_t*` | `arb_vec_struct` | `ArbVector` | `ArbRefVector` |

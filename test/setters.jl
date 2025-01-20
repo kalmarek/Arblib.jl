@@ -45,7 +45,10 @@
         @test_throws InexactError Arblib.set!(T(), 1 + 1im)
     end
 
-    @testset "$name" for (name, T) in [("Acf", Acf), ("AcfRef", Acf)] # FIXME: No support for AcfRef
+    # TODO: There is currently no way to construct an AcfRef. Once
+    # that is added the T for AcfRef in this loop should be updated to
+    # use that constructor.
+    @testset "$name" for (name, T) in [("Acf", Acf), ("AcfRef", Acf)]
         # Setting real part
         @test Arblib.set!(T(), one(Mag)) == one(Acf)
         @test Arblib.set!(T(), one(Mag).mag) == one(Acf)
