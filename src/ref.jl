@@ -52,7 +52,7 @@ end
 
 Base.getindex(x::MagRef) = Mag(x)
 Base.getindex(x::ArfRef) = Arf(x)
-Base.getindex(x::AcfRef) = Arf(x)
+Base.getindex(x::AcfRef) = Acf(x)
 Base.getindex(x::ArbRef) = Arb(x)
 Base.getindex(x::AcbRef) = Acb(x)
 

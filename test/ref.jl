@@ -61,9 +61,25 @@ end
     @test precision(AcfRef()) == Arblib.DEFAULT_PRECISION[]
     @test precision(AcfRef(prec = 80)) == 80
 
-    # TODO: There is currently no way to construct an AcfRef which is
-    # referencing anything. Once that is added there should also be
-    # tests for it here.
+    # The only way to construct an AcfRef is currently by a raw
+    # pointer to an Acf.
+    x = Acf()
+    GC.@preserve x begin
+        ptr = Ptr{Arblib.acf_struct}(pointer_from_objref(x.acf))
+        parent = nothing
+        @test AcfRef(ptr, parent) == Acf()
+        @test precision(AcfRef(ptr, parent)) == Arblib.DEFAULT_PRECISION[]
+        @test precision(AcfRef(ptr, parent, prec = 80)) == 80
+
+        Arblib.set!(x, 2)
+        @test AcfRef(ptr, parent) == 2
+        Arblib.set!(AcfRef(ptr, parent), 3)
+        @test x == 3
+        Arblib.set!(Acf(AcfRef(ptr, parent)), 4)
+        @test x == 3
+        Arblib.set!(AcfRef(ptr, parent)[], 4)
+        @test x == 3
+    end
 
     @test isequal(zero(AcfRef), zero(Acf))
     @test isequal(one(AcfRef), one(Acf))
