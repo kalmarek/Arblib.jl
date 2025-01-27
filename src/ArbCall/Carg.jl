@@ -22,8 +22,7 @@ function Carg(str::AbstractString)
     m = match(r"(?<const>const)?\s*(?<type>\w+(\s\*)?)\s+(?<name>\w+)", str)
     isnothing(m) && throw(ArgumentError("string doesn't match c-argument pattern"))
     isconst =
-        !isnothing(m[:const]) ||
-        (!isnothing(m[:type]) && (m[:type] == "arb_srcptr" || m[:type] == "acb_srcptr"))
+        !isnothing(m[:const]) || (!isnothing(m[:type]) && endswith(m[:type], "_srcptr"))
     return Carg{arbargtypes[m[:type]]}(m[:name], isconst)
 end
 
@@ -37,8 +36,9 @@ Base.:(==)(a::Carg{T}, b::Carg{S}) where {T,S} =
 function arbsignature(ca::Carg)
     arbtype = arbargtypes.supported_reversed[rawtype(ca)]
 
-    if isconst(ca) && (arbtype == "arb_ptr" || arbtype == "acb_ptr")
-        return "$(split(arbtype, "_")[1])_srcptr $(name(ca))"
+    if isconst(ca) && endswith(arbtype, "_ptr")
+        const_arbtype = replace(arbtype, "_ptr" => "_srcptr")
+        return "$const_arbtype $(name(ca))"
     else
         return ifelse(isconst(ca), "const ", "") * "$arbtype $(name(ca))"
     end
