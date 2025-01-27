@@ -94,6 +94,14 @@
               Acf(2) * UInt(3) ==
               UInt(3) * Acf(2) ==
               6
+        @test Acf(6) / Acf(2) ==
+              Acf(6) / 2 ==
+              6 / Acf(2) ==
+              Acf(6) / UInt(2) ==
+              UInt(6) / Acf(2) ==
+              Acf(6) / UInt8(2) ==
+              UInt8(6) / Acf(2) ==
+              3
 
         # real, imag
         @test real(Acf(1, 2)) isa Arf

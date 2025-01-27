@@ -12,8 +12,14 @@ for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
         return z
     end
 
-    if jf != :/ # Acf doesn't define div
-        # There are no integer versions defined for Acf
+    if jf == :/
+        # There is not div method for Acf, only an approx_div version
+        @eval function Base.$jf(x::AcfOrRef, y::AcfOrRef)
+            z = Acf(prec = _precision(x, y))
+            approx_div!(z, x, y)
+            return z
+        end
+    else
         @eval function Base.$jf(x::AcfOrRef, y::AcfOrRef)
             z = Acf(prec = _precision(x, y))
             $af(z, x, y)
