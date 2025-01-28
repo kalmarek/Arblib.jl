@@ -9,9 +9,9 @@ Struct for conversion between C argument types in the Arb
 documentation and Julia types.
 """
 struct ArbArgTypes
-    supported::Dict{String,DataType}
+    supported::Dict{String,Union{DataType,UnionAll}}
     unsupported::Set{String}
-    supported_reversed::Dict{DataType,String}
+    supported_reversed::Dict{Union{DataType,UnionAll},String}
 end
 
 function Base.getindex(arbargtypes::ArbArgTypes, key::AbstractString)
@@ -22,7 +22,7 @@ end
 
 # Define the conversions we use for the rest of the code
 const arbargtypes = ArbArgTypes(
-    Dict{String,DataType}(
+    Dict{String,Union{DataType,UnionAll}}(
         # Primitive
         "void" => Cvoid,
         "int" => Cint,
@@ -43,6 +43,10 @@ const arbargtypes = ArbArgTypes(
         "mpfr_rnd_t" => Base.MPFR.MPFRRoundingMode,
         # mag.h
         "mag_t" => Mag,
+        # nfloat.h
+        "nfloat_ptr" => NFloat,
+        "nfloat_srcptr" => NFloat,
+        "gr_ctx_t" => nfloat_ctx_struct, # Actually in gr_types.h
         # arf.h
         "arf_t" => Arf,
         "arf_rnd_t" => arb_rnd,
@@ -66,7 +70,7 @@ const arbargtypes = ArbArgTypes(
         "acb_mat_t" => AcbMatrix,
     ),
     Set(["FILE *", "flint_rand_t"]),
-    Dict{DataType,String}(
+    Dict{Union{DataType,UnionAll},String}(
         # Primitive
         Cvoid => "void",
         Cint => "int",
@@ -87,6 +91,9 @@ const arbargtypes = ArbArgTypes(
         Base.MPFR.MPFRRoundingMode => "mpfr_rnd_t",
         # mag.h
         Mag => "mag_t",
+        # nfloat.h
+        NFloat => "nfloat_ptr",
+        nfloat_ctx_struct => "gr_ctx_t", # Actually in gr_types.h
         # arf.h
         Arf => "arf_t",
         arb_rnd => "arf_rnd_t",

@@ -71,6 +71,8 @@ jltype(::Carg{Vector{ComplexF64}}) = Vector{ComplexF64}
 jltype(::Carg{Base.MPFR.MPFRRoundingMode}) = Union{Base.MPFR.MPFRRoundingMode,RoundingMode}
 # mag.h
 jltype(::Carg{Mag}) = MagLike
+# nfloat.h
+jltype(::Carg{NFloat}) = NFloatLike
 # arf.h
 jltype(::Carg{Arf}) = ArfLike
 jltype(::Carg{arb_rnd}) = Union{arb_rnd,RoundingMode}
@@ -103,6 +105,8 @@ ctype(::Carg{T}) where {T<:Union{Mag,Arf,Acf,Arb,Acb,ArbPoly,AcbPoly,ArbMatrix,A
     Ref{cstructtype(T)}
 ctype(::Carg{T}) where {T<:Union{ArbVector,arb_vec_struct}} = Ptr{arb_struct}
 ctype(::Carg{T}) where {T<:Union{AcbVector,acb_vec_struct}} = Ptr{acb_struct}
+ctype(::Carg{T}) where {T<:NFloat} = Ref{nfloat_struct}
+ctype(::Carg{T}) where {T<:nfloat_ctx_struct} = Ref{nfloat_ctx_struct}
 
 """
     jlarg(ca::Carg{T}) where {T}
@@ -130,6 +134,8 @@ is_length_argument(ca::Carg, prev_ca::Carg) =
     (startswith(string(name(ca)), "len") || name(ca) == :n) &&
     rawtype(ca) == Int &&
     rawtype(prev_ca) ∈ (ArbVector, AcbVector)
+
+is_ctx_argument(ca::Carg{T}) where {T} = T <: nfloat_ctx_struct
 
 function extract_precision_argument(ca::Carg, first_ca::Carg)
     is_precision_argument(ca) ||
@@ -159,6 +165,14 @@ function extract_length_argument(ca::Carg, prev_ca::Carg)
     is_length_argument(ca, prev_ca) ||
         throw(ArgumentError("argument is not a valid length argument, $ca"))
     return Expr(:kw, jlarg(ca), :(length($(name(prev_ca)))))
+end
+
+# TODO: This needs to handle the case when it is not the first
+# argument we should get the context from. This happens for e.g.
+# nfloat_get_arf.
+function extract_ctx_argument(ca::Carg, first_ca::Carg)
+    is_ctx_argument(ca) || throw(ArgumentError("argument is not a valid ctx argument, $ca"))
+    return Expr(:kw, jlarg(ca), :(_get_nfloat_ctx_struct($(name(first_ca)))))
 end
 
 """

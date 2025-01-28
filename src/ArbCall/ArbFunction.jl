@@ -67,6 +67,8 @@ const jlfname_prefixes = (
     "double",
     "cdouble",
     "mag",
+    "nfloat",
+    "ctx",
     "arf",
     "acf",
     "arb",
@@ -78,7 +80,7 @@ const jlfname_prefixes = (
     "scalar",
 )
 const jlfname_suffixes =
-    ("si", "ui", "d", "str", "mpz", "mpfr", "mag", "arf", "acf", "arb", "acb")
+    ("si", "ui", "d", "str", "mpz", "mpfr", "mag", "nfloat", "arf", "acf", "arb", "acb")
 
 function jlfname(
     arbfname::AbstractString;
@@ -146,6 +148,8 @@ function jlargs(af::ArbFunction; argument_detection::Bool = true)
             push!(kwargs, extract_rounding_argument(carg))
         elseif i > 1 && is_length_argument(carg, cargs[i-1])
             push!(kwargs, extract_length_argument(carg, cargs[i-1]))
+        elseif is_ctx_argument(carg)
+            push!(kwargs, extract_ctx_argument(carg, first(cargs)))
         else
             push!(args, jlarg(carg))
         end

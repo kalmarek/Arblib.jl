@@ -54,6 +54,8 @@ include("types.jl")
 include("hash.jl")
 include("serialize.jl")
 
+include("nfloat.jl")
+
 include("ArbCall/ArbCall.jl")
 import .ArbCall: @arbcall_str, @arbfpwrapcall_str
 include("manual_overrides.jl")
@@ -84,6 +86,7 @@ include("calc_integrate.jl")
 include("special-functions.jl")
 
 include("arbcalls/mag.jl")
+include("arbcalls/nfloat.jl")
 include("arbcalls/arf.jl")
 include("arbcalls/acf.jl")
 include("arbcalls/arb.jl")
