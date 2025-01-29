@@ -27,12 +27,18 @@ midpoint(x::ArbOrRef) = midpoint(Arf, x)
     midpoint([T, ] z::AcbOrRef)
 
 Returns the midpoint of `z` as a `Complex{Arf}`. If `T` is given and
-equal to `Arf` or `Arb`, convert to `Complex{T}`. If `T` is `Acb` then
-convert to that.
+equal to `Arf` or `Arb`, convert to `Complex{T}`. If `T` is equal to
+`Acf` or `Acb` then convert to that.
+
+!!! note "Default type"
+    For compatability reasons this functions returns `Complex{Arf}` if
+    `T` is omitted. In a future version the default might change to
+    `Acf`.
 """
 midpoint(::Type{Acb}, z::AcbOrRef) = Acb(midref(realref(z)), midref(imagref(z)))
 midpoint(T::Type{<:Union{Arf,Arb}}, z::AcbOrRef) =
     Complex(midpoint(T, realref(z)), midpoint(T, imagref(z)))
+midpoint(T::Type{Acf}, z::AcbOrRef) = Acf(midref(realref(z)), midref(imagref(z)))
 midpoint(z::AcbOrRef) = midpoint(Arf, z)
 
 """

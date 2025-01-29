@@ -29,6 +29,31 @@ struct Mag <: Real
 end
 
 """
+    Acf <: AbstractFloat
+
+Complex arbitrary precision floating point number type.
+
+The internal representation of the real and imaginary parts are the
+same as for [`Arf`](@ref). It is a wrapper of the type
+[`acf`](https://flintlib.org/doc/acf.html) in Flint.
+
+See also [`AcfRef`](@ref) for handling pointers to `acf` objects and
+[`Acb`](@ref) for a complex number type with rigorous error tracking.
+
+!!! note "Limited capabilities"
+    The `Acf` type only implements very basic functionalities. For
+    most purposes it is better to use the [`Acb`](@ref) type, this is
+    true even in situations where the rigorous error tracking done by
+    `Acb` is not needed.
+"""
+struct Acf <: Number
+    acf::acf_struct
+    prec::Int
+
+    Acf(; prec::Integer = DEFAULT_PRECISION[]) = new(acf_struct(), prec)
+end
+
+"""
     Arb <: AbstractFloat
 """
 struct Arb <: AbstractFloat
@@ -68,12 +93,28 @@ struct ArbRef <: AbstractFloat
 end
 
 """
+    AcfRef <: Number
+
+Type handling references to [`Acf`](@ref) objects.
+
+!!! note "No standard constructors"
+    There are currently no types from which `AcfRef` can be natively
+    constructed. It can as of now only be constructed from a raw point
+    to an [`acf_struct`](@ref).
+"""
+struct AcfRef <: Number
+    acf_ptr::Ptr{acf_struct}
+    prec::Int
+    parent::Union{Nothing}
+end
+
+"""
     ArfRef <: AbstractFloat
 """
 struct ArfRef <: AbstractFloat
     arf_ptr::Ptr{arf_struct}
     prec::Int
-    parent::Union{arb_struct,ArbRef}
+    parent::Union{acf_struct,AcfRef,arb_struct,ArbRef}
 end
 
 """
@@ -351,6 +392,7 @@ end
 for (T, prefix) in (
     (Mag, :mag),
     (Arf, :arf),
+    (Acf, :acf),
     (Arb, :arb),
     (Acb, :acb),
     (Union{ArbVector,ArbRefVector}, :arb_vec),
@@ -374,8 +416,18 @@ end
 cstruct(x::ArbSeries) = cstruct(x.poly)
 cstruct(x::AcbSeries) = cstruct(x.poly)
 
-# handle Ref types
-for prefix in [:mag, :arf, :arb, :acb]
+# Handle Ref types
+const MagOrRef = Union{Mag,MagRef}
+const ArfOrRef = Union{Arf,ArfRef}
+const AcfOrRef = Union{Acf,AcfRef}
+const ArbOrRef = Union{Arb,ArbRef}
+const AcbOrRef = Union{Acb,AcbRef}
+const ArbVectorOrRef = Union{ArbVector,ArbRefVector}
+const AcbVectorOrRef = Union{AcbVector,AcbRefVector}
+const ArbMatrixOrRef = Union{ArbMatrix,ArbRefMatrix}
+const AcbMatrixOrRef = Union{AcbMatrix,AcbRefMatrix}
+
+for prefix in [:mag, :arf, :acf, :arb, :acb]
     T = Symbol(uppercasefirst(string(prefix)))
     TRef = Symbol(T, :Ref)
     TStruct = Symbol(prefix, :_struct)
@@ -392,7 +444,6 @@ for prefix in [:mag, :arf, :arb, :acb]
         parentstruct(x::$T) = cstruct(x)
         parentstruct(x::$TRef) = x
         parentstruct(x::$TStruct) = x
-        Base.copy(x::Union{$T,$TRef}) = $T(x)
     end
 end
 
@@ -400,14 +451,22 @@ end
 # similar code. It's convenient to have this method then.
 _nonreftype(::Type{T}) where {T<:Union{ArbPoly,AcbPoly,ArbSeries,AcbSeries}} = T
 
-const MagOrRef = Union{Mag,MagRef}
-const ArfOrRef = Union{Arf,ArfRef}
-const ArbOrRef = Union{Arb,ArbRef}
-const AcbOrRef = Union{Acb,AcbRef}
-const ArbVectorOrRef = Union{ArbVector,ArbRefVector}
-const AcbVectorOrRef = Union{AcbVector,AcbRefVector}
-const ArbMatrixOrRef = Union{ArbMatrix,ArbRefMatrix}
-const AcbMatrixOrRef = Union{AcbMatrix,AcbRefMatrix}
+# Copy of vectors and matrices is defined in their own files.
+Base.copy(
+    x::T,
+) where {
+    T<:Union{
+        MagOrRef,
+        ArfOrRef,
+        AcfOrRef,
+        ArbOrRef,
+        AcbOrRef,
+        ArbPoly,
+        AcbPoly,
+        ArbSeries,
+        AcbSeries,
+    },
+} = _nonreftype(T)(x)
 
 """
     MagLike = Union{Mag,MagRef,mag_struct,Ptr{mag_struct}}
@@ -417,6 +476,10 @@ const MagLike = Union{Mag,MagRef,cstructtype(Mag),Ptr{cstructtype(Mag)}}
     ArfLike = Union{Arf,ArfRef,arf_struct,Ptr{arf_struct}}}
 """
 const ArfLike = Union{Arf,ArfRef,cstructtype(Arf),Ptr{cstructtype(Arf)}}
+"""
+    AcfLike = Union{Acf,AcfRef,acf_struct,Ptr{acf_struct}}}
+"""
+const AcfLike = Union{Acf,AcfRef,cstructtype(Acf),Ptr{cstructtype(Acf)}}
 """
     ArbLike = Union{Arb,ArbRef,arb_struct,Ptr{arb_struct}}}
 """
@@ -455,6 +518,8 @@ const ArbTypes = Union{
     MagRef,
     Arf,
     ArfRef,
+    Acf,
+    AcfRef,
     Arb,
     ArbRef,
     Acb,

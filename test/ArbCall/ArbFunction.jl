@@ -8,6 +8,7 @@
             ("arf_set_ui", :set),
             ("arf_set_si", :set),
             ("arf_set_d", :set),
+            ("acf_set", :set),
             ("arb_set", :set),
             ("arf_set_mpz", :set),
             ("arf_set_mpfr", :set),
@@ -187,6 +188,25 @@
                 ],
             ),
             (
+                "int acf_add(acf_t res, const acf_t x, const acf_t y, slong prec, arf_rnd_t rnd)",
+                [
+                    :(res::$(Arblib.AcfLike)),
+                    :(x::$(Arblib.AcfLike)),
+                    :(y::$(Arblib.AcfLike)),
+                ],
+                [
+                    Expr(:kw, :(prec::Integer), :(_precision(res))),
+                    Expr(:kw, :(rnd::Union{Arblib.arb_rnd,RoundingMode}), :(RoundNearest)),
+                ],
+                [
+                    :(res::$(Arblib.AcfLike)),
+                    :(x::$(Arblib.AcfLike)),
+                    :(y::$(Arblib.AcfLike)),
+                    :(prec::$Integer),
+                    :(rnd::$(Union{Arblib.arb_rnd,RoundingMode})),
+                ],
+            ),
+            (
                 "void arb_lambertw(arb_t res, const arb_t x, int flags, slong prec)",
                 [:(res::$(Arblib.ArbLike)), :(x::$(Arblib.ArbLike))],
                 [
@@ -265,6 +285,7 @@
 
     @testset "arbsignature" begin
         for str in (
+            "slong acf_allocated_bytes(const acf_t x)",
             "void arb_init(arb_t x)",
             "slong arb_rel_error_bits(const arb_t x)",
             "int arb_is_zero(const arb_t x)",

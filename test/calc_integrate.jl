@@ -20,11 +20,6 @@
     # Test with a method that accepts analytic as a keyword argument
     f3 = (x; analytic) -> Arblib.real_abs!(Acb(prec = prec), x, analytic)
     f3! = (res, x; analytic) -> Arblib.real_abs!(res, x, analytic)
-    # FIXME: These are supposed to be identical but due to a bug in
-    # Arb the produce slightly different results, see
-    # https://github.com/kalmarek/Arblib.jl/issues/70. Once Arb is
-    # updated so that they start to produce identical results this can
-    # be updated and the issue closed.
     res3 = "[0.50000000000000000 +/- 2.73e-18]"
     @test string(Arblib.integrate(f3, a, b, check_analytic = true, prec = prec)) == res3
     @test string(Arblib.integrate!(f3!, Acb(prec = prec), a, b, check_analytic = true)) ==
@@ -34,7 +29,6 @@
     # a keyword arguments
     f4 = (x; analytic, prec) -> Arblib.real_abs!(Acb(), x, analytic, prec = prec)
     f4! = (res, x; analytic, prec) -> Arblib.real_abs!(res, x, analytic, prec = prec)
-    # FIXME: See above
     res4 = "[0.50000000000000000 +/- 2.73e-18]"
     @test string(
         Arblib.integrate(f4, a, b, check_analytic = true, take_prec = true, prec = prec),

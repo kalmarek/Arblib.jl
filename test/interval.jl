@@ -34,14 +34,21 @@
         x = zero(Acb)
         y = Acb(1, 1)
 
-        @test midpoint(x) == midpoint(Arf, x) == midpoint(Arb, x) == midpoint(Acb, x) == 0
+        @test midpoint(x) ==
+              midpoint(Arf, x) ==
+              midpoint(Acf, x) ==
+              midpoint(Arb, x) ==
+              midpoint(Acb, x) ==
+              0
         @test midpoint(y) ==
               midpoint(Arf, y) ==
+              midpoint(Acf, y) ==
               midpoint(Arb, y) ==
               midpoint(Acb, y) ==
               1 + im
         @test midpoint(x) isa Complex{Arf}
         @test midpoint(Arf, x) isa Complex{Arf}
+        @test midpoint(Acf, x) isa Acf
         @test midpoint(Arb, x) isa Complex{Arb}
         @test midpoint(Acb, x) isa Acb
 
@@ -49,6 +56,7 @@
         @test precision(imag(midpoint(Acb(prec = 80)))) == 80
         @test precision(real(midpoint(Arf, Acb(prec = 80)))) == 80
         @test precision(imag(midpoint(Arf, Acb(prec = 80)))) == 80
+        @test precision(midpoint(Acf, Acb(prec = 80))) == 80
         @test precision(real(midpoint(Arb, Acb(prec = 80)))) == 80
         @test precision(imag(midpoint(Arb, Acb(prec = 80)))) == 80
         @test precision(midpoint(Acb, Acb(prec = 80))) == 80

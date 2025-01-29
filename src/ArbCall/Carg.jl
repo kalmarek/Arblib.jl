@@ -70,6 +70,7 @@ jltype(::Carg{Vector{Float64}}) = Vector{<:Base.GMP.CdoubleMax}
 jltype(::Carg{Vector{ComplexF64}}) = Vector{<:Union{ComplexF16,ComplexF32,ComplexF64}}
 jltype(::Carg{Mag}) = MagLike
 jltype(::Carg{Arf}) = ArfLike
+jltype(::Carg{Acf}) = AcfLike
 jltype(::Carg{Arb}) = ArbLike
 jltype(::Carg{Acb}) = AcbLike
 jltype(::Carg{ArbVector}) = ArbVectorLike
@@ -87,7 +88,7 @@ The type that should be used for the argument when passed to C code.
 ctype(ca::Carg) = rawtype(ca)
 ctype(::Carg{T}) where {T<:Union{ArbVector,arb_vec_struct}} = Ptr{arb_struct}
 ctype(::Carg{T}) where {T<:Union{AcbVector,acb_vec_struct}} = Ptr{acb_struct}
-ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbPoly,AcbPoly,ArbMatrix,AcbMatrix}} =
+ctype(::Carg{T}) where {T<:Union{Mag,Arf,Acf,Arb,Acb,ArbPoly,AcbPoly,ArbMatrix,AcbMatrix}} =
     Ref{cstructtype(T)}
 ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
 ctype(::Carg{Vector{T}}) where {T} = Ref{T}

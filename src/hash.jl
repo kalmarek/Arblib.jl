@@ -50,6 +50,7 @@ Base.decompose(x::Union{MagOrRef,ArfOrRef}) = Base.decompose(cstruct(x))
 # type and then hashed together with their type
 Base.hash(x::mag_struct, h::UInt) = hash(Mag(x), hash(typeof(x), h))
 Base.hash(x::arf_struct, h::UInt) = hash(Arf(x), hash(typeof(x), h))
+Base.hash(x::acf_struct, h::UInt) = hash(Acf(x), hash(typeof(x), h))
 Base.hash(x::arb_struct, h::UInt) = hash(Arb(x), hash(typeof(x), h))
 Base.hash(x::acb_struct, h::UInt) = hash(Acb(x), hash(typeof(x), h))
 Base.hash(x::arb_vec_struct, h::UInt) =
@@ -76,7 +77,7 @@ function Base.hash(x::ArbOrRef, h::UInt)
     return hash(Arblib.midref(x), h)
 end
 
-function Base.hash(z::AcbOrRef, h::UInt)
+function Base.hash(z::Union{AcfOrRef,AcbOrRef}, h::UInt)
     # Same as for Complex{T}
     hash(realref(z), h ⊻ hash(imagref(z), Base.h_imag) ⊻ Base.hash_0_imag)
 end

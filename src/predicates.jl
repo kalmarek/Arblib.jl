@@ -105,6 +105,16 @@ for (T, funcpairs) in (
     end
 end
 
+# There are no predicates defined for Acf in Flint. We define the most
+# important ones for basic usage.
+Base.iszero(x::AcfOrRef) = iszero(realref(x)) && iszero(imagref(x))
+Base.isone(x::AcfOrRef) = isone(realref(x)) && iszero(imagref(x))
+Base.isfinite(x::AcfOrRef) = isfinite(realref(x)) && isfinite(imagref(x))
+Base.isinf(x::AcfOrRef) = isinf(realref(x)) && isinf(imagref(x))
+Base.isnan(x::AcfOrRef) = isnan(realref(x)) || isnan(imagref(x))
+Base.isinteger(x::AcfOrRef) = isinteger(realref(x)) && iszero(imagref(x))
+Base.isreal(x::AcfOrRef) = iszero(imagref(x))
+
 Base.isnan(x::ArbOrRef) = isnan(midref(x))
 Base.isnan(x::AcbOrRef) = isnan(midref(realref(x))) || isnan(midref(imagref(x)))
 
@@ -148,6 +158,7 @@ end
 
 for (ArbT, args) in (
     (ArfOrRef, ((:(==), :equal),)),
+    (AcfOrRef, ((:(==), :equal),)),
     (
         ArbOrRef,
         ((:(==), :eq), (:(!=), :ne), (:(<), :lt), (:(<=), :le), (:(>), :gt), (:(>=), :ge)),

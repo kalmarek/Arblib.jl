@@ -7,7 +7,10 @@ function Serialization.serialize(
     Serialization.serialize(s, dump_string(x))
 end
 
-function Serialization.serialize(s::Serialization.AbstractSerializer, x::acb_struct)
+function Serialization.serialize(
+    s::Serialization.AbstractSerializer,
+    x::Union{acf_struct,acb_struct},
+)
     Serialization.serialize_type(s, typeof(x))
     str = dump_string(Arblib.realref(x)) * " " * dump_string(Arblib.imagref(x))
     Serialization.serialize(s, str)
@@ -54,6 +57,21 @@ Serialization.deserialize(
     s::Serialization.AbstractSerializer,
     T::Type{<:Union{mag_struct,arf_struct,arb_struct}},
 ) = Arblib.load_string!(T(), Serialization.deserialize(s))
+
+function Serialization.deserialize(s::Serialization.AbstractSerializer, T::Type{acf_struct})
+    str = Serialization.deserialize(s)
+    # One spaces in the real part, so we are looking for
+    spaces = findall(" ", str)
+    @assert length(spaces) == 3
+
+    real_str = str[1:spaces[2].start-1]
+    imag_str = str[spaces[2].stop+1:end]
+
+    res = acf_struct()
+    Arblib.load_string!(Arblib.realref(res), real_str)
+    Arblib.load_string!(Arblib.imagref(res), imag_str)
+    return res
+end
 
 function Serialization.deserialize(s::Serialization.AbstractSerializer, T::Type{acb_struct})
     str = Serialization.deserialize(s)

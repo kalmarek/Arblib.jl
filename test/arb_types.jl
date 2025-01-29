@@ -1,11 +1,12 @@
 @testset "arb_types" begin
     mag = Arblib.mag_struct()
     arf = Arblib.arf_struct()
+    acf = Arblib.acf_struct()
     arb = Arblib.arb_struct()
     acb = Arblib.acb_struct()
 
     prec = 256
-    for x in (arf, arb, acb)
+    for x in (arf, acf, arb, acb)
         @test precision(x) == prec
         @test precision(Ptr{typeof(x)}()) == prec
         @test precision(typeof(x)) == prec
@@ -16,6 +17,7 @@
         for x in [
             Arblib.mag_struct(),
             Arblib.arf_struct(),
+            Arblib.acf_struct(),
             Arblib.arb_struct(),
             Arblib.acb_struct(),
             Arblib.arb_poly_struct(),

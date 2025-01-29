@@ -41,10 +41,48 @@ end
     Arblib.set!(z, 4)
     @test Arblib.midref(x) == Arf(2)
 
+    w = Acf()
+    Arblib.set!(Arblib.realref(w), 2)
+    @test w == Acf(2, 0)
+    @test Arblib.realref(w) == Arf(2)
+    Arblib.set!(Arblib.imagref(w), 3)
+    @test w == Acf(2, 3)
+    @test Arblib.imagref(w) == Arf(3)
+
     @test isequal(zero(ArfRef), zero(Arf))
     @test isequal(zero(Arblib.midref(x)), zero(Arf))
     @test isequal(one(ArfRef), one(Arf))
     @test isequal(one(Arblib.midref(x)), one(Arf))
+end
+
+@testset "AcfRef" begin
+    @test AcfRef() isa Acf
+    @test isequal(AcfRef(), Acf())
+    @test precision(AcfRef()) == Arblib.DEFAULT_PRECISION[]
+    @test precision(AcfRef(prec = 80)) == 80
+
+    # The only way to construct an AcfRef is currently by a raw
+    # pointer to an Acf.
+    x = Acf()
+    GC.@preserve x begin
+        ptr = Ptr{Arblib.acf_struct}(pointer_from_objref(x.acf))
+        parent = nothing
+        @test AcfRef(ptr, parent) == Acf()
+        @test precision(AcfRef(ptr, parent)) == Arblib.DEFAULT_PRECISION[]
+        @test precision(AcfRef(ptr, parent, prec = 80)) == 80
+
+        Arblib.set!(x, 2)
+        @test AcfRef(ptr, parent) == 2
+        Arblib.set!(AcfRef(ptr, parent), 3)
+        @test x == 3
+        Arblib.set!(Acf(AcfRef(ptr, parent)), 4)
+        @test x == 3
+        Arblib.set!(AcfRef(ptr, parent)[], 4)
+        @test x == 3
+    end
+
+    @test isequal(zero(AcfRef), zero(Acf))
+    @test isequal(one(AcfRef), one(Acf))
 end
 
 @testset "ArbRef" begin

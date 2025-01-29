@@ -1,5 +1,5 @@
 @testset "Random" begin
-    @testset "rand $T" for T in (Arf, Arb, Acb)
+    @testset "rand $T" for T in (Arf, Acf, Arb, Acb)
         @test rand(T) isa T
         @test precision(rand(T)) == precision(T)
         @test precision(rand(T(prec = 128))) == 128

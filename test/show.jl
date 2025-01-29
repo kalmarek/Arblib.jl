@@ -24,6 +24,24 @@
         @test string(Arf(1 // 3) * Arf(10)^81) ==
               "3.3333333333333333333333333333333333333333333333333333333333333333333333333334e+80"
 
+        @test string(Acf()) == "0"
+        @test string(Acf(1)) == "1.0"
+        @test string(Acf(0, 1)) == "0 + 1.0im"
+        @test string(Acf(1, 1)) == "1.0 + 1.0im"
+        @test string(Acf(1, 1), digits = 3, remove_trailing_zeros = false) ==
+              "1.00 + 1.00im"
+        @test string(Acf(1, 1), digits = 12, remove_trailing_zeros = false) ==
+              "1.00000000000 + 1.00000000000im"
+        @test string(Acf(1 // 3, 1 // 7)) ==
+              "0.33333333333333333333333333333333333333333333333333333333333333333333333333333 + 0.14285714285714285714285714285714285714285714285714285714285714285714285714286im"
+        @test string(Acf(1 // 3, 1 // 7), digits = 12) ==
+              "0.333333333333 + 0.142857142857im"
+        @test string(Acf(10)^100) == "1.0e+100"
+        @test string(Acf(10)^100, remove_trailing_zeros = false) ==
+              "1.0000000000000000000000000000000000000000000000000000000000000000000000000000e+100"
+        @test string(Acf(1 // 3) * Acf(10)^81) ==
+              "3.3333333333333333333333333333333333333333333333333333333333333333333333333334e+80"
+
         @test string(Arb()) == "0"
         @test string(Arb(1)) == "1.0"
         @test string(Arb(1, prec = 64), remove_trailing_zeros = false) ==

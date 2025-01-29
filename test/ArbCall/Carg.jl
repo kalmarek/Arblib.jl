@@ -1,6 +1,7 @@
 @testset "Carg" begin
     mag_struct = Arblib.mag_struct
     arf_struct = Arblib.arf_struct
+    acf_struct = Arblib.acf_struct
     arb_struct = Arblib.arb_struct
     acb_struct = Arblib.acb_struct
 
@@ -9,6 +10,7 @@
         for (str, name, isconst, jltype, ctype) in (
             ("mag_t res", :res, false, Arblib.MagLike, Ref{mag_struct}),
             ("arf_t res", :res, false, Arblib.ArfLike, Ref{arf_struct}),
+            ("acf_t res", :res, false, Arblib.AcfLike, Ref{acf_struct}),
             ("arb_t res", :res, false, Arblib.ArbLike, Ref{arb_struct}),
             ("acb_t res", :res, false, Arblib.AcbLike, Ref{acb_struct}),
             ("const mag_t x", :x, true, Arblib.MagLike, Ref{mag_struct}),

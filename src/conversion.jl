@@ -69,6 +69,8 @@ function Base.Int(x::ArfOrRef)
     return get_si(x, ArbRoundNearest)
 end
 
+Base.Int(x::AcfOrRef) = isreal(x) ? Int(realref(x)) : throw(InexactError(:Int, Int, x))
+
 Base.Int(x::ArbOrRef) = is_int(x) ? Int(midref(x)) : throw(InexactError(:Int, Int, x))
 
 Base.Int(x::AcbOrRef) =
@@ -88,6 +90,9 @@ function Base.BigInt(x::ArfOrRef)
     return BigInt(n)
 end
 
+Base.BigInt(x::AcfOrRef) =
+    isreal(x) ? BigInt(realref(x)) : throw(InexactError(:BigInt, BigInt, x))
+
 Base.BigInt(x::ArbOrRef) =
     is_int(x) ? BigInt(midref(x)) : throw(InexactError(:BigInt, BigInt, x))
 
@@ -95,8 +100,9 @@ Base.BigInt(x::AcbOrRef) =
     is_int(x) ? BigInt(midref(realref(x))) : throw(InexactError(:BigInt, BigInt, x))
 
 ## Conversion to Complex
-
-# TODO: This currently allows construction of Complex{ArbRef}, which
-# we probably don't want.
+# TODO: This currently allows construction of Complex{ArfRef} and
+# Complex{ArbRef}, which we probably don't want.
+Base.Complex{T}(z::AcfOrRef) where {T} = Complex{T}(realref(z), imagref(z))
 Base.Complex{T}(z::AcbOrRef) where {T} = Complex{T}(realref(z), imagref(z))
+Base.Complex(z::Acf) = Complex{Arf}(z)
 Base.Complex(z::AcbOrRef) = Complex{Arb}(z)

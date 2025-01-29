@@ -43,6 +43,27 @@ end
 set!(res::ArfLike, x::Complex) =
     isreal(x) ? set!(res, real(x)) : throw(InexactError(:Arf, Arf, x))
 
+# Acf
+function set!(res::AcfLike, x::Union{Real,MagLike,ArfLike})
+    set!(realref(res), x)
+    zero!(imagref(res))
+    return res
+end
+
+# Doesn't support aliasing between realref(res) and im
+function set!(
+    res::AcfLike,
+    re::Union{Real,MagLike,ArfLike},
+    im::Union{Real,MagLike,ArfLike},
+)
+    set!(realref(res), re)
+    set!(imagref(res), im)
+    return res
+end
+
+set!(res::AcfLike, z::Complex) = set!(res, real(z), imag(z))
+
+
 # Arb
 function set!(res::ArbLike, x::Union{UInt128,Int128,MagLike,BigInt,BigFloat})
     set!(midref(res), x)
@@ -133,5 +154,6 @@ function set!(
     return res
 end
 
+set!(res::AcbLike, z::AcfOrRef) = set!(res, realref(z), imagref(z))
 set!(res::AcbLike, z::Complex) = set!(res, real(z), imag(z))
 set!(res::AcbLike, ::Irrational{:π}) = const_pi!(res)

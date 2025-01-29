@@ -4,6 +4,7 @@
 
     types = (
         Arf,
+        Acf,
         Arb,
         Acb,
         ArbPoly,
@@ -109,6 +110,7 @@
         let _precision = Arblib._precision
             # One argument
             @test _precision(Arf(prec = 64)) == 64
+            @test _precision(Acf(prec = 64)) == 64
             @test _precision(Arb(prec = 64)) == 64
             @test _precision(Acb(prec = 64)) == 64
             @test _precision(BigFloat(precision = 64)) == 64

@@ -65,6 +65,7 @@ is_series_method(af::ArbFunction) =
 
 const jlfname_prefixes = (
     "arf",
+    "acf",
     "arb",
     "acb",
     "mag",
@@ -76,7 +77,8 @@ const jlfname_prefixes = (
     "double",
     "cdouble",
 )
-const jlfname_suffixes = ("si", "ui", "d", "mag", "arf", "arb", "acb", "mpz", "mpfr", "str")
+const jlfname_suffixes =
+    ("si", "ui", "d", "mag", "arf", "acf", "arb", "acb", "mpz", "mpfr", "str")
 
 function jlfname(
     arbfname::AbstractString;

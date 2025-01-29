@@ -47,6 +47,31 @@ mutable struct mag_struct
 end
 
 """
+    acf_struct
+"""
+mutable struct acf_struct
+    # ┌ arf_struct (real part)
+    exponent_r::UInt      # │ fmpz
+    size_r::UInt          # │ mp_size_t
+    mantissa1_r::UInt     # │ mantissa_struct of length 128
+    mantissa2_r::UInt     # │
+    # └
+    # ┌ arf_struct (imaginary part)
+    exponent_i::UInt      # │ fmpz
+    size_i::UInt          # │ mp_size_t
+    mantissa1_i::UInt     # │ mantissa_struct of length 128
+    mantissa2_i::UInt     # │
+    # └
+
+    function acf_struct()
+        res = new()
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
+end
+
+"""
     arb_struct
 """
 mutable struct arb_struct
@@ -194,6 +219,7 @@ end
 const ArbStructTypes = Union{
     mag_struct,
     arf_struct,
+    acf_struct,
     arb_struct,
     acb_struct,
     arb_vec_struct,
