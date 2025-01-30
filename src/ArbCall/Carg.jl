@@ -93,6 +93,21 @@ ctype(::Carg{T}) where {T<:Union{Mag,Arf,Acf,Arb,Acb,ArbPoly,AcbPoly,ArbMatrix,A
 ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
 ctype(::Carg{Vector{T}}) where {T} = Ref{T}
 
+"""
+    jlarg(ca::Carg{T}) where {T}
+
+Return an `Expr` for representing the argument in a Julia function
+header.
+
+```jldoctest
+julia> Arblib.ArbCall.jlarg(Arblib.ArbCall.Carg("const arb_t x"))
+:(x::ArbLike)
+julia> Arblib.ArbCall.jlarg(Arblib.ArbCall.Carg("slong prec"))
+:(prec::Integer)
+```
+"""
+jlarg(ca::Carg) = :($(name(ca))::$(jltype(ca)))
+
 is_precision_argument(ca::Carg) = ca == Carg{Int}(:prec, false)
 
 is_flag_argument(ca::Carg) = ca == Carg{Cint}(:flags, false)
@@ -111,36 +126,28 @@ function extract_precision_argument(ca::Carg, first_ca::Carg)
     # If the first argument has a precision, then use this otherwise
     # make it a mandatory kwarg
     if rawtype(first_ca) <: ArbTypes && rawtype(first_ca) != Mag
-        return Expr(:kw, :(prec::Integer), :(_precision($(name(first_ca)))))
+        return Expr(:kw, jlarg(ca), :(_precision($(name(first_ca)))))
     else
-        return :(prec::Integer)
+        return jlarg(ca)
     end
 end
 
 function extract_flag_argument(ca::Carg)
     is_flag_argument(ca) ||
         throw(ArgumentError("argument is not a valid flag argument, $ca"))
-    return Expr(:kw, :(flags::Integer), 0)
+    return Expr(:kw, jlarg(ca), 0)
 end
 
 function extract_rounding_argument(ca::Carg)
     is_rounding_argument(ca) ||
         throw(ArgumentError("argument is not a valid rounding argument, $ca"))
-    if rawtype(ca) == arb_rnd
-        return Expr(:kw, :(rnd::Union{Arblib.arb_rnd,RoundingMode}), :(RoundNearest))
-    elseif rawtype(ca) == Base.MPFR.MPFRRoundingMode
-        return Expr(
-            :kw,
-            :(rnd::Union{Base.MPFR.MPFRRoundingMode,RoundingMode}),
-            :(RoundNearest),
-        )
-    end
+    return Expr(:kw, jlarg(ca), :(RoundNearest))
 end
 
 function extract_length_argument(ca::Carg, prev_ca::Carg)
     is_length_argument(ca, prev_ca) ||
         throw(ArgumentError("argument is not a valid length argument, $ca"))
-    return Expr(:kw, :($(name(ca))::Integer), :(length($(name(prev_ca)))))
+    return Expr(:kw, jlarg(ca), :(length($(name(prev_ca)))))
 end
 
 """

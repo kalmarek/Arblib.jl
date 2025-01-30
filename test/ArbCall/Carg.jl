@@ -168,13 +168,13 @@
         first_carg3 = Arblib.ArbCall.Carg("mag_t res")
         first_carg4 = Arblib.ArbCall.Carg("int n")
         @test Arblib.ArbCall.extract_precision_argument(carg, first_carg1) ==
-              Expr(:kw, :(prec::Integer), :(_precision(res)))
+              Expr(:kw, :(prec::$Integer), :(_precision(res)))
         @test Arblib.ArbCall.extract_precision_argument(carg, first_carg2) ==
-              Expr(:kw, :(prec::Integer), :(_precision(z)))
+              Expr(:kw, :(prec::$Integer), :(_precision(z)))
         @test Arblib.ArbCall.extract_precision_argument(carg, first_carg3) ==
-              :(prec::Integer)
+              :(prec::$Integer)
         @test Arblib.ArbCall.extract_precision_argument(carg, first_carg4) ==
-              :(prec::Integer)
+              :(prec::$Integer)
         @test_throws ArgumentError Arblib.ArbCall.extract_precision_argument(
             Arblib.ArbCall.Carg("int prec"),
             first_carg1,
@@ -187,7 +187,7 @@
         @test !Arblib.ArbCall.is_flag_argument(Arblib.ArbCall.Carg("int n"))
 
         @test Arblib.ArbCall.extract_flag_argument(Arblib.ArbCall.Carg("int flags")) ==
-              Expr(:kw, :(flags::Integer), 0)
+              Expr(:kw, :(flags::$Integer), 0)
         @test_throws ArgumentError Arblib.ArbCall.extract_flag_argument(
             Arblib.ArbCall.Carg("slong flag"),
         )
@@ -202,12 +202,12 @@
 
         @test Arblib.ArbCall.extract_rounding_argument(
             Arblib.ArbCall.Carg("arf_rnd_t rnd"),
-        ) == Expr(:kw, :(rnd::Union{Arblib.arb_rnd,RoundingMode}), :(RoundNearest))
+        ) == Expr(:kw, :(rnd::$(Union{Arblib.arb_rnd,RoundingMode})), :(RoundNearest))
         @test Arblib.ArbCall.extract_rounding_argument(
             Arblib.ArbCall.Carg("mpfr_rnd_t rnd"),
         ) == Expr(
             :kw,
-            :(rnd::Union{Base.MPFR.MPFRRoundingMode,RoundingMode}),
+            :(rnd::$(Union{Base.MPFR.MPFRRoundingMode,RoundingMode})),
             :(RoundNearest),
         )
         @test_throws ArgumentError Arblib.ArbCall.extract_rounding_argument(
@@ -234,11 +234,11 @@
 
 
         @test Arblib.ArbCall.extract_length_argument(carg1, prev_carg) ==
-              :($(Expr(:kw, :(lenA::Integer), :(length(A)))))
+              :($(Expr(:kw, :(lenA::$Integer), :(length(A)))))
         @test_throws ArgumentError Arblib.ArbCall.extract_length_argument(
             carg4,
             prev_carg,
-        ) == :($(Expr(:kw, :(lenA::Integer), :(length(A)))))
+        ) == :($(Expr(:kw, :(lenA::$Integer), :(length(A)))))
     end
 
     @testset "fpwrap_res_argument" begin
