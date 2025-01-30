@@ -155,9 +155,9 @@
             (
                 "int arb_fpwrap_double_hypgeom_pfq(double * res, const double * a, slong p, const double * b, slong q, double z, int regularized, int flags)",
                 [
-                    :(a::$(Vector{<:Union{Float16,Float32,Float64}})),
+                    :(a::$(Vector{Float64})),
                     :(p::$Integer),
-                    :(b::$(Vector{<:Union{Float16,Float32,Float64}})),
+                    :(b::$(Vector{Float64})),
                     :(q::$Integer),
                     :(z::$(Union{Float16,Float32,Float64})),
                     :(regularized::$Integer),
