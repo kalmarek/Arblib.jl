@@ -64,21 +64,21 @@ is_series_method(af::ArbFunction) =
     (jltype(first(arguments(af))) <: Union{Arblib.ArbPolyLike,Arblib.AcbPolyLike})
 
 const jlfname_prefixes = (
+    "double",
+    "cdouble",
+    "mag",
     "arf",
     "acf",
     "arb",
     "acb",
-    "mag",
-    "mat",
     "vec",
     "poly",
-    "scalar",
+    "mat",
     "fpwrap",
-    "double",
-    "cdouble",
+    "scalar",
 )
 const jlfname_suffixes =
-    ("si", "ui", "d", "mag", "arf", "acf", "arb", "acb", "mpz", "mpfr", "str")
+    ("si", "ui", "d", "str", "mpz", "mpfr", "mag", "arf", "acf", "arb", "acb")
 
 function jlfname(
     arbfname::AbstractString;
