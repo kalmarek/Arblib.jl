@@ -36,7 +36,7 @@
             ("int flags", :flags, false, Integer, Cint),
             ("slong x", :x, false, Integer, Int),
             ("ulong x", :x, false, Unsigned, UInt),
-            ("double x", :x, false, Union{Float16,Float32,Float64}, Cdouble),
+            ("double x", :x, false, Union{Float16,Float32,Float64}, Float64),
             (
                 "complex_double x",
                 :x,
@@ -99,10 +99,7 @@
         # Unsupported types
         for str in (
             "FILE * file",
-            "fmpr_t x",
-            "fmpr_rnd_t rnd",
             "flint_rand_t state",
-            "bool_mat_t mat",
         )
             @test_throws Arblib.ArbCall.UnsupportedArgumentType arg =
                 Arblib.ArbCall.Carg(str)
