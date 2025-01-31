@@ -112,4 +112,6 @@ include("arbcalls/arb_fpwrap.jl")
 include("arbcalls/fmpz_extras.jl")
 include("arbcalls/eigen.jl")
 
+include("nfloat_init_contexts.jl")
+
 end # module

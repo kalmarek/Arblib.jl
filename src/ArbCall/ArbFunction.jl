@@ -201,13 +201,22 @@ function jlcode(af::ArbFunction, jl_fname = jlfname(af))
 
     returnT = returntype(af)
     cargs = arguments(af)
+    where_type_parameters = unique(reduce(vcat, type_parameters.(cargs)))
 
-    func_full_args = :(
-        function $jl_fname($(jl_full_args...))
+    func_full_args_call = :($jl_fname($(jl_full_args...)))
+
+    func_full_args_header = if isempty(where_type_parameters)
+        func_full_args_call
+    else
+        Expr(:where, func_full_args_call, where_type_parameters...)
+    end
+
+    func_full_args_body = :(
+        begin
             __ret = ccall(
                 Arblib.@libflint($(arbfname(af))),
                 $returnT,
-                $(Expr(:tuple, ctype.(cargs)...)),
+                $(Expr(:tuple, carg_expr.(cargs)...)),
                 $(name.(cargs)...),
             )
             $(
@@ -222,7 +231,11 @@ function jlcode(af::ArbFunction, jl_fname = jlfname(af))
         end
     )
 
+    func_full_args = Expr(:function, func_full_args_header, func_full_args_body)
+
     if is_series_method(af)
+        @assert isempty(where_type_parameters) # Currently not supported for series methods
+
         # Note that this currently doesn't respect any custom function
         # name given as an argument.
         jl_fname_series = jlfname_series(af)
@@ -244,9 +257,16 @@ function jlcode(af::ArbFunction, jl_fname = jlfname(af))
     if isempty(jl_kwargs)
         return code
     else
+        func_kwarg_args_call = :($jl_fname($(jl_args...); $(jl_kwargs...)))
+        func_kwarg_args_header = if isempty(where_type_parameters)
+            func_kwarg_args_call
+        else
+            Expr(:where, func_kwarg_args_call, where_type_parameters...)
+        end
+
         return quote
             $code
-            $jl_fname($(jl_args...); $(jl_kwargs...)) = $jl_fname($(name.(cargs)...))
+            $func_kwarg_args_header = $jl_fname($(name.(cargs)...))
         end
     end
 end

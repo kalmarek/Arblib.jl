@@ -28,7 +28,7 @@ mutable struct nfloat_struct{P,F}
     function nfloat_struct{P,F}() where {P,F}
         @assert P isa Int && F isa Int
         res = new{P,F}()
-        init!(res, nfloat_ctx_struct{P,F}())
+        init!(res)
         return res
     end
 end
@@ -49,9 +49,11 @@ const NFloatLike{P,F} = Union{NFloat{P,F},NFloatRef{P,F},nfloat_struct{P,F}}
 nfloat_ctx_struct(::NFloatLike{P,F}) where {P,F} = nfloat_ctx_struct{P,F}()
 nfloat_ctx_struct(::Type{NFloatLike{P,F}}) where {P,F} = nfloat_ctx_struct{P,F}()
 
-# TODO: Precompute these for all(?) possible values
-function _get_nfloat_ctx_struct(::Union{Type{NFloatLike{P,F}},NFloatLike{P,F}}) where {P,F}
-    return nfloat_ctx_struct{P,F}()
+# The contexts are precomputed in nfloat_late.jl
+@generated function _get_nfloat_ctx_struct(
+    ::Union{Type{<:NFloatLike{P,F}},NFloatLike{P,F}},
+) where {P,F}
+    Symbol(:_nfloat_ctx_struct_, P, :_, F)
 end
 
 # Helper function for constructing a flag argument for NFloat
@@ -178,6 +180,13 @@ function Base.string(
 end
 
 Base.show(io::IO, ::Type{NFloatLike}) = print(io, :NFloatLike)
+
+# As in promotion.jl
+
+Base.promote_rule(
+    ::Type{<:NFloatOrRef{P1,F1}},
+    ::Type{<:Union{NFloatOrRef{P2,F2}}},
+) where {P1,P2,F1,F2} = NFloat{max(P1, P2),F1 | F2}
 
 # As in arithmetic.jl
 

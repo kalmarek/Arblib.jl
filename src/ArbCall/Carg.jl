@@ -93,6 +93,12 @@ jltype(::Carg{ArbMatrix}) = ArbMatrixLike
 # acb_mat.h
 jltype(::Carg{AcbMatrix}) = AcbMatrixLike
 
+type_parameters_from_type(type::UnionAll) =
+    [type.var.name; type_parameters_from_type(type.body)]
+type_parameters_from_type(_) = Symbol[]
+
+type_parameters(ca::Carg) = type_parameters_from_type(jltype(ca))
+
 """
     ctype(ca::Carg)
 
@@ -105,8 +111,8 @@ ctype(::Carg{T}) where {T<:Union{Mag,Arf,Acf,Arb,Acb,ArbPoly,AcbPoly,ArbMatrix,A
     Ref{cstructtype(T)}
 ctype(::Carg{T}) where {T<:Union{ArbVector,arb_vec_struct}} = Ptr{arb_struct}
 ctype(::Carg{T}) where {T<:Union{AcbVector,acb_vec_struct}} = Ptr{acb_struct}
-ctype(::Carg{T}) where {T<:NFloat} = Ref{nfloat_struct}
-ctype(::Carg{T}) where {T<:nfloat_ctx_struct} = Ref{nfloat_ctx_struct}
+ctype(::Carg{T}) where {T<:NFloat} = Ref{nfloat_struct{P,F}} where {P,F}
+ctype(::Carg{T}) where {T<:nfloat_ctx_struct} = Ref{nfloat_ctx_struct{P,F}} where {P,F}
 
 """
     jlarg(ca::Carg{T}) where {T}
@@ -119,9 +125,39 @@ julia> Arblib.ArbCall.jlarg(Arblib.ArbCall.Carg("const arb_t x"))
 :(x::ArbLike)
 julia> Arblib.ArbCall.jlarg(Arblib.ArbCall.Carg("slong prec"))
 :(prec::Integer)
+julia> Arblib.ArbCall.jlarg(Arblib.ArbCall.Carg("nfloat_ptr res"))
+:(res::(NFloatLike){P,F})
 ```
 """
-jlarg(ca::Carg) = :($(name(ca))::$(jltype(ca)))
+function jlarg(ca::Carg)
+    if jltype(ca) isa UnionAll
+        :($(name(ca))::$(jltype(ca)){$(type_parameters(ca)...)})
+    else
+        :($(name(ca))::$(jltype(ca)))
+    end
+end
+
+"""
+    carg_expr(ca::Carg{T}) where {T}
+
+Return a value for representing the argument in a `ccall`.
+
+```jldoctest
+julia> Arblib.ArbCall.carg_expr(Arblib.ArbCall.Carg("const arb_t x"))
+Ref{Arblib.arb_struct}
+julia> Arblib.ArbCall.carg_expr(Arblib.ArbCall.Carg("slong prec"))
+Int64
+julia> Arblib.ArbCall.carg_expr(Arblib.ArbCall.Carg("nfloat_ptr res"))
+:((Ref{Arblib.nfloat_struct{P, F}} where {P, F}){P, F})
+```
+"""
+function carg_expr(ca::Carg)
+    if ctype(ca) isa UnionAll
+        :($(ctype(ca)){$(type_parameters(ca)...)})
+    else
+        :($(ctype(ca)))
+    end
+end
 
 is_precision_argument(ca::Carg) = ca == Carg{Int}(:prec, false)
 
