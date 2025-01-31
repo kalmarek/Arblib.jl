@@ -192,6 +192,7 @@ function parse_and_generate_arbdoc(
     out_dir = "src/arbcalls/";
     filenames = [
         "mag",
+        "nfloat",
         "arf",
         "acf",
         "arb",

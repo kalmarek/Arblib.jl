@@ -33,9 +33,6 @@
             ("acb_set_fmpq", :set_fmpq),
             ("arb_bin_uiui", :bin_uiui),
 
-            # Deprecated types
-            ("arf_set_fmpr", :set_fmpr),
-
             # Underscore methods
             ("_acb_vec_set", :set),
 
@@ -160,7 +157,7 @@
             (
                 "void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)",
                 [:(z::$(Arblib.ArbLike)), :(x::$(Arblib.ArbLike)), :(y::$(Arblib.ArbLike))],
-                [Expr(:kw, :(prec::Integer), :(_precision(z)))],
+                [Expr(:kw, :(prec::$Integer), :(_precision(z)))],
                 [
                     :(z::$(Arblib.ArbLike)),
                     :(x::$(Arblib.ArbLike)),
@@ -176,8 +173,12 @@
                     :(y::$(Arblib.ArfLike)),
                 ],
                 [
-                    Expr(:kw, :(prec::Integer), :(_precision(res))),
-                    Expr(:kw, :(rnd::Union{Arblib.arb_rnd,RoundingMode}), :(RoundNearest)),
+                    Expr(:kw, :(prec::$Integer), :(_precision(res))),
+                    Expr(
+                        :kw,
+                        :(rnd::$(Union{Arblib.arb_rnd,RoundingMode})),
+                        :(RoundNearest),
+                    ),
                 ],
                 [
                     :(res::$(Arblib.ArfLike)),
@@ -195,8 +196,12 @@
                     :(y::$(Arblib.AcfLike)),
                 ],
                 [
-                    Expr(:kw, :(prec::Integer), :(_precision(res))),
-                    Expr(:kw, :(rnd::Union{Arblib.arb_rnd,RoundingMode}), :(RoundNearest)),
+                    Expr(:kw, :(prec::$Integer), :(_precision(res))),
+                    Expr(
+                        :kw,
+                        :(rnd::$(Union{Arblib.arb_rnd,RoundingMode})),
+                        :(RoundNearest),
+                    ),
                 ],
                 [
                     :(res::$(Arblib.AcfLike)),
@@ -210,8 +215,8 @@
                 "void arb_lambertw(arb_t res, const arb_t x, int flags, slong prec)",
                 [:(res::$(Arblib.ArbLike)), :(x::$(Arblib.ArbLike))],
                 [
-                    Expr(:kw, :(flags::Integer), 0),
-                    Expr(:kw, :(prec::Integer), :(_precision(res))),
+                    Expr(:kw, :(flags::$Integer), 0),
+                    Expr(:kw, :(prec::$Integer), :(_precision(res))),
                 ],
                 [
                     :(res::$(Arblib.ArbLike)),
@@ -223,7 +228,7 @@
             (
                 "int _acb_vec_is_zero(acb_srcptr vec, slong len)",
                 [:(vec::$(Arblib.AcbVectorLike))],
-                [:($(Expr(:kw, :(len::Integer), :(length(vec)))))],
+                [Expr(:kw, :(len::$Integer), :(length(vec)))],
                 [:(vec::$(Arblib.AcbVectorLike)), :(len::$Integer)],
             ),
         )
@@ -244,7 +249,7 @@
                     :(f::$(Arblib.ArbSeries)),
                     Expr(:kw, :(n::$(Integer)), :(length(res))),
                 ],
-                [Expr(:kw, :(prec::Integer), :(_precision(res)))],
+                [Expr(:kw, :(prec::$Integer), :(_precision(res)))],
             ),
             (
                 "void acb_poly_div_series(acb_poly_t Q, const acb_poly_t A, const acb_poly_t B, slong n, slong prec)",
@@ -252,9 +257,9 @@
                     :(Q::$(Arblib.AcbSeries)),
                     :(A::$(Arblib.AcbSeries)),
                     :(B::$(Arblib.AcbSeries)),
-                    Expr(:kw, :(n::$(Integer)), :(length(Q))),
+                    Expr(:kw, :(n::$Integer), :(length(Q))),
                 ],
-                [Expr(:kw, :(prec::Integer), :(_precision(Q)))],
+                [Expr(:kw, :(prec::$Integer), :(_precision(Q)))],
             ),
             (
                 "void acb_hypgeom_u_1f1_series(acb_poly_t res, const acb_poly_t a, const acb_poly_t b, const acb_poly_t z, slong len, slong prec)",
@@ -263,9 +268,9 @@
                     :(a::$(Arblib.AcbSeries)),
                     :(b::$(Arblib.AcbSeries)),
                     :(z::$(Arblib.AcbSeries)),
-                    Expr(:kw, :(len::$(Integer)), :(length(res))),
+                    Expr(:kw, :(len::$Integer), :(length(res))),
                 ],
-                [Expr(:kw, :(prec::Integer), :(_precision(res)))],
+                [Expr(:kw, :(prec::$Integer), :(_precision(res)))],
             ),
             (
                 "void arb_poly_mullow(arb_poly_t C, const arb_poly_t A, const arb_poly_t B, slong n, slong prec)",
@@ -273,9 +278,9 @@
                     :(C::$(Arblib.ArbSeries)),
                     :(A::$(Arblib.ArbSeries)),
                     :(B::$(Arblib.ArbSeries)),
-                    Expr(:kw, :(n::$(Integer)), :(length(C))),
+                    Expr(:kw, :(n::$Integer), :(length(C))),
                 ],
-                [Expr(:kw, :(prec::Integer), :(_precision(C)))],
+                [Expr(:kw, :(prec::$Integer), :(_precision(C)))],
             ),
         )
             @test (args, kwargs) ==

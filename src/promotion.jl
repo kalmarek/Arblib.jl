@@ -1,25 +1,38 @@
 ### Internal ###
 # Prioritise left
 Base.promote_rule(::Type{<:MagOrRef}, ::Type{<:Union{MagOrRef}}) = Mag
-Base.promote_rule(::Type{<:ArfOrRef}, ::Type{<:Union{MagOrRef,ArfOrRef}}) = Arf
-Base.promote_rule(::Type{<:AcfOrRef}, ::Type{<:Union{MagOrRef,ArfOrRef,AcfOrRef}}) = Acf
-Base.promote_rule(::Type{<:ArbOrRef}, ::Type{<:Union{MagOrRef,ArfOrRef,ArbOrRef}}) = Arb
+Base.promote_rule(
+    ::Type{<:NFloatOrRef{P,F}},
+    ::Type{<:Union{MagOrRef,NFloatOrRef{P,F}}},
+) where {P,F} = NFloat{P,F}
+Base.promote_rule(::Type{<:ArfOrRef}, ::Type{<:Union{MagOrRef,NFloatOrRef,ArfOrRef}}) = Arf
+Base.promote_rule(
+    ::Type{<:AcfOrRef},
+    ::Type{<:Union{MagOrRef,NFloatOrRef,ArfOrRef,AcfOrRef}},
+) = Acf
+Base.promote_rule(
+    ::Type{<:ArbOrRef},
+    ::Type{<:Union{MagOrRef,NFloatOrRef,ArfOrRef,ArbOrRef}},
+) = Arb
 Base.promote_rule(
     ::Type{<:AcbOrRef},
-    ::Type{<:Union{MagOrRef,ArfOrRef,AcfOrRef,ArbOrRef,AcbOrRef}},
+    ::Type{<:Union{MagOrRef,NFloatOrRef,ArfOrRef,AcfOrRef,ArbOrRef,AcbOrRef}},
 ) = Acb
-Base.promote_rule(::Type{ArbSeries}, ::Type{<:Union{MagOrRef,ArfOrRef,ArbOrRef}}) =
-    ArbSeries
+Base.promote_rule(
+    ::Type{ArbSeries},
+    ::Type{<:Union{MagOrRef,NFloatOrRef,ArfOrRef,ArbOrRef}},
+) = ArbSeries
 Base.promote_rule(
     ::Type{AcbSeries},
-    ::Type{<:Union{MagOrRef,ArfOrRef,AcfOrRef,ArbOrRef,AcbOrRef,ArbSeries}},
+    ::Type{<:Union{MagOrRef,NFloatOrRef,ArfOrRef,AcfOrRef,ArbOrRef,AcbOrRef,ArbSeries}},
 ) = AcbSeries
 
 # Prioritise right
 Base.promote_rule(
     ::Type{<:MagOrRef},
     ::Type{T},
-) where {T<:Union{ArfOrRef,ArbOrRef,AcfOrRef,AcbOrRef,ArbSeries,AcbSeries}} = _nonreftype(T)
+) where {T<:Union{NFloatOrRef,ArfOrRef,ArbOrRef,AcfOrRef,AcbOrRef,ArbSeries,AcbSeries}} =
+    _nonreftype(T)
 Base.promote_rule(
     ::Type{<:ArfOrRef},
     ::Type{T},
@@ -44,6 +57,7 @@ Base.promote_rule(::Type{ArbSeries}, ::Type{<:Union{AcfOrRef,AcbOrRef}}) = AcbSe
 
 # Always prioritise Arb types
 Base.promote_rule(::Type{<:MagOrRef}, ::Type{<:Base.GMP.CdoubleMax}) = Mag
+Base.promote_rule(T::Type{<:NFloatOrRef}, ::Type{<:Real}) = _nonreftype(T)
 Base.promote_rule(::Type{<:ArfOrRef}, ::Type{<:Real}) = Arf
 Base.promote_rule(::Type{<:AcfOrRef}, ::Type{<:Number}) = Acf
 Base.promote_rule(::Type{<:ArbOrRef}, ::Type{<:Real}) = Arb
