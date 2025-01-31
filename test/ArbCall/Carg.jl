@@ -8,31 +8,6 @@
     @testset "Parsing" begin
         # Supported types
         for (str, name, isconst, jltype, ctype) in (
-            ("mag_t res", :res, false, Arblib.MagLike, Ref{mag_struct}),
-            ("arf_t res", :res, false, Arblib.ArfLike, Ref{arf_struct}),
-            ("acf_t res", :res, false, Arblib.AcfLike, Ref{acf_struct}),
-            ("arb_t res", :res, false, Arblib.ArbLike, Ref{arb_struct}),
-            ("acb_t res", :res, false, Arblib.AcbLike, Ref{acb_struct}),
-            ("const mag_t x", :x, true, Arblib.MagLike, Ref{mag_struct}),
-            ("const arf_t x", :x, true, Arblib.ArfLike, Ref{arf_struct}),
-            ("const arb_t x", :x, true, Arblib.ArbLike, Ref{arb_struct}),
-            ("const acb_t x", :x, true, Arblib.AcbLike, Ref{acb_struct}),
-            (
-                "arf_rnd_t rnd",
-                :rnd,
-                false,
-                Union{Arblib.arb_rnd,RoundingMode},
-                Arblib.arb_rnd,
-            ),
-            ("mpfr_t x", :x, false, BigFloat, Ref{BigFloat}),
-            (
-                "mpfr_rnd_t rnd",
-                :rnd,
-                false,
-                Union{Base.MPFR.MPFRRoundingMode,RoundingMode},
-                Base.MPFR.MPFRRoundingMode,
-            ),
-            ("mpz_t x", :x, false, BigInt, Ref{BigInt}),
             ("int flags", :flags, false, Integer, Cint),
             ("slong x", :x, false, Integer, Int),
             ("ulong x", :x, false, Unsigned, UInt),
@@ -44,21 +19,55 @@
                 Union{ComplexF16,ComplexF32,ComplexF64},
                 ComplexF64,
             ),
+            ("void * L", :L, false, Ptr{Cvoid}, Ptr{Cvoid}),
+            ("const char * inp", :inp, true, AbstractString, Cstring),
             ("slong * x", :x, false, Vector{Int}, Ref{Int}),
             ("ulong * x", :x, false, Vector{UInt}, Ref{UInt}),
             ("double * x", :x, false, Vector{Float64}, Ref{Float64}),
             ("complex_double * x", :x, false, Vector{ComplexF64}, Ref{ComplexF64}),
-            ("const char * inp", :inp, true, AbstractString, Cstring),
-            ("arb_ptr v", :v, false, Arblib.ArbVectorLike, Ptr{arb_struct}),
-            ("arb_srcptr res", :res, true, Arblib.ArbVectorLike, Ptr{arb_struct}),
-            ("acb_ptr v", :v, false, Arblib.AcbVectorLike, Ptr{acb_struct}),
-            ("acb_srcptr res", :res, true, Arblib.AcbVectorLike, Ptr{acb_struct}),
+            ("mpz_t x", :x, false, BigInt, Ref{BigInt}),
+            ("mpfr_t x", :x, false, BigFloat, Ref{BigFloat}),
             (
                 "mpfr_rnd_t rnd",
                 :rnd,
                 false,
                 Union{Base.MPFR.MPFRRoundingMode,RoundingMode},
                 Base.MPFR.MPFRRoundingMode,
+            ),
+            ("mag_t res", :res, false, Arblib.MagLike, Ref{mag_struct}),
+            ("const mag_t x", :x, true, Arblib.MagLike, Ref{mag_struct}),
+            ("arf_t res", :res, false, Arblib.ArfLike, Ref{arf_struct}),
+            ("const arf_t x", :x, true, Arblib.ArfLike, Ref{arf_struct}),
+            (
+                "arf_rnd_t rnd",
+                :rnd,
+                false,
+                Union{Arblib.arb_rnd,RoundingMode},
+                Arblib.arb_rnd,
+            ),
+            ("acf_t res", :res, false, Arblib.AcfLike, Ref{acf_struct}),
+            ("const acf_t res", :res, true, Arblib.AcfLike, Ref{acf_struct}),
+            ("arb_t res", :res, false, Arblib.ArbLike, Ref{arb_struct}),
+            ("const arb_t x", :x, true, Arblib.ArbLike, Ref{arb_struct}),
+            ("arb_ptr v", :v, false, Arblib.ArbVectorLike, Ptr{arb_struct}),
+            ("arb_srcptr res", :res, true, Arblib.ArbVectorLike, Ptr{arb_struct}),
+            ("acb_t res", :res, false, Arblib.AcbLike, Ref{acb_struct}),
+            ("const acb_t x", :x, true, Arblib.AcbLike, Ref{acb_struct}),
+            ("acb_ptr v", :v, false, Arblib.AcbVectorLike, Ptr{acb_struct}),
+            ("acb_srcptr res", :res, true, Arblib.AcbVectorLike, Ptr{acb_struct}),
+            (
+                "arb_poly_t mat",
+                :mat,
+                false,
+                Arblib.ArbPolyLike,
+                Ref{Arblib.arb_poly_struct},
+            ),
+            (
+                "acb_poly_t mat",
+                :mat,
+                false,
+                Arblib.AcbPolyLike,
+                Ref{Arblib.acb_poly_struct},
             ),
             (
                 "arb_mat_t mat",
@@ -74,20 +83,6 @@
                 Arblib.AcbMatrixLike,
                 Ref{Arblib.acb_mat_struct},
             ),
-            (
-                "arb_poly_t mat",
-                :mat,
-                false,
-                Arblib.ArbPolyLike,
-                Ref{Arblib.arb_poly_struct},
-            ),
-            (
-                "acb_poly_t mat",
-                :mat,
-                false,
-                Arblib.AcbPolyLike,
-                Ref{Arblib.acb_poly_struct},
-            ),
         )
             arg = Arblib.ArbCall.Carg(str)
             @test Arblib.ArbCall.name(arg) == name
@@ -97,10 +92,7 @@
         end
 
         # Unsupported types
-        for str in (
-            "FILE * file",
-            "flint_rand_t state",
-        )
+        for str in ("FILE * file", "flint_rand_t state")
             @test_throws Arblib.ArbCall.UnsupportedArgumentType arg =
                 Arblib.ArbCall.Carg(str)
         end
@@ -108,12 +100,11 @@
         # Unimplemented types
         for str in (
             "fmpz_t x",
-            "fmpq_t x",
-            "mag_ptr res",
             "const fmpz_t x",
+            "fmpq_t x",
             "const fmpq_t x",
+            "mag_ptr res",
             "mag_srcptr res",
-
             # Internal types
             "mp_limb_t lo",
             "mp_bitcnt_t r",
@@ -133,12 +124,12 @@
 
     @testset "arbsignature" begin
         for str in (
-            "arf_t x",
-            "arb_t x",
-            "const arf_t y",
-            "const arb_t x",
             "slong prec",
             "ulong y",
+            "arf_t x",
+            "const arf_t y",
+            "arb_t x",
+            "const arb_t x",
             "arb_ptr res",
             "arb_srcptr poly",
             "acb_ptr res",

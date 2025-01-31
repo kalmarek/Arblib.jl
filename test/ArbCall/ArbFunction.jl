@@ -33,9 +33,6 @@
             ("acb_set_fmpq", :set_fmpq),
             ("arb_bin_uiui", :bin_uiui),
 
-            # Deprecated types
-            ("arf_set_fmpr", :set_fmpr),
-
             # Underscore methods
             ("_acb_vec_set", :set),
 

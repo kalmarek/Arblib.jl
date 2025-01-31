@@ -56,29 +56,40 @@ types with lower precision. In general the conversion is done using
 `Base.cconvert`.
 """
 jltype(ca::Carg) = rawtype(ca)
+# Primitive
 jltype(::Carg{Cint}) = Integer
 jltype(::Carg{Int}) = Integer
 jltype(::Carg{UInt}) = Unsigned
 jltype(::Carg{Float64}) = Union{Float16,Float32,Float64}
 jltype(::Carg{ComplexF64}) = Union{ComplexF16,ComplexF32,ComplexF64}
-jltype(::Carg{arb_rnd}) = Union{arb_rnd,RoundingMode}
-jltype(::Carg{Base.MPFR.MPFRRoundingMode}) = Union{Base.MPFR.MPFRRoundingMode,RoundingMode}
 jltype(::Carg{Cstring}) = AbstractString
 jltype(::Carg{Vector{Int}}) = Vector{Int}
 jltype(::Carg{Vector{UInt}}) = Vector{UInt}
 jltype(::Carg{Vector{Float64}}) = Vector{Float64}
 jltype(::Carg{Vector{ComplexF64}}) = Vector{ComplexF64}
+# mpfr.h
+jltype(::Carg{Base.MPFR.MPFRRoundingMode}) = Union{Base.MPFR.MPFRRoundingMode,RoundingMode}
+# mag.h
 jltype(::Carg{Mag}) = MagLike
+# arf.h
 jltype(::Carg{Arf}) = ArfLike
+jltype(::Carg{arb_rnd}) = Union{arb_rnd,RoundingMode}
+# acf.h
 jltype(::Carg{Acf}) = AcfLike
+# arb.h
 jltype(::Carg{Arb}) = ArbLike
-jltype(::Carg{Acb}) = AcbLike
 jltype(::Carg{ArbVector}) = ArbVectorLike
+# acb.h
+jltype(::Carg{Acb}) = AcbLike
 jltype(::Carg{AcbVector}) = AcbVectorLike
-jltype(::Carg{ArbMatrix}) = ArbMatrixLike
-jltype(::Carg{AcbMatrix}) = AcbMatrixLike
+# arb_poly.h
 jltype(::Carg{ArbPoly}) = ArbPolyLike
+# acb_poly.h
 jltype(::Carg{AcbPoly}) = AcbPolyLike
+# arb_mat.h
+jltype(::Carg{ArbMatrix}) = ArbMatrixLike
+# acb_mat.h
+jltype(::Carg{AcbMatrix}) = AcbMatrixLike
 
 """
     ctype(ca::Carg)
@@ -86,12 +97,12 @@ jltype(::Carg{AcbPoly}) = AcbPolyLike
 The type that should be used for the argument when passed to C code.
 """
 ctype(ca::Carg) = rawtype(ca)
-ctype(::Carg{T}) where {T<:Union{ArbVector,arb_vec_struct}} = Ptr{arb_struct}
-ctype(::Carg{T}) where {T<:Union{AcbVector,acb_vec_struct}} = Ptr{acb_struct}
+ctype(::Carg{Vector{T}}) where {T} = Ref{T}
+ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
 ctype(::Carg{T}) where {T<:Union{Mag,Arf,Acf,Arb,Acb,ArbPoly,AcbPoly,ArbMatrix,AcbMatrix}} =
     Ref{cstructtype(T)}
-ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
-ctype(::Carg{Vector{T}}) where {T} = Ref{T}
+ctype(::Carg{T}) where {T<:Union{ArbVector,arb_vec_struct}} = Ptr{arb_struct}
+ctype(::Carg{T}) where {T<:Union{AcbVector,acb_vec_struct}} = Ptr{acb_struct}
 
 """
     jlarg(ca::Carg{T}) where {T}
