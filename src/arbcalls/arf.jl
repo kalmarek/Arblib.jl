@@ -178,8 +178,8 @@ arbcall"int arf_complex_mul_fallback(arf_t e, arf_t f, const arf_t a, const arf_
 arbcall"int arf_complex_sqr(arf_t e, arf_t f, const arf_t a, const arf_t b, slong prec, arf_rnd_t rnd)"
 
 ### Low-level methods
-#ni arbcall"int _arf_get_integer_mpn(mp_ptr y, mp_srcptr xp, mp_size_t xn, slong exp)"
-#ni arbcall"int _arf_set_mpn_fixed(arf_t z, mp_srcptr xp, mp_size_t xn, mp_size_t fixn, int negative, slong prec, arf_rnd_t rnd)"
+#ni arbcall"int _arf_get_integer_mpn(nn_ptr y, nn_srcptr xp, slong xn, slong exp)"
+#ni arbcall"int _arf_set_mpn_fixed(arf_t z, nn_srcptr xp, slong xn, slong fixn, int negative, slong prec, arf_rnd_t rnd)"
 arbcall"int _arf_set_round_ui(arf_t z, ulong x, int sgnbit, slong prec, arf_rnd_t rnd)"
-#ni arbcall"int _arf_set_round_uiui(arf_t z, slong * fix, mp_limb_t hi, mp_limb_t lo, int sgnbit, slong prec, arf_rnd_t rnd)"
-#ni arbcall"int _arf_set_round_mpn(arf_t z, slong * exp_shift, mp_srcptr x, mp_size_t xn, int sgnbit, slong prec, arf_rnd_t rnd)"
+arbcall"int _arf_set_round_uiui(arf_t z, slong * fix, ulong hi, ulong lo, int sgnbit, slong prec, arf_rnd_t rnd)"
+#ni arbcall"int _arf_set_round_mpn(arf_t z, slong * exp_shift, nn_srcptr x, slong xn, int sgnbit, slong prec, arf_rnd_t rnd)"

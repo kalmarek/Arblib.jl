@@ -18,8 +18,8 @@ arbcall"void acb_mat_set(acb_mat_t dest, const acb_mat_t src)"
 #ni arbcall"void acb_mat_set_fmpq_mat(acb_mat_t dest, const fmpq_mat_t src, slong prec)"
 arbcall"void acb_mat_set_arb_mat(acb_mat_t dest, const arb_mat_t src)"
 arbcall"void acb_mat_set_round_arb_mat(acb_mat_t dest, const arb_mat_t src, slong prec)"
-arbcall"void acb_mat_get_real(arb_mat_t re, const arb_mat_t mat)"
-arbcall"void acb_mat_get_imag(arb_mat_t im, const arb_mat_t mat)"
+arbcall"void acb_mat_get_real(arb_mat_t re, const acb_mat_t mat)"
+arbcall"void acb_mat_get_imag(arb_mat_t im, const acb_mat_t mat)"
 arbcall"void acb_mat_set_real_imag(acb_mat_t mat, const arb_mat_t re, const arb_mat_t im)"
 
 ### Random generation
