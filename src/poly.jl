@@ -706,7 +706,7 @@ Base.sinpi(p::Series) = sin_pi_series!(zero(p), p, length(p))
 Base.cospi(p::Series) = cos_pi_series!(zero(p), p, length(p))
 cotpi(p::Series) = cot_pi_series!(zero(p), p, length(p))
 # Julias definition of sinc is equivalent to Arbs definition of sincpi
-Base.sinc(p::ArbSeries) = sinc_pi_series!(zero(p), p, length(p))
+Base.sinc(p::Series) = sinc_pi_series!(zero(p), p, length(p))
 
 function Base.sincos(p::Series)
     s, c = zero(p), zero(p)

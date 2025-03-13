@@ -347,6 +347,7 @@
             cospi,
             Arblib.cotpi,
             Arblib.rsqrt,
+            sinc,
         ]
             res = f(p)
             @test res[0] ≈ f(x)
@@ -360,7 +361,7 @@
         @test all(isequal.(Arblib.sinhcosh(p), (sinh(p), cosh(p))))
 
         if TSeries == ArbSeries
-            for f in [asin, acos, sinc]
+            for f in [asin, acos]
                 res = f(p)
                 @test res[0] ≈ f(x)
                 @test !iszero(res[1])
