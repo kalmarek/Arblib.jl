@@ -64,21 +64,23 @@ is_series_method(af::ArbFunction) =
     (jltype(first(arguments(af))) <: Union{Arblib.ArbPolyLike,Arblib.AcbPolyLike})
 
 const jlfname_prefixes = (
+    "double",
+    "cdouble",
+    "mag",
+    "nfloat",
+    "ctx",
     "arf",
     "acf",
     "arb",
     "acb",
-    "mag",
-    "mat",
     "vec",
     "poly",
-    "scalar",
+    "mat",
     "fpwrap",
-    "double",
-    "cdouble",
+    "scalar",
 )
 const jlfname_suffixes =
-    ("si", "ui", "d", "mag", "arf", "acf", "arb", "acb", "mpz", "mpfr", "str")
+    ("si", "ui", "d", "str", "mpz", "mpfr", "mag", "nfloat", "arf", "acf", "arb", "acb")
 
 function jlfname(
     arbfname::AbstractString;
@@ -117,7 +119,7 @@ jlfname_series(af::ArbFunction) = jlfname_series(arbfname(af))
 function jlargs(af::ArbFunction; argument_detection::Bool = true)
     cargs = arguments(af)
 
-    jl_arg_names_types = Tuple{Symbol,Any}[]
+    args = Expr[]
     kwargs = Expr[]
 
     prec_kwarg = false
@@ -125,7 +127,7 @@ function jlargs(af::ArbFunction; argument_detection::Bool = true)
     flags_kwarg = false
     for (i, carg) in enumerate(cargs)
         if !argument_detection
-            push!(jl_arg_names_types, (name(carg), jltype(carg)))
+            push!(args, jlarg(carg))
             continue
         end
 
@@ -146,12 +148,12 @@ function jlargs(af::ArbFunction; argument_detection::Bool = true)
             push!(kwargs, extract_rounding_argument(carg))
         elseif i > 1 && is_length_argument(carg, cargs[i-1])
             push!(kwargs, extract_length_argument(carg, cargs[i-1]))
+        elseif is_ctx_argument(carg)
+            push!(kwargs, extract_ctx_argument(carg, first(cargs)))
         else
-            push!(jl_arg_names_types, (name(carg), jltype(carg)))
+            push!(args, jlarg(carg))
         end
     end
-
-    args = [:($a::$T) for (a, T) in jl_arg_names_types]
 
     return args, kwargs
 end
@@ -199,13 +201,22 @@ function jlcode(af::ArbFunction, jl_fname = jlfname(af))
 
     returnT = returntype(af)
     cargs = arguments(af)
+    where_type_parameters = unique(reduce(vcat, type_parameters.(cargs)))
 
-    func_full_args = :(
-        function $jl_fname($(jl_full_args...))
+    func_full_args_call = :($jl_fname($(jl_full_args...)))
+
+    func_full_args_header = if isempty(where_type_parameters)
+        func_full_args_call
+    else
+        Expr(:where, func_full_args_call, where_type_parameters...)
+    end
+
+    func_full_args_body = :(
+        begin
             __ret = ccall(
                 Arblib.@libflint($(arbfname(af))),
                 $returnT,
-                $(Expr(:tuple, ctype.(cargs)...)),
+                $(Expr(:tuple, carg_expr.(cargs)...)),
                 $(name.(cargs)...),
             )
             $(
@@ -220,7 +231,11 @@ function jlcode(af::ArbFunction, jl_fname = jlfname(af))
         end
     )
 
+    func_full_args = Expr(:function, func_full_args_header, func_full_args_body)
+
     if is_series_method(af)
+        @assert isempty(where_type_parameters) # Currently not supported for series methods
+
         # Note that this currently doesn't respect any custom function
         # name given as an argument.
         jl_fname_series = jlfname_series(af)
@@ -242,9 +257,16 @@ function jlcode(af::ArbFunction, jl_fname = jlfname(af))
     if isempty(jl_kwargs)
         return code
     else
+        func_kwarg_args_call = :($jl_fname($(jl_args...); $(jl_kwargs...)))
+        func_kwarg_args_header = if isempty(where_type_parameters)
+            func_kwarg_args_call
+        else
+            Expr(:where, func_kwarg_args_call, where_type_parameters...)
+        end
+
         return quote
             $code
-            $jl_fname($(jl_args...); $(jl_kwargs...)) = $jl_fname($(name.(cargs)...))
+            $func_kwarg_args_header = $jl_fname($(name.(cargs)...))
         end
     end
 end

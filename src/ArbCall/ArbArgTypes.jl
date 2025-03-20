@@ -9,9 +9,9 @@ Struct for conversion between C argument types in the Arb
 documentation and Julia types.
 """
 struct ArbArgTypes
-    supported::Dict{String,DataType}
+    supported::Dict{String,Union{DataType,UnionAll}}
     unsupported::Set{String}
-    supported_reversed::Dict{DataType,String}
+    supported_reversed::Dict{Union{DataType,UnionAll},String}
 end
 
 function Base.getindex(arbargtypes::ArbArgTypes, key::AbstractString)
@@ -22,65 +22,96 @@ end
 
 # Define the conversions we use for the rest of the code
 const arbargtypes = ArbArgTypes(
-    Dict{String,DataType}(
+    Dict{String,Union{DataType,UnionAll}}(
+        # Primitive
         "void" => Cvoid,
-        "void *" => Ptr{Cvoid},
         "int" => Cint,
         "slong" => Int,
         "ulong" => UInt,
-        "double" => Cdouble,
-        "double *" => Vector{Float64},
+        "double" => Float64,
         "complex_double" => ComplexF64,
-        "complex_double *" => Vector{ComplexF64},
-        "arf_t" => Arf,
-        "acf_t" => Acf,
-        "arb_t" => Arb,
-        "acb_t" => Acb,
-        "mag_t" => Mag,
-        "arb_srcptr" => ArbVector,
-        "arb_ptr" => ArbVector,
-        "acb_srcptr" => AcbVector,
-        "acb_ptr" => AcbVector,
-        "arb_poly_t" => ArbPoly,
-        "acb_poly_t" => AcbPoly,
-        "arb_mat_t" => ArbMatrix,
-        "acb_mat_t" => AcbMatrix,
-        "arf_rnd_t" => arb_rnd,
-        "mpfr_t" => BigFloat,
-        "mpfr_rnd_t" => Base.MPFR.MPFRRoundingMode,
-        "mpz_t" => BigInt,
+        "void *" => Ptr{Cvoid},
         "char *" => Cstring,
         "slong *" => Vector{Int},
         "ulong *" => Vector{UInt},
+        "double *" => Vector{Float64},
+        "complex_double *" => Vector{ComplexF64},
+        # gmp.h
+        "mpz_t" => BigInt,
+        # mpfr.h
+        "mpfr_t" => BigFloat,
+        "mpfr_rnd_t" => Base.MPFR.MPFRRoundingMode,
+        # mag.h
+        "mag_t" => Mag,
+        # nfloat.h
+        "nfloat_ptr" => NFloat,
+        "nfloat_srcptr" => NFloat,
+        "gr_ctx_t" => nfloat_ctx_struct, # Actually in gr_types.h
+        # arf.h
+        "arf_t" => Arf,
+        "arf_rnd_t" => arb_rnd,
+        # acf.h
+        "acf_t" => Acf,
+        # arb.h
+        "arb_t" => Arb,
+        "arb_ptr" => ArbVector,
+        "arb_srcptr" => ArbVector,
+        # acb.h
+        "acb_t" => Acb,
+        "acb_ptr" => AcbVector,
+        "acb_srcptr" => AcbVector,
+        # arb_poly.h
+        "arb_poly_t" => ArbPoly,
+        # acb_poly.h
+        "acb_poly_t" => AcbPoly,
+        # arb_mat.h
+        "arb_mat_t" => ArbMatrix,
+        # acb_mat.h
+        "acb_mat_t" => AcbMatrix,
     ),
-    Set(["FILE *", "fmpr_t", "fmpr_rnd_t", "flint_rand_t", "bool_mat_t"]),
-    Dict{DataType,String}(
+    Set(["FILE *", "flint_rand_t"]),
+    Dict{Union{DataType,UnionAll},String}(
+        # Primitive
         Cvoid => "void",
-        Ptr{Cvoid} => "void *",
         Cint => "int",
         Int => "slong",
         UInt => "ulong",
-        Cdouble => "double",
-        Vector{Float64} => "double *",
+        Float64 => "double",
         ComplexF64 => "complex_double",
-        Vector{ComplexF64} => "complex_double *",
-        Arf => "arf_t",
-        Acf => "acf_t",
-        Arb => "arb_t",
-        Acb => "acb_t",
-        Mag => "mag_t",
-        ArbVector => "arb_ptr",
-        AcbVector => "acb_ptr",
-        ArbPoly => "arb_poly_t",
-        AcbPoly => "acb_poly_t",
-        ArbMatrix => "arb_mat_t",
-        AcbMatrix => "acb_mat_t",
-        arb_rnd => "arf_rnd_t",
-        BigFloat => "mpfr_t",
-        Base.MPFR.MPFRRoundingMode => "mpfr_rnd_t",
-        BigInt => "mpz_t",
+        Ptr{Cvoid} => "void *",
         Cstring => "char *",
         Vector{Int} => "slong *",
         Vector{UInt} => "ulong *",
+        Vector{Float64} => "double *",
+        Vector{ComplexF64} => "complex_double *",
+        # gmp.h
+        BigInt => "mpz_t",
+        # mpfr.h
+        BigFloat => "mpfr_t",
+        Base.MPFR.MPFRRoundingMode => "mpfr_rnd_t",
+        # mag.h
+        Mag => "mag_t",
+        # nfloat.h
+        NFloat => "nfloat_ptr",
+        nfloat_ctx_struct => "gr_ctx_t", # Actually in gr_types.h
+        # arf.h
+        Arf => "arf_t",
+        arb_rnd => "arf_rnd_t",
+        # acf.h
+        Acf => "acf_t",
+        # arb.h
+        Arb => "arb_t",
+        ArbVector => "arb_ptr",
+        # acb.h
+        Acb => "acb_t",
+        AcbVector => "acb_ptr",
+        # arb_poly.h
+        ArbPoly => "arb_poly_t",
+        # acb_poly.h
+        AcbPoly => "acb_poly_t",
+        # arb_mat.h
+        ArbMatrix => "arb_mat_t",
+        # acb_mat.h
+        AcbMatrix => "acb_mat_t",
     ),
 )
