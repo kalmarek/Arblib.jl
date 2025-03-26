@@ -222,6 +222,53 @@
             @test_throws InexactError BigInt(Acb(setball(Arb, 1, 1)))
             @test_throws InexactError BigInt(Acb(2, 1))
         end
+
+        @testset "Other" begin
+            @test !Bool(Arf(0))
+            @test Bool(Arf(1))
+            @test_throws InexactError Bool(Arf(2))
+            @test Integer(Arf(1)) isa BigInt
+            @test Integer(Arf(1)) == 1
+            @test UInt(Arf(1)) isa UInt
+            @test UInt(Arf(1)) == 1
+            @test Int16(Arf(2)) isa Int16
+            @test Int16(Arf(2)) == 2
+            @test Int128(Arf(typemax(Int)) + 1) == Int128(typemax(Int)) + 1
+
+            @test !Bool(Acf(0))
+            @test Bool(Acf(1))
+            @test_throws InexactError Bool(Acf(1, 1))
+            @test Integer(Acf(1)) isa BigInt
+            @test Integer(Acf(1)) == 1
+            @test UInt(Acf(1)) isa UInt
+            @test UInt(Acf(1)) == 1
+            @test Int16(Acf(2)) isa Int16
+            @test Int16(Acf(2)) == 2
+            @test Int128(Acf(typemax(Int)) + 1) == Int128(typemax(Int)) + 1
+
+
+            @test !Bool(Arb(0))
+            @test Bool(Arb(1))
+            @test_throws InexactError Bool(Arb((-1, 1)))
+            @test Integer(Arb(1)) isa BigInt
+            @test Integer(Arb(1)) == 1
+            @test UInt(Arb(1)) isa UInt
+            @test UInt(Arb(1)) == 1
+            @test Int16(Arb(2)) isa Int16
+            @test Int16(Arb(2)) == 2
+            @test Int128(Arb(typemax(Int)) + 1) == Int128(typemax(Int)) + 1
+
+            @test !Bool(Acb(0))
+            @test Bool(Acb(1))
+            @test_throws InexactError Bool(Acb((-1, 1)))
+            @test Integer(Acb(1)) isa BigInt
+            @test Integer(Acb(1)) == 1
+            @test UInt(Acb(1)) isa UInt
+            @test UInt(Acb(1)) == 1
+            @test Int16(Acb(2)) isa Int16
+            @test Int16(Acb(2)) == 2
+            @test Int128(Acb(typemax(Int)) + 1) == Int128(typemax(Int)) + 1
+        end
     end
 
     @testset "Complex" begin
