@@ -99,6 +99,15 @@ Base.BigInt(x::ArbOrRef) =
 Base.BigInt(x::AcbOrRef) =
     is_int(x) ? BigInt(midref(realref(x))) : throw(InexactError(:BigInt, BigInt, x))
 
+function (::Type{T})(x::Union{ArfOrRef,AcfOrRef,ArbOrRef,AcbOrRef}) where {T<:Integer}
+    if typemax(T) <= typemax(Int)
+        convert(T, Int(x))
+    else
+        convert(T, BigInt(x))
+    end
+end
+(::Type{Integer})(x::Union{ArfOrRef,AcfOrRef,ArbOrRef,AcbOrRef}) = BigInt(x)
+
 ## Conversion to Complex
 # TODO: This currently allows construction of Complex{ArfRef} and
 # Complex{ArbRef}, which we probably don't want.
