@@ -49,7 +49,7 @@ end
 
 include("arb_types.jl")
 include("fmpz.jl")
-include("rounding.jl")
+include("rounding_types.jl")
 include("types.jl")
 include("hash.jl")
 include("serialize.jl")
@@ -73,6 +73,7 @@ include("rand.jl")
 include("float.jl")
 include("interval.jl")
 include("multi-argument.jl")
+include("rounding.jl")
 
 include("ref.jl")
 include("vector.jl")
