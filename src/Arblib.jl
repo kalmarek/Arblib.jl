@@ -73,6 +73,7 @@ include("rand.jl")
 include("float.jl")
 include("interval.jl")
 include("multi-argument.jl")
+include("rounding.jl")
 
 include("ref.jl")
 include("vector.jl")
