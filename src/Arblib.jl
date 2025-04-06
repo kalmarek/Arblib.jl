@@ -49,7 +49,7 @@ end
 
 include("arb_types.jl")
 include("fmpz.jl")
-include("rounding.jl")
+include("rounding_types.jl")
 include("types.jl")
 include("hash.jl")
 include("serialize.jl")

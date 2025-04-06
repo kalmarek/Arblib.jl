@@ -30,7 +30,7 @@ DocMeta.setdocmeta!(Arblib, :DocTestSetup, :(using Arblib); recursive = true)
     include("ArbCall/runtests.jl")
 
     include("arb_types.jl")
-    include("rounding.jl")
+    include("rounding_types.jl")
     include("types.jl")
     include("hash.jl")
     include("serialize.jl")

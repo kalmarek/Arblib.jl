@@ -1,4 +1,4 @@
-@testset "rounding" begin
+@testset "rounding_types" begin
     @test convert(Arblib.arb_rnd, RoundToZero) == Arblib.ArbRoundToZero
     @test convert(Arblib.arb_rnd, RoundFromZero) == Arblib.ArbRoundFromZero
     @test convert(Arblib.arb_rnd, RoundDown) == Arblib.ArbRoundDown
