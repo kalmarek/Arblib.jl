@@ -1,9 +1,7 @@
 const DEFAULT_PRECISION = Ref{Int}(256)
 
 let f
-    f = if VERSION < v"1.8.0-DEV.725"
-        :precision
-    elseif VERSION < v"1.11.0-DEV.1363"
+    f = if VERSION < v"1.11.0-DEV.1363"
         # Since Julia 1.8.0 Base.precision calls Base._precision and by
         # overloading that we automatically support giving base argument.
         # Ref: https://github.com/JuliaLang/julia/pull/42428
@@ -30,20 +28,16 @@ let f
     end
 end
 
-if VERSION >= v"1.8.0-DEV.725"
-    # Base.precision only allows AbstractFloat, we want to be able to use
-    # all ArbLib types.
-    # Hence we have to define `Base.precision` on Julia versions for which
-    # it is not defined above
-    Base.precision(
-        T::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}};
-        base::Integer = 2,
-    ) = Base._precision(T, base)
-    Base.precision(
-        x::Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}};
-        base::Integer = 2,
-    ) = Base._precision(x, base)
-end
+# Base.precision only allows AbstractFloat, we want to be able to use
+# all ArbLib types.
+# Hence we have to define `Base.precision` on Julia versions for which
+# it is not defined above
+Base.precision(
+    T::Type{<:Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}};
+    base::Integer = 2,
+) = Base._precision(T, base)
+Base.precision(x::Union{ArbTypes,ArbStructTypes,Ptr{<:ArbStructTypes}}; base::Integer = 2) =
+    Base._precision(x, base)
 
 # Used internally for determining the precision
 @inline _precision(x::Union{ArbTypes,BigFloat}) = precision(x)

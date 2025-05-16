@@ -22,35 +22,8 @@ end
 # See https://github.com/JuliaLang/julia/issues/45932.
 # Note that it works fine for Mag and Arf.
 
-# Before 1.8.0 there is no way to fix the implementation in Base.
-# Instead we define a new method. Note that this doesn't fully fix the
-# problem, there is no way to dispatch on for example
-# minimum(x -> Arb(x), [1, 2, 3, 4]) or an array with only some Arb.
-if VERSION < v"1.8.0-rc3"
-    function Base.minimum(A::AbstractArray{<:ArbOrRef})
-        isempty(A) &&
-            throw(ArgumentError("reducing over an empty collection is not allowed"))
-        res = copy(first(A))
-        for x in Iterators.drop(A, 1)
-            Arblib.min!(res, res, x)
-        end
-        return res
-    end
-
-    function Base.maximum(A::AbstractArray{<:ArbOrRef})
-        isempty(A) &&
-            throw(ArgumentError("reducing over an empty collection is not allowed"))
-        res = copy(first(A))
-        for x in Iterators.drop(A, 1)
-            Arblib.max!(res, res, x)
-        end
-        return res
-    end
-end
-
-# Since 1.8.0 it is possible to fix the Base implementation by
-# overloading some internal methods. This also works before 1.8.0 but
-# doesn't solve the full problem.
+# Is is possible to fix the Base implementation by overloading some
+# internal methods.
 
 # The default implementation in Base is not correct for Arb
 Base._fast(::typeof(min), x::ArbOrRef, y::ArbOrRef) = min(x, y)

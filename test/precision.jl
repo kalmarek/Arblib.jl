@@ -54,17 +54,15 @@
             @test precision(y[1, 1]) == prec
         end
 
-        if VERSION >= v"1.8.0"
-            @test precision(x, base = 4) == precdefault ÷ 2
-            @test precision(y, base = 4) == prec ÷ 2
+        @test precision(x, base = 4) == precdefault ÷ 2
+        @test precision(y, base = 4) == prec ÷ 2
 
-            @test precision(Arblib.cstruct(x), base = 4) == precdefault ÷ 2
-            @test precision(Arblib.cstruct(y), base = 4) == precdefault ÷ 2
+        @test precision(Arblib.cstruct(x), base = 4) == precdefault ÷ 2
+        @test precision(Arblib.cstruct(y), base = 4) == precdefault ÷ 2
 
-            @test precision(T, base = 4) == precdefault ÷ 2
-            @test precision(Arblib.cstructtype(T), base = 4) == precdefault ÷ 2
-            @test precision(Ptr{Arblib.cstructtype(T)}, base = 4) == precdefault ÷ 2
-        end
+        @test precision(T, base = 4) == precdefault ÷ 2
+        @test precision(Arblib.cstructtype(T), base = 4) == precdefault ÷ 2
+        @test precision(Ptr{Arblib.cstructtype(T)}, base = 4) == precdefault ÷ 2
 
         x2 = setprecision(x, prec)
         @test precision(x2) == prec
@@ -85,11 +83,9 @@
             @test !isequal(x, x2)
         end
 
-        if VERSION >= v"1.8.0"
-            x3 = setprecision(x, prec ÷ 2, base = 4)
-            @test precision(x3) == prec
-            @test isequal(x3, x)
-        end
+        x3 = setprecision(x, prec ÷ 2, base = 4)
+        @test precision(x3) == prec
+        @test isequal(x3, x)
     end
 
     @testset "setprecision do" begin
