@@ -204,10 +204,10 @@ function _union!(res::T, x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}}
     if common_degree + 1 < res_length
         z = zero(eltype(T))
         # At most one of the below loops will run
-        for i = common_degree+1:degree(x)
+        for i = (common_degree+1):degree(x)
             union!(ref(res, i), ref(x, i), z)
         end
-        for i = common_degree+1:degree(y)
+        for i = (common_degree+1):degree(y)
             union!(ref(res, i), ref(y, i), z)
         end
     end
@@ -285,13 +285,13 @@ function _intersection!(res::ArbPoly, x::ArbPoly, y::ArbPoly)
 
     if common_degree + 1 < res_length
         # At most one of the below loops will run
-        for i = common_degree+1:degree(x)
+        for i = (common_degree+1):degree(x)
             xi = ref(x, i)
             contains_zero(xi) ||
                 throw(ArgumentError("intersection of non-intersecting balls not allowed"))
             isnan(midref(xi)) && indeterminate!(ref(res, i))
         end
-        for i = common_degree+1:degree(y)
+        for i = (common_degree+1):degree(y)
             yi = ref(y, i)
             contains_zero(yi) ||
                 throw(ArgumentError("intersection of non-intersecting balls not allowed"))

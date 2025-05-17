@@ -74,7 +74,7 @@ function approx_eig_qr(
 end
 
 for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
-    jlf_allocating = Symbol(string(jlf)[1:end-1])
+    jlf_allocating = Symbol(string(jlf)[1:(end-1)])
     @eval begin
         function $jlf(
             eigvals::AcbVectorLike,

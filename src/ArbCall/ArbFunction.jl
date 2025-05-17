@@ -89,7 +89,7 @@ function jlfname(
     strs = filter(!isempty, split(arbfname, "_"))
     k = findfirst(s -> s ∉ prefixes, strs)
     l = findfirst(s -> s ∉ suffixes, reverse(strs))
-    fname = join(strs[k:end-l+1], "_")
+    fname = join(strs[k:(end-l+1)], "_")
     return inplace ? Symbol(fname, "!") : Symbol(fname)
 end
 
