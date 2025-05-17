@@ -18,8 +18,13 @@
     end
 
     @testset "minimum/maximum/extrema" begin
-        # See https://github.com/JuliaLang/julia/issues/45932 for
-        # discussions about the issues with the Base implementation
+        # Before 1.13 the implementation of minimum and maximum lead
+        # to several issues, see
+        # https://github.com/JuliaLang/julia/issues/45932 for
+        # discussions about the issues with the Base implementation.
+        # Since https://github.com/JuliaLang/julia/pull/58267 the
+        # special implementation of minimum and maximum is removed and
+        # the fallback implementation plays well with Arb.
 
         # Currently there is no special implementation of extrema, the
         # default implementation works well. But to help find future
@@ -54,7 +59,7 @@
         @test iszero(extrema(identity, A)[1])
         @test iszero(extrema(identity, -A)[2])
 
-        # Fails with default implementation due to Base._fast
+        # Before 1.13 these fails with default implementation due to Base._fast
         A = [Arb(0); [setball(Arb, 0, i) for i in reverse(0:257)]]
         @test Arblib.contains(minimum(A), -257)
         @test Arblib.contains(maximum(A), 257)
@@ -84,8 +89,8 @@
         @test maximum(AbstractFloat[Arb(0); fill(1.0, 257)]) == 1
         @test extrema(AbstractFloat[Arb(0); fill(1.0, 257)]) == (0, 1)
 
-        # Fails with default implementation due to both short circuit
-        # and Base._fast
+        # Before 1.13 these fails with the default implementation due
+        # to both short circuit and Base._fast
         A = [setball(Arb, 0, i) for i = 0:1000]
         @test Arblib.contains(minimum(A), -1000)
         @test Arblib.contains(maximum(A), 1000)
@@ -97,32 +102,34 @@
         @test Arblib.contains(extrema(identity, A)[1], -1000)
         @test Arblib.contains(extrema(identity, A)[2], 1000)
 
-        @test !Base.isbadzero(min, zero(Mag))
-        @test !Base.isbadzero(min, zero(Arf))
-        @test !Base.isbadzero(min, zero(Arb))
-        @test !Base.isbadzero(min, Arblib.radref(zero(Arb)))
-        @test !Base.isbadzero(min, Arblib.midref(zero(Arb)))
-        @test !Base.isbadzero(min, Arblib.realref(zero(Acb)))
+        if VERSION < v"1.13.0-DEV.536"
+            @test !Base.isbadzero(min, zero(Mag))
+            @test !Base.isbadzero(min, zero(Arf))
+            @test !Base.isbadzero(min, zero(Arb))
+            @test !Base.isbadzero(min, Arblib.radref(zero(Arb)))
+            @test !Base.isbadzero(min, Arblib.midref(zero(Arb)))
+            @test !Base.isbadzero(min, Arblib.realref(zero(Acb)))
 
-        @test !Base.isbadzero(max, zero(Mag))
-        @test !Base.isbadzero(max, zero(Arf))
-        @test !Base.isbadzero(max, zero(Arb))
-        @test !Base.isbadzero(max, Arblib.radref(zero(Arb)))
-        @test !Base.isbadzero(max, Arblib.midref(zero(Arb)))
-        @test !Base.isbadzero(max, Arblib.realref(zero(Acb)))
+            @test !Base.isbadzero(max, zero(Mag))
+            @test !Base.isbadzero(max, zero(Arf))
+            @test !Base.isbadzero(max, zero(Arb))
+            @test !Base.isbadzero(max, Arblib.radref(zero(Arb)))
+            @test !Base.isbadzero(max, Arblib.midref(zero(Arb)))
+            @test !Base.isbadzero(max, Arblib.realref(zero(Acb)))
 
-        @test !Base.isgoodzero(min, zero(Mag))
-        @test !Base.isgoodzero(min, zero(Arf))
-        @test !Base.isgoodzero(min, zero(Arb))
-        @test !Base.isgoodzero(min, Arblib.radref(zero(Arb)))
-        @test !Base.isgoodzero(min, Arblib.midref(zero(Arb)))
-        @test !Base.isgoodzero(min, Arblib.realref(zero(Acb)))
+            @test !Base.isgoodzero(min, zero(Mag))
+            @test !Base.isgoodzero(min, zero(Arf))
+            @test !Base.isgoodzero(min, zero(Arb))
+            @test !Base.isgoodzero(min, Arblib.radref(zero(Arb)))
+            @test !Base.isgoodzero(min, Arblib.midref(zero(Arb)))
+            @test !Base.isgoodzero(min, Arblib.realref(zero(Acb)))
 
-        @test !Base.isgoodzero(max, zero(Mag))
-        @test !Base.isgoodzero(max, zero(Arf))
-        @test !Base.isgoodzero(max, zero(Arb))
-        @test !Base.isgoodzero(max, Arblib.radref(zero(Arb)))
-        @test !Base.isgoodzero(max, Arblib.midref(zero(Arb)))
-        @test !Base.isgoodzero(max, Arblib.realref(zero(Acb)))
+            @test !Base.isgoodzero(max, zero(Mag))
+            @test !Base.isgoodzero(max, zero(Arf))
+            @test !Base.isgoodzero(max, zero(Arb))
+            @test !Base.isgoodzero(max, Arblib.radref(zero(Arb)))
+            @test !Base.isgoodzero(max, Arblib.midref(zero(Arb)))
+            @test !Base.isgoodzero(max, Arblib.realref(zero(Acb)))
+        end
     end
 end
