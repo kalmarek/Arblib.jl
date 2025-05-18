@@ -47,7 +47,7 @@ function Serialization.serialize(
     Serialization.serialize_type(s, typeof(p))
     Serialization.serialize(s, length(p))
     T = p isa arb_poly_struct ? arb_struct : acb_struct
-    for i = 0:length(p)-1
+    for i = 0:(length(p)-1)
         Serialization.serialize(s, unsafe_load(p.coeffs + i * sizeof(T)))
     end
 end
@@ -64,8 +64,8 @@ function Serialization.deserialize(s::Serialization.AbstractSerializer, T::Type{
     spaces = findall(" ", str)
     @assert length(spaces) == 3
 
-    real_str = str[1:spaces[2].start-1]
-    imag_str = str[spaces[2].stop+1:end]
+    real_str = str[1:(spaces[2].start-1)]
+    imag_str = str[(spaces[2].stop+1):end]
 
     res = acf_struct()
     Arblib.load_string!(Arblib.realref(res), real_str)
@@ -79,8 +79,8 @@ function Serialization.deserialize(s::Serialization.AbstractSerializer, T::Type{
     spaces = findall(" ", str)
     @assert length(spaces) == 7
 
-    real_str = str[1:spaces[4].start-1]
-    imag_str = str[spaces[4].stop+1:end]
+    real_str = str[1:(spaces[4].start-1)]
+    imag_str = str[(spaces[4].stop+1):end]
 
     res = acb_struct()
     Arblib.load_string!(Arblib.realref(res), real_str)
@@ -120,7 +120,7 @@ function Serialization.deserialize(
 )
     n = Serialization.deserialize(s)
     res = T()
-    for i = 0:n-1
+    for i = 0:(n-1)
         set_coeff!(res, i, Serialization.deserialize(s))
     end
     return res
