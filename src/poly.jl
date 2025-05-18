@@ -176,7 +176,7 @@ end
 ##
 
 for (TPoly, TSeries) in [(:ArbPoly, :ArbSeries), (:AcbPoly, :AcbSeries)]
-    @eval $TPoly(p::cstructtype($TPoly); prec::Integer = DEFAULT_PRECISION[]) =
+    @eval $TPoly(p::cstructtype($TPoly); prec::Integer = _current_precision()) =
         set!($TPoly(; prec), p)
 
     @eval function $TPoly(coeff; prec::Integer = _precision(coeff))
@@ -222,7 +222,7 @@ for (TSeries, TPoly) in [(:ArbSeries, :ArbPoly), (:AcbSeries, :AcbPoly)]
     @eval $TSeries(
         p::cstructtype($TSeries);
         degree::Integer = degree(p),
-        prec::Integer = DEFAULT_PRECISION[],
+        prec::Integer = _current_precision(),
     ) = set!($TSeries(; degree, prec), p)
 
     @eval function $TSeries(coeff; degree::Integer = 0, prec::Integer = _precision(coeff))
@@ -284,16 +284,16 @@ Base.one(p::Series) = one!(zero(p))
 Base.zero(::Type{T}) where {T<:Union{Poly,Series}} = T()
 Base.one(::Type{T}) where {T<:Union{Poly,Series}} = one!(zero(T))
 
-fromroots(::Type{ArbPoly}, roots::ArbVector; prec::Integer = DEFAULT_PRECISION[]) =
+fromroots(::Type{ArbPoly}, roots::ArbVector; prec::Integer = _current_precision()) =
     product_roots!(ArbPoly(; prec), roots)
-fromroots(::Type{ArbPoly}, roots::AbstractVector; prec::Integer = DEFAULT_PRECISION[]) =
+fromroots(::Type{ArbPoly}, roots::AbstractVector; prec::Integer = _current_precision()) =
     fromroots(ArbPoly, ArbVector(roots; prec); prec)
 
 fromroots(
     ::Type{ArbPoly},
     real_roots::ArbVector,
     complex_roots::AcbVector;
-    prec::Integer = DEFAULT_PRECISION[],
+    prec::Integer = _current_precision(),
 ) = product_roots_complex!(
     ArbPoly(; prec),
     real_roots,
@@ -305,12 +305,12 @@ fromroots(
     ::Type{ArbPoly},
     real_roots::AbstractVector,
     complex_roots::AbstractVector;
-    prec::Integer = DEFAULT_PRECISION[],
+    prec::Integer = _current_precision(),
 ) = fromroots(ArbPoly, ArbVector(real_roots; prec), AcbVector(complex_roots; prec); prec)
 
-fromroots(::Type{AcbPoly}, roots::AcbVector; prec::Integer = DEFAULT_PRECISION[]) =
+fromroots(::Type{AcbPoly}, roots::AcbVector; prec::Integer = _current_precision()) =
     product_roots!(AcbPoly(; prec), roots)
-fromroots(::Type{AcbPoly}, roots::AbstractVector; prec::Integer = DEFAULT_PRECISION[]) =
+fromroots(::Type{AcbPoly}, roots::AbstractVector; prec::Integer = _current_precision()) =
     fromroots(AcbPoly, AcbVector(roots; prec); prec)
 
 ##

@@ -29,7 +29,7 @@ Arb(x::Arb; prec::Integer = precision(x)) = set!(Arb(; prec), x)
 Arb(x::Rational; prec::Integer = _precision(x)) = set!(Arb(; prec), x)
 Arb(x::Complex; prec::Integer = _precision(x)) = set!(Arb(; prec), x)
 
-function Arb(str::AbstractString; prec::Integer = DEFAULT_PRECISION[])
+function Arb(str::AbstractString; prec::Integer = _current_precision())
     res = Arb(; prec)
     flag = set!(res, str)
     iszero(flag) || throw(ArgumentError("could not parse $str as an Arb"))
@@ -60,14 +60,14 @@ Acb(re, im; prec::Integer = max(_precision(re), _precision(im))) = set!(Acb(; pr
 # disambiguation
 Acb(x::Acb; prec::Integer = precision(x)) = set!(Acb(; prec), x)
 
-function Acb(str::AbstractString; prec::Integer = DEFAULT_PRECISION[])
+function Acb(str::AbstractString; prec::Integer = _current_precision())
     res = Acb(; prec)
     flag = set!(realref(res), str)
     iszero(flag) || throw(ArgumentError("could not parse $str as an Arb"))
     return res
 end
 
-function Acb(re::AbstractString, im::AbstractString; prec::Integer = DEFAULT_PRECISION[])
+function Acb(re::AbstractString, im::AbstractString; prec::Integer = _current_precision())
     res = Acb(; prec)
     flag = set!(realref(res), re)
     iszero(flag) || throw(ArgumentError("could not parse $str as an Arb"))

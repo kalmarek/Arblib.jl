@@ -88,17 +88,46 @@
         @test isequal(x3, x)
     end
 
-    @testset "setprecision do" begin
-        x = Arb("0.1")
+    @testset "setprecision" begin
+        x = Arb(π)
         @test precision(x) == 256
-        @test string(x) ==
-              "[0.1000000000000000000000000000000000000000000000000000000000000000000000000000 +/- 1.95e-78]"
+        @test Arblib.rel_accuracy_bits(x) == 255
 
-        setprecision(Arb, 64) do
-            @test precision(x) == 256
-            y = Arb("0.1")
-            @test precision(y) == 64
-            @test string(y) == "[0.100000000000000000 +/- 1.22e-20]"
+        y = setprecision(x, 512)
+        @test precision(y) == 512
+        @test Arblib.rel_accuracy_bits(x) == 255 # Still same value
+
+        # Change global precision
+        setprecision(Arb, 512)
+        x = Arb(π)
+        @test precision(x) == 512
+        @test Arblib.rel_accuracy_bits(x) == 511
+        # Reset global precision
+        setprecision(Arb, 256)
+        x = Arb(π)
+        @test precision(x) == 256
+        @test Arblib.rel_accuracy_bits(x) == 255
+
+        setprecision(Arb, 512) do
+            x = Arb(π)
+            @test precision(x) == 512
+            @test Arblib.rel_accuracy_bits(x) == 511
+        end
+
+        # Check that setprecision in a dynamic scope doesn't change
+        # global default. It is difficult to make a precise test for
+        # this since the scopes need to run concurrently.
+        let
+            Threads.@spawn let
+                setprecision(Arb, 64) do
+                    @test Arblib.DEFAULT_PRECISION[] == 256
+                    sleep(0.02) # Sleep for a short time so that the scopes overlap
+                    @test precision(Arb()) == 64
+                end
+            end
+
+            sleep(0.01) # Sleep for a short time so that the scopes overlap
+            @test precision(Arb) == 256
         end
     end
 

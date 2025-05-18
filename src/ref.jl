@@ -1,34 +1,34 @@
-ArfRef(; prec::Integer = DEFAULT_PRECISION[]) = Arf(; prec)
-AcfRef(; prec::Integer = DEFAULT_PRECISION[]) = Acf(; prec)
-ArbRef(; prec::Integer = DEFAULT_PRECISION[]) = Arb(; prec)
-AcbRef(; prec::Integer = DEFAULT_PRECISION[]) = Acb(; prec)
+ArfRef(; prec::Integer = _current_precision()) = Arf(; prec)
+AcfRef(; prec::Integer = _current_precision()) = Acf(; prec)
+ArbRef(; prec::Integer = _current_precision()) = Arb(; prec)
+AcbRef(; prec::Integer = _current_precision()) = Acb(; prec)
 MagRef() = Mag()
 
 function ArfRef(
     ptr::Ptr{arf_struct},
     parent::Union{acf_struct,arb_struct,AcfRef,ArbRef};
-    prec::Integer = DEFAULT_PRECISION[],
+    prec::Integer = _current_precision(),
 )
     ArfRef(ptr, prec, parent)
 end
 function AcfRef(
     ptr::Ptr{acf_struct},
     parent::Union{Nothing};
-    prec::Integer = DEFAULT_PRECISION[],
+    prec::Integer = _current_precision(),
 )
     AcfRef(ptr, prec, parent)
 end
 function ArbRef(
     ptr::Ptr{arb_struct},
     parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_mat_struct};
-    prec::Integer = DEFAULT_PRECISION[],
+    prec::Integer = _current_precision(),
 )
     ArbRef(ptr, prec, parent)
 end
 function AcbRef(
     ptr::Ptr{acb_struct},
     parent::Union{Nothing,acb_vec_struct,acb_mat_struct};
-    prec::Integer = DEFAULT_PRECISION[],
+    prec::Integer = _current_precision(),
 )
     AcbRef(ptr, prec, parent)
 end
