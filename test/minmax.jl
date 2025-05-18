@@ -47,15 +47,9 @@
         @test iszero(maximum(-A))
         @test iszero(extrema(A)[1])
         @test iszero(extrema(-A)[2])
-        # Before 1.8.0 these still fails and there is no real way to
-        # overload them
-        if VERSION < v"1.8.0-rc3"
-            @test_broken iszero(minimum(identity, A))
-            @test_broken iszero(maximum(identity, -A))
-        else
-            @test iszero(minimum(identity, A))
-            @test iszero(maximum(identity, -A))
-        end
+        # Before 1.8.0 these test failed with no way to fix them
+        @test iszero(minimum(identity, A))
+        @test iszero(maximum(identity, -A))
         # These work
         @test iszero(extrema(identity, A)[1])
         @test iszero(extrema(identity, -A)[2])
@@ -97,13 +91,9 @@
         @test Arblib.contains(maximum(A), 1000)
         @test Arblib.contains(extrema(A)[1], -1000)
         @test Arblib.contains(extrema(A)[2], 1000)
-        if VERSION < v"1.8.0-rc3"
-            @test_broken Arblib.contains(minimum(identity, A), -1000)
-            @test_broken Arblib.contains(maximum(identity, A), 1000)
-        else
-            @test Arblib.contains(minimum(identity, A), -1000)
-            @test Arblib.contains(maximum(identity, A), 1000)
-        end
+        # Before 1.8.0 these test failed with no way to fix them
+        @test Arblib.contains(minimum(identity, A), -1000)
+        @test Arblib.contains(maximum(identity, A), 1000)
         @test Arblib.contains(extrema(identity, A)[1], -1000)
         @test Arblib.contains(extrema(identity, A)[2], 1000)
 
