@@ -2,6 +2,7 @@ module Arblib
 
 using FLINT_jll
 import LinearAlgebra
+import ScopedValues
 import Serialization
 import SpecialFunctions
 

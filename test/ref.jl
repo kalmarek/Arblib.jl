@@ -22,14 +22,14 @@ end
 @testset "ArfRef" begin
     @test ArfRef() isa Arf
     @test isequal(ArfRef(), Arf())
-    @test precision(ArfRef()) == Arblib.DEFAULT_PRECISION[]
+    @test precision(ArfRef()) == Arblib._current_precision()
     @test precision(ArfRef(prec = 80)) == 80
 
     x = Arb()
     ptr = Arblib.midref(x).arf_ptr
     parent = Arblib.parentstruct(x)
     @test ArfRef(ptr, parent) == Arf()
-    @test precision(ArfRef(ptr, parent)) == Arblib.DEFAULT_PRECISION[]
+    @test precision(ArfRef(ptr, parent)) == Arblib._current_precision()
     @test precision(ArfRef(ptr, parent, prec = 80)) == 80
 
     Arblib.set!(Arblib.midref(x), 2)
@@ -58,7 +58,7 @@ end
 @testset "AcfRef" begin
     @test AcfRef() isa Acf
     @test isequal(AcfRef(), Acf())
-    @test precision(AcfRef()) == Arblib.DEFAULT_PRECISION[]
+    @test precision(AcfRef()) == Arblib._current_precision()
     @test precision(AcfRef(prec = 80)) == 80
 
     # The only way to construct an AcfRef is currently by a raw
@@ -68,7 +68,7 @@ end
         ptr = Ptr{Arblib.acf_struct}(pointer_from_objref(x.acf))
         parent = nothing
         @test AcfRef(ptr, parent) == Acf()
-        @test precision(AcfRef(ptr, parent)) == Arblib.DEFAULT_PRECISION[]
+        @test precision(AcfRef(ptr, parent)) == Arblib._current_precision()
         @test precision(AcfRef(ptr, parent, prec = 80)) == 80
 
         Arblib.set!(x, 2)
@@ -88,14 +88,14 @@ end
 @testset "ArbRef" begin
     @test ArbRef() isa Arb
     @test isequal(ArbRef(), Arb())
-    @test precision(ArbRef()) == Arblib.DEFAULT_PRECISION[]
+    @test precision(ArbRef()) == Arblib._current_precision()
     @test precision(ArbRef(prec = 80)) == 80
 
     x = Acb()
     ptr = Arblib.realref(x).arb_ptr
     parent = Arblib.parentstruct(x)
     @test ArbRef(ptr, parent) == Arb()
-    @test precision(ArbRef(ptr, parent)) == Arblib.DEFAULT_PRECISION[]
+    @test precision(ArbRef(ptr, parent)) == Arblib._current_precision()
     @test precision(ArbRef(ptr, parent, prec = 80)) == 80
 
     Arblib.set!(Arblib.realref(x), 2)
@@ -118,7 +118,7 @@ end
 @testset "AcbRef" begin
     @test AcbRef() isa Acb
     @test isequal(AcbRef(), Acb())
-    @test precision(AcbRef()) == Arblib.DEFAULT_PRECISION[]
+    @test precision(AcbRef()) == Arblib._current_precision()
     @test precision(AcbRef(prec = 80)) == 80
 
     v = AcbRefVector([0])
@@ -126,7 +126,7 @@ end
     ptr = x.acb_ptr
     parent = nothing
     @test AcbRef(ptr, parent) == Acb()
-    @test precision(AcbRef(ptr, parent)) == Arblib.DEFAULT_PRECISION[]
+    @test precision(AcbRef(ptr, parent)) == Arblib._current_precision()
     @test precision(AcbRef(ptr, parent, prec = 80)) == 80
 
     @test isequal(zero(AcbRef), zero(Acb))

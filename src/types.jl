@@ -5,9 +5,9 @@ struct Arf <: AbstractFloat
     arf::arf_struct
     prec::Int
 
-    Arf(; prec::Integer = DEFAULT_PRECISION[]) = new(arf_struct(), prec)
+    Arf(; prec::Integer = _current_precision()) = new(arf_struct(), prec)
 
-    Arf(x::Union{UInt,Int}; prec::Integer = DEFAULT_PRECISION[]) = new(arf_struct(x), prec)
+    Arf(x::Union{UInt,Int}; prec::Integer = _current_precision()) = new(arf_struct(x), prec)
 end
 
 """
@@ -50,7 +50,7 @@ struct Acf <: Number
     acf::acf_struct
     prec::Int
 
-    Acf(; prec::Integer = DEFAULT_PRECISION[]) = new(acf_struct(), prec)
+    Acf(; prec::Integer = _current_precision()) = new(acf_struct(), prec)
 end
 
 """
@@ -60,7 +60,7 @@ struct Arb <: AbstractFloat
     arb::arb_struct
     prec::Int
 
-    Arb(; prec::Integer = DEFAULT_PRECISION[]) = new(arb_struct(), prec)
+    Arb(; prec::Integer = _current_precision()) = new(arb_struct(), prec)
 end
 
 """
@@ -70,7 +70,7 @@ struct Acb <: Number
     acb::acb_struct
     prec::Int
 
-    Acb(; prec::Integer = DEFAULT_PRECISION[]) = new(acb_struct(), prec)
+    Acb(; prec::Integer = _current_precision()) = new(acb_struct(), prec)
 end
 
 # Refs are in reverse order to model their possible depencies
@@ -132,7 +132,7 @@ struct ArbPoly
     arb_poly::arb_poly_struct
     prec::Int
 
-    ArbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(arb_poly_struct(), prec)
+    ArbPoly(; prec::Integer = _current_precision()) = new(arb_poly_struct(), prec)
 end
 
 """
@@ -142,7 +142,7 @@ struct ArbSeries <: Number
     poly::ArbPoly
     degree::Int
 
-    ArbSeries(; degree::Integer = 0, prec::Integer = DEFAULT_PRECISION[]) =
+    ArbSeries(; degree::Integer = 0, prec::Integer = _current_precision()) =
         fit_length!(new(ArbPoly(; prec), degree), degree + 1)
 end
 
@@ -153,7 +153,7 @@ struct AcbPoly
     acb_poly::acb_poly_struct
     prec::Int
 
-    AcbPoly(; prec::Integer = DEFAULT_PRECISION[]) = new(acb_poly_struct(), prec)
+    AcbPoly(; prec::Integer = _current_precision()) = new(acb_poly_struct(), prec)
 end
 
 """
@@ -163,13 +163,13 @@ struct AcbSeries <: Number
     poly::AcbPoly
     degree::Int
 
-    AcbSeries(; degree::Integer = 0, prec::Integer = DEFAULT_PRECISION[]) =
+    AcbSeries(; degree::Integer = 0, prec::Integer = _current_precision()) =
         fit_length!(new(AcbPoly(; prec), degree), degree + 1)
 end
 
 """
     ArbVector <: DenseVector{Arb}
-    ArbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[])
+    ArbVector(n::Integer; prec::Integer = _current_precision())
     ArbVector(v::ArbVectorLike; shallow::Bool = false, prec::Integer = precision(v))
     ArbVector(v::AbstractVector; prec::Integer = _precision(v))
 
@@ -187,7 +187,7 @@ struct ArbVector <: DenseVector{Arb}
     function ArbVector(
         v::arb_vec_struct;
         shallow::Bool = false,
-        prec::Integer = DEFAULT_PRECISION[],
+        prec::Integer = _current_precision(),
     )
         if shallow
             return new(v, prec)
@@ -199,7 +199,7 @@ end
 
 """
     AcbVector <: DenseVector{Acb}
-    AcbVector(n::Integer; prec::Integer = DEFAULT_PRECISION[])
+    AcbVector(n::Integer; prec::Integer = _current_precision())
     AcbVector(v::AcbVectorLike; shallow::Bool = false, prec::Integer = precision(v))
     AcbVector(v::AbstractVector; prec::Integer = _precision(v))
 
@@ -217,7 +217,7 @@ struct AcbVector <: DenseVector{Acb}
     function AcbVector(
         v::acb_vec_struct;
         shallow::Bool = false,
-        prec::Integer = DEFAULT_PRECISION[],
+        prec::Integer = _current_precision(),
     )
         if shallow
             return new(v, prec)
@@ -229,7 +229,7 @@ end
 
 """
     ArbMatrix <: DenseMatrix{Arb}
-    ArbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[])
+    ArbMatrix(r::Integer, c::Integer; prec::Integer = _current_precision())
     ArbMatrix(A::ArbMatrixLike; shallow::Bool = false, prec::Integer = precision(v))
     ArbMatrix(A::AbstractMatrix; prec::Integer = _precision(v))
     ArbMatrix(v::AbstractVector; prec::Integer = _precision(v))
@@ -248,7 +248,7 @@ struct ArbMatrix <: DenseMatrix{Arb}
     function ArbMatrix(
         A::arb_mat_struct;
         shallow::Bool = false,
-        prec::Integer = DEFAULT_PRECISION[],
+        prec::Integer = _current_precision(),
     )
         if shallow
             return new(A, prec)
@@ -260,7 +260,7 @@ end
 
 """
     AcbMatrix <: DenseMatrix{Acb}
-    AcbMatrix(r::Integer, c::Integer; prec::Integer = DEFAULT_PRECISION[])
+    AcbMatrix(r::Integer, c::Integer; prec::Integer = _current_precision())
     AcbMatrix(A::AcbMatrixLike; shallow::Bool = false, prec::Integer = precision(v))
     AcbMatrix(A::AbstractMatrix; prec::Integer = _precision(v))
     AcbMatrix(v::AbstractVector; prec::Integer = _precision(v))
@@ -279,7 +279,7 @@ struct AcbMatrix <: DenseMatrix{Acb}
     function AcbMatrix(
         A::acb_mat_struct;
         shallow::Bool = false,
-        prec::Integer = DEFAULT_PRECISION[],
+        prec::Integer = _current_precision(),
     )
         if shallow
             return new(A, prec)
@@ -304,7 +304,7 @@ struct ArbRefVector <: DenseVector{ArbRef}
     function ArbRefVector(
         arb_vec::arb_vec_struct;
         shallow::Bool = false,
-        prec::Integer = DEFAULT_PRECISION[],
+        prec::Integer = _current_precision(),
     )
         if shallow
             return new(arb_vec, prec)
@@ -329,7 +329,7 @@ struct AcbRefVector <: DenseVector{AcbRef}
     function AcbRefVector(
         acb_vec::acb_vec_struct;
         shallow::Bool = false,
-        prec::Integer = DEFAULT_PRECISION[],
+        prec::Integer = _current_precision(),
     )
         if shallow
             return new(acb_vec, prec)
@@ -354,7 +354,7 @@ struct ArbRefMatrix <: DenseMatrix{ArbRef}
     function ArbRefMatrix(
         A::arb_mat_struct;
         shallow::Bool = false,
-        prec::Integer = DEFAULT_PRECISION[],
+        prec::Integer = _current_precision(),
     )
         if shallow
             return new(A, prec)
@@ -379,7 +379,7 @@ struct AcbRefMatrix <: DenseMatrix{AcbRef}
     function AcbRefMatrix(
         A::acb_mat_struct;
         shallow::Bool = false,
-        prec::Integer = DEFAULT_PRECISION[],
+        prec::Integer = _current_precision(),
     )
         if shallow
             return new(A, prec)
