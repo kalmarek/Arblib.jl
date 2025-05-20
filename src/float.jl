@@ -47,3 +47,27 @@ function Base.frexp(x::ArbOrRef)
 end
 
 Base.ldexp(x::Union{ArfOrRef,ArbOrRef}, n::Integer) = mul_2exp!(zero(x), x, n)
+
+# Note that significand and exponent are equivalent to frexp except
+# for a factor 2 and the fact that exponent throws an error for zero
+# or non-finite values.
+# Technically the documentation for exponent says that it "Returns the
+# largest integer y such that 2^y ≤ abs(x).", which is not quite true
+# for Arb input if the radius is non-zero.
+
+function Base.significand(x::Union{ArfOrRef,ArbOrRef})
+    if iszero(x) || !isfinite(x)
+        return copy(x)
+    else
+        res = frexp(x)[1]
+        return mul_2exp!(res, res, 1)
+    end
+end
+
+function Base.exponent(x::Union{ArfOrRef,ArbOrRef})
+    if iszero(x) || !isfinite(x)
+        throw(DomainError(x, "`x` must be non-zero and finite."))
+    else
+        return frexp(x)[2] - 1
+    end
+end
