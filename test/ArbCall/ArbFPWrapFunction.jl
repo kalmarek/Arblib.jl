@@ -214,15 +214,17 @@
             @test typeof(eval(code)) <: Function
         end
 
-        for str in (
+        # To avoid issues with world age it is better to define both
+        # versions of the function before testing them.
+        afs = Arblib.ArbCall.ArbFPWrapFunction.([
             "int arb_fpwrap_double_exp(double * res, double x, int flags)",
             "int arb_fpwrap_cdouble_exp(complex_double * res, complex_double x, int flags)",
-        )
-            af = Arblib.ArbCall.ArbFPWrapFunction(str)
-            # Use a different name to avoid overwriting existing function
-            fname = Symbol(Arblib.ArbCall.jlfname(af), :_test)
-            eval(Arblib.ArbCall.jlcode(af, fname))
+        ])
+        # Use a different name to avoid overwriting existing function
+        fnames = Symbol.(Arblib.ArbCall.jlfname.(afs), :_test)
+        eval.(Arblib.ArbCall.jlcode.(afs, fnames))
 
+        for (af, fname) in zip(afs, fnames)
             f = eval(fname)
             T = Arblib.ArbCall.basetype(af)
             args = zeros(T, length(Arblib.ArbCall.jlargs(af)[1]))
