@@ -64,21 +64,21 @@ is_series_method(af::ArbFunction) =
     (jltype(first(arguments(af))) <: Union{Arblib.ArbPolyLike,Arblib.AcbPolyLike})
 
 const jlfname_prefixes = (
+    "double",
+    "cdouble",
+    "mag",
     "arf",
     "acf",
     "arb",
     "acb",
-    "mag",
-    "mat",
     "vec",
     "poly",
-    "scalar",
+    "mat",
     "fpwrap",
-    "double",
-    "cdouble",
+    "scalar",
 )
 const jlfname_suffixes =
-    ("si", "ui", "d", "mag", "arf", "acf", "arb", "acb", "mpz", "mpfr", "str")
+    ("si", "ui", "d", "str", "mpz", "mpfr", "mag", "arf", "acf", "arb", "acb")
 
 function jlfname(
     arbfname::AbstractString;
@@ -117,7 +117,7 @@ jlfname_series(af::ArbFunction) = jlfname_series(arbfname(af))
 function jlargs(af::ArbFunction; argument_detection::Bool = true)
     cargs = arguments(af)
 
-    jl_arg_names_types = Tuple{Symbol,Any}[]
+    args = Expr[]
     kwargs = Expr[]
 
     prec_kwarg = false
@@ -125,7 +125,7 @@ function jlargs(af::ArbFunction; argument_detection::Bool = true)
     flags_kwarg = false
     for (i, carg) in enumerate(cargs)
         if !argument_detection
-            push!(jl_arg_names_types, (name(carg), jltype(carg)))
+            push!(args, jlarg(carg))
             continue
         end
 
@@ -147,11 +147,9 @@ function jlargs(af::ArbFunction; argument_detection::Bool = true)
         elseif i > 1 && is_length_argument(carg, cargs[i-1])
             push!(kwargs, extract_length_argument(carg, cargs[i-1]))
         else
-            push!(jl_arg_names_types, (name(carg), jltype(carg)))
+            push!(args, jlarg(carg))
         end
     end
-
-    args = [:($a::$T) for (a, T) in jl_arg_names_types]
 
     return args, kwargs
 end

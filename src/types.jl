@@ -1,4 +1,17 @@
 """
+    Mag <: Real
+"""
+struct Mag <: Real
+    mag::mag_struct
+
+    Mag() = new(mag_struct())
+
+    # Uses init_set! constructor. Argument type should be MagLike but
+    # that is only defined further down.
+    Mag(x::Union{Mag,mag_struct,Ptr{mag_struct}}) = new(mag_struct(cstruct(x)))
+end
+
+"""
     Arf <: AbstractFloat
 """
 struct Arf <: AbstractFloat
@@ -8,24 +21,6 @@ struct Arf <: AbstractFloat
     Arf(; prec::Integer = _current_precision()) = new(arf_struct(), prec)
 
     Arf(x::Union{UInt,Int}; prec::Integer = _current_precision()) = new(arf_struct(x), prec)
-end
-
-"""
-    Mag <: Real
-"""
-struct Mag <: Real
-    mag::mag_struct
-
-    Mag() = new(mag_struct())
-
-    # Uses init_set! constructor. Argument type should be
-    # Union{MagLike,ArfLike} but those are only defined further down.
-    Mag(
-        x::Union{
-            Union{Mag,mag_struct,Ptr{mag_struct}},
-            Union{Arf,arf_struct,Ptr{arf_struct}},
-        },
-    ) = new(mag_struct(cstruct(x)))
 end
 
 """
