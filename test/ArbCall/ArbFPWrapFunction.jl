@@ -155,9 +155,9 @@
             (
                 "int arb_fpwrap_double_hypgeom_pfq(double * res, const double * a, slong p, const double * b, slong q, double z, int regularized, int flags)",
                 [
-                    :(a::$(Vector{<:Union{Float16,Float32,Float64}})),
+                    :(a::$(Vector{Float64})),
                     :(p::$Integer),
-                    :(b::$(Vector{<:Union{Float16,Float32,Float64}})),
+                    :(b::$(Vector{Float64})),
                     :(q::$Integer),
                     :(z::$(Union{Float16,Float32,Float64})),
                     :(regularized::$Integer),
@@ -214,14 +214,18 @@
             @test typeof(eval(code)) <: Function
         end
 
-        for str in (
+        # To avoid issues with world age it is better to define both
+        # versions of the function before testing them.
+        afs = Arblib.ArbCall.ArbFPWrapFunction.([
             "int arb_fpwrap_double_exp(double * res, double x, int flags)",
             "int arb_fpwrap_cdouble_exp(complex_double * res, complex_double x, int flags)",
-        )
-            af = Arblib.ArbCall.ArbFPWrapFunction(str)
-            eval(Arblib.ArbCall.jlcode(af))
+        ])
+        # Use a different name to avoid overwriting existing function
+        fnames = Symbol.(Arblib.ArbCall.jlfname.(afs), :_test)
+        eval.(Arblib.ArbCall.jlcode.(afs, fnames))
 
-            f = eval(Arblib.ArbCall.jlfname(af))
+        for (af, fname) in zip(afs, fnames)
+            f = eval(fname)
             T = Arblib.ArbCall.basetype(af)
             args = zeros(T, length(Arblib.ArbCall.jlargs(af)[1]))
             @test f(args...) isa T
@@ -237,21 +241,22 @@
         af = Arblib.ArbCall.ArbFPWrapFunction(
             "int arb_fpwrap_double_bessel_j(double * res, double nu, double x, int flags)",
         )
-        eval(Arblib.ArbCall.jlcode(af))
+        # Use a different name to avoid overwriting existing function
+        eval(Arblib.ArbCall.jlcode(af, Symbol(Arblib.ArbCall.jlfname(af), :_test)))
 
         # Test that it errors on failure
-        @test !isnan(Arblib.fpwrap_bessel_j(1.0, 1e40))
-        @test isnan(Arblib.fpwrap_bessel_j(1.0, 1e40, work_limit = 1))
-        @test_throws ErrorException Arblib.fpwrap_bessel_j(
+        @test !isnan(fpwrap_bessel_j_test(1.0, 1e40))
+        @test isnan(fpwrap_bessel_j_test(1.0, 1e40, work_limit = 1))
+        @test_throws ErrorException fpwrap_bessel_j_test(
             1.0,
             1e40,
             error_on_failure = true,
             work_limit = 1,
         )
         Arblib.ArbCall.fpwrap_error_on_failure_default_set(true)
-        @test_throws ErrorException Arblib.fpwrap_bessel_j(1.0, 1e40, work_limit = 1)
+        @test_throws ErrorException fpwrap_bessel_j_test(1.0, 1e40, work_limit = 1)
         @test isnan(
-            Arblib.fpwrap_bessel_j(1.0, 1e40, error_on_failure = false, work_limit = 1),
+            fpwrap_bessel_j_test(1.0, 1e40, error_on_failure = false, work_limit = 1),
         )
         Arblib.ArbCall.fpwrap_error_on_failure_default_set(false)
     end

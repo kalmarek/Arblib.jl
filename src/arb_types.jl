@@ -1,4 +1,27 @@
 """
+    mag_struct
+"""
+mutable struct mag_struct
+    exponent::UInt       # fmpz
+    mantissa::UInt       # mp_limb_t
+
+    function mag_struct()
+        res = new()
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
+
+    # Argument type should be MagLike but that is not defined yet
+    function mag_struct(x::Union{mag_struct,Ptr{mag_struct}})
+        res = new()
+        init_set!(res, x)
+        finalizer(clear!, res)
+        return res
+    end
+end
+
+"""
     arf_struct
 """
 mutable struct arf_struct
@@ -15,30 +38,6 @@ mutable struct arf_struct
     end
 
     function arf_struct(x::Union{UInt,Int})
-        res = new()
-        init_set!(res, x)
-        finalizer(clear!, res)
-        return res
-    end
-end
-
-"""
-    mag_struct
-"""
-mutable struct mag_struct
-    exponent::UInt       # fmpz
-    mantissa::UInt       # mp_limb_t
-
-    function mag_struct()
-        res = new()
-        init!(res)
-        finalizer(clear!, res)
-        return res
-    end
-
-    # Argument type should be Union{MagLike,ArfLike} but those are not
-    # defined yet
-    function mag_struct(x::Union{mag_struct,Ptr{mag_struct},arf_struct,Ptr{arf_struct}})
         res = new()
         init_set!(res, x)
         finalizer(clear!, res)

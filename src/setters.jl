@@ -5,6 +5,7 @@ Base.setindex!(res::Union{MagLike,ArfLike,ArbLike,AcbLike}, x) = set!(res, x)
 set!(res::MagLike, x::Integer) = set!(res, convert(UInt, x))
 set!(res::MagLike, ::Irrational{:π}) = const_pi!(res)
 set!(res::MagLike, x::Integer, y::Integer) = set_ui_2exp!(res, convert(UInt, x), y)
+set!(res::MagLike, x::ArfLike) = get!(res, x)
 set!(res::MagLike, x::Complex) =
     isreal(x) ? set!(res, real(x)) : throw(InexactError(:Mag, Mag, x))
 

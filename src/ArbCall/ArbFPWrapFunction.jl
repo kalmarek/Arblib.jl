@@ -101,7 +101,7 @@ function jlargs(af::ArbFPWrapFunction)
     cargs[end] == Carg{Cint}(:flags, false) ||
         throw(ArgumentError("expected last argument to be flags::Cint, got $(cargs[end])"))
 
-    args = [:($(name(carg))::$(jltype(carg))) for carg in cargs[(n+1):(end-1)]]
+    args = [jlarg(carg) for carg in cargs[(n+1):(end-1)]]
 
     if basetype(af) == Float64
         kwargs = [
