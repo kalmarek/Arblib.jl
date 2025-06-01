@@ -1,8 +1,8 @@
+MagRef() = Mag()
 ArfRef(; prec::Integer = _current_precision()) = Arf(; prec)
 AcfRef(; prec::Integer = _current_precision()) = Acf(; prec)
 ArbRef(; prec::Integer = _current_precision()) = Arb(; prec)
 AcbRef(; prec::Integer = _current_precision()) = Acb(; prec)
-MagRef() = Mag()
 
 function ArfRef(
     ptr::Ptr{arf_struct},
@@ -32,12 +32,6 @@ function AcbRef(
 )
     AcbRef(ptr, prec, parent)
 end
-
-Mag(x::MagRef) = set!(Mag(), x)
-Arf(x::ArfRef; prec::Integer = precision(x)) = set!(Arf(; prec), x)
-Acf(x::AcfRef; prec::Integer = precision(x)) = set!(Acf(; prec), x)
-Arb(x::ArbRef; prec::Integer = precision(x)) = set!(Arb(; prec), x)
-Acb(x::AcbRef; prec::Integer = precision(x)) = set!(Acb(; prec), x)
 
 Base.zero(::Union{Type{MagRef},MagRef}) = zero(Mag)
 Base.one(::Union{Type{MagRef},MagRef}) = one(Mag)
@@ -72,8 +66,8 @@ end
 Return an `ArfRef` referencing the imaginary part of `z`.
 """
 function imagref(z::AcfLike; prec = precision(z))
-    real_ptr = ccall(@libflint(acf_imag_ptr), Ptr{arf_struct}, (Ref{acf_struct},), z)
-    ArfRef(real_ptr, prec, parentstruct(z))
+    imag_ptr = ccall(@libflint(acf_imag_ptr), Ptr{arf_struct}, (Ref{acf_struct},), z)
+    ArfRef(imag_ptr, prec, parentstruct(z))
 end
 
 """
@@ -112,6 +106,6 @@ end
 Return an `ArbRef` referencing the imaginary part of `z`.
 """
 function imagref(z::AcbLike; prec = precision(z))
-    real_ptr = ccall(@libflint(acb_imag_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
-    ArbRef(real_ptr, prec, parentstruct(z))
+    imag_ptr = ccall(@libflint(acb_imag_ptr), Ptr{arb_struct}, (Ref{acb_struct},), z)
+    ArbRef(imag_ptr, prec, parentstruct(z))
 end
