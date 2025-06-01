@@ -2,9 +2,8 @@ export setball
 
 # Mag
 Mag(x) = set!(Mag(), x)
-# Can't be defined inside Mag due to MagRef and ArfRef being defined
-# later.
-Mag(x::Union{MagRef,ArfRef}) = Mag(cstruct(x))
+# Uses the init_set! constructor
+Mag(x::Union{Mag,MagRef}) = Mag(cstruct(x))
 Mag(x, y) = set!(Mag(), x, y)
 # disambiguation
 Mag(x::Complex) = set!(Mag(), x)
