@@ -7,6 +7,9 @@
         @test π < Float64(Mag(π)) < 3.15
         @test Mag(3, 4) == Mag(3 * 2^4)
 
+        # Test init_set! constructor
+        @test Mag(Ptr{Arblib.mag_struct}(pointer_from_objref(Mag().mag))) == Mag()
+
         # Check for ambiguities
         @test Mag(1 + 0im) == Mag(1)
         @test_throws InexactError Mag(1 + im)

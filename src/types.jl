@@ -6,9 +6,8 @@ struct Mag <: Real
 
     Mag() = new(mag_struct())
 
-    # Uses init_set! constructor. Argument type should be MagLike but
-    # that is only defined further down.
-    Mag(x::Union{Mag,mag_struct,Ptr{mag_struct}}) = new(mag_struct(cstruct(x)))
+    # Uses init_set! constructor.
+    Mag(x::Union{mag_struct,Ptr{mag_struct}}) = new(mag_struct(x))
 end
 
 """
