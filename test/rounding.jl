@@ -2,9 +2,11 @@
     @testset "round" begin
         xs = range(-3, 3, length = 25)
         # RoundNearest
-        @test_throws ArgumentError round(Arf(0))
-        @test_throws ArgumentError round(Arf(0), RoundNearest)
-        @test round.(xs) == round.(Arb.(xs)) == round.(Arb.(xs), RoundNearest)
+        @test round.(xs) ==
+              round.(Arf.(xs)) ==
+              round.(Arf.(xs), RoundNearest) ==
+              round.(Arb.(xs)) ==
+              round.(Arb.(xs), RoundNearest)
         # RoundNearestTiesAway
         @test_throws ArgumentError round(Arf(0), RoundNearestTiesAway)
         @test_throws ArgumentError round(Arb(0), RoundNearestTiesAway)
@@ -27,7 +29,7 @@
 
         # Make sure it works correctly for intervals
         @test Arblib.contains(round(Arb((0.4, 0.6))), 0)
-        @test Arblib.contains(round(Arb((0.4, 0.6))), 1) # Bug in Flint
+        @test Arblib.contains(round(Arb((0.4, 0.6))), 1)
 
         @test Arblib.contains(round(Arb((0.9, 1.1)), RoundToZero), 0)
         @test Arblib.contains(round(Arb((0.9, 1.1)), RoundToZero), 1)
@@ -40,8 +42,8 @@
 
         # Complex
         ys = transpose(xs)
-        for rr in (RoundToZero, RoundFromZero, RoundUp, RoundDown)
-            for ri in (RoundToZero, RoundFromZero, RoundUp, RoundDown)
+        for rr in (RoundNearest, RoundToZero, RoundFromZero, RoundUp, RoundDown)
+            for ri in (RoundNearest, RoundToZero, RoundFromZero, RoundUp, RoundDown)
                 @test round.(complex.(xs, ys), rr, ri) == round.(Acf.(xs, ys), rr, ri)
             end
         end
@@ -50,8 +52,8 @@
                 @test round.(complex.(xs, ys), rr, ri) == round.(Acb.(xs, ys), rr, ri)
             end
         end
-        @test_throws ArgumentError round(Acf(1, 1), RoundNearest, RoundDown)
-        @test_throws ArgumentError round(Acf(1, 1), RoundDown, RoundNearest)
+        @test_throws ArgumentError round(Acf(1, 1), RoundNearestTiesAway, RoundDown)
+        @test_throws ArgumentError round(Acf(1, 1), RoundDown, RoundNearestTiesAway)
         @test_throws ArgumentError round(Acb(1, 1), RoundNearestTiesAway, RoundDown)
         @test_throws ArgumentError round(Acb(1, 1), RoundDown, RoundNearestTiesAway)
     end
