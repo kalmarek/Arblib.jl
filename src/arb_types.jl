@@ -188,7 +188,7 @@ mutable struct arb_mat_struct
     entries::Ptr{arb_struct}
     r::Int
     c::Int
-    rows::Ptr{Ptr{arb_struct}}
+    stride::Int
 
     function arb_mat_struct(r::Integer, c::Integer)
         A = new()
@@ -205,7 +205,7 @@ mutable struct acb_mat_struct
     entries::Ptr{acb_struct}
     r::Int
     c::Int
-    rows::Ptr{Ptr{acb_struct}}
+    stride::Int
 
     function acb_mat_struct(r::Integer, c::Integer)
         A = new()

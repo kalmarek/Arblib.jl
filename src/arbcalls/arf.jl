@@ -55,6 +55,7 @@ arbcall"int arf_get_mpfr(mpfr_t res, const arf_t x, mpfr_rnd_t rnd)"
 #ni arbcall"int arf_get_fmpz_fixed_si(fmpz_t res, const arf_t x, slong e)"
 arbcall"void arf_floor(arf_t res, const arf_t x)"
 arbcall"void arf_ceil(arf_t res, const arf_t x)"
+arbcall"void arf_nint(arf_t res, const arf_t x)"
 #ni arbcall"void arf_get_fmpq(fmpq_t res, const arf_t x)"
 
 ### Comparisons and bounds
