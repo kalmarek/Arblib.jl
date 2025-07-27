@@ -1,4 +1,4 @@
-digits_prec(prec::Integer) = floor(Int, prec * (log(2) / log(10)))
+digits_prec(prec::Integer) = max(floor(Int, prec * (log(2) / log(10))), 1)
 
 function _remove_trailing_zeros(str::AbstractString)
     if occursin('.', str)
