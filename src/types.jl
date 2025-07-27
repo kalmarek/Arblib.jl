@@ -124,6 +124,12 @@ end
 # Refs are in reverse order to model their possible depencies
 """
     AcbRef <: Number
+
+Type handling references to [`Acb`](@ref) objects.
+
+!!! note "No standard constructors"
+    This type cannot be constructed directly, but is returned by other
+    functions such as [`ref`](@ref).
 """
 struct AcbRef <: Number
     acb_ptr::Ptr{acb_struct}
@@ -133,6 +139,13 @@ end
 
 """
     ArbRef <: AbstractFloat
+
+Type handling references to [`Arb`](@ref) objects.
+
+!!! note "No standard constructors"
+    This type cannot be constructed directly, but is returned by other
+    functions such as [`ref`](@ref), [`realref`](@ref) and
+    [`imagref`](@ref).
 """
 struct ArbRef <: AbstractFloat
     arb_ptr::Ptr{arb_struct}
@@ -158,6 +171,12 @@ end
 
 """
     ArfRef <: AbstractFloat
+
+Type handling references to [`Arf`](@ref) objects.
+
+!!! note "No standard constructors"
+    This type cannot be constructed directly, but is returned by other
+    functions such as [`midref`](@ref).
 """
 struct ArfRef <: AbstractFloat
     arf_ptr::Ptr{arf_struct}
@@ -167,6 +186,12 @@ end
 
 """
     MagRef <: Real
+
+Type handling references to [`Mag`](@ref) objects.
+
+!!! note "No standard constructors"
+    This type cannot be constructed directly, but is returned by other
+    functions such as [`radref`](@ref).
 """
 struct MagRef <: Real
     mag_ptr::Ptr{mag_struct}
