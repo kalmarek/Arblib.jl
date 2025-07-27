@@ -1,5 +1,17 @@
 """
     Mag <: Real
+
+Fixed-precision unsigned floating-point numbers for bounds. Used to
+represent the radius for the [`Arb`](@ref) type.
+
+It is a wrapper of the type [`mag`](https://flintlib.org/doc/mag.html)
+in Flint, see that page for more detailed information.
+
+See also [`MagRef`](@ref) for handling pointers to `mag` objects.
+
+!!! note "Limited capabilities"
+    The `Mag` type only implements very basic functionalities and
+    should rarely be used directly.
 """
 struct Mag <: Real
     mag::mag_struct
@@ -12,6 +24,22 @@ end
 
 """
     Arf <: AbstractFloat
+
+Arbitrary precision floating point number type. Used to represent the
+midpoint for the [`Arb`](@ref) type.
+
+It is a wrapper of the type [`arf`](https://flintlib.org/doc/arf.html)
+in Flint, see that page for more detailed information.
+
+See also [`ArfRef`](@ref) for handling pointers to `arf` objects,
+[`Acf`](@ref) for a complex version and [`Arb`](@ref) for a number
+type with rigorous error tracking.
+
+!!! note "Limited capabilities"
+    The `Arf` type only implements basic functionalities. For most
+    purposes it is better to use the [`Arb`](@ref) type, this is true
+    even in situations where the rigorous error tracking done by `Arb`
+    is not needed.
 """
 struct Arf <: AbstractFloat
     arf::arf_struct
@@ -27,9 +55,10 @@ end
 
 Complex arbitrary precision floating point number type.
 
-The internal representation of the real and imaginary parts are the
-same as for [`Arf`](@ref). It is a wrapper of the type
-[`acf`](https://flintlib.org/doc/acf.html) in Flint.
+It is internally represented by a pair of [`Arf`](@ref) values.
+
+It is a wrapper of the type [`acf`](https://flintlib.org/doc/acf.html)
+in Flint, see that page for more detailed information.
 
 See also [`AcfRef`](@ref) for handling pointers to `acf` objects and
 [`Acb`](@ref) for a complex number type with rigorous error tracking.
@@ -49,6 +78,22 @@ end
 
 """
     Arb <: AbstractFloat
+
+Arbitrary precision floating point number type with rigorous error tracking.
+
+It is given by an interval ``[m ± r] = [m - r, m + r]`` where the
+midpoint `m` is internally represented by an [`Arf`](@ref) value and
+radius `r` is internally represented by a [`Mag`](@ref) value. The
+result of an (approximate) operation done on `Arb` variables is a ball
+which contains the result of the (mathematically exact) operation
+applied to any choice of points in the input balls. In general, the
+output ball is not the smallest possible.
+
+It is a wrapper of the type [`arb`](https://flintlib.org/doc/arb.html)
+in Flint, see that page for more detailed information.
+
+See also [`ArbRef`](@ref) for handling pointers to `arb` objects and
+[`Acb`](@ref) for a complex version.
 """
 struct Arb <: AbstractFloat
     arb::arb_struct
@@ -59,6 +104,15 @@ end
 
 """
     Acb <: Number
+
+Complex arbitrary precision floating point number type with rigorous error tracking.
+
+It is internally represented by a pair of [`Arb`](@ref) values.
+
+It is a wrapper of the type [`acb`](https://flintlib.org/doc/acb.html)
+in Flint, see that page for more detailed information.
+
+See also [`AcbRef`](@ref) for handling pointers to `acb` objects.
 """
 struct Acb <: Number
     acb::acb_struct
