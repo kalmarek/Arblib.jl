@@ -94,6 +94,12 @@ in Flint, see that page for more detailed information.
 
 See also [`ArbRef`](@ref) for handling pointers to `arb` objects and
 [`Acb`](@ref) for a complex version.
+
+!!! note "Printing of `Arb` values"
+    When printing `Arb` values, care is taken to only print accurate
+    digits. In some cases, in particular when the radius is large,
+    this can lead to confusing results. See [`string`](@ref) as well
+    as the online documentation about printing for more details.
 """
 struct Arb <: AbstractFloat
     arb::arb_struct
