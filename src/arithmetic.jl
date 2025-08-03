@@ -161,10 +161,12 @@ Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{1}) = copy(x)
 Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{2}) = sqr(x)
 Base.literal_pow(::typeof(^), x::AcbOrRef, ::Val{3}) = cube(x)
 
-### real, imag, conj
+### real, imag, angle, conj
 
 Base.real(z::AcfOrRef) = Arf(realref(z))
 Base.imag(z::AcfOrRef) = Arf(imagref(z))
+
 Base.real(z::AcbOrRef) = get_real!(Arb(prec = _precision(z)), z)
 Base.imag(z::AcbOrRef) = get_imag!(Arb(prec = _precision(z)), z)
+Base.angle(z::AcbOrRef) = arg!(Arb(prec = precision(z)), z)
 Base.conj(z::AcbOrRef) = conj!(zero(z), z)
