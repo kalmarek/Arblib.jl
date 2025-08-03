@@ -7,33 +7,39 @@ is surprisingly tricky. See for example the issues
 examples of confusions coming from the way [`Arb`](@ref) values are
 printed by default.
 
-The main source of confusion is the convention that the output is
-rounded so that **the printed midpoint is correct to within 1 ulp
-(unit in the last decimal place)**. Compare
+!!! note
+    The main source of confusion is the convention that, by default,
+    the output is rounded so that **the printed midpoint is correct to
+    within 1 ulp (unit in the last decimal place)**. Compare
 
-``` @repl
-using Arblib # hide
+    ``` @repl
+    using Arblib # hide
 
-Arb(π, prec = 64)
+    Arb(π, prec = 64)
 
-string(Arb(π, prec = 64), digits = 50, more = true)
+    Arb(π, prec = 128)
+    ```
 
-Arb(π, prec = 128)
-```
+    to
 
-Where we have manually used the [`string`](@ref) function with the
-`more` flag to force it to print more digits of the midpoint in the
-second case. In all cases the output is correct, in the sense that the
-printed enclosure indeed is an enclosure of $\pi$. The second case is
-however rather misleading, since it shows a lot of digits that are not
-in the actual value for $\pi$.
+    ``` @repl
+    using Arblib # hide
 
-This convention can give confusing behavior when the radius is too
-large for even the first digit to be known to 1 ulp. In this case, no
-digits of the midpoints are printed and instead the value is printed
-in the format `[+/- R]` where `R` is an upper bound for the absolute
-value of the input. As above, the `more` argument to [`string`](@ref)
-can then be used to print more (possibly incorrect) digits.
+    string(Arb(π, prec = 64), digits = 37, more = true)
+    ```
+
+    While in all cases the output is correct, in the sense that the
+    printed enclosure indeed is an enclosure of $\pi$. In the latter
+    example though we forced Arb to print more digits of the midpoint that
+    are not in the actual value for $\pi$.
+
+This convention of rounding the output to be correct within 1 ulp can
+give confusing behavior when the radius is too large for even the
+first digit to be known to 1 ulp. In this case, no digits of the
+midpoints are printed and instead the value is printed in the format
+`[+/- R]` where `R` is an upper bound for the absolute value of the
+input. As above, the `more` argument to [`string`](@ref) can then be
+used to print more (possibly incorrect) digits.
 
 ``` @repl
 using Arblib # hide
@@ -62,7 +68,7 @@ string(x, digits = 50, more = true)
 radius(x)
 ```
 
-Even for exact values a radius is printed if the number of digits
+Even for exact values the radius is printed if the number of digits
 requested is not enough to represent the value exactly.
 
 ``` @repl
@@ -78,9 +84,9 @@ string(x, digits = 39) # We need at least 39 digits to print the exact value
 # Serialization
 As apparent from the above discussion, printing an [`Arb`](@ref) value
 as a decimal string is a lossy operation. If you want to convert to a
-string as an intermediate formation you can serialize the value as a
-string using the [`Arblib.dump_string`](@ref) function. The result can
-then be read back using [`Arblib.load_string`](@ref).
+string as an intermediate representation, you can serialize the value
+using [`Arblib.dump_string`](@ref). The result can then be read back
+using [`Arblib.load_string`](@ref).
 
 ``` @repl
 using Arblib # hide

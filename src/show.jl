@@ -79,7 +79,7 @@ midpoint-radius format "[m ± r]".
 
 With default flags, the output can be parsed back as `Arb(string(x))`,
 and this is guaranteed to produce an interval containing the original
-interval `x` (but is generally wider). For loss free, but not human
+interval `x` (but is generally wider). For lossless, but not human
 readable, serialization as a string, see [`dump_string`](@ref) and
 [`load_string`](@ref).
 
@@ -87,12 +87,13 @@ By default, the output is rounded so that the value given for the
 midpoint is correct up to 1 ulp (unit in the last decimal place).
 
 !!! warning
-    The output can be confusing for wide inputs, when the radius is too
-    large for even the first digit to be known up to 1 ulp. In this case
-    the interval is printed in the format `[+/- R]` where `R` is an upper
-    bound for the absolute value of `x`. The `more` argument (see below)
-    can then be used (possibly in combination with `digits`) to print more
-    digits, but which are then not guaranteed to be correct within 1 ulp.
+    The output can be confusing for wide inputs, when the radius is
+    too large for even the first digit to be known up to 1 ulp. In
+    this case the interval is printed in the format `[+/- R]` where
+    `R` is an upper bound for the absolute value of `x`. The `more`
+    keyword argument (see below) can then be used (possibly in
+    combination with `digits`) to print more digits, which are however
+    no longer guaranteed to be correct within 1 ulp.
     ```jldoctest
     julia> x = Arb((1, 2));
 
@@ -113,20 +114,20 @@ midpoint is correct up to 1 ulp (unit in the last decimal place).
   to display.
 - `more::Bool = false`: If `true`, display more (possibly incorrect)
   digits.
-- `no_radius::Bool = false`: If `true`, display the radius is not
-  included in the output. Unless `more` is set, the output is rounded
-  so that the midpoint is correct to 1 ulp. As a special case, if
-  there are no significant digits after rounding, the result will be
-  shown as ``0e+n``, meaning that the result is between ``-1e+n`` and
-  ``1e+n`` (following the contract that the output is correct to
-  within one unit in the only shown digit).
+- `no_radius::Bool = false`: If `true`, the radius is not displayed in
+  the output. Unless `more` is set, the output is rounded so that the
+  midpoint is correct to 1 ulp. As a special case, if there are no
+  significant digits after rounding, the result will be shown as
+  ``0e+n``, meaning that the result is between ``-1e+n`` and ``1e+n``
+  (following the contract that the output is correct to within one
+  unit in the only shown digit).
 - `condense::Integer = 0`: If non-zero, strings of more than three
   times `condense` consecutive digits are condensed, only printing the
   leading and trailing `condense` digits along with brackets
   indicating the number of digits omitted (useful when computing
   values to extremely high precision).
-- `unicode::Bool = false`: If `true`, use unicode characters for parts
-  of the output in the output, e.g., `±` instead of `+/-`.
+- `unicode::Bool = false`: If `true`, use unicode characters in the
+  output in the output, e.g., `±` instead of `+/-`.
 - `remove_trailing_zeros::Bool = !no_radius`: If `true`, remove
   trailing zeros after the decimal point.
 
