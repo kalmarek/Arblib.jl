@@ -9,7 +9,7 @@
         @test Mag(120) <= *(Mag.((1, 2, 3, 4, 5))...) <= Mag(121)
     end
 
-    @testset "$T + and *" for T in [Arf, Arb, Acb]
+    @testset "$T + and *" for T in [Arf, Acf, Arb, Acb]
         @test +(T.((1, 2, 3))...) == 6
         @test +(T.((1, 2, 3, 4))...) == 10
         @test +(T.((1, 2, 3, 4, 5))...) == 15

@@ -24,13 +24,13 @@ DocMeta.setdocmeta!(Arblib, :DocTestSetup, :(using Arblib); recursive = true)
     # ArbSeries and AcbSeries.
     Aqua.test_all(
         Arblib,
-        ambiguities = (exclude = [Mag, Arf, Arb, Acb, ArbSeries, AcbSeries, +, *],),
+        ambiguities = (exclude = [Mag, Arf, Acf, Arb, Acb, ArbSeries, AcbSeries, +, *],),
     )
 
     include("ArbCall/runtests.jl")
 
     include("arb_types.jl")
-    include("rounding.jl")
+    include("rounding_types.jl")
     include("types.jl")
     include("hash.jl")
     include("serialize.jl")
@@ -50,6 +50,7 @@ DocMeta.setdocmeta!(Arblib, :DocTestSetup, :(using Arblib); recursive = true)
     include("float.jl")
     include("interval.jl")
     include("multi-argument.jl")
+    include("rounding.jl")
     include("vector.jl")
     include("matrix.jl")
     include("eigen.jl")

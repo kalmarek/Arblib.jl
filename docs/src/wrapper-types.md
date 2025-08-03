@@ -8,6 +8,7 @@ interface](interface-types.md).
 ``` @docs
 Arblib.mag_struct
 Arblib.arf_struct
+Arblib.acf_struct
 Arblib.arb_struct
 Arblib.acb_struct
 Arblib.arb_vec_struct
@@ -27,6 +28,7 @@ these union-types.
 ``` @docs
 Arblib.MagLike
 Arblib.ArfLike
+Arblib.AcfLike
 Arblib.ArbLike
 Arblib.AcbLike
 Arblib.ArbVectorLike

@@ -36,7 +36,6 @@
         )
             Serialization.serialize(s, x)
             Arblib.zero!(x) # To catch aliasing issues
-
         end
         seek(s, 0)
         @test isequal_and_prec_equal(Serialization.deserialize(s), Arf())
@@ -47,6 +46,48 @@
         @test isequal_and_prec_equal(Serialization.deserialize(s), Arf(1 // 3, prec = 64))
         @test isequal_and_prec_equal(Serialization.deserialize(s), Arf(1 // 3, prec = 256))
         @test isequal_and_prec_equal(Serialization.deserialize(s), Arf(1 // 3, prec = 512))
+    end
+
+    # Acf
+    create_serialization_stream() do s
+        for x in (
+            Acf(),
+            Acf(1),
+            Acf(0, 1),
+            Acf(1, 2),
+            Acf(-Inf, Inf),
+            Acf(Inf, -Inf),
+            Acf(NaN),
+            Acf(0, NaN),
+            Acf(1 // 3, 1 // 5, prec = 64),
+            Acf(1 // 3, 1 // 5, prec = 256),
+            Acf(1 // 3, 1 // 5, prec = 512),
+        )
+            Serialization.serialize(s, x)
+            Arblib.zero!(Arblib.realref(x)) # To catch aliasing issues
+            Arblib.zero!(Arblib.imagref(x))
+        end
+        seek(s, 0)
+        @test isequal_and_prec_equal(Serialization.deserialize(s), Acf())
+        @test isequal_and_prec_equal(Serialization.deserialize(s), Acf(1))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), Acf(0, 1))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), Acf(1, 2))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), Acf(-Inf, Inf))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), Acf(Inf, -Inf))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), Acf(NaN))
+        @test isequal_and_prec_equal(Serialization.deserialize(s), Acf(0, NaN))
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            Acf(1 // 3, 1 // 5, prec = 64),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            Acf(1 // 3, 1 // 5, prec = 256),
+        )
+        @test isequal_and_prec_equal(
+            Serialization.deserialize(s),
+            Acf(1 // 3, 1 // 5, prec = 512),
+        )
     end
 
     # Arb

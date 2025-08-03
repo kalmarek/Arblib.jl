@@ -102,6 +102,7 @@ For example Arb declares the following functions
 9. `void arb_cos(arb_t c, const arb_t x, slong prec)`
 10. `void arb_sin_cos(arb_t s, arb_t c, const arb_t x, slong prec)`
 11. `int arf_add(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)`
+12. `void arb_poly_sin_series(arb_poly_t s, const arb_poly_t h, slong n, slong prec)`
 
 For which the following methods are generated
 
@@ -116,3 +117,21 @@ For which the following methods are generated
 9. `cos!(c::ArbLike, x::ArbLike; prec::Integer = _precision(c))::ArbLike`
 10. `sin_cos!(s::ArbLike, c::ArbLike, x::ArbLike, prec::Integer = _precision(s))::ArbLike`
 11. `add!(res::ArfLike, x::ArfLike, y::ArfLike; prec::Integer = _precision(res), rnd::Union{Arblib.arb_rnd, RoundingMode} = RoundNearest)::Int32`
+12. `sin_series!(s::ArbPolyLike, h::ArbPolyLike, n::Integer; prec::Integer = _precision(s))::ArbPolyLike`
+
+### Series methods
+Arb has several functions mean for computing truncated Taylor series
+(e.g. `arb_sin_series`). These functions have special handling, to
+make them more convenient to use. In addition to the procedure
+discussed above they generate one more method. This extra method
+removes the "_series" suffix from the method name, restricts the input
+type to only series types (and not polynomial types) and takes the
+default length of the computed series from the first argument. As an
+example the function
+- `void arb_poly_sin_series(arb_poly_t s, const arb_poly_t h, slong n, slong prec)`
+generates the method
+- `sin!(s::ArbSeries, h::ArbSeries, n::Integer = length(s); prec::Integer = _precision(s))::ArbSeries`
+in addition to the usual one (see the examples above).
+
+The main motivation for these extra methods is to make it easier to
+write generic code using mutability, see [Mutable arithmetic](@ref).

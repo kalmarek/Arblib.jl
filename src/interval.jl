@@ -27,12 +27,18 @@ midpoint(x::ArbOrRef) = midpoint(Arf, x)
     midpoint([T, ] z::AcbOrRef)
 
 Returns the midpoint of `z` as a `Complex{Arf}`. If `T` is given and
-equal to `Arf` or `Arb`, convert to `Complex{T}`. If `T` is `Acb` then
-convert to that.
+equal to `Arf` or `Arb`, convert to `Complex{T}`. If `T` is equal to
+`Acf` or `Acb` then convert to that.
+
+!!! note "Default type"
+    For compatability reasons this functions returns `Complex{Arf}` if
+    `T` is omitted. In a future version the default might change to
+    `Acf`.
 """
 midpoint(::Type{Acb}, z::AcbOrRef) = Acb(midref(realref(z)), midref(imagref(z)))
 midpoint(T::Type{<:Union{Arf,Arb}}, z::AcbOrRef) =
     Complex(midpoint(T, realref(z)), midpoint(T, imagref(z)))
+midpoint(T::Type{Acf}, z::AcbOrRef) = Acf(midref(realref(z)), midref(imagref(z)))
 midpoint(z::AcbOrRef) = midpoint(Arf, z)
 
 """
@@ -198,10 +204,10 @@ function _union!(res::T, x::T, y::T) where {T<:Union{ArbPoly,AcbPoly}}
     if common_degree + 1 < res_length
         z = zero(eltype(T))
         # At most one of the below loops will run
-        for i = common_degree+1:degree(x)
+        for i = (common_degree+1):degree(x)
             union!(ref(res, i), ref(x, i), z)
         end
-        for i = common_degree+1:degree(y)
+        for i = (common_degree+1):degree(y)
             union!(ref(res, i), ref(y, i), z)
         end
     end
@@ -279,13 +285,13 @@ function _intersection!(res::ArbPoly, x::ArbPoly, y::ArbPoly)
 
     if common_degree + 1 < res_length
         # At most one of the below loops will run
-        for i = common_degree+1:degree(x)
+        for i = (common_degree+1):degree(x)
             xi = ref(x, i)
             contains_zero(xi) ||
                 throw(ArgumentError("intersection of non-intersecting balls not allowed"))
             isnan(midref(xi)) && indeterminate!(ref(res, i))
         end
-        for i = common_degree+1:degree(y)
+        for i = (common_degree+1):degree(y)
             yi = ref(y, i)
             contains_zero(yi) ||
                 throw(ArgumentError("intersection of non-intersecting balls not allowed"))

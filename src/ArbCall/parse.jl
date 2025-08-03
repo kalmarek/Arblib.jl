@@ -53,7 +53,7 @@ function parse_arbdoc(filename)
         previous_was_function = false
         for line in lines[start:stop]
             if startswith(line, ".. function::")
-                push!(sections[n][2], strip(line[length(".. function::")+1:end]))
+                push!(sections[n][2], strip(line[(length(".. function::")+1):end]))
                 previous_was_function = true
             elseif previous_was_function
                 if !isempty(strip(line))

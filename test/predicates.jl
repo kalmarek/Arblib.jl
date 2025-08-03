@@ -19,6 +19,7 @@
                     iszero,
                 ),
             ),
+            (Acf, (iszero, isone, isfinite, isinf, isnan, isinteger, isreal)),
             (
                 Arb,
                 (
@@ -82,6 +83,12 @@
         @test isequal(Arf(0), 0)
         @test isequal(0, Arf(0))
 
+        @test isequal(Acf(0), Acf(0))
+        @test !isequal(Acf(0), Acf(1))
+        @test isequal(Acf(NaN), Acf(NaN))
+        @test isequal(Acf(0), 0)
+        @test isequal(0, Acf(0))
+
         @test isequal(Arb(0), Arb(0))
         @test !isequal(Arb(0), Arb(1))
         @test isequal(Arb(NaN), Arb(NaN))
@@ -121,6 +128,14 @@
         @test y <= 1
         @test y <= UInt(1)
         @test y <= 1.0
+
+        x, y = Acf(0), Acf(1)
+        @test x == x
+        @test x == 0
+        @test 0 == x
+        @test y == 1
+        @test 1 == y
+        @test x != y
 
         x, y = Arb(0), Arb(1)
         @test x == x
@@ -175,6 +190,7 @@
         let cstruct = Arblib.cstruct
             @test isequal(cstruct(Mag(1)), cstruct(Mag(1)))
             @test isequal(cstruct(Arf(1)), cstruct(Arf(1)))
+            @test isequal(cstruct(Acf(1)), cstruct(Acf(1)))
             @test isequal(cstruct(Arb(1)), cstruct(Arb(1)))
             @test isequal(cstruct(Acb(1)), cstruct(Acb(1)))
 
@@ -196,6 +212,7 @@
             # Different types should not be equal even if they are
             # numerically the same
             @test !isequal(cstruct(Mag(1)), cstruct(Arf(1)))
+            @test !isequal(cstruct(Arf(1)), cstruct(Acf(1)))
             @test !isequal(cstruct(Arb(1)), cstruct(Acb(1)))
             @test !isequal(cstruct(ArbVector([1])), cstruct(AcbVector([1])))
             @test !isequal(cstruct(ArbMatrix([1])), cstruct(AcbMatrix([1])))

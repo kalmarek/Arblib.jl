@@ -18,6 +18,7 @@ makedocs(
             "Integration" => "interface-integration.md",
             "Series" => "interface-series.md",
             "Mutable arithmetic" => "interface-mutable.md",
+            "Precision" => "precision.md",
         ],
         "Rigorous numerics" => "rigorous.md",
     ],

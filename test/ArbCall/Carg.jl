@@ -1,27 +1,31 @@
 @testset "Carg" begin
     mag_struct = Arblib.mag_struct
     arf_struct = Arblib.arf_struct
+    acf_struct = Arblib.acf_struct
     arb_struct = Arblib.arb_struct
     acb_struct = Arblib.acb_struct
 
     @testset "Parsing" begin
         # Supported types
         for (str, name, isconst, jltype, ctype) in (
-            ("mag_t res", :res, false, Arblib.MagLike, Ref{mag_struct}),
-            ("arf_t res", :res, false, Arblib.ArfLike, Ref{arf_struct}),
-            ("arb_t res", :res, false, Arblib.ArbLike, Ref{arb_struct}),
-            ("acb_t res", :res, false, Arblib.AcbLike, Ref{acb_struct}),
-            ("const mag_t x", :x, true, Arblib.MagLike, Ref{mag_struct}),
-            ("const arf_t x", :x, true, Arblib.ArfLike, Ref{arf_struct}),
-            ("const arb_t x", :x, true, Arblib.ArbLike, Ref{arb_struct}),
-            ("const acb_t x", :x, true, Arblib.AcbLike, Ref{acb_struct}),
+            ("int flags", :flags, false, Integer, Cint),
+            ("slong x", :x, false, Integer, Int),
+            ("ulong x", :x, false, Unsigned, UInt),
+            ("double x", :x, false, Union{Float16,Float32,Float64}, Float64),
             (
-                "arf_rnd_t rnd",
-                :rnd,
+                "complex_double x",
+                :x,
                 false,
-                Union{Arblib.arb_rnd,RoundingMode},
-                Arblib.arb_rnd,
+                Union{ComplexF16,ComplexF32,ComplexF64},
+                ComplexF64,
             ),
+            ("void * L", :L, false, Ptr{Cvoid}, Ptr{Cvoid}),
+            ("const char * inp", :inp, true, AbstractString, Cstring),
+            ("slong * x", :x, false, Vector{Int}, Ref{Int}),
+            ("ulong * x", :x, false, Vector{UInt}, Ref{UInt}),
+            ("double * x", :x, false, Vector{Float64}, Ref{Float64}),
+            ("complex_double * x", :x, false, Vector{ComplexF64}, Ref{ComplexF64}),
+            ("mpz_t x", :x, false, BigInt, Ref{BigInt}),
             ("mpfr_t x", :x, false, BigFloat, Ref{BigFloat}),
             (
                 "mpfr_rnd_t rnd",
@@ -30,39 +34,40 @@
                 Union{Base.MPFR.MPFRRoundingMode,RoundingMode},
                 Base.MPFR.MPFRRoundingMode,
             ),
-            ("mpz_t x", :x, false, BigInt, Ref{BigInt}),
-            ("int flags", :flags, false, Integer, Cint),
-            ("slong x", :x, false, Integer, Int),
-            ("ulong x", :x, false, Unsigned, UInt),
-            ("double x", :x, false, Base.GMP.CdoubleMax, Cdouble),
+            ("mag_t res", :res, false, Arblib.MagLike, Ref{mag_struct}),
+            ("const mag_t x", :x, true, Arblib.MagLike, Ref{mag_struct}),
+            ("arf_t res", :res, false, Arblib.ArfLike, Ref{arf_struct}),
+            ("const arf_t x", :x, true, Arblib.ArfLike, Ref{arf_struct}),
             (
-                "complex_double x",
-                :x,
+                "arf_rnd_t rnd",
+                :rnd,
                 false,
-                Union{ComplexF16,ComplexF32,ComplexF64},
-                ComplexF64,
+                Union{Arblib.arb_rnd,RoundingMode},
+                Arblib.arb_rnd,
             ),
-            ("slong * x", :x, false, Vector{<:Integer}, Ref{Int}),
-            ("ulong * x", :x, false, Vector{<:Unsigned}, Ref{UInt}),
-            ("double * x", :x, false, Vector{<:Base.GMP.CdoubleMax}, Ref{Float64}),
-            (
-                "complex_double * x",
-                :x,
-                false,
-                Vector{<:Union{ComplexF16,ComplexF32,ComplexF64}},
-                Ref{ComplexF64},
-            ),
-            ("const char * inp", :inp, true, AbstractString, Cstring),
+            ("acf_t res", :res, false, Arblib.AcfLike, Ref{acf_struct}),
+            ("const acf_t res", :res, true, Arblib.AcfLike, Ref{acf_struct}),
+            ("arb_t res", :res, false, Arblib.ArbLike, Ref{arb_struct}),
+            ("const arb_t x", :x, true, Arblib.ArbLike, Ref{arb_struct}),
             ("arb_ptr v", :v, false, Arblib.ArbVectorLike, Ptr{arb_struct}),
             ("arb_srcptr res", :res, true, Arblib.ArbVectorLike, Ptr{arb_struct}),
+            ("acb_t res", :res, false, Arblib.AcbLike, Ref{acb_struct}),
+            ("const acb_t x", :x, true, Arblib.AcbLike, Ref{acb_struct}),
             ("acb_ptr v", :v, false, Arblib.AcbVectorLike, Ptr{acb_struct}),
             ("acb_srcptr res", :res, true, Arblib.AcbVectorLike, Ptr{acb_struct}),
             (
-                "mpfr_rnd_t rnd",
-                :rnd,
+                "arb_poly_t mat",
+                :mat,
                 false,
-                Union{Base.MPFR.MPFRRoundingMode,RoundingMode},
-                Base.MPFR.MPFRRoundingMode,
+                Arblib.ArbPolyLike,
+                Ref{Arblib.arb_poly_struct},
+            ),
+            (
+                "acb_poly_t mat",
+                :mat,
+                false,
+                Arblib.AcbPolyLike,
+                Ref{Arblib.acb_poly_struct},
             ),
             (
                 "arb_mat_t mat",
@@ -78,20 +83,6 @@
                 Arblib.AcbMatrixLike,
                 Ref{Arblib.acb_mat_struct},
             ),
-            (
-                "arb_poly_t mat",
-                :mat,
-                false,
-                Arblib.ArbPolyLike,
-                Ref{Arblib.arb_poly_struct},
-            ),
-            (
-                "acb_poly_t mat",
-                :mat,
-                false,
-                Arblib.AcbPolyLike,
-                Ref{Arblib.acb_poly_struct},
-            ),
         )
             arg = Arblib.ArbCall.Carg(str)
             @test Arblib.ArbCall.name(arg) == name
@@ -101,13 +92,7 @@
         end
 
         # Unsupported types
-        for str in (
-            "FILE * file",
-            "fmpr_t x",
-            "fmpr_rnd_t rnd",
-            "flint_rand_t state",
-            "bool_mat_t mat",
-        )
+        for str in ("FILE * file", "flint_rand_t state")
             @test_throws Arblib.ArbCall.UnsupportedArgumentType arg =
                 Arblib.ArbCall.Carg(str)
         end
@@ -115,12 +100,11 @@
         # Unimplemented types
         for str in (
             "fmpz_t x",
-            "fmpq_t x",
-            "mag_ptr res",
             "const fmpz_t x",
+            "fmpq_t x",
             "const fmpq_t x",
+            "mag_ptr res",
             "mag_srcptr res",
-
             # Internal types
             "mp_limb_t lo",
             "mp_bitcnt_t r",
@@ -140,12 +124,12 @@
 
     @testset "arbsignature" begin
         for str in (
-            "arf_t x",
-            "arb_t x",
-            "const arf_t y",
-            "const arb_t x",
             "slong prec",
             "ulong y",
+            "arf_t x",
+            "const arf_t y",
+            "arb_t x",
+            "const arb_t x",
             "arb_ptr res",
             "arb_srcptr poly",
             "acb_ptr res",
@@ -166,13 +150,13 @@
         first_carg3 = Arblib.ArbCall.Carg("mag_t res")
         first_carg4 = Arblib.ArbCall.Carg("int n")
         @test Arblib.ArbCall.extract_precision_argument(carg, first_carg1) ==
-              Expr(:kw, :(prec::Integer), :(_precision(res)))
+              Expr(:kw, :(prec::$Integer), :(_precision(res)))
         @test Arblib.ArbCall.extract_precision_argument(carg, first_carg2) ==
-              Expr(:kw, :(prec::Integer), :(_precision(z)))
+              Expr(:kw, :(prec::$Integer), :(_precision(z)))
         @test Arblib.ArbCall.extract_precision_argument(carg, first_carg3) ==
-              :(prec::Integer)
+              :(prec::$Integer)
         @test Arblib.ArbCall.extract_precision_argument(carg, first_carg4) ==
-              :(prec::Integer)
+              :(prec::$Integer)
         @test_throws ArgumentError Arblib.ArbCall.extract_precision_argument(
             Arblib.ArbCall.Carg("int prec"),
             first_carg1,
@@ -185,7 +169,7 @@
         @test !Arblib.ArbCall.is_flag_argument(Arblib.ArbCall.Carg("int n"))
 
         @test Arblib.ArbCall.extract_flag_argument(Arblib.ArbCall.Carg("int flags")) ==
-              Expr(:kw, :(flags::Integer), 0)
+              Expr(:kw, :(flags::$Integer), 0)
         @test_throws ArgumentError Arblib.ArbCall.extract_flag_argument(
             Arblib.ArbCall.Carg("slong flag"),
         )
@@ -200,12 +184,12 @@
 
         @test Arblib.ArbCall.extract_rounding_argument(
             Arblib.ArbCall.Carg("arf_rnd_t rnd"),
-        ) == Expr(:kw, :(rnd::Union{Arblib.arb_rnd,RoundingMode}), :(RoundNearest))
+        ) == Expr(:kw, :(rnd::$(Union{Arblib.arb_rnd,RoundingMode})), :(RoundNearest))
         @test Arblib.ArbCall.extract_rounding_argument(
             Arblib.ArbCall.Carg("mpfr_rnd_t rnd"),
         ) == Expr(
             :kw,
-            :(rnd::Union{Base.MPFR.MPFRRoundingMode,RoundingMode}),
+            :(rnd::$(Union{Base.MPFR.MPFRRoundingMode,RoundingMode})),
             :(RoundNearest),
         )
         @test_throws ArgumentError Arblib.ArbCall.extract_rounding_argument(
@@ -232,11 +216,11 @@
 
 
         @test Arblib.ArbCall.extract_length_argument(carg1, prev_carg) ==
-              :($(Expr(:kw, :(lenA::Integer), :(length(A)))))
+              :($(Expr(:kw, :(lenA::$Integer), :(length(A)))))
         @test_throws ArgumentError Arblib.ArbCall.extract_length_argument(
             carg4,
             prev_carg,
-        ) == :($(Expr(:kw, :(lenA::Integer), :(length(A)))))
+        ) == :($(Expr(:kw, :(lenA::$Integer), :(length(A)))))
     end
 
     @testset "fpwrap_res_argument" begin

@@ -3,8 +3,8 @@
 
     end
 
-    @testset "Mag, Arf, Arb, Acb" begin
-        Ts1 = (Mag, Arf, Arb, Acb)
+    @testset "Mag, Arf, Acf, Arb, Acb" begin
+        Ts1 = (Mag, Arf, Acf, Arb, Acb)
 
         @test all(isequal(hash(0)), hash.(zero.(Ts1)))
         @test all(isequal(hash(1)), hash.(one.(Ts1)))
@@ -16,15 +16,16 @@
         )
         @test all(isequal(hash(Inf)), hash.(convert.(Ts1, Inf)))
 
-        Ts2 = (Arf, Arb, Acb)
+        Ts2 = (Arf, Acf, Arb, Acb)
         @test all(isequal(hash(-1)), hash.(convert.(Ts2, -1)))
         @test all(isequal(hash(-Inf)), hash.(convert.(Ts2, -Inf)))
         @test all(isequal(hash(NaN)), hash.(convert.(Ts2, NaN)))
 
-        @test hash(0 + im) == hash(Acb(0, 1))
-        @test hash(1 + im) == hash(Acb(1, 1))
-        @test hash(0 + Inf * im) == hash(Acb(0, Inf))
-        @test hash(0 + NaN * im) == hash(Acb(0, NaN))
+        Ts3 = (Acf, Acb)
+        @test all(isequal(hash(0 + im)), hash.(convert.(Ts3, complex(0, 1))))
+        @test all(isequal(hash(1 + im)), hash.(convert.(Ts3, complex(1, 1))))
+        @test all(isequal(hash(0 + Inf * im)), hash.(convert.(Ts3, complex(0, Inf))))
+        @test all(isequal(hash(0 + NaN * im)), hash.(convert.(Ts3, complex(0, NaN))))
 
         @test hash(Arb(π)) == hash(Acb(π)) != hash(midpoint(Arb(π)))
         @test hash(Acb(π)) != hash(Acb(0, π))
@@ -62,7 +63,7 @@
         for T in (ArbVector, AcbVector)
             @test hash(T([], prec = 256)) ==
                   hash(T([], prec = 256)) ==
-                  hash(T([], prec = 80)) # FIXME
+                  hash(T([], prec = 80))
             @test hash(T([1])) == hash(T([1])) == hash(T([1], prec = 80))
             @test hash(T([1, 2, 3])) == hash(T([1, 2, 3])) == hash(T([1, 2, 3], prec = 80))
 
@@ -74,7 +75,7 @@
         for T in (ArbMatrix, AcbMatrix)
             @test hash(T([], prec = 256)) ==
                   hash(T([], prec = 256)) ==
-                  hash(T([], prec = 80)) # FIXME
+                  hash(T([], prec = 80))
             @test hash(T([1])) == hash(T([1])) == hash(T([1], prec = 80))
             @test hash(T([1, 2, 3])) == hash(T([1, 2, 3])) == hash(T([1, 2, 3], prec = 80))
 
@@ -91,6 +92,9 @@
             @test hash(cstruct(Arf(1 // 3))) ==
                   hash(cstruct(Arf(1 // 3))) !=
                   hash(Arf(1 // 3))
+            @test hash(cstruct(Acf(1 // 3))) ==
+                  hash(cstruct(Acf(1 // 3))) !=
+                  hash(Acf(1 // 3))
             @test hash(cstruct(Arb(1 // 3))) ==
                   hash(cstruct(Arb(1 // 3))) !=
                   hash(Arb(1 // 3))

@@ -7,6 +7,9 @@
         @test π < Float64(Mag(π)) < 3.15
         @test Mag(3, 4) == Mag(3 * 2^4)
 
+        # Test init_set! constructor
+        @test Mag(Ptr{Arblib.mag_struct}(pointer_from_objref(Mag().mag))) == Mag()
+
         # Check for ambiguities
         @test Mag(1 + 0im) == Mag(1)
         @test_throws InexactError Mag(1 + im)
@@ -31,6 +34,42 @@
         # Check for ambiguities
         @test Arf(1 + 0im) == 1
         @test_throws InexactError Arf(1 + im)
+    end
+
+    @testset "Acf" begin
+        for T in [UInt, Int, Float64, Mag, Arf, BigFloat]
+            @test Acf(zero(T)) == zero(Acf)
+            @test Acf(one(T)) == one(Acf)
+            @test precision(Acf(zero(T), prec = 80)) == 80
+
+            @test imag(Acf(zero(T), one(T))) == one(Arb)
+            @test precision(Acf(zero(T), zero(T), prec = 80)) == 80
+
+            @test imag(Acf(Complex(zero(T), one(T)))) == one(Arb)
+            @test precision(Acf(Complex(zero(T), zero(T)), prec = 80)) == 80
+        end
+
+        @test Acf(0) == zero(Acf)
+        @test Acb(1) == one(Acf)
+
+        @test imag(Acf(zero(Arf), one(Arf))) == one(Arf)
+        @test precision(Acf(zero(Arf), zero(Arf), prec = 80)) == 80
+
+        @test precision(Acf(Arf(prec = 80))) == 80
+        @test precision(Acf(Acf(prec = 80))) == 80
+        @test precision(Acf(BigFloat(0, precision = 80))) == 80
+
+        @test precision(Acf(Arf(prec = 80), Arf(prec = 100))) == 100
+        @test precision(Acf(BigFloat(0, precision = 80), BigFloat(0, precision = 100))) ==
+              100
+
+        @test precision(Acf(Complex(Arf(prec = 80), Arf(prec = 100)))) == 100
+        @test precision(
+            Acf(Complex(BigFloat(0, precision = 80), BigFloat(0, precision = 100))),
+        ) == 100
+
+        @test precision(zero(Acf(prec = 80))) == 80
+        @test precision(one(Acf(prec = 80))) == 80
     end
 
     @testset "Arb" begin
@@ -127,8 +166,8 @@
             Acb(Complex(BigFloat(0, precision = 80), BigFloat(0, precision = 100))),
         ) == 100
 
-        @test precision(zero(Arb(prec = 80))) == 80
-        @test precision(one(Arb(prec = 80))) == 80
+        @test precision(zero(Acb(prec = 80))) == 80
+        @test precision(one(Acb(prec = 80))) == 80
 
         @test isequal(real(Acb(π)), Arb(π))
         @test isequal(real(Acb(ℯ)), Arb(ℯ))
@@ -145,9 +184,9 @@
     end
 
     @testset "zeros/ones" begin
-        for T in [Arf, Arb, Acb]
-            @test zeros(T, 2) == [zero(T), zero(T)]
-            @test ones(T, 2) == [one(T), one(T)]
+        for T in [Mag, Arf, Acf, Arb, Acb]
+            @test zeros(T, 2) == zeros(one(T), 2) == [zero(T), zero(T)]
+            @test ones(T, 2) == ones(zero(T), 2) == [one(T), one(T)]
         end
 
         v = zeros(Arb, 2)

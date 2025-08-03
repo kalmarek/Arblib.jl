@@ -81,4 +81,33 @@
         @test precision(ldexp(Arf(1, prec = 80), 1)) == 80
         @test precision(ldexp(Arb(1, prec = 80), 1)) == 80
     end
+
+    @testset "significand/exponent" begin
+        @test significand(Arf(12.3)) == significand(12.3)
+        @test significand(Arf(-12.3)) == significand(-12.3)
+        @test significand(Arf(0)) == significand(0.0)
+        @test significand(Arf(Inf)) == significand(Inf)
+        @test precision(significand(Arf(1, prec = 80))[1]) == 80
+        @test significand(Arf(1)) isa Arf
+
+        @test significand(Arb(12.3)) == significand(12.3)
+        @test significand(Arb(-12.3)) == significand(-12.3)
+        @test significand(Arb(0)) == significand(0.0)
+        @test significand(Arb(Inf)) == significand(Inf)
+        @test isequal(significand(Arb(π))[1], Arblib.mul_2exp!(Arb(), Arb(π), -1))
+        @test precision(significand(Arb(1, prec = 80))[1]) == 80
+        @test significand(Arb(1)) isa Arb
+
+        @test exponent(Arf(12.3)) == exponent(12.3)
+        @test exponent(Arf(-12.3)) == exponent(-12.3)
+        @test_throws DomainError exponent(Arf(0))
+        @test_throws DomainError exponent(Arf(Inf))
+        @test exponent(Arf(1)) isa BigInt
+
+        @test exponent(Arb(12.3)) == exponent(12.3)
+        @test exponent(Arb(-12.3)) == exponent(-12.3)
+        @test_throws DomainError exponent(Arb(0))
+        @test_throws DomainError exponent(Arb(Inf))
+        @test exponent(Arb(1)) isa BigInt
+    end
 end

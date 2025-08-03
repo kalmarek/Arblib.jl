@@ -221,6 +221,8 @@ arbcall"void _acb_poly_cosh_series(acb_ptr c, acb_srcptr h, slong hlen, slong n,
 arbcall"void acb_poly_cosh_series(acb_poly_t c, const acb_poly_t h, slong n, slong prec)"
 arbcall"void _acb_poly_sinc_series(acb_ptr s, acb_srcptr h, slong hlen, slong n, slong prec)"
 arbcall"void acb_poly_sinc_series(acb_poly_t s, const acb_poly_t h, slong n, slong prec)"
+arbcall"void _acb_poly_sinc_pi_series(acb_ptr s, acb_srcptr h, slong hlen, slong n, slong prec)"
+arbcall"void acb_poly_sinc_pi_series(acb_poly_t s, const acb_poly_t h, slong n, slong prec)"
 
 ### Lambert W function
 #ni arbcall"void _acb_poly_lambertw_series(acb_ptr res, acb_srcptr z, slong zlen, const fmpz_t k, int flags, slong len, slong prec)"
@@ -274,7 +276,6 @@ arbcall"void _acb_poly_root_bound_fujiwara(mag_t bound, acb_srcptr poly, slong l
 arbcall"void acb_poly_root_bound_fujiwara(mag_t bound, acb_poly_t poly)"
 arbcall"void _acb_poly_root_inclusion(acb_t r, const acb_t m, acb_srcptr poly, acb_srcptr polyder, slong len, slong prec)"
 arbcall"slong _acb_poly_validate_roots(acb_ptr roots, acb_srcptr poly, slong len, slong prec)"
-arbcall"void _acb_poly_refine_roots_durand_kerner(acb_ptr roots, acb_srcptr poly, slong len, slong prec)"
 arbcall"slong _acb_poly_find_roots(acb_ptr roots, acb_srcptr poly, acb_srcptr initial, slong len, slong maxiter, slong prec)"
 arbcall"slong acb_poly_find_roots(acb_ptr roots, const acb_poly_t poly, acb_srcptr initial, slong maxiter, slong prec)"
 arbcall"int _acb_poly_validate_real_roots(acb_srcptr roots, acb_srcptr poly, slong len, slong prec)"

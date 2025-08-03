@@ -4,6 +4,7 @@
 
     types = (
         Arf,
+        Acf,
         Arb,
         Acb,
         ArbPoly,
@@ -53,17 +54,15 @@
             @test precision(y[1, 1]) == prec
         end
 
-        if VERSION >= v"1.8.0"
-            @test precision(x, base = 4) == precdefault ÷ 2
-            @test precision(y, base = 4) == prec ÷ 2
+        @test precision(x, base = 4) == precdefault ÷ 2
+        @test precision(y, base = 4) == prec ÷ 2
 
-            @test precision(Arblib.cstruct(x), base = 4) == precdefault ÷ 2
-            @test precision(Arblib.cstruct(y), base = 4) == precdefault ÷ 2
+        @test precision(Arblib.cstruct(x), base = 4) == precdefault ÷ 2
+        @test precision(Arblib.cstruct(y), base = 4) == precdefault ÷ 2
 
-            @test precision(T, base = 4) == precdefault ÷ 2
-            @test precision(Arblib.cstructtype(T), base = 4) == precdefault ÷ 2
-            @test precision(Ptr{Arblib.cstructtype(T)}, base = 4) == precdefault ÷ 2
-        end
+        @test precision(T, base = 4) == precdefault ÷ 2
+        @test precision(Arblib.cstructtype(T), base = 4) == precdefault ÷ 2
+        @test precision(Ptr{Arblib.cstructtype(T)}, base = 4) == precdefault ÷ 2
 
         x2 = setprecision(x, prec)
         @test precision(x2) == prec
@@ -84,24 +83,51 @@
             @test !isequal(x, x2)
         end
 
-        if VERSION >= v"1.8.0"
-            x3 = setprecision(x, prec ÷ 2, base = 4)
-            @test precision(x3) == prec
-            @test isequal(x3, x)
-        end
+        x3 = setprecision(x, prec ÷ 2, base = 4)
+        @test precision(x3) == prec
+        @test isequal(x3, x)
     end
 
-    @testset "setprecision do" begin
-        x = Arb("0.1")
+    @testset "setprecision" begin
+        x = Arb(π)
         @test precision(x) == 256
-        @test string(x) ==
-              "[0.1000000000000000000000000000000000000000000000000000000000000000000000000000 +/- 1.95e-78]"
+        @test Arblib.rel_accuracy_bits(x) == 255
 
-        setprecision(Arb, 64) do
-            @test precision(x) == 256
-            y = Arb("0.1")
-            @test precision(y) == 64
-            @test string(y) == "[0.100000000000000000 +/- 1.22e-20]"
+        y = setprecision(x, 512)
+        @test precision(y) == 512
+        @test Arblib.rel_accuracy_bits(x) == 255 # Still same value
+
+        # Change global precision
+        setprecision(Arb, 512)
+        x = Arb(π)
+        @test precision(x) == 512
+        @test Arblib.rel_accuracy_bits(x) == 511
+        # Reset global precision
+        setprecision(Arb, 256)
+        x = Arb(π)
+        @test precision(x) == 256
+        @test Arblib.rel_accuracy_bits(x) == 255
+
+        setprecision(Arb, 512) do
+            x = Arb(π)
+            @test precision(x) == 512
+            @test Arblib.rel_accuracy_bits(x) == 511
+        end
+
+        # Check that setprecision in a dynamic scope doesn't change
+        # global default. It is difficult to make a precise test for
+        # this since the scopes need to run concurrently.
+        let
+            Threads.@spawn let
+                setprecision(Arb, 64) do
+                    @test Arblib.DEFAULT_PRECISION[] == 256
+                    sleep(0.02) # Sleep for a short time so that the scopes overlap
+                    @test precision(Arb()) == 64
+                end
+            end
+
+            sleep(0.01) # Sleep for a short time so that the scopes overlap
+            @test precision(Arb) == 256
         end
     end
 
@@ -109,6 +135,7 @@
         let _precision = Arblib._precision
             # One argument
             @test _precision(Arf(prec = 64)) == 64
+            @test _precision(Acf(prec = 64)) == 64
             @test _precision(Arb(prec = 64)) == 64
             @test _precision(Acb(prec = 64)) == 64
             @test _precision(BigFloat(precision = 64)) == 64

@@ -7,7 +7,10 @@ function Serialization.serialize(
     Serialization.serialize(s, dump_string(x))
 end
 
-function Serialization.serialize(s::Serialization.AbstractSerializer, x::acb_struct)
+function Serialization.serialize(
+    s::Serialization.AbstractSerializer,
+    x::Union{acf_struct,acb_struct},
+)
     Serialization.serialize_type(s, typeof(x))
     str = dump_string(Arblib.realref(x)) * " " * dump_string(Arblib.imagref(x))
     Serialization.serialize(s, str)
@@ -44,7 +47,7 @@ function Serialization.serialize(
     Serialization.serialize_type(s, typeof(p))
     Serialization.serialize(s, length(p))
     T = p isa arb_poly_struct ? arb_struct : acb_struct
-    for i = 0:length(p)-1
+    for i = 0:(length(p)-1)
         Serialization.serialize(s, unsafe_load(p.coeffs + i * sizeof(T)))
     end
 end
@@ -55,14 +58,29 @@ Serialization.deserialize(
     T::Type{<:Union{mag_struct,arf_struct,arb_struct}},
 ) = Arblib.load_string!(T(), Serialization.deserialize(s))
 
+function Serialization.deserialize(s::Serialization.AbstractSerializer, T::Type{acf_struct})
+    str = Serialization.deserialize(s)
+    # One spaces in the real part, so we are looking for
+    spaces = findall(" ", str)
+    @assert length(spaces) == 3
+
+    real_str = str[1:(spaces[2].start-1)]
+    imag_str = str[(spaces[2].stop+1):end]
+
+    res = acf_struct()
+    Arblib.load_string!(Arblib.realref(res), real_str)
+    Arblib.load_string!(Arblib.imagref(res), imag_str)
+    return res
+end
+
 function Serialization.deserialize(s::Serialization.AbstractSerializer, T::Type{acb_struct})
     str = Serialization.deserialize(s)
     # Three spaces in the real part, so we are looking for
     spaces = findall(" ", str)
     @assert length(spaces) == 7
 
-    real_str = str[1:spaces[4].start-1]
-    imag_str = str[spaces[4].stop+1:end]
+    real_str = str[1:(spaces[4].start-1)]
+    imag_str = str[(spaces[4].stop+1):end]
 
     res = acb_struct()
     Arblib.load_string!(Arblib.realref(res), real_str)
@@ -102,7 +120,7 @@ function Serialization.deserialize(
 )
     n = Serialization.deserialize(s)
     res = T()
-    for i = 0:n-1
+    for i = 0:(n-1)
         set_coeff!(res, i, Serialization.deserialize(s))
     end
     return res

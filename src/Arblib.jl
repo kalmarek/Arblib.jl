@@ -2,6 +2,7 @@ module Arblib
 
 using FLINT_jll
 import LinearAlgebra
+import ScopedValues
 import Serialization
 import SpecialFunctions
 
@@ -9,6 +10,8 @@ export Mag,
     MagRef,
     Arf,
     ArfRef,
+    Acf,
+    AcfRef,
     Arb,
     ArbRef,
     Acb,
@@ -47,7 +50,7 @@ end
 
 include("arb_types.jl")
 include("fmpz.jl")
-include("rounding.jl")
+include("rounding_types.jl")
 include("types.jl")
 include("hash.jl")
 include("serialize.jl")
@@ -71,6 +74,7 @@ include("rand.jl")
 include("float.jl")
 include("interval.jl")
 include("multi-argument.jl")
+include("rounding.jl")
 
 include("ref.jl")
 include("vector.jl")
@@ -96,6 +100,7 @@ include("arbcalls/acb_hypgeom.jl")
 include("arbcalls/arb_hypgeom.jl")
 include("arbcalls/acb_elliptic.jl")
 include("arbcalls/acb_modular.jl")
+include("arbcalls/acb_theta.jl")
 include("arbcalls/acb_dirichlet.jl")
 include("arbcalls/bernoulli.jl")
 include("arbcalls/hypgeom.jl")

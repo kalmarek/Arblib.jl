@@ -59,45 +59,65 @@ function ispredicate(af::ArbFunction)
     return jlname_starts || jlname_contains || jlname_eq
 end
 
+is_series_method(af::ArbFunction) =
+    (endswith(arbfname(af), "_series") || endswith(arbfname(af), "mullow")) &&
+    (jltype(first(arguments(af))) <: Union{Arblib.ArbPolyLike,Arblib.AcbPolyLike})
+
 const jlfname_prefixes = (
-    "arf",
-    "arb",
-    "acb",
-    "mag",
-    "mat",
-    "vec",
-    "poly",
-    "scalar",
-    "fpwrap",
     "double",
     "cdouble",
+    "mag",
+    "arf",
+    "acf",
+    "arb",
+    "acb",
+    "vec",
+    "poly",
+    "mat",
+    "fpwrap",
+    "scalar",
 )
-const jlfname_suffixes = ("si", "ui", "d", "mag", "arf", "arb", "acb", "mpz", "mpfr", "str")
+const jlfname_suffixes =
+    ("si", "ui", "d", "str", "mpz", "mpfr", "mag", "arf", "acf", "arb", "acb")
 
 function jlfname(
-    arbfname::AbstractString,
+    arbfname::AbstractString;
     prefixes = jlfname_prefixes,
-    suffixes = jlfname_suffixes;
+    suffixes = jlfname_suffixes,
     inplace = false,
 )
     strs = filter(!isempty, split(arbfname, "_"))
     k = findfirst(s -> s ∉ prefixes, strs)
     l = findfirst(s -> s ∉ suffixes, reverse(strs))
-    fname = join(strs[k:end-l+1], "_")
+    fname = join(strs[k:(end-l+1)], "_")
     return inplace ? Symbol(fname, "!") : Symbol(fname)
 end
 
 jlfname(
-    af::ArbFunction,
+    af::ArbFunction;
     prefixes = jlfname_prefixes,
-    suffixes = jlfname_suffixes;
+    suffixes = jlfname_suffixes,
     inplace = inplace(af),
-) = jlfname(arbfname(af), prefixes, suffixes; inplace)
+) = jlfname(arbfname(af); prefixes, suffixes, inplace)
+
+function jlfname_series(arbfname::AbstractString)
+    name = jlfname(arbfname, suffixes = (jlfname_suffixes..., "series"), inplace = true)
+    if name == :mullow!
+        # Handle this as a special case. There is no
+        # arb_poly_mul_series method, it is instead called
+        # arb_poly_mullow (same for acb_poly).
+        return :mul!
+    else
+        return name
+    end
+end
+
+jlfname_series(af::ArbFunction) = jlfname_series(arbfname(af))
 
 function jlargs(af::ArbFunction; argument_detection::Bool = true)
     cargs = arguments(af)
 
-    jl_arg_names_types = Tuple{Symbol,Any}[]
+    args = Expr[]
     kwargs = Expr[]
 
     prec_kwarg = false
@@ -105,7 +125,7 @@ function jlargs(af::ArbFunction; argument_detection::Bool = true)
     flags_kwarg = false
     for (i, carg) in enumerate(cargs)
         if !argument_detection
-            push!(jl_arg_names_types, (name(carg), jltype(carg)))
+            push!(args, jlarg(carg))
             continue
         end
 
@@ -127,11 +147,41 @@ function jlargs(af::ArbFunction; argument_detection::Bool = true)
         elseif i > 1 && is_length_argument(carg, cargs[i-1])
             push!(kwargs, extract_length_argument(carg, cargs[i-1]))
         else
-            push!(jl_arg_names_types, (name(carg), jltype(carg)))
+            push!(args, jlarg(carg))
         end
     end
 
-    args = [:($a::$T) for (a, T) in jl_arg_names_types]
+    return args, kwargs
+end
+
+"""
+    jlargs_series(af::ArbFunction)
+
+Compute `args` and `kwargs` for an Arb function `af` satisfying
+`is_series_method(af)`. The values are similar to those computed by
+[`jlargs`](@ref) with the following adjustements:
+1. The argument giving the length of the result has the default value
+   given by the length of the first argument.
+2. Arguments accepting types `ArbPolyLike` and `AcbPolyLike` are
+   restricted to only accept `ArbSeries` and `AcbSeries` respectively.
+"""
+function jlargs_series(af::ArbFunction)
+    args, kwargs = jlargs(af)
+
+    len_name = args[end].args[1]
+    len_type = args[end].args[2]
+    @assert len_name == :len || len_name == :n || len_name == :trunc
+    @assert len_type == Integer
+    first_name = args[1].args[1]
+    args[end] = Expr(:kw, args[end], :(length($first_name)))
+
+    for arg in args
+        if arg.args[2] == Arblib.ArbPolyLike
+            arg.args[2] = Arblib.ArbSeries
+        elseif arg.args[2] == Arblib.AcbPolyLike
+            arg.args[2] = Arblib.AcbSeries
+        end
+    end
 
     return args, kwargs
 end
@@ -168,11 +218,30 @@ function jlcode(af::ArbFunction, jl_fname = jlfname(af))
         end
     )
 
+    if is_series_method(af)
+        # Note that this currently doesn't respect any custom function
+        # name given as an argument.
+        jl_fname_series = jlfname_series(af)
+        jl_args_series, jl_kwargs_series = jlargs_series(af)
+
+        func_series = quote
+            $jl_fname_series($(jl_args_series...); $(jl_kwargs_series...)) =
+                $jl_fname($(name.(cargs)...))
+        end
+
+        code = quote
+            $func_full_args
+            $func_series
+        end
+    else
+        code = func_full_args
+    end
+
     if isempty(jl_kwargs)
-        return func_full_args
+        return code
     else
         return quote
-            $func_full_args
+            $code
             $jl_fname($(jl_args...); $(jl_kwargs...)) = $jl_fname($(name.(cargs)...))
         end
     end

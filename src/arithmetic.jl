@@ -12,6 +12,21 @@ for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
         return z
     end
 
+    if jf == :/
+        # There is not div method for Acf, only an approx_div version
+        @eval function Base.$jf(x::AcfOrRef, y::AcfOrRef)
+            z = Acf(prec = _precision(x, y))
+            approx_div!(z, x, y)
+            return z
+        end
+    else
+        @eval function Base.$jf(x::AcfOrRef, y::AcfOrRef)
+            z = Acf(prec = _precision(x, y))
+            $af(z, x, y)
+            return z
+        end
+    end
+
     @eval Base.$jf(x::ArbOrRef, y::Union{ArbOrRef,ArfOrRef,_BitInteger}) =
         $af(Arb(prec = _precision(x, y)), x, y)
 
@@ -51,6 +66,12 @@ for (jf, af) in [(:+, :add!), (:-, :sub!), (:*, :mul!), (:/, :div!)]
 end
 
 Base.:-(x::Union{ArfOrRef,ArbOrRef,AcbOrRef}) = neg!(zero(x), x)
+function Base.:-(x::AcfOrRef)
+    y = Acf(x)
+    neg!(realref(y), realref(y))
+    neg!(imagref(y), imagref(y))
+    return y
+end
 Base.inv(x::Union{MagOrRef,ArbOrRef,AcbOrRef}) = inv!(zero(x), x)
 
 Base.:+(x::MagOrRef, y::Integer) = add!(zero(x), x, convert(UInt, y))
@@ -142,6 +163,8 @@ Base.literal_pow(::typeof(^), x::AcbOrRef, ::Val{3}) = cube(x)
 
 ### real, imag, conj
 
+Base.real(z::AcfOrRef) = Arf(realref(z))
+Base.imag(z::AcfOrRef) = Arf(imagref(z))
 Base.real(z::AcbOrRef) = get_real!(Arb(prec = _precision(z)), z)
 Base.imag(z::AcbOrRef) = get_imag!(Arb(prec = _precision(z)), z)
 Base.conj(z::AcbOrRef) = conj!(zero(z), z)

@@ -60,7 +60,7 @@ for (T, TOrRef) in [
     (:AcbVector, :AcbVectorOrRef),
     (:AcbRefVector, :AcbVectorOrRef),
 ]
-    @eval $T(n::Integer; prec::Integer = DEFAULT_PRECISION[]) =
+    @eval $T(n::Integer; prec::Integer = _current_precision()) =
         $T(cstructtype($T)(n), shallow = true; prec)
 
     @eval $T(v::$TOrRef; shallow::Bool = false, prec::Integer = precision(v)) =

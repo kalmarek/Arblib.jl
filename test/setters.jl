@@ -45,6 +45,55 @@
         @test_throws InexactError Arblib.set!(T(), 1 + 1im)
     end
 
+    # TODO: Currently the only way to construct an AcfRef is by a raw
+    # pointer, which is a bit cumbersome to use here. For that reason
+    # there are no tests for AcfRef. Once there is a better way to
+    # construct AcfRef it should be used here.
+    @testset "$name" for (name, T) in [("Acf", Acf)]
+        # Setting real part
+        @test Arblib.set!(T(), one(Mag)) == one(Acf)
+        @test Arblib.set!(T(), one(Mag).mag) == one(Acf)
+        @test Arblib.set!(T(), one(Arf)) == one(Acf)
+        @test Arblib.set!(T(), one(Arf).arf) == one(Acf)
+        @test Arblib.set!(T(), one(Int)) == one(Acf)
+        @test Arblib.set!(T(), one(Int128)) == one(Acf)
+        @test Arblib.set!(T(), one(Float64)) == one(Acf)
+        @test Arblib.set!(T(), one(BigInt)) == one(Acf)
+        @test Arblib.set!(T(), one(BigFloat)) == one(Acf)
+
+        # Test that imaginary part is zeroed out
+        @test Arblib.set!(T(0, 1), one(Mag)) == one(Acf)
+        @test Arblib.set!(T(0, 1), one(Mag).mag) == one(Acf)
+        @test Arblib.set!(T(0, 1), one(Arf)) == one(Acf)
+        @test Arblib.set!(T(0, 1), one(Arf).arf) == one(Acf)
+        @test Arblib.set!(T(0, 1), one(Int)) == one(Acf)
+        @test Arblib.set!(T(0, 1), one(Int128)) == one(Acf)
+        @test Arblib.set!(T(0, 1), one(BigInt)) == one(Acf)
+        @test Arblib.set!(T(0, 1), one(Float64)) == one(Acf)
+        @test Arblib.set!(T(0, 1), one(BigFloat)) == one(Acf)
+
+        # UInt128 and Int128
+        let x = Int128(227725055589944414706309)
+            @test Arblib.set!(T(), UInt128(x)) == Arb("227725055589944414706309")
+            @test Arblib.set!(T(), x) == Arb("227725055589944414706309")
+            @test Arblib.set!(T(), -x) == Arb("-227725055589944414706309")
+        end
+
+        # Setting real and imaginary part
+        # Testing with a various mix of arguments
+        @test real(Arblib.set!(T(), 1, 2)) == 1
+        @test imag(Arblib.set!(T(), 1, 2)) == 2
+        @test real(Arblib.set!(T(), Arf(1), Mag(2))) == 1
+        @test imag(Arblib.set!(T(), Arf(1), Mag(2))) == 2
+        @test real(Arblib.set!(T(), Arf(1).arf, Mag(2).mag)) == 1
+        @test imag(Arblib.set!(T(), Arf(1).arf, Mag(2).mag)) == 2
+
+        # From complex
+        @test Arblib.set!(T(), Complex(1, 2)) == Acf(1, 2)
+        @test Arblib.set!(T(), Complex(BigFloat(1), BigFloat(2))) == Acf(1, 2)
+        @test Arblib.set!(T(), Complex(Arf(1), Arf(2))) == Acf(1, 2)
+    end
+
     @testset "$name" for (name, T) in
                          [("Arb", Arb), ("ArbRef", () -> Arblib.realref(Acb()))]
         # MagLike, BigFloat

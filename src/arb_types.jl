@@ -1,4 +1,27 @@
 """
+    mag_struct
+"""
+mutable struct mag_struct
+    exponent::UInt       # fmpz
+    mantissa::UInt       # mp_limb_t
+
+    function mag_struct()
+        res = new()
+        init!(res)
+        finalizer(clear!, res)
+        return res
+    end
+
+    # Argument type should be MagLike but that is not defined yet
+    function mag_struct(x::Union{mag_struct,Ptr{mag_struct}})
+        res = new()
+        init_set!(res, x)
+        finalizer(clear!, res)
+        return res
+    end
+end
+
+"""
     arf_struct
 """
 mutable struct arf_struct
@@ -23,24 +46,25 @@ mutable struct arf_struct
 end
 
 """
-    mag_struct
+    acf_struct
 """
-mutable struct mag_struct
-    exponent::UInt       # fmpz
-    mantissa::UInt       # mp_limb_t
+mutable struct acf_struct
+    # ┌ arf_struct (real part)
+    exponent_r::UInt      # │ fmpz
+    size_r::UInt          # │ mp_size_t
+    mantissa1_r::UInt     # │ mantissa_struct of length 128
+    mantissa2_r::UInt     # │
+    # └
+    # ┌ arf_struct (imaginary part)
+    exponent_i::UInt      # │ fmpz
+    size_i::UInt          # │ mp_size_t
+    mantissa1_i::UInt     # │ mantissa_struct of length 128
+    mantissa2_i::UInt     # │
+    # └
 
-    function mag_struct()
+    function acf_struct()
         res = new()
         init!(res)
-        finalizer(clear!, res)
-        return res
-    end
-
-    # Argument type should be Union{MagLike,ArfLike} but those are not
-    # defined yet
-    function mag_struct(x::Union{mag_struct,Ptr{mag_struct},arf_struct,Ptr{arf_struct}})
-        res = new()
-        init_set!(res, x)
         finalizer(clear!, res)
         return res
     end
@@ -164,7 +188,7 @@ mutable struct arb_mat_struct
     entries::Ptr{arb_struct}
     r::Int
     c::Int
-    rows::Ptr{Ptr{arb_struct}}
+    stride::Int
 
     function arb_mat_struct(r::Integer, c::Integer)
         A = new()
@@ -181,7 +205,7 @@ mutable struct acb_mat_struct
     entries::Ptr{acb_struct}
     r::Int
     c::Int
-    rows::Ptr{Ptr{acb_struct}}
+    stride::Int
 
     function acb_mat_struct(r::Integer, c::Integer)
         A = new()
@@ -194,6 +218,7 @@ end
 const ArbStructTypes = Union{
     mag_struct,
     arf_struct,
+    acf_struct,
     arb_struct,
     acb_struct,
     arb_vec_struct,

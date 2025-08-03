@@ -1,44 +1,52 @@
-#=
-    Specifies the rounding mode for the result of an approximate operation.
-ARF_RND_NEAR   (4)
-    Round to the nearest representable number, rounding to even if there is a tie.
-ARF_RND_FLOOR  (2)
-    Round to the nearest representable number in the direction towards minus infinity.
-ARF_RND_CEIL   (3)
-    Round to the nearest representable number in the direction towards plus infinity.
-ARF_RND_DOWN   (0)
-    Round to the nearest representable number in the direction towards zero.
-ARF_RND_UP     (1)
-    Round to the nearest representable number in the direction away from zero.
-=#
+# IMPROVE: In principle we could try to implement the currently
+# unsupported rounding modes. One would however have to be a bit
+# careful to get them correct, so for now we just throw an error.
 
-@enum(
-    arb_rnd::Cint,
-    ArbRoundToZero, # ARF_RND_DOWN
-    ArbRoundFromZero, # ARF_RND_UP
-    ArbRoundDown, # ARF_RND_FLOOR
-    ArbRoundUp, # ARF_RND_CEIL
-    ArbRoundNearest, # ARF_RND_NEAR
+_round!(res::ArfOrRef, x::ArfOrRef, r::typeof(RoundNearest)) = nint!(res, x)
+_round!(res::ArfOrRef, x::ArfOrRef, r::typeof(RoundNearestTiesAway)) =
+    throw(ArgumentError("rounding mode $r not supported for Arf"))
+_round!(res::ArfOrRef, x::ArfOrRef, r::typeof(RoundNearestTiesUp)) =
+    throw(ArgumentError("rounding mode $r not supported for Arf"))
+_round!(res::ArfOrRef, x::ArfOrRef, r::typeof(RoundToZero)) =
+    signbit(x) ? _round!(res, x, RoundUp) : _round!(res, x, RoundDown)
+_round!(res::ArfOrRef, x::ArfOrRef, r::typeof(RoundFromZero)) =
+    signbit(x) ? _round!(res, x, RoundDown) : _round!(res, x, RoundUp)
+_round!(res::ArfOrRef, x::ArfOrRef, ::typeof(RoundUp)) = ceil!(res, x)
+_round!(res::ArfOrRef, x::ArfOrRef, ::typeof(RoundDown)) = floor!(res, x)
+
+_round!(res::ArbOrRef, x::ArbOrRef, r::typeof(RoundNearest)) = nint!(res, x)
+_round!(res::ArbOrRef, x::ArbOrRef, r::typeof(RoundNearestTiesAway)) =
+    throw(ArgumentError("rounding mode $r not supported for Arb"))
+_round!(res::ArbOrRef, x::ArbOrRef, r::typeof(RoundNearestTiesUp)) =
+    throw(ArgumentError("rounding mode $r not supported for Arb"))
+_round!(res::ArbOrRef, x::ArbOrRef, r::typeof(RoundToZero)) = trunc!(res, x)
+_round!(res::ArbOrRef, x::ArbOrRef, r::typeof(RoundFromZero)) =
+    throw(ArgumentError("rounding mode $r not supported for Arb"))
+_round!(res::ArbOrRef, x::ArbOrRef, ::typeof(RoundUp)) = ceil!(res, x)
+_round!(res::ArbOrRef, x::ArbOrRef, ::typeof(RoundDown)) = floor!(res, x)
+
+Base.round(x::Union{ArfOrRef,ArbOrRef}, r::RoundingMode) = _round!(zero(x), x, r)
+# Handle ambiguities
+Base.round(x::Union{ArfOrRef,ArbOrRef}, r::typeof(RoundNearestTiesAway)) =
+    _round!(zero(x), x, r)
+Base.round(x::Union{ArfOrRef,ArbOrRef}, r::typeof(RoundNearestTiesUp)) =
+    _round!(zero(x), x, r)
+Base.round(x::Union{ArfOrRef,ArbOrRef}, r::typeof(RoundFromZero)) = _round!(zero(x), x, r)
+
+function Base.round(
+    z::Union{AcfOrRef,AcbOrRef},
+    rr::RoundingMode = RoundNearest,
+    ri::RoundingMode = RoundNearest,
 )
+    res = zero(z)
+    _round!(realref(res), realref(z), rr)
+    _round!(imagref(res), imagref(z), ri)
+    return res
+end
 
-Base.convert(::Type{arb_rnd}, ::RoundingMode{:ToZero}) = ArbRoundToZero
-Base.convert(::Type{arb_rnd}, ::RoundingMode{:FromZero}) = ArbRoundFromZero
-Base.convert(::Type{arb_rnd}, ::RoundingMode{:Down}) = ArbRoundDown
-Base.convert(::Type{arb_rnd}, ::RoundingMode{:Up}) = ArbRoundUp
-Base.convert(::Type{arb_rnd}, ::RoundingMode{:Nearest}) = ArbRoundNearest
-
-function Base.convert(::Type{RoundingMode}, r::arb_rnd)
-    if r == ArbRoundToZero
-        return RoundToZero
-    elseif r == ArbRoundFromZero
-        return RoundFromZero
-    elseif r == ArbRoundDown
-        return RoundDown
-    elseif r == ArbRoundUp
-        return RoundUp
-    elseif r == ArbRoundNearest
-        return RoundNearest
-    else
-        throw(ArgumentError("invalid Arb rounding mode code: $r"))
-    end
+# There is no Arf version of this since getting the correct rounding
+# for that would require some more work.
+function Base.div(x::ArbOrRef, y::ArbOrRef, r::RoundingMode)
+    res = x / y
+    return _round!(res, res, r)
 end

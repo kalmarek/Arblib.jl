@@ -29,11 +29,13 @@ for (jf, af) in [(:+, :add!), (:*, :mul!), (:min, :min!), (:max, :max!)]
     end
 end
 
-for T in (ArfOrRef, ArbOrRef, AcbOrRef, ArbPoly, AcbPoly)
+for T in (ArfOrRef, AcfOrRef, ArbOrRef, AcbOrRef, ArbPoly, AcbPoly)
     @eval @inline _precision(x::$T, y::$T, z::$T, rest::Vararg{$T}) =
         max(precision(x), _precision(y, z, rest...))
 
     for (jf, af) in [(:+, :add!), (:*, :mul!), (:min, :min!), (:max, :max!)]
+        T == AcfOrRef && jf == :min && continue
+        T == AcfOrRef && jf == :max && continue
         T == AcbOrRef && jf == :min && continue
         T == AcbOrRef && jf == :max && continue
         T == ArbPoly && jf == :min && continue

@@ -22,8 +22,7 @@ function Carg(str::AbstractString)
     m = match(r"(?<const>const)?\s*(?<type>\w+(\s\*)?)\s+(?<name>\w+)", str)
     isnothing(m) && throw(ArgumentError("string doesn't match c-argument pattern"))
     isconst =
-        !isnothing(m[:const]) ||
-        (!isnothing(m[:type]) && (m[:type] == "arb_srcptr" || m[:type] == "acb_srcptr"))
+        !isnothing(m[:const]) || (!isnothing(m[:type]) && endswith(m[:type], "_srcptr"))
     return Carg{arbargtypes[m[:type]]}(m[:name], isconst)
 end
 
@@ -37,8 +36,9 @@ Base.:(==)(a::Carg{T}, b::Carg{S}) where {T,S} =
 function arbsignature(ca::Carg)
     arbtype = arbargtypes.supported_reversed[rawtype(ca)]
 
-    if isconst(ca) && (arbtype == "arb_ptr" || arbtype == "acb_ptr")
-        return "$(split(arbtype, "_")[1])_srcptr $(name(ca))"
+    if isconst(ca) && endswith(arbtype, "_ptr")
+        const_arbtype = replace(arbtype, "_ptr" => "_srcptr")
+        return "$const_arbtype $(name(ca))"
     else
         return ifelse(isconst(ca), "const ", "") * "$arbtype $(name(ca))"
     end
@@ -56,28 +56,40 @@ types with lower precision. In general the conversion is done using
 `Base.cconvert`.
 """
 jltype(ca::Carg) = rawtype(ca)
+# Primitive
 jltype(::Carg{Cint}) = Integer
 jltype(::Carg{Int}) = Integer
 jltype(::Carg{UInt}) = Unsigned
-jltype(::Carg{Cdouble}) = Base.GMP.CdoubleMax
+jltype(::Carg{Float64}) = Union{Float16,Float32,Float64}
 jltype(::Carg{ComplexF64}) = Union{ComplexF16,ComplexF32,ComplexF64}
-jltype(::Carg{arb_rnd}) = Union{arb_rnd,RoundingMode}
-jltype(::Carg{Base.MPFR.MPFRRoundingMode}) = Union{Base.MPFR.MPFRRoundingMode,RoundingMode}
 jltype(::Carg{Cstring}) = AbstractString
-jltype(::Carg{Vector{Int}}) = Vector{<:Integer}
-jltype(::Carg{Vector{UInt}}) = Vector{<:Unsigned}
-jltype(::Carg{Vector{Float64}}) = Vector{<:Base.GMP.CdoubleMax}
-jltype(::Carg{Vector{ComplexF64}}) = Vector{<:Union{ComplexF16,ComplexF32,ComplexF64}}
+jltype(::Carg{Vector{Int}}) = Vector{Int}
+jltype(::Carg{Vector{UInt}}) = Vector{UInt}
+jltype(::Carg{Vector{Float64}}) = Vector{Float64}
+jltype(::Carg{Vector{ComplexF64}}) = Vector{ComplexF64}
+# mpfr.h
+jltype(::Carg{Base.MPFR.MPFRRoundingMode}) = Union{Base.MPFR.MPFRRoundingMode,RoundingMode}
+# mag.h
 jltype(::Carg{Mag}) = MagLike
+# arf.h
 jltype(::Carg{Arf}) = ArfLike
+jltype(::Carg{arb_rnd}) = Union{arb_rnd,RoundingMode}
+# acf.h
+jltype(::Carg{Acf}) = AcfLike
+# arb.h
 jltype(::Carg{Arb}) = ArbLike
-jltype(::Carg{Acb}) = AcbLike
 jltype(::Carg{ArbVector}) = ArbVectorLike
+# acb.h
+jltype(::Carg{Acb}) = AcbLike
 jltype(::Carg{AcbVector}) = AcbVectorLike
-jltype(::Carg{ArbMatrix}) = ArbMatrixLike
-jltype(::Carg{AcbMatrix}) = AcbMatrixLike
+# arb_poly.h
 jltype(::Carg{ArbPoly}) = ArbPolyLike
+# acb_poly.h
 jltype(::Carg{AcbPoly}) = AcbPolyLike
+# arb_mat.h
+jltype(::Carg{ArbMatrix}) = ArbMatrixLike
+# acb_mat.h
+jltype(::Carg{AcbMatrix}) = AcbMatrixLike
 
 """
     ctype(ca::Carg)
@@ -85,12 +97,27 @@ jltype(::Carg{AcbPoly}) = AcbPolyLike
 The type that should be used for the argument when passed to C code.
 """
 ctype(ca::Carg) = rawtype(ca)
+ctype(::Carg{Vector{T}}) where {T} = Ref{T}
+ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
+ctype(::Carg{T}) where {T<:Union{Mag,Arf,Acf,Arb,Acb,ArbPoly,AcbPoly,ArbMatrix,AcbMatrix}} =
+    Ref{cstructtype(T)}
 ctype(::Carg{T}) where {T<:Union{ArbVector,arb_vec_struct}} = Ptr{arb_struct}
 ctype(::Carg{T}) where {T<:Union{AcbVector,acb_vec_struct}} = Ptr{acb_struct}
-ctype(::Carg{T}) where {T<:Union{Mag,Arf,Arb,Acb,ArbPoly,AcbPoly,ArbMatrix,AcbMatrix}} =
-    Ref{cstructtype(T)}
-ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
-ctype(::Carg{Vector{T}}) where {T} = Ref{T}
+
+"""
+    jlarg(ca::Carg{T}) where {T}
+
+Return an `Expr` for representing the argument in a Julia function
+header.
+
+```jldoctest
+julia> Arblib.ArbCall.jlarg(Arblib.ArbCall.Carg("const arb_t x"))
+:(x::ArbLike)
+julia> Arblib.ArbCall.jlarg(Arblib.ArbCall.Carg("slong prec"))
+:(prec::Integer)
+```
+"""
+jlarg(ca::Carg) = :($(name(ca))::$(jltype(ca)))
 
 is_precision_argument(ca::Carg) = ca == Carg{Int}(:prec, false)
 
@@ -110,36 +137,28 @@ function extract_precision_argument(ca::Carg, first_ca::Carg)
     # If the first argument has a precision, then use this otherwise
     # make it a mandatory kwarg
     if rawtype(first_ca) <: ArbTypes && rawtype(first_ca) != Mag
-        return Expr(:kw, :(prec::Integer), :(_precision($(name(first_ca)))))
+        return Expr(:kw, jlarg(ca), :(_precision($(name(first_ca)))))
     else
-        return :(prec::Integer)
+        return jlarg(ca)
     end
 end
 
 function extract_flag_argument(ca::Carg)
     is_flag_argument(ca) ||
         throw(ArgumentError("argument is not a valid flag argument, $ca"))
-    return Expr(:kw, :(flags::Integer), 0)
+    return Expr(:kw, jlarg(ca), 0)
 end
 
 function extract_rounding_argument(ca::Carg)
     is_rounding_argument(ca) ||
         throw(ArgumentError("argument is not a valid rounding argument, $ca"))
-    if rawtype(ca) == arb_rnd
-        return Expr(:kw, :(rnd::Union{Arblib.arb_rnd,RoundingMode}), :(RoundNearest))
-    elseif rawtype(ca) == Base.MPFR.MPFRRoundingMode
-        return Expr(
-            :kw,
-            :(rnd::Union{Base.MPFR.MPFRRoundingMode,RoundingMode}),
-            :(RoundNearest),
-        )
-    end
+    return Expr(:kw, jlarg(ca), :(RoundNearest))
 end
 
 function extract_length_argument(ca::Carg, prev_ca::Carg)
     is_length_argument(ca, prev_ca) ||
         throw(ArgumentError("argument is not a valid length argument, $ca"))
-    return Expr(:kw, :($(name(ca))::Integer), :(length($(name(prev_ca)))))
+    return Expr(:kw, jlarg(ca), :(length($(name(prev_ca)))))
 end
 
 """
