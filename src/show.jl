@@ -127,7 +127,7 @@ midpoint is correct up to 1 ulp (unit in the last decimal place).
   indicating the number of digits omitted (useful when computing
   values to extremely high precision).
 - `unicode::Bool = false`: If `true`, use unicode characters in the
-  output in the output, e.g., `±` instead of `+/-`.
+  output, e.g., `±` instead of `+/-`.
 - `remove_trailing_zeros::Bool = !no_radius`: If `true`, remove
   trailing zeros after the decimal point.
 
