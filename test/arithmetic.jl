@@ -227,11 +227,15 @@
               1 // 8
         @test Base.literal_pow(^, Acb(2), Val(3)) == Acb(2)^3 == Arblib.cube(Acb(2)) == 8
 
-        # real, imag, conj
+        # real, imag, angle, conj
         @test real(Acb(1, 2)) isa Arb
         @test real(Acb(1, 2)) == 1
         @test imag(Acb(1, 2)) isa Arb
         @test imag(Acb(1, 2)) == 2
+
+        @test angle(Acb(1)) == 0
+        @test Arblib.overlaps(angle(Acb(-1)), Arb(π))
+        @test angle(Acb(1, 2)) ≈ angle(1 + 2im)
 
         @test conj(Acb(1, 2)) == Acb(1, -2)
     end
