@@ -147,6 +147,8 @@ function Base.:^(x::ArbOrRef, y::_BitInteger)
 end
 Base.:^(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,_BitInteger}) =
     pow!(Acb(prec = _precision(x, y)), x, y)
+# Base defines ^(x::Number, y::Rational) in a non-rigorous way
+Base.:^(x::AcbOrRef, y::Rational) = x^Arb(y, prec = precision(x))
 
 sqr(x::Union{ArbOrRef,AcbOrRef}) = sqr!(zero(x), x)
 cube(x::AcbOrRef) = cube!(zero(x), x)
