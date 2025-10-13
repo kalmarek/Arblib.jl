@@ -11,6 +11,12 @@ ScopedValues = "7e506255-f358-4e82-b7e4-beb19740aa63"
 Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
+[weakdeps]
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+
+[extensions]
+ArblibForwardDiffExt = "ForwardDiff"
+
 [compat]
 Aqua = "0.8"
 Documenter = "1"
@@ -26,7 +32,8 @@ julia = "1.10"
 [extras]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Aqua", "Documenter", "Test"]
+test = ["Aqua", "Documenter", "ForwardDiff", "Test"]
