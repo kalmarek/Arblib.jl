@@ -138,6 +138,7 @@
         @test T(4) / 4 // 1 == 4 // 1 / T(4) == 1
 
         # ^
+        @test isequal(T(2)^T(1 // 3), T(2)^(1 // 3))
         @test Base.literal_pow(^, T(2), Val(-2)) ==
               T(2)^-2 ==
               Arblib.sqr(inv(T(2))) ==
