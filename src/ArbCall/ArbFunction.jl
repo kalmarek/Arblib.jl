@@ -187,17 +187,22 @@ function jlargs_series(af::ArbFunction)
 end
 
 """
-    jlcode(af::ArbFunction, jl_fname = jlfname(af))
+    jlcode(af::ArbFunction, jl_fname = jlfname(af); source = nothing)
 
 Generate the Julia code for calling the Arb function from Julia.
+
+If `source` is given, then add this as line number information for the
+generated code. This is primarily intended to be used together with
+`__source__` inside [`@arbcall_str`](@ref).
 """
-function jlcode(af::ArbFunction, jl_fname = jlfname(af))
+function jlcode(af::ArbFunction, jl_fname = jlfname(af); source = nothing)
     jl_args, jl_kwargs = jlargs(af, argument_detection = true)
     jl_full_args, _ = jlargs(af, argument_detection = false)
 
     returnT = returntype(af)
     cargs = arguments(af)
 
+    # Version with all positional arguments.
     func_full_args = :(
         function $jl_fname($(jl_full_args...))
             __ret = ccall(
@@ -218,32 +223,47 @@ function jlcode(af::ArbFunction, jl_fname = jlfname(af))
         end
     )
 
-    if is_series_method(af)
+    # Version with some arguments as keyword arguments.
+    func_kwargs = if !isempty(jl_kwargs)
+        :(function $jl_fname($(jl_args...); $(jl_kwargs...))
+            $jl_fname($(name.(cargs)...))
+        end)
+    else
+        nothing
+    end
+
+    # Specialized version for series methods.
+    func_series = if is_series_method(af)
         # Note that this currently doesn't respect any custom function
         # name given as an argument.
         jl_fname_series = jlfname_series(af)
         jl_args_series, jl_kwargs_series = jlargs_series(af)
 
-        func_series = quote
-            $jl_fname_series($(jl_args_series...); $(jl_kwargs_series...)) =
-                $jl_fname($(name.(cargs)...))
-        end
-
-        code = quote
-            $func_full_args
-            $func_series
-        end
+        :(function $jl_fname_series($(jl_args_series...); $(jl_kwargs_series...))
+            $jl_fname($(name.(cargs)...))
+        end)
     else
-        code = func_full_args
+        nothing
     end
 
-    if isempty(jl_kwargs)
-        return code
-    else
-        return quote
-            $code
-            $jl_fname($(jl_args...); $(jl_kwargs...)) = $jl_fname($(name.(cargs)...))
+    if !isnothing(source)
+        Base.remove_linenums!(func_full_args)
+        pushfirst!(func_full_args.args[2].args, source)
+
+        if !isnothing(func_kwargs)
+            Base.remove_linenums!(func_kwargs)
+            pushfirst!(func_kwargs.args[2].args, source)
         end
+        if !isnothing(func_series)
+            Base.remove_linenums!(func_series)
+            pushfirst!(func_series.args[2].args, source)
+        end
+    end
+
+    return quote
+        $func_full_args
+        $func_kwargs
+        $func_series
     end
 end
 
@@ -262,5 +282,5 @@ defines the method `zero!(x::ArbLike)`.
 """
 macro arbcall_str(str)
     af = ArbFunction(str)
-    return esc(jlcode(af))
+    return esc(jlcode(af, source = __source__))
 end
