@@ -86,6 +86,9 @@ for (T, funcpairs) in (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
             (:(Base.iszero), :is_zero),
+            (:(LinearAlgebra.istriu), :is_triu),
+            (:(LinearAlgebra.istril), :is_tril),
+            (:(LinearAlgebra.isdiag), :is_diag),
         ),
     ),
     (
@@ -95,6 +98,9 @@ for (T, funcpairs) in (
             (:(Base.isfinite), :is_finite),
             (:(Base.isreal), :is_real),
             (:(Base.iszero), :is_zero),
+            (:(LinearAlgebra.istriu), :is_triu),
+            (:(LinearAlgebra.istril), :is_tril),
+            (:(LinearAlgebra.isdiag), :is_diag),
         ),
     ),
 )
