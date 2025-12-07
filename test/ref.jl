@@ -17,6 +17,8 @@
     @test isequal(zero(Arblib.radref(x)), zero(Mag))
     @test isequal(one(MagRef), one(Mag))
     @test isequal(one(Arblib.radref(x)), one(Mag))
+    @test isequal(oneunit(MagRef), one(Mag))
+    @test isequal(oneunit(Arblib.radref(x)), one(Mag))
 end
 
 @testset "ArfRef" begin
@@ -53,6 +55,8 @@ end
     @test isequal(zero(Arblib.midref(x)), zero(Arf))
     @test isequal(one(ArfRef), one(Arf))
     @test isequal(one(Arblib.midref(x)), one(Arf))
+    @test isequal(oneunit(ArfRef), one(Arf))
+    @test isequal(oneunit(Arblib.midref(x)), one(Arf))
 end
 
 @testset "AcfRef" begin
@@ -83,6 +87,7 @@ end
 
     @test isequal(zero(AcfRef), zero(Acf))
     @test isequal(one(AcfRef), one(Acf))
+    @test isequal(oneunit(AcfRef), one(Acf))
 end
 
 @testset "ArbRef" begin
@@ -113,6 +118,8 @@ end
     @test isequal(zero(Arblib.realref(x)), zero(Arb))
     @test isequal(one(ArbRef), one(Arb))
     @test isequal(one(Arblib.realref(x)), one(Arb))
+    @test isequal(oneunit(ArbRef), one(Arb))
+    @test isequal(oneunit(Arblib.realref(x)), one(Arb))
 end
 
 @testset "AcbRef" begin
@@ -133,6 +140,8 @@ end
     @test isequal(zero(x), zero(Acb))
     @test isequal(one(AcbRef), one(Acb))
     @test isequal(one(x), one(Acb))
+    @test isequal(oneunit(AcbRef), one(Acb))
+    @test isequal(oneunit(x), one(Acb))
 
     Arblib.set!(x, 2)
     @test v[1] == Acb(2)

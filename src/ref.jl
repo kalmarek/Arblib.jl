@@ -35,12 +35,15 @@ end
 
 Base.zero(::Union{Type{MagRef},MagRef}) = zero(Mag)
 Base.one(::Union{Type{MagRef},MagRef}) = one(Mag)
+Base.oneunit(::Union{Type{MagRef},MagRef}) = one(Mag)
 for (TRef, T) in [(ArfRef, Arf), (AcfRef, Acf), (ArbRef, Arb), (AcbRef, Acb)]
     @eval begin
         Base.zero(x::$TRef) = $T(0, prec = precision(x))
         Base.zero(::Type{$TRef}) = zero($T)
         Base.one(x::$TRef) = $T(1, prec = precision(x))
         Base.one(::Type{$TRef}) = one($T)
+        Base.oneunit(x::$TRef) = $T(1, prec = precision(x))
+        Base.oneunit(::Type{$TRef}) = one($T)
     end
 end
 
