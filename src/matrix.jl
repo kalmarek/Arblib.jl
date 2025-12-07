@@ -107,13 +107,13 @@ function Base.copy!(A::T, B::T) where {T<:Matrices}
     return set!(A, B)
 end
 
-# Arithmetic
+# add and sub
 
 for (jf, af) in [(:+, :add!), (:-, :sub!)]
     @eval function Base.$jf(A::T, B::T) where {T<:Matrices}
         @boundscheck (
             size(A) == size(B) ||
-            throw(DimensionMismatch("Matrix sizes are not compatible."))
+            throw(DimensionMismatch("matrix sizes are not compatible."))
         )
         C = T(size(A, 1), size(B, 2); prec = _precision(A, B))
         return $af(C, A, B)
@@ -122,10 +122,12 @@ end
 
 Base.:(-)(A::Matrices) = neg!(similar(A), A)
 
+# mul
+
 function LinearAlgebra.mul!(C::T, A::T, B::T) where {T<:Matrices}
     @boundscheck (
         (size(C) == (size(A, 1), size(B, 2)) && size(A, 2) == size(B, 1)) ||
-        throw(DimensionMismatch("Matrix sizes are not compatible."))
+        throw(DimensionMismatch("matrix sizes are not compatible."))
     )
     return Arblib.mul!(C, A, B)
 end

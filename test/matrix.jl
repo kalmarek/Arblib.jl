@@ -33,7 +33,7 @@
             @test ref(A, 3, 3) isa Union{ArbRef,AcbRef}
         end
 
-        @testset "arithmetic" begin
+        @testset "add and sub" begin
             AInt = [1 2; 3 4]
             BInt = [5 6; 7 8]
             A = TMat(AInt; prec = 96)
@@ -45,8 +45,6 @@
             @test -B isa TMat
             @test -B + A == A - B
             @test precision(-B + A) == 96
-            @test A * B == AInt * BInt
-            @test A * B isa TMat
         end
 
         @testset "scalar arithmetic" begin
@@ -93,6 +91,31 @@
             ldiv!(lu(A), d)
             @test Arblib.overlaps(d, c′) == 1
 
+            @testset "mul" begin
+                A = TMat(sin.(Arb.(reshape(1:6, 3, 2))))
+                B = TMat(cos.(Arb.(reshape(1:8, 2, 4))))
+                @test Arblib.overlaps(A * B, TMat(collect(A) * collect(B)))
+                @test isequal(A * B, LinearAlgebra.mul!(TMat(3, 4), A, B))
+                @test isequal(A * B, Arblib.mul!(TMat(3, 4), A, B))
+
+                @test precision(TMat(1, 1, prec = 80) * TMat(1, 1, prec = 96)) == 96
+
+                @test_throws DimensionMismatch("matrix sizes are not compatible.") TMat(
+                    2,
+                    2,
+                ) * TMat(
+                    3,
+                    3,
+                )
+                @test_throws DimensionMismatch("matrix sizes are not compatible.") TMat(
+                    2,
+                    3,
+                ) * TMat(
+                    2,
+                    3,
+                )
+            end
+
             @testset "inv" begin
                 A = TMat([
                     1 1 1 1;
@@ -108,15 +131,6 @@
                     "matrix is not square: dimensions are (2, 3)",
                 ) inv(TMat(2, 3))
             end
-
-            # mul
-            A = TMat(rand(3, 2))
-            B = TMat(rand(2, 4))
-            B_wrong = TMat(rand(3, 4))
-            C = TMat(3, 4)
-            @test_throws DimensionMismatch("Matrix sizes are not compatible.") A * B_wrong
-            LinearAlgebra.mul!(C, A, B)
-            @test C == A * B
         end
 
         @testset "indexing" begin
