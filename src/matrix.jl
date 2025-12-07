@@ -203,5 +203,14 @@ function Base.:(\)(A::LinearAlgebra.LU{<:Any,T}, B::T) where {T<:Matrices}
     LinearAlgebra.ldiv!(Y, A, B)
 end
 
-# inverse
-LinearAlgebra.inv(A::Matrices) = (B = similar(A); inv!(B, A); B)
+# inv
+function Base.inv(A::Matrices)
+    LinearAlgebra.checksquare(A)
+
+    B = similar(A)
+    flag = inv!(B, A)
+
+    iszero(flag) && throw(LinearAlgebra.SingularException(0))
+
+    return B
+end

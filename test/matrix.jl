@@ -93,10 +93,21 @@
             ldiv!(lu(A), d)
             @test Arblib.overlaps(d, c′) == 1
 
-            # inv
-            id = copy(A)
-            Arblib.one!(id)
-            @test Bool(Arblib.contains(inv(A) * A, id))
+            @testset "inv" begin
+                A = TMat([
+                    1 1 1 1;
+                    1 2 1 1;
+                    1 1 3 1;
+                    1 1 1 4
+                ]) # Some random invertible matrix
+                @test Arblib.overlaps(inv(A) * A, TMat(I(4)))
+
+                @test_throws SingularException(0) inv(TMat(Diagonal([1, 2, 3, 0])))
+
+                @test_throws DimensionMismatch(
+                    "matrix is not square: dimensions are (2, 3)",
+                ) inv(TMat(2, 3))
+            end
 
             # mul
             A = TMat(rand(3, 2))
