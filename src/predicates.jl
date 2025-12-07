@@ -85,7 +85,6 @@ for (T, funcpairs) in (
         (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
-            (:(Base.isone), :is_one),
             (:(Base.iszero), :is_zero),
         ),
     ),
@@ -94,7 +93,6 @@ for (T, funcpairs) in (
         (
             (:isexact, :is_exact),
             (:(Base.isfinite), :is_finite),
-            (:(Base.isone), :is_one),
             (:(Base.isreal), :is_real),
             (:(Base.iszero), :is_zero),
         ),
