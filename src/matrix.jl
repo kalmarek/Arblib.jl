@@ -216,3 +216,7 @@ function Base.inv(A::Matrices)
 
     return B
 end
+
+# det
+LinearAlgebra.det(A::ArbMatrixOrRef) = det!(Arb(prec = precision(A)), A)
+LinearAlgebra.det(A::AcbMatrixOrRef) = det!(Acb(prec = precision(A)), A)

@@ -131,6 +131,20 @@
                     "matrix is not square: dimensions are (2, 3)",
                 ) inv(TMat(2, 3))
             end
+
+            @testset "det" begin
+                A = TMat([
+                    1 1 1 1;
+                    1 2 1 1;
+                    1 1 3 1;
+                    1 1 1 4
+                ]) # Some random invertible matrix
+
+                @test det(A) == det(Int.(A))
+
+                B = TMat(sin.(A))
+                @test Arblib.contains(det(B) * det(inv(B)), T(1))
+            end
         end
 
         @testset "indexing" begin
