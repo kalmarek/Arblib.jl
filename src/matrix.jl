@@ -156,54 +156,135 @@ end
 Base.:(/)(A::Matrices, c::Union{ArbOrRef,AcbOrRef}) = c \ A
 
 # lu factorization
-function LinearAlgebra.lu!(A::Matrices)
-    ipiv = zeros(Int, size(A, 2))
-    retcode = lu!(ipiv, A, A; prec = precision(A))
-    LinearAlgebra.LU(A, ipiv, retcode > 0 ? 0 : 1)
+
+# Helper function to convert a final permutation vector `p` into a
+# sequence of swaps `ipiv` compatible with LinearAlgebra.LU. It is the
+# inverse of LinearAlgebra.ipiv2perm
+function _perm2ipiv!(p::Vector{Int})
+    ipiv = similar(p)
+
+    # q is the inverse permutation (maps position -> value)
+    # We simulate sorting q back to identity
+    q = invperm(p)
+
+    @inbounds for i in eachindex(p)
+        # We want to place value i at index i in q
+
+        k = p[i] # Current position k of value i in q
+        l = q[i]
+
+        # Record the pivot
+        ipiv[i] = k
+
+        # Perform the swap in q
+        # q[i] = i # q[i] is never accessed again, so we can skip swapping it
+        q[k] = l
+
+        # Update the lookup table for the value that was moved
+        p[l] = k
+        # p[i] = i # p[i] is never accessed again, so we can skip swapping it
+    end
+
+    return ipiv
 end
-function LinearAlgebra.lu(A::Matrices)
-    lu = similar(A)
-    ipiv = zeros(Int, size(A, 2))
-    retcode = lu!(ipiv, lu, A; prec = precision(lu))
-    LinearAlgebra.LU(lu, ipiv, retcode > 0 ? 0 : 1)
+
+function LinearAlgebra.lu!(
+    A::Matrices,
+    pivot::LinearAlgebra.RowMaximum;
+    check::Bool = true,
+    allowsingular::Bool = false,
+)
+    LinearAlgebra.checksquare(A) # Flint only supports square LU decomposition
+
+    perm = zeros(Int, size(A, 2))
+
+    flag = lu!(perm, A, A, prec = precision(A))
+
+    check && iszero(flag) && throw(LinearAlgebra.SingularException(0))
+
+    # Convert from 0-based indexing to 1-based indexing
+    perm .+= 1
+
+    ipiv = _perm2ipiv!(perm)
+
+    # Negative info indicates a failure, 0 indicates success
+    info = iszero(flag) ? -1 : 0
+
+    return LinearAlgebra.LU(A, ipiv, info)
 end
+
+# Default implementation of lu uses _lucopy(A, lutype(T)) to convert
+# the input to the right type. Due to how e.g. Arb and ArbRef interact
+# this converts ArbRefMatrix to ArbMatrix, which we don't want.
+# Instead we simply directly call lu!, which is what LinearAlgebra
+# does in the end.
+# The most convenient would be to overload it like
+#lu(A::Matrices, args...; kwargs...) where {T} = _lu(copy(A), args...; kwargs...)
+# This however leads to ambiguities due to the deprecated versions
+#lu(A::AbstractMatrix, ::Val{true}; check::Bool = true)
+#lu(A::AbstractMatrix, ::Val{false}; check::Bool = true)
+# And also with other definitions on Julia version 1.10 and older. We
+# therefore selectively overload only some cases.
+LinearAlgebra.lu(A::Matrices; kwargs...) = LinearAlgebra.lu!(copy(A); kwargs...)
+LinearAlgebra.lu(A::Matrices, pivot::LinearAlgebra.RowMaximum; kwargs...) =
+    LinearAlgebra.lu!(copy(A), pivot; kwargs...)
 
 # ldiv! and \
+
 function LinearAlgebra.ldiv!(Y::T, A::T, B::T) where {T<:Matrices}
+    LinearAlgebra.checksquare(A)
+
     @boundscheck (
-        (size(Y) == size(B) && size(A, 1) == size(A, 2) && size(A, 1) == size(B, 1)) ||
-        throw(DimensionMismatch("Matrix sizes are not compatible."))
+        size(Y) == size(B) || throw(DimensionMismatch("output not same size as input"))
     )
-    LinearAlgebra.ldiv!(Y, LinearAlgebra.lu(A), B)
+    @boundscheck (
+        size(A, 1) == size(B, 1) ||
+        throw(DimensionMismatch("matrix sizes are not compatible"))
+    )
+
+    # Directly call arb_mat_solve (or acb_mat_solve), which
+    # automatically selects between arb_mat_solve_lu and
+    # arb_mat_solve_precond depending on the size of the input and the
+    # precision.
+    flag = solve!(Y, A, B)
+
+    iszero(flag) && throw(LinearAlgebra.SingularException(0))
+
+    return Y
 end
 
-function LinearAlgebra.ldiv!(A::T, B::T) where {T<:Matrices}
-    @boundscheck (
-        (size(A, 1) == size(A, 2)) ||
-        throw(DimensionMismatch("Expected a square matrix as the left hand side."))
-    )
-    LinearAlgebra.ldiv!(B, LinearAlgebra.lu(A), B)
-end
+LinearAlgebra.ldiv!(A::T, B::T) where {T<:Matrices} = LinearAlgebra.ldiv!(B, A, B)
+Base.:(\)(A::T, B::T) where {T<:Matrices} =
+    LinearAlgebra.ldiv!(T(size(B)...; prec = _precision(A, B)), A, B)
 
+# TODO: How to handle the Any?
 function LinearAlgebra.ldiv!(Y::T, A::LinearAlgebra.LU{<:Any,T}, B::T) where {T<:Matrices}
+    LinearAlgebra.checksquare(A)
     @boundscheck (
-        (size(Y) == size(B) && size(A, 1) == size(A, 2) && size(A, 1) == size(B, 1)) ||
-        throw(DimensionMismatch("Matrix sizes are not compatible."))
+        size(Y) == size(B) || throw(DimensionMismatch("output not same size as input"))
     )
-    Arblib.solve_lu_precomp!(Y, A.ipiv, A.factors, B)
-    Y
+    @boundscheck (
+        size(A, 1) == size(B, 1) ||
+        throw(DimensionMismatch("matrix sizes are not compatible"))
+    )
+
+    # The documentation of LinearAlgebra.lu specifies that it is the
+    # users responsibility to check issuccess(A). We therefore don't
+    # check it here, it will just return garbage in case it wasn't
+    # successful.
+
+    # Convert from 1-based indexing to 0-based indexing
+    # IMPROVE: It seems like A.p always generates a new copy of p. We
+    # could hence mutate it to save one allocation.
+    perm = A.p .- 1
+
+    return solve_lu_precomp!(Y, perm, A.factors, B)
 end
+
 LinearAlgebra.ldiv!(A::LinearAlgebra.LU{<:Any,T}, B::T) where {T<:Matrices} =
     LinearAlgebra.ldiv!(B, A, B)
-
-function Base.:(\)(A::T, B::T) where {T<:Matrices}
-    Y = T(size(A, 2), size(B, 2); prec = _precision(A, B))
-    LinearAlgebra.ldiv!(Y, A, B)
-end
-function Base.:(\)(A::LinearAlgebra.LU{<:Any,T}, B::T) where {T<:Matrices}
-    Y = T(size(A, 2), size(B, 2); prec = _precision(A.factors, B))
-    LinearAlgebra.ldiv!(Y, A, B)
-end
+Base.:(\)(A::LinearAlgebra.LU{<:Any,T}, B::T) where {T<:Matrices} =
+    LinearAlgebra.ldiv!(T(size(B)...; prec = _precision(A.factors, B)), A, B)
 
 # inv
 function Base.inv(A::Matrices)
