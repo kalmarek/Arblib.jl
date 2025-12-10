@@ -100,6 +100,33 @@
                 )
             end
 
+            @testset "norm" begin
+                A = TMat(sin.(Arb.(reshape(1:6, 3, 2))))
+
+                # TODO: We use norm(real(collect(A))) since
+                # norm(collect(A)) doesn't work for Acb as it doesn't
+                # implement float(::Acb). This might be something we
+                # want to look at implementing at some point.
+                @test Arblib.overlaps(norm(A), norm(real(collect(A))))
+                @test Arblib.overlaps(norm(A, 2), norm(real(collect(A)), 2))
+                @test Arblib.overlaps(norm(A, Arb(2)), norm(real(collect(A)), Arb(2)))
+                @test Arblib.overlaps(norm(A, -Inf), norm(real(collect(A)), -Inf))
+                @test Arblib.overlaps(norm(A, Inf), norm(real(collect(A)), Inf))
+                @test Arblib.overlaps(norm(A, 1), norm(real(collect(A)), 1))
+                @test Arblib.overlaps(norm(A, 0), norm(real(collect(A)), 0))
+                @test Arblib.overlaps(norm(A, -1), norm(real(collect(A)), -1))
+                @test Arblib.overlaps(norm(A, Arb(-1)), norm(real(collect(A)), -1))
+
+                @test iszero(norm(TMat(0, 0)))
+
+                @test precision(norm(TMat(A, prec = 80))) == 80
+                @test precision(norm(TMat(A, prec = 80), 2)) == 80
+                @test precision(norm(TMat(A, prec = 80), Inf)) == 80
+                @test precision(norm(TMat(A, prec = 80), -Inf)) == 80
+                @test precision(norm(TMat(A, prec = 80), 1)) == 80
+                @test precision(norm(TMat(0, 0, prec = 80))) == 80
+            end
+
             @testset "lu" begin
                 A = TMat([
                     1 1 1 1;

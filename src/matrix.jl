@@ -155,6 +155,50 @@ function Base.:(\)(c::AcbOrRef, A::ArbMatrixOrRef)
 end
 Base.:(/)(A::Matrices, c::Union{ArbOrRef,AcbOrRef}) = c \ A
 
+# norm
+function LinearAlgebra.norm(A::Matrices, p::Real = 2)
+    if isempty(A)
+        return Arb(prec = precision(A))
+    elseif p == 2
+        return frobenius_norm!(Arb(prec = precision(A)), A)
+    elseif p == Inf
+        # Return maximum absolute value
+        res = Arb(prec = precision(A))
+        abs_a = zero(res)
+        for ij in CartesianIndices(A)
+            abs!(abs_a, ref(A, Tuple(ij)...))
+            max!(res, res, abs_a)
+        end
+
+        return res
+    elseif p == -Inf
+        # Return minimum absolute value
+        # A is always non-empty here, so Inf is neutral
+        res = Arb(Inf, prec = precision(A))
+        abs_a = zero(res)
+        for ij in CartesianIndices(A)
+            abs!(abs_a, ref(A, Tuple(ij)...))
+            min!(res, res, abs_a)
+        end
+
+        return res
+    else
+        p = p isa ArbOrRef ? p : Arb(p, prec = precision(A))
+
+        res = Arb(0, prec = precision(A))
+        pow!(res, res, p)
+        abs_a_pow_p = zero(res)
+        for ij in CartesianIndices(A)
+            abs!(abs_a_pow_p, ref(A, Tuple(ij)...))
+            pow!(abs_a_pow_p, abs_a_pow_p, p)
+            add!(res, res, abs_a_pow_p)
+        end
+
+        inv_p = inv!(abs_a_pow_p, p) # Reuse abs_a_pow_p
+        return pow!(res, res, inv_p)
+    end
+end
+
 # lu factorization
 
 # Helper function to convert a final permutation vector `p` into a
