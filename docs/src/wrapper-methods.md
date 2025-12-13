@@ -24,7 +24,7 @@ Arblib.ArbCall.ArbFunction
 Arblib.ArbCall.jlcode(af::Arblib.ArbCall.ArbFunction)
 ```
 
-The main things to understand is how the name of the generated
+The main things to understand are how the name of the generated
 function is determined, how the arguments are handled and the return
 value.
 
@@ -32,9 +32,9 @@ value.
 The name of the Arb function is "Juliafied" using the following
 guidelines:
 
-1. Prefixes and suffixes a function name which only refer to the type
-   of input are removed since Julia has multiple dispatch to deal with
-   this problem.
+1. Prefixes and suffixes of a function name which only refer to the
+   type of input are removed since Julia has multiple dispatch to deal
+   with this problem.
 2. Functions which modify the first argument get an `!` appended to
    the name.
 
@@ -43,6 +43,33 @@ the function name is referring to the type or when the function
 modifies the argument. This works well for the majority of functions
 but gives a few odd cases.
 
+!!! tip
+    In some instances it can be difficult to figure out what the Julia
+    name for an Arb function is. In this situation it can be useful
+    to manually construct the corresponding `ArbFunction` from the C
+    header of the Arb function. For example, for the
+    [`arb_add_si`](https://flintlib.org/doc/arb.html#c.arb_add_si)
+    function
+
+    ``` @repl
+    using Arblib
+
+    header = "void arb_add_si(arb_t z, const arb_t x, slong y, slong prec)"
+    af = Arblib.ArbCall.ArbFunction(header)
+    Arblib.ArbCall.jlfname(af)
+    ```
+
+    The opposite direction, figuring out the C header for a Julia
+    method, can be done with `@which` or `@less`. With `@which` you
+    get the location where the method is declared, where you can find
+    exactly what the associated C header is.
+
+    ``` @repl
+    using Arblib, InteractiveUtils
+
+    @which Arblib.add!(Arb(), Arb(), 5)
+    ```
+
 ### Arguments
 The arguments of the function are represented by
 
@@ -50,7 +77,7 @@ The arguments of the function are represented by
 Arblib.ArbCall.Carg
 ```
 
-For the generated method the allowed types for the argument is
+For the generated method the allowed types for the argument are
 determined by
 
 ``` @docs
@@ -65,9 +92,9 @@ Some arguments are automatically converted to keyword arguments.
 2. For functions which take a rounding mode argument this argument
    becomes a `rnd::Union{Arblib.arb_rnd,RoundingMode}` keyword
    argument which is by default set to `RoundNearest`.
-3. For functions which takes a flag argument this argument becomes a
+3. For functions which take a flag argument this argument becomes a
    `flag::Integer` keyword argument which is by default set to `0`.
-4. For functions which takes an argument giving the length of the
+4. For functions which take an argument giving the length of the
    vector preceding the argument this argument becomes a keyword
    argument which is by default set to the length of the preceding
    vector. In this case the name of the keyword argument is the same
@@ -80,9 +107,9 @@ keyword argument.
 ### Return value
 The returned value is determined in the following way
 
-1. For functions which have the C function has return type `void` and
+1. For functions for which the C function has return type `void` and
    modify the first argument the generated method returns the first
-   argument. This is follows the normal convention in Julia.
+   argument. This follows the normal convention in Julia.
 2. For predicates, for which the C function returns `int`, the return
    value is converted to a `Bool`.
 3. Otherwise the return type is the same as for the C function.
@@ -115,22 +142,26 @@ For which the following methods are generated
 7. `add!(z::ArbLike, x::ArbLike, y::Integer; prec::Integer = _precision(z))::ArbLike`
 8. `sin!(s::ArbLike, x::ArbLike; prec::Integer = _precision(s))::ArbLike`
 9. `cos!(c::ArbLike, x::ArbLike; prec::Integer = _precision(c))::ArbLike`
-10. `sin_cos!(s::ArbLike, c::ArbLike, x::ArbLike, prec::Integer = _precision(s))::ArbLike`
+10. `sin_cos!(s::ArbLike, c::ArbLike, x::ArbLike; prec::Integer = _precision(s))::ArbLike`
 11. `add!(res::ArfLike, x::ArfLike, y::ArfLike; prec::Integer = _precision(res), rnd::Union{Arblib.arb_rnd, RoundingMode} = RoundNearest)::Int32`
 12. `sin_series!(s::ArbPolyLike, h::ArbPolyLike, n::Integer; prec::Integer = _precision(s))::ArbPolyLike`
 
 ### Series methods
-Arb has several functions mean for computing truncated Taylor series
+Arb has several functions meant for computing truncated Taylor series
 (e.g. `arb_sin_series`). These functions have special handling, to
 make them more convenient to use. In addition to the procedure
 discussed above they generate one more method. This extra method
 removes the "_series" suffix from the method name, restricts the input
 type to only series types (and not polynomial types) and takes the
 default length of the computed series from the first argument. As an
-example the function
+example, the function
+
 - `void arb_poly_sin_series(arb_poly_t s, const arb_poly_t h, slong n, slong prec)`
+
 generates the method
+
 - `sin!(s::ArbSeries, h::ArbSeries, n::Integer = length(s); prec::Integer = _precision(s))::ArbSeries`
+
 in addition to the usual one (see the examples above).
 
 The main motivation for these extra methods is to make it easier to

@@ -259,5 +259,27 @@
             fpwrap_bessel_j_test(1.0, 1e40, error_on_failure = false, work_limit = 1),
         )
         Arblib.ArbCall.fpwrap_error_on_failure_default_set(false)
+
+        # Test that source argument is handled correctly
+        af = Arblib.ArbCall.ArbFPWrapFunction(
+            "int arb_fpwrap_double_exp(double * res, double x, int flags)",
+        )
+        code = Arblib.ArbCall.jlcode(af, :exp_test2, source = LineNumberNode(42, :test))
+        eval(code)
+        @test only(methods(exp_test2)).line == 42
+        @test only(methods(exp_test2)).file == :test
+
+        # Check that the source information is correct for the already
+        # parsed functions as well
+        @test which(Arblib.fpwrap_exp, (Float64,)).line == 10
+        @test endswith(
+            string(which(Arblib.fpwrap_exp, (Float64,)).file),
+            joinpath("arbcalls", "arb_fpwrap.jl"),
+        )
+        @test which(Arblib.fpwrap_exp, (ComplexF64,)).line == 11
+        @test endswith(
+            string(which(Arblib.fpwrap_exp, (ComplexF64,)).file),
+            joinpath("arbcalls", "arb_fpwrap.jl"),
+        )
     end
 end
