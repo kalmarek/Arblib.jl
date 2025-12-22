@@ -33,7 +33,7 @@
             @test ref(A, 3, 3) isa Union{ArbRef,AcbRef}
         end
 
-        @testset "arithmetic" begin
+        @testset "add and sub" begin
             AInt = [1 2; 3 4]
             BInt = [5 6; 7 8]
             A = TMat(AInt; prec = 96)
@@ -45,8 +45,6 @@
             @test -B isa TMat
             @test -B + A == A - B
             @test precision(-B + A) == 96
-            @test A * B == AInt * BInt
-            @test A * B isa TMat
         end
 
         @testset "scalar arithmetic" begin
@@ -77,35 +75,247 @@
         end
 
         @testset "LinearAlgebra" begin
-            A = TMat(rand(3, 3))
-            b = TMat(rand(3))
-            c = TMat(3, 1)
+            @testset "mul" begin
+                A = TMat(sin.(Arb.(reshape(1:6, 3, 2))))
+                B = TMat(cos.(Arb.(reshape(1:8, 2, 4))))
+                @test Arblib.overlaps(A * B, TMat(collect(A) * collect(B)))
+                @test isequal(A * B, LinearAlgebra.mul!(TMat(3, 4), A, B))
+                @test isequal(A * B, Arblib.mul!(TMat(3, 4), A, B))
 
-            # lu factorization
-            ldiv!(c, A, b)
-            c′ = A \ b
-            @test Arblib.overlaps(c, c′) == 1
-            ldiv!(c, lu(A), b)
-            @test Arblib.overlaps(c, c′) == 1
-            ldiv!(c, lu!(copy(A)), b)
-            @test Arblib.overlaps(c, c′) == 1
-            d = copy(b)
-            ldiv!(lu(A), d)
-            @test Arblib.overlaps(d, c′) == 1
+                @test precision(TMat(1, 1, prec = 80) * TMat(1, 1, prec = 96)) == 96
 
-            # inv
-            id = copy(A)
-            Arblib.one!(id)
-            @test Bool(Arblib.contains(inv(A) * A, id))
+                @test_throws DimensionMismatch("matrix sizes are not compatible.") TMat(
+                    2,
+                    2,
+                ) * TMat(
+                    3,
+                    3,
+                )
+                @test_throws DimensionMismatch("matrix sizes are not compatible.") TMat(
+                    2,
+                    3,
+                ) * TMat(
+                    2,
+                    3,
+                )
+            end
 
-            # mul
-            A = TMat(rand(3, 2))
-            B = TMat(rand(2, 4))
-            B_wrong = TMat(rand(3, 4))
-            C = TMat(3, 4)
-            @test_throws DimensionMismatch("Matrix sizes are not compatible.") A * B_wrong
-            LinearAlgebra.mul!(C, A, B)
-            @test C == A * B
+            @testset "norm" begin
+                A = TMat(sin.(Arb.(reshape(1:6, 3, 2))))
+
+                # TODO: We use norm(real(collect(A))) since
+                # norm(collect(A)) doesn't work for Acb as it doesn't
+                # implement float(::Acb). This might be something we
+                # want to look at implementing at some point.
+                @test Arblib.overlaps(norm(A), norm(real(collect(A))))
+                @test Arblib.overlaps(norm(A, 2), norm(real(collect(A)), 2))
+                @test Arblib.overlaps(norm(A, Arb(2)), norm(real(collect(A)), Arb(2)))
+                @test Arblib.overlaps(norm(A, -Inf), norm(real(collect(A)), -Inf))
+                @test Arblib.overlaps(norm(A, Inf), norm(real(collect(A)), Inf))
+                @test Arblib.overlaps(norm(A, 1), norm(real(collect(A)), 1))
+                @test Arblib.overlaps(norm(A, 0), norm(real(collect(A)), 0))
+                @test Arblib.overlaps(norm(A, -1), norm(real(collect(A)), -1))
+                @test Arblib.overlaps(norm(A, Arb(-1)), norm(real(collect(A)), -1))
+
+                @test iszero(norm(TMat(0, 0)))
+
+                @test precision(norm(TMat(A, prec = 80))) == 80
+                @test precision(norm(TMat(A, prec = 80), 2)) == 80
+                @test precision(norm(TMat(A, prec = 80), Inf)) == 80
+                @test precision(norm(TMat(A, prec = 80), -Inf)) == 80
+                @test precision(norm(TMat(A, prec = 80), 1)) == 80
+                @test precision(norm(TMat(0, 0, prec = 80))) == 80
+            end
+
+            @testset "lu" begin
+                A = TMat([
+                    1 1 1 1;
+                    1 3 1 1;
+                    1 1 4 1;
+                    1 1 1 5
+                ]) # A matrix with exact lu decomposition
+                B1 = TMat(1:4)
+                B2 = TMat(reshape(1:8, 4, 2))
+
+                F = lu(A)
+
+                @test isequal(F, lu(A, RowMaximum()))
+                F_int = lu(Int.(A))
+                @test isequal(F.L, F_int.L)
+                @test isequal(F.U, F_int.U)
+                @test isequal(F.p, F_int.p)
+
+                @test isequal(A \ B1, F \ B1)
+                @test isequal(A \ B2, F \ B2)
+                @test isequal(A \ B1, LinearAlgebra.ldiv!(F, B1))
+                @test isequal(A \ B2, LinearAlgebra.ldiv!(F, B2))
+                @test isequal(A \ B1, LinearAlgebra.ldiv!(similar(B1), F, B1))
+                @test isequal(A \ B2, LinearAlgebra.ldiv!(similar(B2), F, B2))
+
+                # List of all permutations of 4 elements
+                permutations_4 = [
+                    [1, 2, 3, 4],
+                    [1, 2, 4, 3],
+                    [1, 3, 2, 4],
+                    [1, 3, 4, 2],
+                    [1, 4, 2, 3],
+                    [1, 4, 3, 2],
+                    [2, 1, 3, 4],
+                    [2, 1, 4, 3],
+                    [2, 3, 1, 4],
+                    [2, 3, 4, 1],
+                    [2, 4, 1, 3],
+                    [2, 4, 3, 1],
+                    [3, 1, 2, 4],
+                    [3, 1, 4, 2],
+                    [3, 2, 1, 4],
+                    [3, 2, 4, 1],
+                    [3, 4, 1, 2],
+                    [3, 4, 2, 1],
+                    [4, 1, 2, 3],
+                    [4, 1, 3, 2],
+                    [4, 2, 1, 3],
+                    [4, 2, 3, 1],
+                    [4, 3, 1, 2],
+                    [4, 3, 2, 1],
+                ]
+
+                # For each permutation, construct a matrix such that
+                # when LU factorized it has the given permutation.
+                matrices = map(permutations_4) do perm
+                    C = TMat(4, 4)
+                    for (col_idx, row_idx) in enumerate(perm)
+                        # Use descending powers of 2 (8, 4, 2, 1) to force pivot choices
+                        C[row_idx, col_idx] = 2^(4 - col_idx + 1)
+                    end
+                    return C
+                end
+
+                for A in matrices
+                    F = lu(A)
+                    F_int = lu(Int.(A))
+
+                    @test isequal(F.L, F_int.L)
+                    @test isequal(F.U, F_int.U)
+                    @test isequal(F.p, F_int.p)
+                end
+
+                @test precision(lu(TMat(A, prec = 80)) \ TMat(B1, prec = 96)) == 96
+                @test precision(
+                    LinearAlgebra.ldiv!(lu(TMat(A, prec = 96)), TMat(B1, prec = 80)),
+                ) == 80
+                @test precision(
+                    LinearAlgebra.ldiv!(
+                        TMat(B1, prec = 96),
+                        lu(TMat(A, prec = 80)),
+                        TMat(B1, prec = 80),
+                    ),
+                ) == 96
+
+                @test_throws DimensionMismatch(
+                    "matrix is not square: dimensions are (2, 3)",
+                ) lu(TMat(2, 3))
+
+                @test_throws SingularException(0) lu(TMat(2, 2))
+                @test_throws SingularException(0) lu(TMat(ones(2, 2)))
+
+                @test !issuccess(lu(TMat(2, 2), check = false))
+                @test !issuccess(lu(TMat(2, 2), check = false, allowsingular = true))
+            end
+
+            @testset "ldiv" begin
+                A = TMat([
+                    2 1 1 1;
+                    1 3 1 1;
+                    1 1 4 1;
+                    1 1 1 5
+                ]) # Some random invertible matrix
+                B1 = TMat(1:4)
+                B2 = TMat(reshape(1:8, 4, 2))
+
+                @test Arblib.overlaps(A * (A \ B1), B1)
+                @test Arblib.overlaps(A * (A \ B2), B2)
+
+                @test isequal(A \ B1, LinearAlgebra.ldiv!(A, B1))
+                @test isequal(A \ B2, LinearAlgebra.ldiv!(A, B2))
+
+                @test isequal(A \ B1, LinearAlgebra.ldiv!(similar(B1), A, B1))
+                @test isequal(A \ B2, LinearAlgebra.ldiv!(similar(B2), A, B2))
+
+                @test precision(TMat(A, prec = 80) \ TMat(B1, prec = 96)) == 96
+                @test precision(
+                    LinearAlgebra.ldiv!(TMat(A, prec = 96), TMat(B1, prec = 80)),
+                ) == 80
+                @test precision(
+                    LinearAlgebra.ldiv!(
+                        TMat(B1, prec = 96),
+                        TMat(A, prec = 80),
+                        TMat(B1, prec = 80),
+                    ),
+                ) == 96
+
+                @test_throws SingularException(0) TMat(Diagonal([1, 2, 3, 0])) \ B1
+                @test_throws SingularException(0) TMat(Diagonal([1, 2, 3, 0])) \ B2
+
+                @test_throws DimensionMismatch(
+                    "matrix is not square: dimensions are (2, 3)",
+                ) TMat(2, 3) \ TMat(3, 1)
+                @test_throws DimensionMismatch(
+                    "matrix is not square: dimensions are (2, 3)",
+                ) LinearAlgebra.ldiv!(TMat(2, 3), TMat(3, 1))
+                @test_throws DimensionMismatch(
+                    "matrix is not square: dimensions are (2, 3)",
+                ) LinearAlgebra.ldiv!(TMat(3, 1), TMat(2, 3), TMat(3, 1))
+
+                @test_throws DimensionMismatch("matrix sizes are not compatible") TMat(
+                    2,
+                    2,
+                ) \ TMat(3, 1)
+                @test_throws DimensionMismatch("matrix sizes are not compatible") LinearAlgebra.ldiv!(
+                    TMat(2, 2),
+                    TMat(3, 1),
+                )
+                @test_throws DimensionMismatch("matrix sizes are not compatible") LinearAlgebra.ldiv!(
+                    TMat(3, 1),
+                    TMat(2, 2),
+                    TMat(3, 1),
+                )
+                @test_throws DimensionMismatch("output not same size as input") LinearAlgebra.ldiv!(
+                    TMat(3, 1),
+                    TMat(2, 2),
+                    TMat(2, 1),
+                )
+            end
+
+            @testset "inv" begin
+                A = TMat([
+                    1 1 1 1;
+                    1 2 1 1;
+                    1 1 3 1;
+                    1 1 1 4
+                ]) # Some random invertible matrix
+                @test Arblib.overlaps(inv(A) * A, TMat(I(4)))
+
+                @test_throws SingularException(0) inv(TMat(Diagonal([1, 2, 3, 0])))
+
+                @test_throws DimensionMismatch(
+                    "matrix is not square: dimensions are (2, 3)",
+                ) inv(TMat(2, 3))
+            end
+
+            @testset "det" begin
+                A = TMat([
+                    1 1 1 1;
+                    1 2 1 1;
+                    1 1 3 1;
+                    1 1 1 4
+                ]) # Some random invertible matrix
+
+                @test det(A) == det(Int.(A))
+
+                B = TMat(sin.(A))
+                @test Arblib.contains(det(B) * det(inv(B)), T(1))
+            end
         end
 
         @testset "indexing" begin
