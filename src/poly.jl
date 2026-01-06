@@ -62,7 +62,7 @@ end
 
 Base.@propagate_inbounds function Base.setindex!(
     p::Union{AcbPoly,AcbSeries},
-    x::AcbOrRef,
+    x::Union{AcbOrRef,_BitSigned},
     i::Integer,
 )
     @boundscheck checkbounds(p, i)
