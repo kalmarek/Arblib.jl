@@ -254,8 +254,8 @@
                     ),
                 ) == 96
 
-                @test_throws SingularException(0) TMat(Diagonal([1, 2, 3, 0])) \ B1
-                @test_throws SingularException(0) TMat(Diagonal([1, 2, 3, 0])) \ B2
+                @test all(!isfinite, TMat(Diagonal([1, 2, 3, 0])) \ B1)
+                @test all(!isfinite, TMat(Diagonal([1, 2, 3, 0])) \ B2)
 
                 @test_throws DimensionMismatch(
                     "matrix is not square: dimensions are (2, 3)",
@@ -296,7 +296,7 @@
                 ]) # Some random invertible matrix
                 @test Arblib.overlaps(inv(A) * A, TMat(I(4)))
 
-                @test_throws SingularException(0) inv(TMat(Diagonal([1, 2, 3, 0])))
+                @test all(!isfinite, inv(TMat(Diagonal([1, 2, 3, 0]))))
 
                 @test_throws DimensionMismatch(
                     "matrix is not square: dimensions are (2, 3)",
