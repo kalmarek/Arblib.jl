@@ -292,7 +292,19 @@ function LinearAlgebra.ldiv!(Y::T, A::T, B::T) where {T<:Matrices}
     # precision.
     flag = solve!(Y, A, B)
 
-    iszero(flag) && throw(LinearAlgebra.SingularException(0))
+    # The Base version of this throws a
+    # LinearAlgebra.SingularException in case the inversion fails. We
+    # instead opt to return a matrix filled with indeterminate values.
+    # The motivation for this is that failure to invert matrices is
+    # fairly common when working with wide balls and the overhead of
+    # catching an exception adds a lot of extra work.
+    if iszero(flag)
+        for i in axes(Y, 1)
+            for j in axes(Y, 2)
+                @inbounds indeterminate!(ref(Y, i, j))
+            end
+        end
+    end
 
     return Y
 end
@@ -337,7 +349,19 @@ function Base.inv(A::Matrices)
     B = similar(A)
     flag = inv!(B, A)
 
-    iszero(flag) && throw(LinearAlgebra.SingularException(0))
+    # The Base version of this throws a
+    # LinearAlgebra.SingularException in case the inversion fails. We
+    # instead opt to return a matrix filled with indeterminate values.
+    # The motivation for this is that failure to invert matrices is
+    # fairly common when working with wide balls and the overhead of
+    # catching an exception adds a lot of extra work.
+    if iszero(flag)
+        for i in axes(B, 1)
+            for j in axes(B, 2)
+                @inbounds indeterminate!(ref(B, i, j))
+            end
+        end
+    end
 
     return B
 end
