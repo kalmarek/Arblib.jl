@@ -44,6 +44,36 @@
             end
         end
 
+        for (T, fs) in (
+            (
+                ArbMatrix,
+                (
+                    Arblib.isexact,
+                    isfinite,
+                    iszero,
+                    LinearAlgebra.istriu,
+                    LinearAlgebra.istril,
+                    LinearAlgebra.isdiag,
+                ),
+            ),
+            (
+                AcbMatrix,
+                (
+                    Arblib.isexact,
+                    isfinite,
+                    isreal,
+                    iszero,
+                    LinearAlgebra.istriu,
+                    LinearAlgebra.istril,
+                    LinearAlgebra.isdiag,
+                ),
+            ),
+        )
+            for f in fs
+                @test f(T(2, 2))
+            end
+        end
+
         @test isnan(Arb(NaN))
         @test !isnan(zero(Arb))
         @test !isnan(one(Arb))

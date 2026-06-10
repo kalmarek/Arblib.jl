@@ -18,7 +18,7 @@ function Base.minmax(x::ArbOrRef, y::ArbOrRef)
 end
 
 
-if VERSION < v"1.13.0-DEV.536"
+if VERSION < v"1.12.0-rc1"
     ### minimum and maximum
     # The default implemented in Julia have several issues for the Arb type.
     # See https://github.com/JuliaLang/julia/issues/45932.
@@ -45,6 +45,8 @@ if VERSION < v"1.13.0-DEV.536"
     Base.isbadzero(::typeof(max), x::Union{ArfOrRef,ArbOrRef}) = false
 else
     # The special handling for minimum and maximum was removed in
-    # https://github.com/JuliaLang/julia/pull/58267 and it is hence no
+    # https://github.com/JuliaLang/julia/pull/58267, and then rebased
+    # to be included in the 1.12 release in
+    # https://github.com/JuliaLang/julia/pull/58655. It is hence no
     # longer necessary to work around it.
 end

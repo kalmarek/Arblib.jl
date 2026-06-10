@@ -58,7 +58,12 @@ types with lower precision. In general the conversion is done using
 jltype(ca::Carg) = rawtype(ca)
 # Primitive
 jltype(::Carg{Cint}) = Integer
-jltype(::Carg{Int}) = Integer
+if Int != Cint
+    # On 32-bit systems (x86) we have that Cint and Int are the same
+    # type. We therefore want to avoid defining the function twice in
+    # this case.
+    jltype(::Carg{Int}) = Integer
+end
 jltype(::Carg{UInt}) = Unsigned
 jltype(::Carg{Float64}) = Union{Float16,Float32,Float64}
 jltype(::Carg{ComplexF64}) = Union{ComplexF16,ComplexF32,ComplexF64}

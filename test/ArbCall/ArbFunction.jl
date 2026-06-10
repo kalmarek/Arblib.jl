@@ -308,4 +308,61 @@
             @test Arblib.ArbCall.arbsignature(Arblib.ArbCall.ArbFunction(str)) == str
         end
     end
+
+    @testset "jlcode" begin
+        # Check that source argument is handled correctly
+        af = Arblib.ArbCall.ArbFunction(
+            "void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)",
+        )
+        # Use a different name to avoid overwriting existing function
+        code = Arblib.ArbCall.jlcode(af, :add!_test, source = LineNumberNode(42, :test))
+        eval(code)
+        @test methods(add!_test)[1].line == 42
+        @test methods(add!_test)[1].file == :test
+        @test methods(add!_test)[2].line == 42
+        @test methods(add!_test)[2].file == :test
+
+        # Check that the source information is correct for the already
+        # parsed functions as well
+        @test which(Arblib.zero!, (Arb,)).line == 33
+        @test endswith(
+            string(which(Arblib.zero!, (Arb,)).file),
+            joinpath("arbcalls", "arb.jl"),
+        )
+        @test which(Arblib.zero!, (Mag,)).line == 16
+        @test endswith(
+            string(which(Arblib.zero!, (Mag,)).file),
+            joinpath("arbcalls", "mag.jl"),
+        )
+
+        @test which(Arblib.sin!, (Arb, Arb, Int)).line == 237
+        @test endswith(
+            string(which(Arblib.sin!, (Arb, Arb, Int)).file),
+            joinpath("arbcalls", "arb.jl"),
+        )
+        @test which(Arblib.sin!, (Arb, Arb)).line == 237
+        @test endswith(
+            string(which(Arblib.sin!, (Arb, Arb)).file),
+            joinpath("arbcalls", "arb.jl"),
+        )
+
+        @test which(Arblib.add_series!, (ArbSeries, ArbSeries, ArbSeries, Int, Int)).line ==
+              68
+        @test endswith(
+            string(
+                which(Arblib.add_series!, (ArbSeries, ArbSeries, ArbSeries, Int, Int)).file,
+            ),
+            joinpath("arbcalls", "arb_poly.jl"),
+        )
+        @test which(Arblib.add_series!, (ArbSeries, ArbSeries, ArbSeries, Int)).line == 68
+        @test endswith(
+            string(which(Arblib.add_series!, (ArbSeries, ArbSeries, ArbSeries, Int)).file),
+            joinpath("arbcalls", "arb_poly.jl"),
+        )
+        @test which(Arblib.add!, (ArbSeries, ArbSeries, ArbSeries)).line == 68
+        @test endswith(
+            string(which(Arblib.add!, (ArbSeries, ArbSeries, ArbSeries)).file),
+            joinpath("arbcalls", "arb_poly.jl"),
+        )
+    end
 end

@@ -154,6 +154,7 @@ arbcall"int arf_sosq(arf_t res, const arf_t x, const arf_t y, slong prec, arf_rn
 #ni arbcall"int arf_sum(arf_t res, arf_srcptr terms, slong len, slong prec, arf_rnd_t rnd)"
 
 ### Dot products
+#ni arbcall"int arf_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong xstep, arf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd)"
 #ni arbcall"void arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong xstep, arf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd)"
 
 ### Division

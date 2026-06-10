@@ -147,8 +147,6 @@ arbcall"void _arb_mat_diag_prod(arb_t res, const arb_mat_t mat, slong a, slong b
 arbcall"void arb_mat_diag_prod(arb_t res, const arb_mat_t mat, slong prec)"
 
 ### Sparsity structure
-#ni arbcall"void arb_mat_entrywise_is_zero(fmpz_mat_t dest, const arb_mat_t src)"
-#ni arbcall"void arb_mat_entrywise_not_is_zero(fmpz_mat_t dest, const arb_mat_t src)"
 arbcall"slong arb_mat_count_is_zero(const arb_mat_t mat)"
 arbcall"slong arb_mat_count_not_is_zero(const arb_mat_t mat)"
 
@@ -160,5 +158,5 @@ arbcall"void arb_mat_add_error_mag(arb_mat_t mat, const mag_t err)"
 
 ### LLL reduction
 #ni arbcall"int arb_mat_spd_get_fmpz_mat(fmpz_mat_t B, const arb_mat_t A, slong prec)"
-#ni arbcall"void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)"
-arbcall"int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec)"
+#ni arbcall"void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, double delta, double eta, slong prec)"
+arbcall"int arb_mat_spd_is_lll_reduced(const arb_mat_t A, double delta, double eta, slong prec)"

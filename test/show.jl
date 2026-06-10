@@ -7,9 +7,9 @@
         @test string(Mag(1)) == "1.0"
         @test string(Mag(1), digits = 3, remove_trailing_zeros = false) == "1.00"
         @test string(Mag(1), digits = 12, remove_trailing_zeros = false) == "1.00000000000"
-        @test string(Mag(10^15)) == "1.0e+15"
-        @test string(Mag(10^15), remove_trailing_zeros = false) == "1.00000000e+15"
-        @test string(Mag(π) * 10^10) == "3.14159267e+10"
+        @test string(Mag(10^9)) == "1.0e+9"
+        @test string(Mag(10^9), remove_trailing_zeros = false) == "1.00000000e+9"
+        @test string(Mag(π) * 10^9) == "3.14159266e+9"
 
         @test string(Arf()) == "0"
         @test string(Arf(1)) == "1.0"

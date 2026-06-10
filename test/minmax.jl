@@ -102,7 +102,7 @@
         @test Arblib.contains(extrema(identity, A)[1], -1000)
         @test Arblib.contains(extrema(identity, A)[2], 1000)
 
-        if VERSION < v"1.13.0-DEV.536"
+        if VERSION < v"1.12.0-rc1"
             @test !Base.isbadzero(min, zero(Mag))
             @test !Base.isbadzero(min, zero(Arf))
             @test !Base.isbadzero(min, zero(Arb))

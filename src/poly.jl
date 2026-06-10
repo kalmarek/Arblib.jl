@@ -62,7 +62,7 @@ end
 
 Base.@propagate_inbounds function Base.setindex!(
     p::Union{AcbPoly,AcbSeries},
-    x::AcbOrRef,
+    x::Union{AcbOrRef,_BitSigned},
     i::Integer,
 )
     @boundscheck checkbounds(p, i)
@@ -429,7 +429,10 @@ for (T, Tel, Tel_inplace) in [
     @eval function Base.:+(p::$T, c::$Tel_inplace)
         res = copy(p)
         # Handle p being the zero polynomial
-        iszero(p) && return set_coeff!(res, 0, c)
+        if iszero(p)
+            res[0] = c
+            return res
+        end
         res0 = ref(res, 0)
         add!(res0, res0, c)
         return normalise!(res)
@@ -440,7 +443,7 @@ for (T, Tel, Tel_inplace) in [
         res = copy(p)
         # Handle p being the zero polynomial
         if iszero(p)
-            set_coeff!(res, 0, c)
+            res[0] = c
             res0 = ref(res, 0)
             neg!(res0, res0)
             return res
@@ -453,7 +456,10 @@ for (T, Tel, Tel_inplace) in [
     @eval function Base.:-(c::$Tel_inplace, p::$T)
         res = -p
         # Handle p being the zero polynomial
-        iszero(p) && return set_coeff!(res, 0, c)
+        if iszero(p)
+            res[0] = c
+            return res
+        end
         res0 = ref(res, 0)
         add!(res0, res0, c)
         return normalise!(res)

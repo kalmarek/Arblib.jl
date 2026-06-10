@@ -143,30 +143,20 @@
     @testset "Scalar arithmetic" begin
         p = TPoly([1, 2, 3])
 
-        @test p + T(2) ==
-              T(2) + p ==
-              p + 2 ==
-              2 + p ==
-              p + 2.0 ==
-              2.0 + p ==
-              TPoly([3, 2, 3])
-        @test p - T(2) == p - 2 == p - 2.0 == TPoly([-1, 2, 3])
-        @test T(2) - p == 2 - p == 2.0 - p == TPoly([1, -2, -3])
-        @test p * T(2) ==
-              T(2) * p ==
-              p * 2 ==
-              2 * p ==
-              p * 2.0 ==
-              2.0 * p ==
-              TPoly([2, 4, 6])
-        @test p / T(2) == p / 2 == p / 2.0 == TPoly([0.5, 1, 1.5])
+        for S in [T, Arb, Arf, Int, Float64]
+            @test p + S(2) == S(2) + p == TPoly([3, 2, 3])
+            @test p - S(2) == TPoly([-1, 2, 3])
+            @test S(2) - p == TPoly([1, -2, -3])
+            @test p * S(2) == S(2) * p == TPoly([2, 4, 6])
+            @test p / S(2) == TPoly([0.5, 1, 1.5])
 
-        # Test with zero polynomial
-        @test zero(TPoly) + 1 == TPoly(1)
-        @test zero(TPoly) - 1 == TPoly(-1)
-        @test 1 - zero(TPoly) == TPoly(1)
-        @test 1 * zero(TPoly) == TPoly()
-        @test zero(TPoly) / 1 == TPoly()
+            # Test with zero polynomial
+            @test zero(p) + S(2) == S(2) + zero(p) == TPoly([2])
+            @test zero(p) - S(2) == TPoly([-2])
+            @test S(2) - zero(p) == TPoly([2])
+            @test zero(p) * S(2) == S(2) * zero(p) == TPoly()
+            @test zero(p) / S(2) == TPoly()
+        end
 
         # Test that the normalisation works
         @test iszero(TPoly(-1) + 1)

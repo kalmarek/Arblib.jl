@@ -147,6 +147,8 @@ function Base.:^(x::ArbOrRef, y::_BitInteger)
 end
 Base.:^(x::AcbOrRef, y::Union{AcbOrRef,ArbOrRef,_BitInteger}) =
     pow!(Acb(prec = _precision(x, y)), x, y)
+# Base defines ^(x::Number, y::Rational) in a non-rigorous way
+Base.:^(x::AcbOrRef, y::Rational) = x^Arb(y, prec = precision(x))
 
 sqr(x::Union{ArbOrRef,AcbOrRef}) = sqr!(zero(x), x)
 cube(x::AcbOrRef) = cube!(zero(x), x)
@@ -161,10 +163,12 @@ Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{1}) = copy(x)
 Base.literal_pow(::typeof(^), x::Union{ArbOrRef,AcbOrRef}, ::Val{2}) = sqr(x)
 Base.literal_pow(::typeof(^), x::AcbOrRef, ::Val{3}) = cube(x)
 
-### real, imag, conj
+### real, imag, angle, conj
 
 Base.real(z::AcfOrRef) = Arf(realref(z))
 Base.imag(z::AcfOrRef) = Arf(imagref(z))
+
 Base.real(z::AcbOrRef) = get_real!(Arb(prec = _precision(z)), z)
 Base.imag(z::AcbOrRef) = get_imag!(Arb(prec = _precision(z)), z)
+Base.angle(z::AcbOrRef) = arg!(Arb(prec = precision(z)), z)
 Base.conj(z::AcbOrRef) = conj!(zero(z), z)

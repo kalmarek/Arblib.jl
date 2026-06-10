@@ -42,12 +42,12 @@
             end
             str
         end == """
-        Using    64 bits, sin(x) = [+/- 2.13e+859]
-        Using   128 bits, sin(x) = [+/- 1.15e+840]
-        Using   256 bits, sin(x) = [+/- 3.38e+801]
-        Using   512 bits, sin(x) = [+/- 2.92e+724]
-        Using  1024 bits, sin(x) = [+/- 2.18e+570]
-        Using  2048 bits, sin(x) = [+/- 1.22e+262]
+        Using    64 bits, sin(x) = [+/- 4.28e+858]
+        Using   128 bits, sin(x) = [+/- 2.32e+839]
+        Using   256 bits, sin(x) = [+/- 6.82e+800]
+        Using   512 bits, sin(x) = [+/- 5.89e+723]
+        Using  1024 bits, sin(x) = [+/- 4.39e+569]
+        Using  2048 bits, sin(x) = [+/- 2.45e+261]
         Using  4096 bits, sin(x) = [-0.7190842207 +/- 1.20e-11]
         """
     end

@@ -130,12 +130,16 @@ function jlargs(af::ArbFPWrapFunction)
 end
 
 """
-    jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af))
+    jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af); source = nothing)
 
 Generate the Julia code for calling a function from the `fpwrap`
 module of Arb from Julia.
+
+If `source` is given, then add this as line number information for the
+generated code. This is primarily intended to be used together with
+`__source__` inside [`@arbfpwrapcall_str`](@ref).
 """
-function jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af))
+function jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af); source = nothing)
     T = basetype(af)
     cargs = arguments(af)
     n = count_res_arguments(af)
@@ -174,6 +178,11 @@ function jlcode(af::ArbFPWrapFunction, jl_fname = jlfname(af))
         end
     )
 
+    if !isnothing(source)
+        Base.remove_linenums!(func)
+        pushfirst!(func.args[2].args, source)
+    end
+
     return func
 end
 
@@ -199,5 +208,5 @@ fpwrap_exp(
 """
 macro arbfpwrapcall_str(str)
     af = ArbFPWrapFunction(str)
-    return esc(jlcode(af))
+    return esc(jlcode(af, source = __source__))
 end

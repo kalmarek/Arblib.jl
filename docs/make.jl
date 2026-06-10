@@ -19,6 +19,7 @@ makedocs(
             "Series" => "interface-series.md",
             "Mutable arithmetic" => "interface-mutable.md",
             "Precision" => "precision.md",
+            "Printing" => "printing.md",
         ],
         "Rigorous numerics" => "rigorous.md",
     ],
