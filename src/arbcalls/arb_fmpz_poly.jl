@@ -21,6 +21,8 @@
 #ni arbcall"void arb_fmpz_poly_deflate(fmpz_poly_t res, const fmpz_poly_t poly, ulong deflation)"
 
 ### Polynomial roots
+#ni arbcall"void arb_fmpz_poly_refine_root_arb(arb_t res, const fmpz_poly_t poly, const arb_t initial, slong prec)"
+#ni arbcall"slong arb_fmpz_poly_real_roots(arb_ptr roots, const fmpz_poly_t poly, int flags, slong prec)"
 #ni arbcall"void arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, slong prec)"
 
 ### Special polynomials

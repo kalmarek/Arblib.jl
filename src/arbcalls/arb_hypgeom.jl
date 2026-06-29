@@ -111,6 +111,8 @@ arbcall"void arb_hypgeom_li_series(arb_poly_t res, const arb_poly_t z, int offse
 
 ### Bessel functions
 arbcall"void arb_hypgeom_bessel_j(arb_t res, const arb_t nu, const arb_t z, slong prec)"
+arbcall"void _arb_hypgeom_bessel_j_series(arb_ptr res, const arb_t nu, arb_srcptr z, slong zlen, slong len, slong prec)"
+arbcall"void arb_hypgeom_bessel_j_series(arb_poly_t res, const arb_t nu, const arb_poly_t z, slong len, slong prec)"
 arbcall"void arb_hypgeom_bessel_y(arb_t res, const arb_t nu, const arb_t z, slong prec)"
 arbcall"void arb_hypgeom_bessel_jy(arb_t res1, arb_t res2, const arb_t nu, const arb_t z, slong prec)"
 arbcall"void arb_hypgeom_bessel_i(arb_t res, const arb_t nu, const arb_t z, slong prec)"
