@@ -121,7 +121,14 @@
               UInt8(2) + T(1) ==
               3
         @test T(1) - T(2) == T(1) - 2 == T(1) - UInt(2) == 1 - T(2) == T(-1)
-        @test T(2) * T(3) == T(2) * 3 == 3 * T(2) == T(2) * UInt(3) == UInt(3) * T(2) == 6
+        @test T(2) * T(3) ==
+              T(2) * 3 ==
+              3 * T(2) ==
+              T(2) * UInt(3) ==
+              UInt(3) * T(2) ==
+              T(2) * Arf(3) ==
+              Arf(3) * T(2) ==
+              6
         @test T(6) / T(2) == T(6) / 2 == T(6) / UInt(2) == 6 / T(2) == 3
 
         @test isequal(T(1) + π, T(1) + T(π))
@@ -152,7 +159,6 @@
     @testset "Arb - specific" begin
         @test Arb(1) + Arf(2) == Arf(2) + Arb(1) == 3
         @test Arb(1) - Arf(2) == Arb(-1)
-        @test Arb(2) * Arf(3) == Arf(3) * Arb(2) == 6
         @test Arb(6) / Arf(2) == UInt(6) / Arb(2) == UInt8(6) / Arb(2) == 3
 
         # fma and muladd
