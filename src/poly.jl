@@ -472,8 +472,10 @@ for (T, Tel, Tel_inplace) in [
 end
 
 # Avoid conversion in these cases
-@eval Base.:*(p::Union{ArbPoly,ArbSeries}, c::ArbOrRef) = mul!(zero(p), p, c)
-@eval Base.:*(p::Union{AcbPoly,AcbSeries}, c::AcbOrRef) = mul!(zero(p), p, c)
+@eval Base.:*(p::Union{ArbPoly,ArbSeries}, c::Union{ArbOrRef,_BitSigned}) =
+    mul!(zero(p), p, c)
+@eval Base.:*(p::Union{AcbPoly,AcbSeries}, c::Union{AcbOrRef,_BitSigned}) =
+    mul!(zero(p), p, c)
 
 @eval Base.:/(p::Union{ArbPoly,ArbSeries}, c::ArbOrRef) = div!(zero(p), p, c)
 @eval Base.:/(p::Union{AcbPoly,AcbSeries}, c::AcbOrRef) = div!(zero(p), p, c)
