@@ -157,16 +157,28 @@
         @test besselj(Arb(3), Arb(4)) ≈ besselj(3, 4)
         @test besselj(Acb(2), Acb(3 + 3im)) ≈ besselj(2, 3 + 3im)
         @test besselj(Acb(3), Acb(4 + 4im)) ≈ besselj(3, 4 + 4im)
+        @test besselj(Arb(2), ArbSeries((3, 1)))[0] ≈ besselj(2, 3)
+        @test besselj(Acb(2), AcbSeries((3 + 3im, 1)))[0] ≈ besselj(2, 3 + 3im)
 
         @test besselj0(Arb(2)) ≈ besselj0(2)
         @test besselj0(Arb(3)) ≈ besselj0(3)
         @test besselj0(Acb(2 + 2im)) ≈ besselj0(2 + 2im)
         @test besselj0(Acb(3 + 3im)) ≈ besselj0(3 + 3im)
+        @test isequal(besselj0(ArbSeries((3, 1))), besselj(Arb(0), ArbSeries((3, 1))))
+        @test isequal(
+            besselj0(AcbSeries((3 + 3im, 1))),
+            besselj(Acb(0), AcbSeries((3 + 3im, 1))),
+        )
 
         @test besselj1(Arb(2)) ≈ besselj1(2)
         @test besselj1(Arb(3)) ≈ besselj1(3)
         @test besselj1(Acb(2 + 2im)) ≈ besselj1(2 + 2im)
         @test besselj1(Acb(3 + 3im)) ≈ besselj1(3 + 3im)
+        @test isequal(besselj1(ArbSeries((3, 1))), besselj(Arb(1), ArbSeries((3, 1))))
+        @test isequal(
+            besselj1(AcbSeries((3 + 3im, 1))),
+            besselj(Acb(1), AcbSeries((3 + 3im, 1))),
+        )
 
         @test sphericalbesselj(Arb(2), Arb(3)) ≈ sphericalbesselj(2, 3)
         @test sphericalbesselj(Arb(3), Arb(4)) ≈ sphericalbesselj(3, 4)

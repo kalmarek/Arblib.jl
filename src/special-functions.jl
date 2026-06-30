@@ -511,16 +511,22 @@ SpecialFunctions.besselj(ν::ArbOrRef, z::ArbOrRef) =
     hypgeom_bessel_j!(Arb(0, prec = _precision(ν, z)), ν, z)
 SpecialFunctions.besselj(ν::AcbOrRef, z::AcbOrRef) =
     hypgeom_bessel_j!(Acb(0, prec = _precision(ν, z)), ν, z)
+SpecialFunctions.besselj(ν::ArbOrRef, z::ArbSeries) = hypgeom_bessel_j!(zero(z), ν, z)
+SpecialFunctions.besselj(ν::AcbOrRef, z::AcbSeries) = hypgeom_bessel_j!(zero(z), ν, z)
 
 function SpecialFunctions.besselj0(z::Union{ArbOrRef,AcbOrRef})
     res = zero(z)
     return hypgeom_bessel_j!(res, res, z)
 end
+SpecialFunctions.besselj0(z::Union{ArbSeries,AcbSeries}) =
+    SpecialFunctions.besselj(zero(eltype(z)), z)
 
 function SpecialFunctions.besselj1(z::Union{ArbOrRef,AcbOrRef})
     res = one(z)
     return hypgeom_bessel_j!(res, res, z)
 end
+SpecialFunctions.besselj1(z::Union{ArbSeries,AcbSeries}) =
+    SpecialFunctions.besselj(one(eltype(z)), z)
 
 #SpecialFunctions.besseljx(nu,z)
 # Not implemented by Arb
