@@ -79,7 +79,7 @@ end
 
 Base.sinpi(x::Union{ArbOrRef,AcbOrRef}) = sin_pi!(zero(x), x)
 Base.cospi(x::Union{ArbOrRef,AcbOrRef}) = cos_pi!(zero(x), x)
-tanpi(x::Union{ArbOrRef,AcbOrRef}) = tan_pi!(zero(x), x)
+Base.tanpi(x::Union{ArbOrRef,AcbOrRef}) = tan_pi!(zero(x), x)
 cotpi(x::Union{ArbOrRef,AcbOrRef}) = cot_pi!(zero(x), x)
 cscpi(x::Union{ArbOrRef,AcbOrRef}) = csc_pi!(zero(x), x)
 # Julias definition of sinc is equivalent to Arbs definition of sincpi

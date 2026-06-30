@@ -84,6 +84,8 @@ arbcall"void acb_hypgeom_bessel_j_deriv_bound(mag_t res, const acb_t nu, const a
 arbcall"void acb_hypgeom_bessel_j_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec)"
 arbcall"void acb_hypgeom_bessel_j_0f1(acb_t res, const acb_t nu, const acb_t z, slong prec)"
 arbcall"void acb_hypgeom_bessel_j(acb_t res, const acb_t nu, const acb_t z, slong prec)"
+arbcall"void _acb_hypgeom_bessel_j_series(acb_ptr res, const acb_t nu, acb_srcptr z, slong zlen, slong len, slong prec)"
+arbcall"void acb_hypgeom_bessel_j_series(acb_poly_t res, const acb_t nu, const acb_poly_t z, slong len, slong prec)"
 arbcall"void acb_hypgeom_bessel_y(acb_t res, const acb_t nu, const acb_t z, slong prec)"
 arbcall"void acb_hypgeom_bessel_jy(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slong prec)"
 

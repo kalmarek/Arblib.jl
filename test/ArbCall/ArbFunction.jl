@@ -335,12 +335,12 @@
             joinpath("arbcalls", "mag.jl"),
         )
 
-        @test which(Arblib.sin!, (Arb, Arb, Int)).line == 237
+        @test which(Arblib.sin!, (Arb, Arb, Int)).line == 238
         @test endswith(
             string(which(Arblib.sin!, (Arb, Arb, Int)).file),
             joinpath("arbcalls", "arb.jl"),
         )
-        @test which(Arblib.sin!, (Arb, Arb)).line == 237
+        @test which(Arblib.sin!, (Arb, Arb)).line == 238
         @test endswith(
             string(which(Arblib.sin!, (Arb, Arb)).file),
             joinpath("arbcalls", "arb.jl"),

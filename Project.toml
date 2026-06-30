@@ -1,7 +1,7 @@
 name = "Arblib"
 uuid = "fb37089c-8514-4489-9461-98f9c8763369"
 authors = ["Marek Kaluba <kalmar@amu.edu.pl>", "Sascha Timme <Sascha Timme <timme@math.tu-berlin.de>", "Joel Dahne <joel@dahne.eu>"]
-version = "1.7.1"
+version = "1.8.0"
 
 [deps]
 FLINT_jll = "e134572f-a0d5-539d-bddf-3cad8db41a82"
@@ -20,7 +20,7 @@ ArblibForwardDiffExt = "ForwardDiff"
 [compat]
 Aqua = "0.8"
 Documenter = "1"
-FLINT_jll = "~301.500.000"
+FLINT_jll = "~301.600.000"
 ForwardDiff = "1"
 LinearAlgebra = "1.6"
 Random = "1.6"

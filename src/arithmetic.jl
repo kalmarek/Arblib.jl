@@ -93,6 +93,9 @@ end
 
 Base.:(/)(x::_BitUnsigned, y::ArbOrRef) = ui_div!(zero(y), x, y)
 
+Base.:*(x::AcbOrRef, y::ArfOrRef) = mul!(zero(x), x, y)
+Base.:*(x::ArfOrRef, y::AcbOrRef) = y * x
+
 function Base.:*(x::AcbOrRef, y::Complex{Bool})
     if real(y)
         if imag(y)
