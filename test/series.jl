@@ -340,32 +340,32 @@
             sin,
             cos,
             tan,
+            cot,
             atan,
+            asin,
+            acos,
             sinh,
             cosh,
+            tanh,
+            coth,
+            atanh,
+            asinh,
+            x -> acosh(x + 1), # acosh is not defined at 0.8
+            Arblib.rsqrt,
             sinpi,
             cospi,
+            tanpi,
             Arblib.cotpi,
-            Arblib.rsqrt,
             sinc,
         ]
             res = f(p)
             @test res[0] ≈ f(x)
             @test !iszero(res[1])
-            iszero(res[1]) && @show f
         end
 
         @test all(isequal.(sincos(p), (sin(p), cos(p))))
-        @test all(Arblib.coeffs(Arblib.sincospi(p)[1]) .≈ Arblib.coeffs(sinpi(p)))
-        @test all(Arblib.coeffs(Arblib.sincospi(p)[2]) .≈ Arblib.coeffs(cospi(p)))
+        @test Arblib.overlaps(sincospi(p)[1], sinpi(p))
+        @test Arblib.overlaps(sincospi(p)[2], cospi(p))
         @test all(isequal.(Arblib.sinhcosh(p), (sinh(p), cosh(p))))
-
-        if TSeries == ArbSeries
-            for f in [asin, acos]
-                res = f(p)
-                @test res[0] ≈ f(x)
-                @test !iszero(res[1])
-            end
-        end
     end
 end

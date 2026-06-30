@@ -701,17 +701,34 @@ Base.:^(::Irrational{:ℯ}, e::AcbSeries) = exp(e)
 ## Series methods
 ##
 
-for f in [:sqrt, :log, :log1p, :exp, :sin, :cos, :tan, :atan, :sinh, :cosh]
+for f in [
+    :sqrt,
+    :log,
+    :log1p,
+    :exp,
+    :sin,
+    :cos,
+    :tan,
+    :cot,
+    :atan,
+    :asin,
+    :acos,
+    :sinh,
+    :cosh,
+    :tanh,
+    :coth,
+    :atanh,
+    :asinh,
+    :acosh,
+]
     @eval Base.$f(p::Series) = $(Symbol(f, :_series!))(zero(p), p, length(p))
 end
-
-Base.asin(p::ArbSeries) = asin_series!(zero(p), p, length(p))
-Base.acos(p::ArbSeries) = acos_series!(zero(p), p, length(p))
 
 rsqrt(p::Series) = rsqrt_series!(zero(p), p, length(p))
 
 Base.sinpi(p::Series) = sin_pi_series!(zero(p), p, length(p))
 Base.cospi(p::Series) = cos_pi_series!(zero(p), p, length(p))
+Base.tanpi(p::Series) = tan_pi_series!(zero(p), p, length(p))
 cotpi(p::Series) = cot_pi_series!(zero(p), p, length(p))
 # Julias definition of sinc is equivalent to Arbs definition of sincpi
 Base.sinc(p::Series) = sinc_pi_series!(zero(p), p, length(p))
@@ -721,7 +738,7 @@ function Base.sincos(p::Series)
     sin_cos_series!(s, c, p, length(p))
     return (s, c)
 end
-function sincospi(p::Series)
+function Base.sincospi(p::Series)
     s, c = zero(p), zero(p)
     sin_cos_pi_series!(s, c, p, length(p))
     return (s, c)
