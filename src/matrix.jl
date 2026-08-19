@@ -1,5 +1,6 @@
 # arb_mat_struct and acb_mat_struct methods
 Base.size(A::Union{arb_mat_struct,acb_mat_struct}) = (A.r, A.c)
+Base.size(A::Union{arb_mat_struct,acb_mat_struct}, d::Int) = size(A)[d]
 
 function Base.getindex(A::arb_mat_struct, i::Integer, j::Integer)
     return ccall(
