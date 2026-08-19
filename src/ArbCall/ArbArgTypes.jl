@@ -60,6 +60,8 @@ const arbargtypes = ArbArgTypes(
         "arb_poly_t" => ArbPoly,
         # acb_poly.h
         "acb_poly_t" => AcbPoly,
+        # acb_dft.h
+        "acb_dft_pre_t" => acb_dft_pre_struct,
         # arb_mat.h
         "arb_mat_t" => ArbMatrix,
         # acb_mat.h
@@ -102,6 +104,8 @@ const arbargtypes = ArbArgTypes(
         ArbPoly => "arb_poly_t",
         # acb_poly.h
         AcbPoly => "acb_poly_t",
+        # acb_dft.h
+        acb_dft_pre_struct => "acb_dft_pre_t",
         # arb_mat.h
         ArbMatrix => "arb_mat_t",
         # acb_mat.h
