@@ -8,6 +8,7 @@ Base.unsafe_convert(::Type{Ptr{arb_struct}}, v::arb_vec_struct) = v.entries
 Base.unsafe_convert(::Type{Ptr{acb_struct}}, v::acb_vec_struct) = v.entries
 
 Base.size(v::Union{arb_vec_struct,acb_vec_struct}) = (v.n,)
+Base.length(v::Union{arb_vec_struct,acb_vec_struct}) = v.n
 
 Base.getindex(v::arb_vec_struct, i::Integer) = v.entries + (i - 1) * sizeof(arb_struct)
 Base.getindex(v::acb_vec_struct, i::Integer) = v.entries + (i - 1) * sizeof(acb_struct)
