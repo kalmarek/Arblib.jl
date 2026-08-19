@@ -17,11 +17,11 @@ function approx_eig_qr!(
     prec = _precision(A),
     side = :right,
 )
-    @boundscheck size(eigvals, 1) == size(A, 1) && size(eigvecs) == size(A) || throw(
+    @boundscheck length(eigvals) == size(A, 1) && size(eigvecs) == size(A) || throw(
         DimensionMismatch("eigvals, eigvecs and A sizes are not compatible."),
     )
     @assert side in (:left, :right) || throw(
-        ArgumentError("In approx_eig_qr!: `side` kwarg must be eithe :left or :right"),
+        ArgumentError("in approx_eig_qr!: `side` kwarg must be eithe :left or :right"),
     )
 
     if iszero(tol)
@@ -48,7 +48,7 @@ function approx_eig_qr!(
     maxiter = 0,
     prec = _precision(A),
 )
-    @boundscheck size(eigvals, 1) == size(A, 1) || throw(
+    @boundscheck length(eigvals) == size(A, 1) || throw(
         DimensionMismatch("eigvals, eigvecs and A sizes are not compatible."),
     )
     if iszero(tol)
@@ -61,7 +61,7 @@ function approx_eig_qr!(
 end
 
 function approx_eig_qr(
-    A::Union{AcbMatrix,AcbRefMatrix};
+    A::AcbMatrixOrRef;
     tol = Mag(),
     maxiter = 0,
     prec = precision(A),
@@ -87,15 +87,15 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
         )
             @assert side in (:left, :right) || throw(
                 ArgumentError(
-                    "In approx_eig_qr!: `side` kwarg must be either :left or :right",
+                    "in approx_eig_qr!: `side` kwarg must be either :left or :right",
                 ),
             )
 
-            @boundscheck size(eigvals, 1) == size(eigvals_approx, 1) == size(A, 1) || throw(
-                DimensionMismatch("Eigenvalues sizes are not compatible with matrix A"),
+            @boundscheck length(eigvals) == length(eigvals_approx) == size(A, 1) || throw(
+                DimensionMismatch("eigenvalues sizes are not compatible with matrix A"),
             )
             @boundscheck size(eigvecs) == size(R_eigvecs_approx) == size(A) || throw(
-                DimensionMismatch("Eigenvectors sizes are not compatible with matrix A"),
+                DimensionMismatch("eigenvectors sizes are not compatible with matrix A"),
             )
 
             val = if side == :left
@@ -114,11 +114,11 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
             R_eigvecs_approx::AcbMatrixLike;
             prec = _precision(A),
         )
-            @boundscheck size(eigvals_approx, 1) == size(A, 1) || throw(
-                DimensionMismatch("Eigenvalues sizes are not compatible with matrix A"),
+            @boundscheck length(eigvals_approx) == size(A, 1) || throw(
+                DimensionMismatch("eigenvalues sizes are not compatible with matrix A"),
             )
             @boundscheck size(R_eigvecs_approx) == size(A) || throw(
-                DimensionMismatch("Eigenvectors sizes are not compatible with matrix A"),
+                DimensionMismatch("eigenvectors sizes are not compatible with matrix A"),
             )
 
             val = $jlf(eigvals, C_NULL, C_NULL, A, eigvals_approx, R_eigvecs_approx; prec)
@@ -129,7 +129,7 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
         function $jlf(
             eigvals::AcbVectorLike,
             eigvecs::AcbMatrixLike,
-            A::Union{AcbMatrix,AcbRefMatrix};
+            A::AcbMatrixOrRef;
             prec = precision(A),
             side = :right,
         )
@@ -137,20 +137,12 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
             return $jlf(eigvals, eigvecs, A, eigvals_approx, R_eigvecs_approx; prec, side)
         end
 
-        function $jlf(
-            eigvals::AcbVectorLike,
-            A::Union{AcbMatrix,AcbRefMatrix};
-            prec = precision(A),
-        )
+        function $jlf(eigvals::AcbVectorLike, A::AcbMatrixOrRef; prec = precision(A))
             λ_approx, R_approx = approx_eig_qr(A, prec = prec)
             return $jlf(eigvals, A, λ_approx, R_approx; prec)
         end
 
-        function $jlf_allocating(
-            A::Union{AcbMatrix,AcbRefMatrix};
-            prec = precision(A),
-            side = :right,
-        )
+        function $jlf_allocating(A::AcbMatrixOrRef; prec = precision(A), side = :right)
             eigvals = similar(A, size(A, 1))
             eigvecs = similar(A)
             $jlf(eigvals, eigvecs, A; prec, side)
@@ -160,7 +152,7 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
 end
 
 function eig_global_enclosure(
-    A::Union{AcbMatrix,AcbRefMatrix},
+    A::AcbMatrixOrRef,
     eigvals_approx::AcbVectorLike,
     R_eigvecs_approx::AcbMatrixLike;
     prec = precision(A),
@@ -170,15 +162,15 @@ end
 
 function eig_enclosure_rump!(
     λ::AcbLike,
-    eigvecs::Union{AcbMatrix,AcbRefMatrix},
-    A::Union{AcbMatrix,AcbRefMatrix},
+    eigvecs::AcbMatrixOrRef,
+    A::AcbMatrixOrRef,
     λ_approx::AcbLike,
-    R_eigvecs_approx::Union{AcbMatrix,AcbRefMatrix};
+    R_eigvecs_approx::AcbMatrixOrRef;
     prec = precision(A),
 )
     @boundscheck size(eigvecs) == size(R_eigvecs_approx) &&
                  size(eigvecs, 1) == size(A, 1) ||
-                 throw(DimensionMismatch("Eigenvalues sizes are not compatible"))
+                 throw(DimensionMismatch("eigenvalues sizes are not compatible"))
 
     return eig_enclosure_rump!(λ, C_NULL, eigvecs, A, λ_approx, R_eigvecs_approx; prec)
 end
@@ -186,17 +178,13 @@ end
 for f in (:eig_multiple_rump, :eig_multiple)
     f_inplace = Symbol(f, "!")
     @eval begin
-        function $f_inplace(
-            eigvals::Union{AcbVector,AcbRefVector},
-            A::Union{AcbMatrix,AcbRefMatrix};
-            prec = precision(A),
-        )
+        function $f_inplace(eigvals::AcbVectorOrRef, A::AcbMatrixOrRef; prec = precision(A))
             λ_approx, R_approx = approx_eig_qr(A; prec)
             return $f_inplace(eigvals, A, λ_approx, R_approx; prec)
         end
 
         function $f(
-            A::Union{AcbMatrix,AcbRefMatrix},
+            A::AcbMatrixOrRef,
             eigvals_approx::AcbVectorLike,
             R_eigvecs_approx::AcbMatrixLike;
             prec = precision(A),
@@ -206,7 +194,7 @@ for f in (:eig_multiple_rump, :eig_multiple)
             return λ
         end
 
-        function $f(A::Union{AcbMatrix,AcbRefMatrix}; prec = precision(A))
+        function $f(A::AcbMatrixOrRef; prec = precision(A))
             λ = similar(A, size(A, 1))
             $f_inplace(λ, A; prec)
             return λ
@@ -215,4 +203,4 @@ for f in (:eig_multiple_rump, :eig_multiple)
     end
 end
 
-LinearAlgebra.eigvals(A::Union{AcbMatrix,AcbRefMatrix}) = eig_multiple(A)
+LinearAlgebra.eigvals(A::AcbMatrixOrRef) = eig_multiple(A)
