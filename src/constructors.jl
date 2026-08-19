@@ -69,9 +69,9 @@ end
 function Acb(re::AbstractString, im::AbstractString; prec::Integer = _current_precision())
     res = Acb(; prec)
     flag = set!(realref(res), re)
-    iszero(flag) || throw(ArgumentError("could not parse $str as an Arb"))
+    iszero(flag) || throw(ArgumentError("could not parse $re as an Arb"))
     flag = set!(imagref(res), im)
-    iszero(flag) || throw(ArgumentError("could not parse $str as an Arb"))
+    iszero(flag) || throw(ArgumentError("could not parse $im as an Arb"))
     return res
 end
 
