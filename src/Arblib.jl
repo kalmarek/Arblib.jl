@@ -85,6 +85,7 @@ include("eigen.jl")
 include("poly.jl")
 include("calc_integrate.jl")
 include("special-functions.jl")
+include("fft.jl")
 
 include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")
