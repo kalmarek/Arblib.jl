@@ -632,10 +632,10 @@ function integral(p::T, n::Integer) where {T<:Union{Poly,Series}}
     n == 0 && return copy(p)
     n >= 0 || throw(ArgumentError("n must be non-negative"))
 
-    if T <: Poly
-        res = zero(p)
+    res = if T <: Poly
+        zero(p)
     elseif T <: Series
-        res = T(degree = degree(p) + n, prec = precision(p))
+        T(degree = degree(p) + n, prec = precision(p))
     end
     integral!(res, p)
     for _ = 2:n
