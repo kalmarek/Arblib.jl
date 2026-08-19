@@ -1,4 +1,4 @@
-# arb_mat_struct and acb_mat_struct methods
+# arb_vec_struct and acb_vec_struct methods
 clear!(v::arb_vec_struct) =
     ccall(@libflint(_arb_vec_clear), Cvoid, (Ptr{arb_struct}, Int), v.entries, v.n)
 clear!(v::acb_vec_struct) =
