@@ -127,8 +127,8 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
         end
 
         function $jlf(
-            eigvals::AcbVectorLike,
-            eigvecs::AcbMatrixLike,
+            eigvals::AcbVectorOrRef,
+            eigvecs::AcbMatrixOrRef,
             A::AcbMatrixOrRef;
             prec = precision(A),
             side = :right,
@@ -137,7 +137,7 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
             return $jlf(eigvals, eigvecs, A, eigvals_approx, R_eigvecs_approx; prec, side)
         end
 
-        function $jlf(eigvals::AcbVectorLike, A::AcbMatrixOrRef; prec = precision(A))
+        function $jlf(eigvals::AcbVectorOrRef, A::AcbMatrixOrRef; prec = precision(A))
             λ_approx, R_approx = approx_eig_qr(A, prec = prec)
             return $jlf(eigvals, A, λ_approx, R_approx; prec)
         end
@@ -153,8 +153,8 @@ end
 
 function eig_global_enclosure(
     A::AcbMatrixOrRef,
-    eigvals_approx::AcbVectorLike,
-    R_eigvecs_approx::AcbMatrixLike;
+    eigvals_approx::AcbVectorOrRef,
+    R_eigvecs_approx::AcbMatrixOrRef;
     prec = precision(A),
 )
     return eig_global_enclosure!(Mag(), A, eigvals_approx, R_eigvecs_approx, prec)
@@ -162,15 +162,15 @@ end
 
 function eig_enclosure_rump!(
     λ::AcbLike,
-    eigvecs::AcbMatrixOrRef,
-    A::AcbMatrixOrRef,
+    eigvecs::AcbMatrixLike,
+    A::AcbMatrixLike,
     λ_approx::AcbLike,
-    R_eigvecs_approx::AcbMatrixOrRef;
+    R_eigvecs_approx::AcbMatrixLike;
     prec = precision(A),
 )
     @boundscheck size(eigvecs) == size(R_eigvecs_approx) &&
                  size(eigvecs, 1) == size(A, 1) ||
-                 throw(DimensionMismatch("eigenvalues sizes are not compatible"))
+                 throw(DimensionMismatch("eigenvectors sizes are not compatible"))
 
     return eig_enclosure_rump!(λ, C_NULL, eigvecs, A, λ_approx, R_eigvecs_approx; prec)
 end
@@ -185,8 +185,8 @@ for f in (:eig_multiple_rump, :eig_multiple)
 
         function $f(
             A::AcbMatrixOrRef,
-            eigvals_approx::AcbVectorLike,
-            R_eigvecs_approx::AcbMatrixLike;
+            eigvals_approx::AcbVectorOrRef,
+            R_eigvecs_approx::AcbMatrixOrRef;
             prec = precision(A),
         )
             λ = similar(A, size(A, 1))
