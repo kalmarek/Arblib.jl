@@ -155,6 +155,15 @@
 
             @test Arblib.contains(sort(LinearAlgebra.eigvals(N), by = abs), AcbVector(evs))
 
+            @test_throws Arblib.EigenvalueComputationError Arblib.eig_multiple_rump(
+                AcbMatrix(fill(NaN, 3, 3)),
+            )
+            @test_throws Arblib.EigenvalueComputationError Arblib.eig_multiple(
+                AcbMatrix(fill(NaN, 3, 3)),
+            )
+            @test_throws Arblib.EigenvalueComputationError LinearAlgebra.eigvals(
+                AcbMatrix(fill(NaN, 3, 3)),
+            )
         end
     end
 

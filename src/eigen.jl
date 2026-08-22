@@ -190,13 +190,15 @@ for f in (:eig_multiple_rump, :eig_multiple)
             prec = precision(A),
         )
             λ = similar(A, size(A, 1))
-            $f_inplace(λ, A, eigvals_approx, R_eigvecs_approx; prec)
+            flag = $f_inplace(λ, A, eigvals_approx, R_eigvecs_approx; prec)
+            isone(flag) || throw(EigenvalueComputationError())
             return λ
         end
 
         function $f(A::AcbMatrixOrRef; prec = precision(A))
             λ = similar(A, size(A, 1))
-            $f_inplace(λ, A; prec)
+            flag = $f_inplace(λ, A; prec)
+            isone(flag) || throw(EigenvalueComputationError())
             return λ
         end
 
