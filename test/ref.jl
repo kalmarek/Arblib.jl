@@ -1,4 +1,5 @@
 @testset "MagRef" begin
+    @test MagRef() isa Mag
     @test isequal(MagRef(), Mag())
 
     x = Arb()
@@ -12,6 +13,11 @@
     z = Arblib.radref(x)[]
     Arblib.set!(z, 4)
     @test Arblib.radref(x) == Mag(2)
+
+    # Ptr input
+    @test isnothing(
+        Arblib.radref(Ptr{Arblib.arb_struct}(pointer_from_objref(Arb().arb))).parent,
+    )
 
     @test isequal(zero(MagRef), zero(Mag))
     @test isequal(zero(Arblib.radref(x)), zero(Mag))
@@ -50,6 +56,17 @@ end
     Arblib.set!(Arblib.imagref(w), 3)
     @test w == Acf(2, 3)
     @test Arblib.imagref(w) == Arf(3)
+
+    # Ptr input
+    @test isnothing(
+        Arblib.midref(Ptr{Arblib.arb_struct}(pointer_from_objref(Arb().arb))).parent,
+    )
+    @test isnothing(
+        Arblib.realref(Ptr{Arblib.acf_struct}(pointer_from_objref(Acf().acf))).parent,
+    )
+    @test isnothing(
+        Arblib.imagref(Ptr{Arblib.acf_struct}(pointer_from_objref(Acf().acf))).parent,
+    )
 
     @test isequal(zero(ArfRef), zero(Arf))
     @test isequal(zero(Arblib.midref(x)), zero(Arf))
@@ -113,6 +130,14 @@ end
     z = Arblib.realref(x)[]
     Arblib.set!(z, 4)
     @test Arblib.realref(x) == Arf(2)
+
+    # Ptr input
+    @test isnothing(
+        Arblib.realref(Ptr{Arblib.acb_struct}(pointer_from_objref(Acb().acb))).parent,
+    )
+    @test isnothing(
+        Arblib.imagref(Ptr{Arblib.acb_struct}(pointer_from_objref(Acb().acb))).parent,
+    )
 
     @test isequal(zero(ArbRef), zero(Arb))
     @test isequal(zero(Arblib.realref(x)), zero(Arb))
