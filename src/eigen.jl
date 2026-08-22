@@ -104,7 +104,7 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
                 $jlf(eigvals, C_NULL, eigvecs, A, eigvals_approx, R_eigvecs_approx; prec)
             end
             isone(val) || throw(EigenvalueComputationError())
-            return eigvals, eigvecs
+            return eigvals
         end
 
         function $jlf(
