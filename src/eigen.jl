@@ -114,7 +114,7 @@ for jlf in (:eig_simple_rump!, :eig_simple_vdhoeven_mourrain!, :eig_simple!)
             R_eigvecs_approx::AcbMatrixLike;
             prec = _precision(A),
         )
-            @boundscheck length(eigvals_approx) == size(A, 1) || throw(
+            @boundscheck length(eigvals) == length(eigvals_approx) == size(A, 1) || throw(
                 DimensionMismatch("eigenvalues sizes are not compatible with matrix A"),
             )
             @boundscheck size(R_eigvecs_approx) == size(A) || throw(
