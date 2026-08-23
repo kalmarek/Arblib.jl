@@ -61,11 +61,11 @@ Serialization.deserialize(
 function Serialization.deserialize(s::Serialization.AbstractSerializer, T::Type{acf_struct})
     str = Serialization.deserialize(s)
     # One spaces in the real part, so we are looking for
-    spaces = findall(" ", str)
-    @assert length(spaces) == 3
+    spaces = findall(' ', str)
+    length(spaces) == 3 || throw(ErrorException("invalid format: $str"))
 
-    real_str = str[1:(spaces[2].start-1)]
-    imag_str = str[(spaces[2].stop+1):end]
+    real_str = str[1:(spaces[2]-1)]
+    imag_str = str[(spaces[2]+1):end]
 
     res = acf_struct()
     Arblib.load_string!(Arblib.realref(res), real_str)
@@ -76,11 +76,11 @@ end
 function Serialization.deserialize(s::Serialization.AbstractSerializer, T::Type{acb_struct})
     str = Serialization.deserialize(s)
     # Three spaces in the real part, so we are looking for
-    spaces = findall(" ", str)
-    @assert length(spaces) == 7
+    spaces = findall(' ', str)
+    length(spaces) == 7 || throw(ErrorException("invalid format: $str"))
 
-    real_str = str[1:(spaces[4].start-1)]
-    imag_str = str[(spaces[4].stop+1):end]
+    real_str = str[1:(spaces[4]-1)]
+    imag_str = str[(spaces[4]+1):end]
 
     res = acb_struct()
     Arblib.load_string!(Arblib.realref(res), real_str)

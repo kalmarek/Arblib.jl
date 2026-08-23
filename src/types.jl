@@ -156,7 +156,7 @@ Type handling references to [`Arb`](@ref) objects.
 struct ArbRef <: AbstractFloat
     arb_ptr::Ptr{arb_struct}
     prec::Int
-    parent::Union{acb_struct,AcbRef,arb_vec_struct,arb_poly_struct,arb_mat_struct}
+    parent::Union{Nothing,acb_struct,AcbRef,arb_vec_struct,arb_poly_struct,arb_mat_struct}
 end
 
 """
@@ -187,7 +187,7 @@ Type handling references to [`Arf`](@ref) objects.
 struct ArfRef <: AbstractFloat
     arf_ptr::Ptr{arf_struct}
     prec::Int
-    parent::Union{acf_struct,AcfRef,arb_struct,ArbRef}
+    parent::Union{Nothing,acf_struct,AcfRef,arb_struct,ArbRef}
 end
 
 """
@@ -201,7 +201,7 @@ Type handling references to [`Mag`](@ref) objects.
 """
 struct MagRef <: Real
     mag_ptr::Ptr{mag_struct}
-    parent::Union{arb_struct,ArbRef}
+    parent::Union{Nothing,arb_struct,ArbRef}
 end
 
 """
@@ -523,6 +523,7 @@ for prefix in [:mag, :arf, :acf, :arb, :acb]
         parentstruct(x::$T) = cstruct(x)
         parentstruct(x::$TRef) = x
         parentstruct(x::$TStruct) = x
+        parentstruct(x::Ptr{$TStruct}) = nothing
     end
 end
 
