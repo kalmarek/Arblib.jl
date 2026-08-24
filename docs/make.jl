@@ -16,6 +16,7 @@ makedocs(
             "Types" => "interface-types.md",
             "Ball methods" => "interface-ball.md",
             "Integration" => "interface-integration.md",
+            "FFT" => "interface-fft.md",
             "Series" => "interface-series.md",
             "Mutable arithmetic" => "interface-mutable.md",
             "Precision" => "precision.md",

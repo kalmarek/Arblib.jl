@@ -22,6 +22,7 @@ import ..Arblib:
     acb_poly_struct,
     arb_mat_struct,
     acb_mat_struct,
+    acb_dft_pre_struct,
     MagLike,
     ArfLike,
     AcfLike,

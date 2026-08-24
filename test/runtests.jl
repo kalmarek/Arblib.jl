@@ -59,6 +59,7 @@ DocMeta.setdocmeta!(Arblib, :DocTestSetup, :(using Arblib); recursive = true)
     include("poly.jl")
     include("series.jl")
     include("special-functions.jl")
+    include("fft.jl")
     include("threading.jl")
     include("forward_diff.jl")
 end

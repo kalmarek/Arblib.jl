@@ -48,6 +48,7 @@ function flint_set_num_threads(a::Integer)
     end
 end
 
+include("gr_types.jl")
 include("arb_types.jl")
 include("fmpz.jl")
 include("rounding_types.jl")
@@ -84,6 +85,7 @@ include("eigen.jl")
 include("poly.jl")
 include("calc_integrate.jl")
 include("special-functions.jl")
+include("fft.jl")
 
 include("arbcalls/mag.jl")
 include("arbcalls/arf.jl")

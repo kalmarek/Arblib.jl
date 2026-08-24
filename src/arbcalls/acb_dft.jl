@@ -5,10 +5,10 @@
 ### Main DFT functions
 arbcall"void acb_dft(acb_ptr w, acb_srcptr v, slong len, slong prec)"
 arbcall"void acb_dft_inverse(acb_ptr w, acb_srcptr v, slong len, slong prec)"
-#ni arbcall"void acb_dft_precomp_init(acb_dft_pre_t pre, slong len, slong prec)"
-#ni arbcall"void acb_dft_precomp_clear(acb_dft_pre_t pre)"
-#ni arbcall"void acb_dft_precomp(acb_ptr w, acb_srcptr v, const acb_dft_pre_t pre, slong prec)"
-#ni arbcall"void acb_dft_inverse_precomp(acb_ptr w, acb_srcptr v, const acb_dft_pre_t pre, slong prec)"
+arbcall"void acb_dft_precomp_init(acb_dft_pre_t pre, slong len, slong prec)"
+arbcall"void acb_dft_precomp_clear(acb_dft_pre_t pre)"
+arbcall"void acb_dft_precomp(acb_ptr w, acb_srcptr v, const acb_dft_pre_t pre, slong prec)"
+arbcall"void acb_dft_inverse_precomp(acb_ptr w, acb_srcptr v, const acb_dft_pre_t pre, slong prec)"
 
 ### DFT on products
 arbcall"void acb_dft_prod(acb_ptr w, acb_srcptr v, slong * cyc, slong num, slong prec)"

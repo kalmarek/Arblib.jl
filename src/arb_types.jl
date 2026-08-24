@@ -256,6 +256,9 @@ function Base.deepcopy_internal(
     return y
 end
 
+# In Flint acb_dft_pre_t is an alias for gr_dft_acb_pre_t
+const acb_dft_pre_struct = gr_dft_acb_pre_struct
+
 """
     calc_integrate_opt_struct
 """

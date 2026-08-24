@@ -103,7 +103,7 @@ The type that should be used for the argument when passed to C code.
 """
 ctype(ca::Carg) = rawtype(ca)
 ctype(::Carg{Vector{T}}) where {T} = Ref{T}
-ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt}} = Ref{T}
+ctype(::Carg{T}) where {T<:Union{BigFloat,BigInt,acb_dft_pre_struct}} = Ref{T}
 ctype(::Carg{T}) where {T<:Union{Mag,Arf,Acf,Arb,Acb,ArbPoly,AcbPoly,ArbMatrix,AcbMatrix}} =
     Ref{cstructtype(T)}
 ctype(::Carg{T}) where {T<:Union{ArbVector,arb_vec_struct}} = Ptr{arb_struct}
